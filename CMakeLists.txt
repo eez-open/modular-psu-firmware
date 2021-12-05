@@ -363,6 +363,16 @@ file(GLOB header_eez_gui_widgets
 list (APPEND header_files ${header_eez_gui_widgets})
 source_group("eez\\gui\\widgets" FILES ${src_eez_gui_widgets} ${header_eez_gui_widgets})
 
+file(GLOB src_eez_gui_widgets_containers
+    "src/eez/gui/widgets/containers/*.cpp"
+)
+list (APPEND src_files ${src_eez_gui_widgets_containers})
+file(GLOB header_eez_gui_widgets_containers
+    "src/eez/gui/widgets/containers/*.h"
+)
+list (APPEND header_files ${header_eez_gui_widgets_containers})
+source_group("eez\\gui\\widgets\\containers" FILES ${src_eez_gui_widgets_containers} ${header_eez_gui_widgets_containers})
+
 file(GLOB src_bb3_flow
     "src/bb3/flow/*.cpp"
 )

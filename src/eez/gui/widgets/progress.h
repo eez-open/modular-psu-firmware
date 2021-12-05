@@ -25,6 +25,15 @@ struct ProgressWidget : public Widget {
 };
 
 struct ProgressWidgetState : public WidgetState {
+    ProgressWidgetState(const WidgetCursor &widgetCursor) : WidgetState(widgetCursor) {
+        auto widget = (const ProgressWidget *)widgetCursor.widget;
+        data = get(widgetCursor, widget->data);
+    }
+
+    bool operator!=(const ProgressWidgetState& previousState) {
+        return data != previousState.data;
+    }
+
     void draw(WidgetState *previousState) override;
 };
 

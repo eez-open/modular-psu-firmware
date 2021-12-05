@@ -33,6 +33,18 @@ struct GaugeWidget : public Widget {
 };
 
 struct GaugeWidgetState : public WidgetState {
+    GaugeWidgetState(const WidgetCursor &widgetCursor) : WidgetState(widgetCursor) {
+	    auto widget = (const GaugeWidget *)widgetCursor.widget;
+        
+        data = get(widgetCursor, widget->data);
+    }
+
+    bool operator!=(const GaugeWidgetState& previousState) {
+        return
+            flags.active != previousState.flags.active ||
+			data != previousState.data; 
+    }
+
 	void draw(WidgetState *previousState) override;
 };
 

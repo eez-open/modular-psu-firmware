@@ -25,6 +25,8 @@
 
 #define IGNORE_LUMINOSITY_FLAG 1
 
+static const size_t MAX_TEXT_LEN = 128;
+
 namespace eez {
 namespace gui {
 
@@ -35,28 +37,14 @@ void TextWidget_autoSize(Assets *assets, TextWidget& widget) {
     widget.h = style->border_size_top + style->padding_top + font.getHeight() + style->border_size_bottom + style->padding_bottom;
 }
 
-void TextWidgetState::draw(WidgetState *previousState) {
-    auto widget = (const TextWidget *)widgetCursor.widget;
-
-    flags.focused = isFocusWidget(widgetCursor);
-    
-    const Style *style = getStyle(overrideStyleHook(widgetCursor, widget->style));
-
-    const char *text = widget->text.ptr(widgetCursor.assets);
-
-    flags.blinking = g_isBlinkTime && styleIsBlink(style);
-    data = !(text && text[0]) && widget->data ? get(widgetCursor, widget->data) : 0;
-
-    bool refresh =
-        !previousState ||
-        previousState->flags.focused != flags.focused ||
-        previousState->flags.active != flags.active ||
-        previousState->flags.blinking != flags.blinking ||
-        previousState->data != data;
-
-    static const size_t MAX_TEXT_LEN = 128;
-
+void TextWidgetState::draw(WidgetState *previousStateBase) {
+    auto previousState = (TextWidgetState *)previousStateBase;
+    bool refresh = !previousState || *this != *previousState;
     if (refresh) {
+        auto widget = (const TextWidget *)widgetCursor.widget;
+        const Style *style = getStyle(overrideStyleHook(widgetCursor, widget->style));
+        const char *text = widget->text.ptr(widgetCursor.assets);
+
         uint16_t overrideColor = flags.focused ? style->focus_color : overrideStyleColorHook(widgetCursor, style);
         uint16_t overrideBackgroundColor = flags.focused ? style->focus_background_color : style->background_color;
         uint16_t overrideActiveColor = flags.focused ? style->focus_background_color : overrideActiveStyleColorHook(widgetCursor, style);

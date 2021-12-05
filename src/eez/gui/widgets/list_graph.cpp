@@ -27,30 +27,20 @@
 namespace eez {
 namespace gui {
 
-void ListGraphWidgetState::draw(WidgetState *previousState) {
-    auto widget = (const ListGraphWidget *)widgetCursor.widget;
-
-	const Style* style = getStyle(widget->style);
-	const Style* y1Style = getStyle(widget->y1Style);
-	const Style* y2Style = getStyle(widget->y2Style);
-	const Style* cursorStyle = getStyle(widget->cursorStyle);
-
-    data = get(widgetCursor, widget->data);
-    cursorData = get(widgetCursor, widget->cursorData);
-
-    int iPrevCursor = -1;
-    if (previousState) {
-        iPrevCursor = ((ListGraphWidgetState *)previousState)->cursorData.getInt();
-    }
-
-    int iCursor = cursorData.getInt();
-    int iRow = iCursor / 3;
-
-    bool refresh = !previousState ||
-        previousState->data != data ||
-        iCursor != iPrevCursor;
-
+void ListGraphWidgetState::draw(WidgetState *previousStateBase) {
+    auto previousState = (ListGraphWidgetState *)previousStateBase;
+    bool refresh = !previousState || *this != *previousState;
     if (refresh) {
+        auto widget = (const ListGraphWidget *)widgetCursor.widget;
+
+        const Style* style = getStyle(widget->style);
+        const Style* y1Style = getStyle(widget->y1Style);
+        const Style* y2Style = getStyle(widget->y2Style);
+        const Style* cursorStyle = getStyle(widget->cursorStyle);
+
+        int iCursor = cursorData.getInt();
+        int iRow = iCursor / 3;
+
         // draw background
         display::setColor(style->background_color);
         display::fillRect(widgetCursor.x, widgetCursor.y, widgetCursor.x + (int)widget->w - 1,

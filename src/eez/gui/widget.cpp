@@ -60,15 +60,22 @@ bool g_isActiveWidget;
 
 ////////////////////////////////////////////////////////////////////////////////
 
-struct NoneWidgetState : public WidgetState {};
-struct ReservedWidgetState : public WidgetState {};
+struct NoneWidgetState : public WidgetState {
+    NoneWidgetState(const WidgetCursor &widgetCursor) : WidgetState(widgetCursor) {
+    }
+};
+
+struct ReservedWidgetState : public WidgetState {
+    ReservedWidgetState(const WidgetCursor &widgetCursor) : WidgetState(widgetCursor) {
+    }
+};
 
 #define WIDGET_TYPE(NAME_PASCAL_CASE, NAME, ID) \
-void NAME##placementNew(void *ptr) { new (ptr) NAME_PASCAL_CASE##WidgetState; }
+void NAME##placementNew(void *ptr, const WidgetCursor& widgetCursor) { new (ptr) NAME_PASCAL_CASE##WidgetState(widgetCursor); }
 WIDGET_TYPES
 #undef WIDGET_TYPE
 
-typedef void (*WidgetStatePlacementNewFunctionType)(void *ptr);
+typedef void (*WidgetStatePlacementNewFunctionType)(void *ptr, const WidgetCursor& widgetCursor);
 
 #define WIDGET_TYPE(NAME_PASCAL_CASE, NAME, ID) NAME##placementNew,
 static WidgetStatePlacementNewFunctionType g_widgetStatePlacementNewFunctions[] = {
@@ -140,11 +147,9 @@ void enumWidget(WidgetCursor &widgetCursor, WidgetState *currentState, WidgetSta
 
     auto widgetState = currentState;
 
-	g_widgetStatePlacementNewFunctions[widget->type](widgetState);
+	g_widgetStatePlacementNewFunctions[widget->type](widgetState, widgetCursor);
 
-    widgetState->widgetCursor = widgetCursor;
     widgetState->widgetStateSize = g_widgetStateSize[widget->type];
-    widgetState->flags.active = g_isActiveWidget;
     widgetState->widgetCursor.x += widget->x;
     widgetState->widgetCursor.y += widget->y;
 
@@ -159,7 +164,7 @@ void enumNoneWidget(WidgetCursor &widgetCursor, WidgetState *currentState, Widge
 
 	auto widgetState = currentState;
 
-	g_widgetStatePlacementNewFunctions[widget->type](widgetState);
+	g_widgetStatePlacementNewFunctions[widget->type](widgetState, widgetCursor);
 
 	widgetState->widgetCursor = widgetCursor;
 	widgetState->widgetCursor.widget = widget;

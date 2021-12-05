@@ -26,6 +26,17 @@ struct ButtonGroupWidget : public Widget {
 };
 
 struct ButtonGroupWidgetState : public WidgetState {
+    ButtonGroupWidgetState(const WidgetCursor &widgetCursor) : WidgetState(widgetCursor) {
+        auto widget = (const ButtonGroupWidget *)widgetCursor.widget;
+        data = get(widgetCursor, widget->data);
+    }
+
+    bool operator!=(const ButtonGroupWidgetState& previousState) {
+        return
+            flags.active != previousState.flags.active ||
+			data != previousState.data; 
+    }
+
     void draw(WidgetState *previousState) override;
 	bool hasOnTouch() override;
 	void onTouch(Event &touchEvent) override;

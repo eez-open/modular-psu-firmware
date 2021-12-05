@@ -18,6 +18,8 @@
 
 #pragma once
 
+#define CONF_GUI_TEXT_CURSOR_BLINK_TIME_MS 500
+
 namespace eez {
 namespace gui {
 
@@ -33,6 +35,45 @@ struct DisplayDataWidgetState : public WidgetState {
     uint32_t dataRefreshLastTime;
     int16_t cursorPosition;
     uint8_t xScroll;
+
+    DisplayDataWidgetState(const WidgetCursor &widgetCursor) : WidgetState(widgetCursor) {
+        auto widget = (const DisplayDataWidget *)widgetCursor.widget;
+
+        flags.focused = isFocusWidget(widgetCursor);
+
+        const Style *style = getStyle(overrideStyleHook(widgetCursor, widget->style));
+
+        flags.blinking = g_isBlinkTime && isBlinking(widgetCursor, widget->data);
+        
+        data = get(widgetCursor, widget->data);
+        dataRefreshLastTime = millis();
+
+        color = flags.focused ? style->focus_color : getColor(widgetCursor, widget->data, style);
+        backgroundColor = flags.focused ? style->focus_background_color : getBackgroundColor(widgetCursor, widget->data, style);
+        activeColor = flags.focused ? style->focus_background_color : getActiveColor(widgetCursor, widget->data, style);
+        activeBackgroundColor = flags.focused ? style->focus_color : getActiveBackgroundColor(widgetCursor, widget->data, style);
+
+        bool cursorVisible = millis() % (2 * CONF_GUI_TEXT_CURSOR_BLINK_TIME_MS) < CONF_GUI_TEXT_CURSOR_BLINK_TIME_MS;
+        cursorPosition = cursorVisible ? getTextCursorPosition(widgetCursor, widget->data) : -1;
+        
+        xScroll = getXScroll(widgetCursor);
+    }
+
+    bool operator!=(const DisplayDataWidgetState& previousState) {
+        return 
+            flags.active != previousState.flags.active ||
+            data != previousState.data ||
+            flags.focused != previousState.flags.focused ||
+            flags.blinking != previousState.flags.blinking ||
+            color != previousState.color ||
+            backgroundColor != previousState.backgroundColor ||
+            activeColor != previousState.activeColor ||
+            activeBackgroundColor != previousState.activeBackgroundColor ||
+            cursorPosition != previousState.cursorPosition ||
+            xScroll != previousState.xScroll;
+    }
+
+    void refreshTextData(DisplayDataWidgetState *previousState);
 
     void draw(WidgetState *previousState) override;
 };

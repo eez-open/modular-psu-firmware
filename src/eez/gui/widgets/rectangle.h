@@ -31,6 +31,13 @@ struct RectangleWidget : public Widget {
 };
 
 struct RectangleWidgetState : public WidgetState {
+    RectangleWidgetState(const WidgetCursor &widgetCursor) : WidgetState(widgetCursor) {
+    }
+
+    bool operator!=(const RectangleWidgetState& previousState) {
+        return flags.active != previousState.flags.active;
+    }
+
     void draw(WidgetState *previousState) override;
 };
 

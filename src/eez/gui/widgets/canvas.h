@@ -25,6 +25,16 @@ struct CanvasWidget : public Widget {
 };
 
 struct CanvasWidgetState : public WidgetState {
+    CanvasWidgetState(const WidgetCursor &widgetCursor) : WidgetState(widgetCursor) {
+        auto widget = (const CanvasWidget *)widgetCursor.widget;
+
+        data = get(widgetCursor, widget->data);
+    }
+
+    bool operator!=(const CanvasWidgetState& previousState) {
+        return data != previousState.data;
+    }
+
     void draw(WidgetState *previousState) override;
 };
 

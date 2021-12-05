@@ -24,17 +24,11 @@
 namespace eez {
 namespace gui {
 
-void MultilineTextWidgetState::draw(WidgetState *previousState) {
-    auto widget = (const MultilineTextWidget *)widgetCursor.widget;
-
-    data = widget->data ? get(widgetCursor, widget->data) : 0;
-
-    bool refresh =
-        !previousState ||
-        previousState->flags.active != flags.active ||
-        previousState->data != data;
-
+void MultilineTextWidgetState::draw(WidgetState *previousStateBase) {
+    auto previousState = (MultilineTextWidgetState *)previousStateBase;
+    bool refresh = !previousState || *this != *previousState;
     if (refresh) {
+        auto widget = (const MultilineTextWidget *)widgetCursor.widget;
         const Style* style = getStyle(widget->style);
 
         if (widget->data) {

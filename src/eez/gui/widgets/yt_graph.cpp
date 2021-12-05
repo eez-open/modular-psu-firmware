@@ -482,71 +482,27 @@ struct YTGraphStaticDrawHelper {
 ////////////////////////////////////////////////////////////////////////////////
 
 void YTGraphWidgetState::draw(WidgetState *previousStateBase) {
-    YTGraphWidgetState *previousState = (YTGraphWidgetState *)previousStateBase;
-    const Widget *widget = widgetCursor.widget;
+    auto previousState = (YTGraphWidgetState *)previousStateBase;
+    bool refresh = !previousState || *this != *previousState;
+    if (refresh) {
+        auto widget = (const YTGraphWidget *)widgetCursor.widget;
 
-    flags.focused = isFocusWidget(widgetCursor);
-    data = get(widgetCursor, widget->data);
+        uint16_t graphWidth = (uint16_t)widget->w;
 
-    refreshCounter = ytDataGetRefreshCounter(widgetCursor, widget->data);
-    iChannel = widgetCursor.cursor;
-    numHistoryValues = ytDataGetSize(widgetCursor, widget->data);
-    historyValuePosition = ytDataGetPosition(widgetCursor, widget->data);
-    ytGraphUpdateMethod = ytDataGetGraphUpdateMethod(widgetCursor, widget->data);
-    cursorPosition = historyValuePosition + ytDataGetCursorOffset(widgetCursor, widget->data);
-    bookmarks = ytDataGetBookmarks(widgetCursor, widget->data);
-
-    bool visibleValuesChanged = false;
-
-    showLabels = ytDataGetShowLabels(widgetCursor, widget->data);
-    selectedValueIndex = ytDataGetSelectedValueIndex(widgetCursor, widget->data);
-
-    if (ytGraphUpdateMethod == YT_GRAPH_UPDATE_METHOD_STATIC) {
-        for (int valueIndex = 0; valueIndex < MAX_NUM_OF_Y_VALUES; valueIndex++) {
-            valueIsVisible[valueIndex] = ytDataDataValueIsVisible(widgetCursor, widget->data, valueIndex);
-            valueDiv[valueIndex] = ytDataGetDiv(widgetCursor, widget->data, valueIndex);
-            valueOffset[valueIndex] = ytDataGetOffset(widgetCursor, widget->data, valueIndex);
-            if (
-                previousState && 
-                (
-                    previousState->valueIsVisible[valueIndex] != valueIsVisible[valueIndex] || 
-                    previousState->valueDiv[valueIndex] != valueDiv[valueIndex] || 
-                    previousState->valueOffset[valueIndex] != valueOffset[valueIndex]
-                )
-            ) {
-                visibleValuesChanged = true;
-            }
+        uint32_t previousHistoryValuePosition;
+        if (
+			previousState && 
+            (
+                previousState->iChannel == iChannel &&
+                previousState->ytGraphUpdateMethod == ytGraphUpdateMethod &&
+                previousState->refreshCounter == refreshCounter
+            )
+        ) {
+            previousHistoryValuePosition = previousState->historyValuePosition;
+        } else {
+            previousHistoryValuePosition = historyValuePosition - graphWidth;
         }
-    }
-    uint16_t graphWidth = (uint16_t)widget->w;
 
-    uint32_t previousHistoryValuePosition;
-    if (previousState &&
-        previousState->iChannel == iChannel &&
-        previousState->ytGraphUpdateMethod == ytGraphUpdateMethod &&
-        previousState->refreshCounter == refreshCounter)
-    {
-        previousHistoryValuePosition = previousState->historyValuePosition;
-    } else {
-        previousHistoryValuePosition = historyValuePosition - graphWidth;
-    }
-
-    bool refreshBackground = !previousState;
-
-    if (
-        refreshBackground || 
-        previousState->flags.focused != flags.focused ||
-        showLabels != previousState->showLabels ||
-        selectedValueIndex != previousState->selectedValueIndex ||
-        visibleValuesChanged || 
-        previousHistoryValuePosition != historyValuePosition || 
-        (
-            !previousState ||
-            previousState->numHistoryValues != numHistoryValues ||
-            previousState->cursorPosition != cursorPosition ||
-            previousState->bookmarks != bookmarks
-        )
-    ) {
         if (ytGraphUpdateMethod == YT_GRAPH_UPDATE_METHOD_STATIC) {
             YTGraphStaticDrawHelper drawHelper(this, widgetCursor);
 
@@ -556,7 +512,7 @@ void YTGraphWidgetState::draw(WidgetState *previousStateBase) {
         } else {
             const Style* style = getStyle(widget->style);
 
-            if (refreshBackground) {
+            if (!previousState) {
                 display::setColor(style->background_color);
                 display::fillRect(widgetCursor.x, widgetCursor.y, widgetCursor.x + (int)widget->w - 1, widgetCursor.y + (int)widget->h - 1);
             }

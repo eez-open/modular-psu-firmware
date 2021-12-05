@@ -24,9 +24,9 @@
 namespace eez {
 namespace gui {
 
-void RectangleWidgetState::draw(WidgetState *previousState) {
-    bool refresh = !previousState || previousState->flags.active != flags.active;
-
+void RectangleWidgetState::draw(WidgetState *previousStateBase) {
+    auto previousState = (RectangleWidgetState *)previousStateBase;
+    bool refresh = !previousState || *this != *previousState;
     if (refresh) {
         auto widget = (const RectangleWidget *)widgetCursor.widget;
         const Style* style = getStyle(widget->style);

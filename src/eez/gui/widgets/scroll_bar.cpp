@@ -66,10 +66,7 @@ void getThumbGeometry(int size, int position, int pageSize, int xTrack, int wTra
     xThumb = xTrack + (int)round(remap(position, 0, 0, size - pageSize, wTrack - widthThumb));
 }
 
-void ScrollBarWidgetState::draw(WidgetState *previousStateBase) {
-    auto previousState = (ScrollBarWidgetState *)previousStateBase;
-    auto widget = (const ScrollBarWidget *)widgetCursor.widget;
-
+ScrollBarWidgetState::ScrollBarWidgetState(const WidgetCursor &widgetCursor) : WidgetState(widgetCursor) {
     flags.active = g_selectedWidget == widgetCursor;
     flags.focused = isFocusWidget(widgetCursor);
 
@@ -77,17 +74,13 @@ void ScrollBarWidgetState::draw(WidgetState *previousStateBase) {
     position = getPosition(widgetCursor);
     pageSize = getPageSize(widgetCursor);
     segment = g_segment;
+}
 
-    bool refresh =
-        !previousState ||
-        previousState->flags.active != flags.active ||
-        previousState->flags.focused != flags.focused ||
-        previousState->size != size ||
-        previousState->position != position ||
-        previousState->pageSize != pageSize ||
-        previousState->segment != segment;
-
+void ScrollBarWidgetState::draw(WidgetState *previousStateBase) {
+    auto previousState = (ScrollBarWidgetState *)previousStateBase;
+    bool refresh = !previousState || *this != *previousState;
     if (refresh) {
+        auto widget = (const ScrollBarWidget *)widgetCursor.widget;
         if (pageSize < size) {
             const Style *buttonsStyle = getStyle(widget->buttonsStyle);
             auto isHorizontal = widget->w > widget->h;

@@ -28,6 +28,14 @@ struct UpDownWidget : public Widget {
 };
 
 struct UpDownWidgetState : public WidgetState {
+    UpDownWidgetState(const WidgetCursor &widgetCursor);
+
+    bool operator!=(const UpDownWidgetState& previousState) {
+        return
+            flags.active != previousState.flags.active ||
+            data != previousState.data;
+    }
+
     void draw(WidgetState *previousState) override;
 	bool hasOnTouch() override;
 	void onTouch(Event &touchEvent) override;

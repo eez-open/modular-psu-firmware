@@ -28,6 +28,26 @@ struct ButtonWidget : public Widget {
 };
 
 struct ButtonWidgetState : public WidgetState {
+    ButtonWidgetState(const WidgetCursor &widgetCursor) : WidgetState(widgetCursor) {
+        auto widget = (const ButtonWidget *)widgetCursor.widget;
+
+        auto enabled = get(widgetCursor, widget->enabled);
+        flags.enabled = enabled.getType() == VALUE_TYPE_UNDEFINED || get(widgetCursor, widget->enabled).getInt() ? 1 : 0;
+
+        const Style *style = getStyle(flags.enabled ? widget->style : widget->disabledStyle);
+        flags.blinking = g_isBlinkTime && (isBlinking(widgetCursor, widget->data) || styleIsBlink(style));
+
+        data = widget->data ? get(widgetCursor, widget->data) : 0;
+    }
+
+    bool operator!=(const ButtonWidgetState& previousState) {
+        return
+            flags.active != previousState.flags.active ||
+            flags.enabled != previousState.flags.enabled ||
+            flags.blinking != previousState.flags.blinking ||
+            data != previousState.data;
+    }
+
     void draw(WidgetState *previousState) override;
 };
 

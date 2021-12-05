@@ -21,13 +21,15 @@
 namespace eez {
 namespace gui {
 
-struct ListWidget : public Widget {
+struct GridWidget : public Widget {
     AssetsPtr<Widget> itemWidget;
-    uint8_t listType; // LIST_TYPE_VERTICAL or LIST_TYPE_HORIZONTAL
-    uint8_t gap;
+    uint8_t gridFlow; // GRID_FLOW_ROW or GRID_FLOW_COLUMN
 };
 
-struct ListWidgetState : public WidgetState {
+struct GridWidgetState : public WidgetState {
+    GridWidgetState(const WidgetCursor &widgetCursor) : WidgetState(widgetCursor) {
+    }
+
     void draw(WidgetState *previousState) override;
 };
 

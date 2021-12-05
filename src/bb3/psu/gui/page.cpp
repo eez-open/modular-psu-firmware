@@ -674,16 +674,14 @@ void MenuWithButtonsPage::updateInternalPage(const WidgetCursor &widgetCursor2, 
         widgetCursor.y = y + m_containerRectangleWidget.y;
         currentState->flags.active = 0;
 
-		RectangleWidgetState rectangleWidgetState;
-		rectangleWidgetState.widgetCursor = widgetCursor;
+		RectangleWidgetState rectangleWidgetState(widgetCursor);
 		rectangleWidgetState.draw(previousState);
 
         widgetCursor.widget = &m_messageTextWidget;
         widgetCursor.x = x + m_messageTextWidget.x;
         widgetCursor.y = y + m_messageTextWidget.y;
         currentState->flags.active = 0;
-		TextWidgetState textWidgetState;
-		textWidgetState.widgetCursor = widgetCursor;
+		TextWidgetState textWidgetState(widgetCursor);
 		textWidgetState.draw(previousState);
     }
 
@@ -693,8 +691,7 @@ void MenuWithButtonsPage::updateInternalPage(const WidgetCursor &widgetCursor2, 
         widgetCursor.y = y + m_buttonTextWidgets[i].y;
         widgetCursor.cursor = i;
         currentState->flags.active = isActiveWidget(widgetCursor);
-		TextWidgetState textWidgetState;
-		textWidgetState.widgetCursor = widgetCursor;
+		TextWidgetState textWidgetState(widgetCursor);
 		textWidgetState.draw(previousState);
     }
 }

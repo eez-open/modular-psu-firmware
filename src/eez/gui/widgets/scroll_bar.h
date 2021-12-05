@@ -43,6 +43,18 @@ struct ScrollBarWidgetState : public WidgetState {
     int pageSize;
     ScrollBarWidgetSegment segment;
 
+	ScrollBarWidgetState(const WidgetCursor &widgetCursor);
+
+    bool operator!=(const ScrollBarWidgetState& previousState) {
+        return
+            flags.active != previousState.flags.active ||
+            flags.focused != previousState.flags.focused ||
+            size != previousState.size ||
+            position != previousState.position ||
+            pageSize != previousState.pageSize ||
+            segment != previousState.segment;
+    }
+
     void draw(WidgetState *previousState) override;
 	bool hasOnTouch() override;
 	void onTouch(Event &touchEvent) override;

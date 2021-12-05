@@ -171,14 +171,16 @@ struct WidgetCursor {
 	bool isPage() const;
 };
 
+extern bool g_isActiveWidget;
+
 struct WidgetState {
 	WidgetCursor widgetCursor;
 	size_t widgetStateSize;
 	WidgetStateFlags flags;
 	Value data;
 
-	WidgetState() {
-		flags.active = 0;
+	WidgetState(const WidgetCursor& widgetCursor_) : widgetCursor(widgetCursor_) {
+		flags.active = g_isActiveWidget;
 		flags.focused = 0;
 		flags.blinking = 0;
 		flags.enabled = 0;
@@ -198,8 +200,6 @@ struct WidgetState {
 };
 
 ////////////////////////////////////////////////////////////////////////////////
-
-extern bool g_isActiveWidget;
 
 #define nextWidgetState(p) (WidgetState *)(((uint8_t *)p) + p->widgetStateSize)
 

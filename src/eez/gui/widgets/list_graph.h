@@ -34,6 +34,18 @@ struct ListGraphWidget : public Widget {
 struct ListGraphWidgetState : public WidgetState {
     Value cursorData;
 
+    ListGraphWidgetState(const WidgetCursor &widgetCursor) : WidgetState(widgetCursor) {
+        auto widget = (const ListGraphWidget *)widgetCursor.widget;
+        data = get(widgetCursor, widget->data);
+        cursorData = get(widgetCursor, widget->cursorData);
+    }
+
+    bool operator!=(const ListGraphWidgetState& previousState) {
+        return 
+            data != previousState.data ||
+            cursorData != previousState.cursorData;
+    }
+
     void draw(WidgetState *previousState) override;
 	bool hasOnTouch() override;
 	void onTouch(Event &touchEvent) override;

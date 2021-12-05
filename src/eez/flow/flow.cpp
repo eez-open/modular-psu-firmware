@@ -23,7 +23,7 @@
 #include <eez/gui/gui.h>
 #include <eez/gui/widgets/input.h>
 
-#include <eez/gui/widgets/layout_view.h>
+#include <eez/gui/widgets/containers/layout_view.h>
 
 #include <eez/flow/flow.h>
 #include <eez/flow/components.h>

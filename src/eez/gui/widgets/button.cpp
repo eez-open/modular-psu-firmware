@@ -21,30 +21,18 @@
 #include <eez/gui/gui.h>
 #include <eez/gui/widgets/button.h>
 
+static const size_t MAX_TEXT_LEN = 128;
+
 namespace eez {
 namespace gui {
 
-void ButtonWidgetState::draw(WidgetState *previousState) {
-    auto widget = (const ButtonWidget *)widgetCursor.widget;
-
-    auto enabled = get(widgetCursor, widget->enabled);
-    flags.enabled = enabled.getType() == VALUE_TYPE_UNDEFINED  || get(widgetCursor, widget->enabled).getInt() ? 1 : 0;
-
-    const Style *style = getStyle(flags.enabled ? widget->style : widget->disabledStyle);
-
-    flags.blinking = g_isBlinkTime && (isBlinking(widgetCursor, widget->data) || styleIsBlink(style));
-    data = widget->data ? get(widgetCursor, widget->data) : 0;
-
-    bool refresh =
-        !previousState ||
-        previousState->flags.active != flags.active ||
-        previousState->flags.enabled != flags.enabled ||
-        previousState->flags.blinking != flags.blinking ||
-        previousState->data != data;
-
-	static const size_t MAX_TEXT_LEN = 128;
-
+void ButtonWidgetState::draw(WidgetState *previousStateBase) {
+    auto previousState = (ButtonWidgetState *)previousStateBase;
+    bool refresh = !previousState || *this != *previousState;
     if (refresh) {
+        auto widget = (const ButtonWidget *)widgetCursor.widget;
+        const Style *style = getStyle(flags.enabled ? widget->style : widget->disabledStyle);
+        
         if (widget->data) {
             if (data.isString()) {
                 drawText(data.getString(), -1, widgetCursor.x,

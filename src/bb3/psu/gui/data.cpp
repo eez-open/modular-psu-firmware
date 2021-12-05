@@ -42,7 +42,7 @@
 #include <bb3/fs_driver.h>
 
 #include <eez/gui/gui.h>
-#include <eez/gui/widgets/container.h>
+#include <eez/gui/widgets/containers/container.h>
 #include <eez/gui/widgets/yt_graph.h>
 
 #if OPTION_FAN

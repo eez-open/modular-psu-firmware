@@ -26,6 +26,18 @@ struct BitmapWidget : public Widget {
 };
 
 struct BitmapWidgetState : public WidgetState {
+    BitmapWidgetState(const WidgetCursor &widgetCursor) : WidgetState(widgetCursor) {
+	    auto widget = (const BitmapWidget *)widgetCursor.widget;
+        
+        data = widget->data ? getBitmapImage(widgetCursor, widget->data) : 0;
+    }
+
+    bool operator!=(const BitmapWidgetState& previousState) {
+        return
+            flags.active != previousState.flags.active ||
+			data != previousState.data; 
+    }
+
     void draw(WidgetState *previousState) override;
 };
 

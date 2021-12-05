@@ -90,17 +90,12 @@ void drawButtons(const Widget *widget, int x, int y, const Style *style, const S
     }
 }
 
-void ButtonGroupWidgetState::draw(WidgetState *previousState) {
-    auto widget = (const ButtonGroupWidget *)widgetCursor.widget;
-
-    data = get(widgetCursor, widget->data);
-
-    bool refresh =
-        !previousState ||
-        previousState->flags.active != flags.active ||
-        previousState->data != data;
-
+void ButtonGroupWidgetState::draw(WidgetState *previousStateBase) {
+    auto previousState = (ButtonGroupWidgetState *)previousStateBase;
+    bool refresh = !previousState || *this != *previousState;
     if (refresh) {
+        auto widget = (const ButtonGroupWidget *)widgetCursor.widget;
+
         const Style* style = getStyle(widget->style);
         const Style* selectedStyle = getStyle(widget->selectedStyle);
 

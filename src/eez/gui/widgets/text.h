@@ -27,6 +27,26 @@ struct TextWidget : public Widget {
 }; 
 
 struct TextWidgetState : public WidgetState {
+    TextWidgetState(const WidgetCursor &widgetCursor) : WidgetState(widgetCursor) {
+        auto widget = (const TextWidget *)widgetCursor.widget;
+
+        flags.focused = isFocusWidget(widgetCursor);
+
+        const Style *style = getStyle(overrideStyleHook(widgetCursor, widget->style));
+        flags.blinking = g_isBlinkTime && styleIsBlink(style);
+        
+        const char *text = widget->text.ptr(widgetCursor.assets);
+        data = !(text && text[0]) && widget->data ? get(widgetCursor, widget->data) : 0;
+    }
+
+    bool operator!=(const TextWidgetState& previousState) {
+        return
+            flags.focused != previousState.flags.focused ||
+            flags.active != previousState.flags.active ||
+            flags.blinking != previousState.flags.blinking ||
+            data != previousState.data;
+    }
+
     void draw(WidgetState *previousState) override;
 };
 

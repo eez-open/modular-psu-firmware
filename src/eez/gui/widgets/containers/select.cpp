@@ -17,7 +17,7 @@
  */
 
 #include <eez/gui/gui.h>
-#include <eez/gui/widgets/select.h>
+#include <eez/gui/widgets/containers/select.h>
 
 namespace eez {
 namespace gui {

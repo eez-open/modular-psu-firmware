@@ -24,14 +24,11 @@
 namespace eez {
 namespace gui {
 
-void ProgressWidgetState::draw(WidgetState *previousState) {
-    auto widget = widgetCursor.widget;
-
-    data = get(widgetCursor, widget->data);
-
-    bool refresh = !previousState || previousState->data != data;
-
+void ProgressWidgetState::draw(WidgetState *previousStateBase) {
+    auto previousState = (ProgressWidgetState *)previousStateBase;
+    bool refresh = !previousState || *this != *previousState;
     if (refresh) {
+        auto widget = (const ProgressWidget *)widgetCursor.widget;
         const Style* style = getStyle(widget->style);
 
         drawRectangle(widgetCursor.x, widgetCursor.y, (int)widget->w, (int)widget->h, style, false, false, true);

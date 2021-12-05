@@ -18,9 +18,6 @@
 
 #pragma once
 
-#include <eez/gui/widgets/text.h>
-#include <eez/gui/widgets/rectangle.h>
-
 namespace eez {
 namespace gui {
 
@@ -69,7 +66,6 @@ public:
 
 protected:
     Widget widget;
-	WidgetState widgetState;
 };
 
 } // namespace gui

@@ -25,8 +25,6 @@
 #include <eez/gui/gui.h>
 #include <eez/gui/widgets/display_data.h>
 
-#define CONF_GUI_TEXT_CURSOR_BLINK_TIME_MS 500
-
 namespace eez {
 namespace gui {
 
@@ -50,59 +48,27 @@ int findStartOfUnit(char *text, int i) {
     return i;
 }
 
-void DisplayDataWidgetState::draw(WidgetState *previousStateBase) {
-    auto previousState = (DisplayDataWidgetState *)previousStateBase;
-    auto widget = (const DisplayDataWidget *)widgetCursor.widget;
-
-    flags.focused = isFocusWidget(widgetCursor);
-
-	const Style *style = getStyle(overrideStyleHook(widgetCursor, widget->style));
-
-    flags.blinking = g_isBlinkTime && isBlinking(widgetCursor, widget->data);
-    
-    uint32_t currentTime = millis();
-	data = get(widgetCursor, widget->data);
-    bool refreshData = false;
-    if (previousState) {
-        refreshData = data != previousState->data;
-        if (refreshData) {
-            uint32_t refreshRate = getTextRefreshRate(widgetCursor, widget->data);
-            if (refreshRate != 0) {
-                refreshData = (currentTime - previousState->dataRefreshLastTime) > refreshRate;
-                if (!refreshData) {
-                    data = previousState->data;
-                }
+void DisplayDataWidgetState::refreshTextData(DisplayDataWidgetState *previousState) {
+    if (previousState && data != previousState->data) {
+		auto widget = (const DisplayDataWidget *)widgetCursor.widget;
+        uint32_t refreshRate = getTextRefreshRate(widgetCursor, widget->data);
+        if (refreshRate != 0) {
+            if (dataRefreshLastTime - previousState->dataRefreshLastTime < refreshRate) {
+                data = previousState->data;
+                dataRefreshLastTime = previousState->dataRefreshLastTime;
             }
         }
-    } else {
-        refreshData = true;
     }
-    dataRefreshLastTime = refreshData ? currentTime : previousState->dataRefreshLastTime;
+}
 
-    color = flags.focused ? style->focus_color : getColor(widgetCursor, widget->data, style);
-    backgroundColor = flags.focused ? style->focus_background_color : getBackgroundColor(widgetCursor, widget->data, style);
-    activeColor = flags.focused ? style->focus_background_color : getActiveColor(widgetCursor, widget->data, style);
-    activeBackgroundColor = flags.focused ? style->focus_color : getActiveBackgroundColor(widgetCursor, widget->data, style);
-
-    bool cursorVisible = millis() % (2 * CONF_GUI_TEXT_CURSOR_BLINK_TIME_MS) < CONF_GUI_TEXT_CURSOR_BLINK_TIME_MS;
-    cursorPosition = cursorVisible ? getTextCursorPosition(widgetCursor, widget->data) : -1;
-    
-    xScroll = getXScroll(widgetCursor);
-
-    bool refresh =
-        !previousState ||
-        previousState->flags.focused != flags.focused ||
-        previousState->flags.active != flags.active ||
-        previousState->flags.blinking != flags.blinking ||
-        refreshData ||
-        color != previousState->color ||
-        backgroundColor != previousState->backgroundColor ||
-        activeColor != previousState->activeColor ||
-        activeBackgroundColor != previousState->activeBackgroundColor ||
-        cursorPosition != previousState->cursorPosition ||
-        xScroll != previousState->xScroll;
-
+void DisplayDataWidgetState::draw(WidgetState *previousStateBase) {
+    auto previousState = (DisplayDataWidgetState *)previousStateBase;
+    refreshTextData(previousState);
+    bool refresh = !previousState || *this != *previousState;
     if (refresh) {
+        auto widget = (const DisplayDataWidget *)widgetCursor.widget;
+        const Style *style = getStyle(overrideStyleHook(widgetCursor, widget->style));
+
         char text[64];
         data.toText(text, sizeof(text));
 

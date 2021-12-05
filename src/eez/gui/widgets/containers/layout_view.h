@@ -1,6 +1,6 @@
 /*
  * EEZ Modular Firmware
- * Copyright (C) 2021-present, Envox d.o.o.
+ * Copyright (C) 2015-present, Envox d.o.o.
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -21,13 +21,19 @@
 namespace eez {
 namespace gui {
 
-struct GridWidget : public Widget {
-    AssetsPtr<Widget> itemWidget;
-    uint8_t gridFlow; // GRID_FLOW_ROW or GRID_FLOW_COLUMN
+struct LayoutViewWidget : public Widget {
+    int16_t layout; // page ID
+    int16_t context; // data ID
+	uint16_t componentIndex;
 };
 
-struct GridWidgetState : public WidgetState {
-    void draw(WidgetState *previousState) override;
+struct LayoutViewWidgetState : public WidgetState {
+    Value context;
+
+    LayoutViewWidgetState(const WidgetCursor &widgetCursor) : WidgetState(widgetCursor) {
+    }
+
+	void draw(WidgetState *previousState) override;
 };
 
 } // namespace gui

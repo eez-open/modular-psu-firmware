@@ -66,56 +66,27 @@ void drawLineInBarGraphWidget(const BarGraphWidget *barGraphWidget, int p, uint1
     }
 }
 
-void BarGraphWidgetState::draw(WidgetState *previousStateBase) {
-    auto previousState = (BarGraphWidgetState *)previousStateBase;
-    auto widget = (const BarGraphWidget *)widgetCursor.widget;
-    const Style* style = getStyle(overrideStyleHook(widgetCursor, widget->style));
-
-    flags.blinking = g_isBlinkTime && isBlinking(widgetCursor, widget->data);
-    data = get(widgetCursor, widget->data);
-    
-    color = getColor(widgetCursor, widget->data, style);
-    backgroundColor = getBackgroundColor(widgetCursor, widget->data, style);
-    activeColor = getActiveColor(widgetCursor, widget->data, style);
-    activeBackgroundColor = getActiveBackgroundColor(widgetCursor, widget->data, style);
-
-    line1Data = get(widgetCursor, widget->line1Data);
-    
-    line2Data = get(widgetCursor, widget->line2Data);
-
-    uint32_t currentTime = millis();
-    textData = data;
-    bool refreshTextData;
-    if (previousState) {
-        refreshTextData = textData != previousState->textData;
-        if (refreshTextData) {
-            uint32_t refreshRate = getTextRefreshRate(widgetCursor, widget->data);
-            if (refreshRate != 0) {
-                refreshTextData = (currentTime - previousState->textDataRefreshLastTime) > refreshRate;
-                if (!refreshTextData) {
-                    textData = previousState->textData;
-                }
+void BarGraphWidgetState::refreshTextData(BarGraphWidgetState *previousState) {
+    if (previousState && textData != previousState->textData) {
+		auto widget = (const BarGraphWidget *)widgetCursor.widget;
+		uint32_t refreshRate = getTextRefreshRate(widgetCursor, widget->data);
+        if (refreshRate != 0) {
+            if (textDataRefreshLastTime - previousState->textDataRefreshLastTime < refreshRate) {
+                textData = previousState->textData;
+                textDataRefreshLastTime = previousState->textDataRefreshLastTime;
             }
         }
-    } else {
-        refreshTextData = true;
     }
-    textDataRefreshLastTime = refreshTextData ? currentTime : previousState->textDataRefreshLastTime;
-   
-    bool refresh =
-        !previousState ||
-        previousState->flags.active != flags.active ||
-        previousState->flags.blinking != flags.blinking ||
-        previousState->data != data ||
-        color != previousState->color ||
-        backgroundColor != previousState->backgroundColor ||
-        activeColor != previousState->activeColor ||
-        activeBackgroundColor != previousState->activeBackgroundColor ||
-        previousState->line1Data != line1Data ||
-        previousState->line2Data != line2Data ||
-        refreshTextData;
+}
 
+void BarGraphWidgetState::draw(WidgetState *previousStateBase) {
+    auto previousState = (BarGraphWidgetState *)previousStateBase;
+    refreshTextData(previousState);
+    bool refresh = !previousState || *this != *previousState;
     if (refresh) {
+		auto widget = (const BarGraphWidget *)widgetCursor.widget;
+		const Style* style = getStyle(overrideStyleHook(widgetCursor, widget->style));
+
         int x = widgetCursor.x;
         int y = widgetCursor.y;
         const int w = widget->w;

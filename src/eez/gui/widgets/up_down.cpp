@@ -39,18 +39,18 @@ enum UpDownWidgetSegment {
 static UpDownWidgetSegment g_segment;
 static WidgetCursor g_selectedWidget;
 
-void UpDownWidgetState::draw(WidgetState *previousState) {
+UpDownWidgetState::UpDownWidgetState(const WidgetCursor &widgetCursor) : WidgetState(widgetCursor) {
     auto widget = (const UpDownWidget *)widgetCursor.widget;
 
-    data = get(widgetCursor, widget->data);
     flags.active = g_selectedWidget == widgetCursor;
+    data = get(widgetCursor, widget->data);
+}
 
-    bool refresh =
-        !previousState ||
-        previousState->flags.active != flags.active ||
-        previousState->data != data;
-
+void UpDownWidgetState::draw(WidgetState *previousStateBase) {
+    auto previousState = (UpDownWidgetState *)previousStateBase;
+    bool refresh = !previousState || *this != *previousState;
     if (refresh) {
+        auto widget = (const UpDownWidget *)widgetCursor.widget;
         const Style *buttonsStyle = getStyle(widget->buttonsStyle);
 
         font::Font buttonsFont = styleGetFont(buttonsStyle);

@@ -33,6 +33,23 @@ struct InputWidget : public Widget {
 };
 
 struct InputWidgetState : public WidgetState {
+    InputWidgetState(const WidgetCursor &widgetCursor) : WidgetState(widgetCursor) {
+		auto widget = (const InputWidget*)widgetCursor.widget;
+		const Style *style = getStyle(overrideStyleHook(widgetCursor, widget->style));
+
+		flags.focused = isFocusWidget(widgetCursor);
+		flags.blinking = g_isBlinkTime && styleIsBlink(style);
+		data = get(widgetCursor, widget->data);
+    }
+
+    bool operator!=(const InputWidgetState& previousState) {
+		return 
+			flags.focused != previousState.flags.focused ||
+			flags.active != previousState.flags.active ||
+			flags.blinking != previousState.flags.blinking ||
+			data != previousState.data;
+    }
+
 	void draw(WidgetState *previousState) override;
 };
 

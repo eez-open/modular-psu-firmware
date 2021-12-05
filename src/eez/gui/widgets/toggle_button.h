@@ -27,6 +27,17 @@ struct ToggleButtonWidget : public Widget {
 };
 
 struct ToggleButtonWidgetState : public WidgetState {
+    ToggleButtonWidgetState(const WidgetCursor &widgetCursor) : WidgetState(widgetCursor) {
+        auto widget = (const ToggleButtonWidget *)widgetCursor.widget;
+        flags.enabled = get(widgetCursor, widget->data).getInt() ? 1 : 0;
+    }
+
+    bool operator!=(const ToggleButtonWidgetState& previousState) {
+        return
+            flags.active != previousState.flags.active ||
+            flags.enabled != previousState.flags.enabled;
+    }
+
     void draw(WidgetState *previousState) override;
 };
 

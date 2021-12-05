@@ -17,7 +17,7 @@
  */
 
 #include <eez/gui/gui.h>
-#include <eez/gui/widgets/grid.h>
+#include <eez/gui/widgets/containers/grid.h>
 
 namespace eez {
 namespace gui {

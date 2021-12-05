@@ -19,7 +19,7 @@
 #include <assert.h>
 
 #include <eez/gui/gui.h>
-#include <eez/gui/widgets/app_view.h>
+#include <eez/gui/widgets/containers/app_view.h>
 
 namespace eez {
 namespace gui {
@@ -34,17 +34,10 @@ void AppViewWidgetState::draw(WidgetState *previousState) {
         appContext = widgetCursor.appContext;
     }
 
-    bool refresh =
-        !previousState &&
-        !appContext->isActivePageInternal() &&
-        appContext->getActivePageId() != PAGE_ID_NONE;
-
-    if (refresh ) {
-        appContext->rect.x = widgetCursor.x;
-        appContext->rect.y = widgetCursor.y;
-        appContext->rect.w = widgetCursor.widget->w;
-        appContext->rect.h = widgetCursor.widget->h;
-    }
+    appContext->rect.x = widgetCursor.x;
+    appContext->rect.y = widgetCursor.y;
+    appContext->rect.w = widgetCursor.widget->w;
+    appContext->rect.h = widgetCursor.widget->h;
 
     WidgetState *childCurrentState = this;
 	WidgetState *childPreviousState = previousState;

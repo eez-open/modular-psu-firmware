@@ -40,6 +40,43 @@ struct BarGraphWidgetState : public WidgetState {
     Value textData;
     uint32_t textDataRefreshLastTime;
 
+    BarGraphWidgetState(const WidgetCursor &widgetCursor) : WidgetState(widgetCursor) {
+        auto widget = (const BarGraphWidget *)widgetCursor.widget;
+
+        const Style* style = getStyle(overrideStyleHook(widgetCursor, widget->style));
+
+        flags.blinking = g_isBlinkTime && isBlinking(widgetCursor, widget->data);
+        data = get(widgetCursor, widget->data);
+        
+        color = getColor(widgetCursor, widget->data, style);
+        backgroundColor = getBackgroundColor(widgetCursor, widget->data, style);
+        activeColor = getActiveColor(widgetCursor, widget->data, style);
+        activeBackgroundColor = getActiveBackgroundColor(widgetCursor, widget->data, style);
+
+        line1Data = get(widgetCursor, widget->line1Data);
+        
+        line2Data = get(widgetCursor, widget->line2Data);
+
+        textData = data;
+        textDataRefreshLastTime = millis();
+    }
+
+    bool operator!=(const BarGraphWidgetState& previousState) {
+        return 
+            flags.active != previousState.flags.active ||
+            flags.blinking != previousState.flags.blinking ||
+            data != previousState.data ||
+            color != previousState.color ||
+            backgroundColor != previousState.backgroundColor ||
+            activeColor != previousState.activeColor ||
+            activeBackgroundColor != previousState.activeBackgroundColor ||
+            line1Data != previousState.line1Data ||
+            line2Data != previousState.line2Data ||
+            textData != previousState.textData;
+    }
+
+    void refreshTextData(BarGraphWidgetState *previousState);
+
     void draw(WidgetState *previousState) override;
 };
 

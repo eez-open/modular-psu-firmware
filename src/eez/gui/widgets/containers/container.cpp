@@ -20,7 +20,7 @@
 #include <eez/os.h>
 
 #include <eez/gui/gui.h>
-#include <eez/gui/widgets/container.h>
+#include <eez/gui/widgets/containers/container.h>
 
 namespace eez {
 namespace gui {
@@ -131,9 +131,12 @@ void ContainerWidgetState::drawOverlay(WidgetState *previousStateBase, Overlay *
 
     auto widgetOverrides = overlay->widgetOverrides;
     auto widgetPtr = widgets.itemsPtr(widgetCursor.assets);
-    for (uint32_t index = 0; index < widgets.count; ++index, ++widgetOverrides, ++widgetPtr) {
-        if (!widgetOverrides->isVisible) {
-            continue;
+    for (uint32_t index = 0; index < widgets.count; ++index, ++widgetPtr) {
+        if (widgetOverrides) {
+			if (!widgetOverrides->isVisible) {
+				widgetOverrides++;
+				continue;
+			}
         }
 
         childWidgetCursor.widget = (const Widget *)widgetPtr->ptr(widgetCursor.assets);
@@ -143,17 +146,23 @@ void ContainerWidgetState::drawOverlay(WidgetState *previousStateBase, Overlay *
         int wSaved = childWidgetCursor.widget->w;
         int hSaved = childWidgetCursor.widget->h;
 
-        ((Widget*)childWidgetCursor.widget)->x = widgetOverrides->x;
-        ((Widget*)childWidgetCursor.widget)->y = widgetOverrides->y;
-        ((Widget*)childWidgetCursor.widget)->w = widgetOverrides->w;
-        ((Widget*)childWidgetCursor.widget)->h = widgetOverrides->h;
+		if (widgetOverrides) {
+			((Widget*)childWidgetCursor.widget)->x = widgetOverrides->x;
+			((Widget*)childWidgetCursor.widget)->y = widgetOverrides->y;
+			((Widget*)childWidgetCursor.widget)->w = widgetOverrides->w;
+			((Widget*)childWidgetCursor.widget)->h = widgetOverrides->h;
+		}
 
         enumWidget(childWidgetCursor, childCurrentState, childPreviousState);
 
-        ((Widget*)childWidgetCursor.widget)->x = xSaved;
-        ((Widget*)childWidgetCursor.widget)->y = ySaved;
-        ((Widget*)childWidgetCursor.widget)->w = wSaved;
-        ((Widget*)childWidgetCursor.widget)->h = hSaved;
+		if (widgetOverrides) {
+			((Widget*)childWidgetCursor.widget)->x = xSaved;
+			((Widget*)childWidgetCursor.widget)->y = ySaved;
+			((Widget*)childWidgetCursor.widget)->w = wSaved;
+			((Widget*)childWidgetCursor.widget)->h = hSaved;
+			
+			widgetOverrides++;
+		}
 
         if (childPreviousState) {
             childPreviousState = nextWidgetState(childPreviousState);

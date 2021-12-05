@@ -25,6 +25,9 @@ struct AppViewWidget : public Widget {
 };
 
 struct AppViewWidgetState : public WidgetState {
+    AppViewWidgetState(const WidgetCursor &widgetCursor) : WidgetState(widgetCursor) {
+    }
+
 	void draw(WidgetState *previousState) override;
 };
 
