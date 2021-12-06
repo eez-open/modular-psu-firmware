@@ -231,15 +231,6 @@ struct Value {
 		pVoidValue = 0;
 	}
 
-    void freeRef() {
-		if (options & VALUE_OPTIONS_REF) {
-			if (--refValue->refCounter == 0) {
-				free(refValue);
-			}
-            clear();
-		}
-    }
-
     const Value& operator = (const Value &value) {
 		if (options & VALUE_OPTIONS_REF) {
 			if (--refValue->refCounter == 0) {

@@ -24,34 +24,40 @@
 namespace eez {
 namespace gui {
 
-void MultilineTextWidgetState::draw(WidgetState *previousStateBase) {
-    auto previousState = (MultilineTextWidgetState *)previousStateBase;
-    bool refresh = !previousState || *this != *previousState;
-    if (refresh) {
-        auto widget = (const MultilineTextWidget *)widgetCursor.widget;
-        const Style* style = getStyle(widget->style);
+bool MultilineTextWidgetState::updateState(const WidgetCursor &widgetCursor) {
+    bool hasPreviousState = widgetCursor.hasPreviousState;
+    auto widget = (const MultilineTextWidget *)widgetCursor.widget;
 
-        if (widget->data) {
-            if (data.isString()) {
-                drawMultilineText(data.getString(), widgetCursor.x,
-                    widgetCursor.y, (int)widget->w, (int)widget->h, style,
-                    flags.active,
-                    widget->firstLineIndent, widget->hangingIndent);
-            } else {
-                char text[64];
-                data.toText(text, sizeof(text));
-                drawMultilineText(text, widgetCursor.x, widgetCursor.y, (int)widget->w,
-                    (int)widget->h, style,
-                    flags.active,
-                    widget->firstLineIndent, widget->hangingIndent);
-            }
+    WIDGET_STATE(flags.active, g_isActiveWidget);
+    WIDGET_STATE(data, widget->data ? get(widgetCursor, widget->data) : 0);
+
+    return !hasPreviousState;
+}
+
+void MultilineTextWidgetState::render(WidgetCursor &widgetCursor) {
+    auto widget = (const MultilineTextWidget *)widgetCursor.widget;
+    const Style* style = getStyle(widget->style);
+
+    if (widget->data) {
+        if (data.isString()) {
+            drawMultilineText(data.getString(), widgetCursor.x,
+                widgetCursor.y, (int)widget->w, (int)widget->h, style,
+                flags.active,
+                widget->firstLineIndent, widget->hangingIndent);
         } else {
-            drawMultilineText(
-                widget->text.ptr(widgetCursor.assets), 
-                widgetCursor.x, widgetCursor.y, (int)widget->w, (int)widget->h,
-                style, flags.active,
+            char text[64];
+            data.toText(text, sizeof(text));
+            drawMultilineText(text, widgetCursor.x, widgetCursor.y, (int)widget->w,
+                (int)widget->h, style,
+                flags.active,
                 widget->firstLineIndent, widget->hangingIndent);
         }
+    } else {
+        drawMultilineText(
+            widget->text.ptr(widgetCursor.assets), 
+            widgetCursor.x, widgetCursor.y, (int)widget->w, (int)widget->h,
+            style, flags.active,
+            widget->firstLineIndent, widget->hangingIndent);
     }
 };
 

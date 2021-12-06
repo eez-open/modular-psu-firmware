@@ -25,109 +25,100 @@
 namespace eez {
 namespace gui {
 
-void ContainerWidgetState::draw(WidgetState *previousStateBase) {
-    Overlay *overlay = getOverlay(widgetCursor);
+bool ContainerWidgetState::updateState(const WidgetCursor &widgetCursor) {
+	bool hasPreviousState = widgetCursor.hasPreviousState;
+	WIDGET_STATE(flags.active, g_isActiveWidget);
+
+	overlay = getOverlay(widgetCursor);
+	if (overlay) {
+		auto widget = (const ContainerWidget *)widgetCursor.widget;
+
+		// update overlay data
+		auto containerWidget = (const ContainerWidget *)widget;
+		Value widgetCursorValue((void *)&widgetCursor, VALUE_TYPE_POINTER);
+		DATA_OPERATION_FUNCTION(containerWidget->overlay, DATA_OPERATION_UPDATE_OVERLAY_DATA, widgetCursor, widgetCursorValue);
+
+		WIDGET_STATE(overlayState, overlay->state);
+
+		if (overlayState == 0) {
+			displayBufferIndex = -1;
+		} else {
+			if (!hasPreviousState) {
+				displayBufferIndex = -1;
+			}
+		}
+	}
+
+	return !hasPreviousState;
+}
+
+void ContainerWidgetState::render(WidgetCursor &widgetCursor) {
+	auto widget = (const ContainerWidget *)widgetCursor.widget;
+
+	if (overlay) {
+		if (overlayState == 0) {
+			return;
+		}
+		
+		if (displayBufferIndex == -1) {
+			displayBufferIndex = display::allocBuffer();
+		}
+
+		display::selectBuffer(displayBufferIndex);
+		displayBufferSelected = true;
+	}
+
+	drawRectangle(
+		widgetCursor.x, widgetCursor.y, (int)widget->w, (int)widget->h,
+		getStyle(widget->style), flags.active, false, true
+	);
+}
+
+void ContainerWidgetState::enumChildren(WidgetCursor &widgetCursor) {
     if (overlay) {
-        drawOverlay(previousStateBase, overlay);
+        renderOverlayChildren(widgetCursor);
         return;
     }
 
-	auto previousState = (ContainerWidgetState *)previousStateBase;
-    auto widget = (const ContainerWidget *)widgetCursor.widget;
-
-    bool refresh = !previousState || previousState->flags.active != flags.active;
-
-    if (refresh) {
-        drawRectangle(
-            widgetCursor.x, widgetCursor.y, (int)widget->w, (int)widget->h, 
-            getStyle(widget->style), flags.active, false, true
-        );
-    }
-
-    WidgetState *childCurrentState = this;
-	WidgetState *childPreviousState = previousState;
-    WidgetCursor childWidgetCursor = getFirstChildWidgetCursor(widgetCursor, childCurrentState, childPreviousState);
-
-    auto &widgets = widget->widgets;
-
-    WidgetState *endOfContainerInPreviousState = 0;
-    if (previousState) {
-        endOfContainerInPreviousState = nextWidgetState(previousState);
-    }
+	auto savedWidget = widgetCursor.widget;
+	
+	auto widget = (const ContainerWidget *)widgetCursor.widget;
+	auto &widgets = widget->widgets;
 
 	auto widgetPtr = widgets.itemsPtr(widgetCursor.assets);
 	for (uint32_t index = 0; index < widgets.count; ++index, ++widgetPtr) {
-		childWidgetCursor.widget = (const Widget *)widgetPtr->ptr(widgetCursor.assets);
+		widgetCursor.widget = (const Widget *)widgetPtr->ptr(widgetCursor.assets);
 
-        enumWidget(childWidgetCursor, childCurrentState, childPreviousState);
-
-        if (childPreviousState) {
-            childPreviousState = nextWidgetState(childPreviousState);
-            if (childPreviousState > endOfContainerInPreviousState) {
-                childPreviousState = 0;
-            }
-        }
-        childCurrentState = nextWidgetState(childCurrentState);
+        enumWidget(widgetCursor);
     }
 
-    widgetStateSize = (uint8_t *)childCurrentState - (uint8_t *)this;
-
+	widgetCursor.widget = savedWidget;
 }
 
-void ContainerWidgetState::drawOverlay(WidgetState *previousStateBase, Overlay *overlay) {
-	auto previousState = (ContainerWidgetState *)previousStateBase;
-    auto widget = (const ContainerWidget *)widgetCursor.widget;
-
-    bool refresh = 
-        !previousState ||
-        previousState->flags.active != flags.active;
-
-    // update overlay data
-    auto containerWidget = (const ContainerWidget *)widget;
-    Value widgetCursorValue((void *)&widgetCursor, VALUE_TYPE_POINTER);
-    DATA_OPERATION_FUNCTION(containerWidget->overlay, DATA_OPERATION_UPDATE_OVERLAY_DATA, widgetCursor, widgetCursorValue);
-
-    overlayState = overlay->state;
-    
-    if (overlayState == 0) {
-        displayBufferIndex = -1;
+void ContainerWidgetState::renderOverlayChildren(WidgetCursor &widgetCursor) {
+    if (displayBufferIndex == -1) {
         return;
     }
 
-    if (previousState && overlayState != previousState->overlayState) {
-        refresh = true;
-    }
+	if (g_findCallback == nullptr) {
+		if (!displayBufferSelected) {
+			display::selectBuffer(displayBufferIndex);
+		} else {
+			displayBufferSelected = false;
+		}
+	}
 
-    if (refresh || previousState->displayBufferIndex == -1) {
-        displayBufferIndex = display::allocBuffer();
-        refresh = true;
-    } else {
-        displayBufferIndex = previousState->displayBufferIndex;
-    }
-    
-    display::selectBuffer(displayBufferIndex);
+	auto savedWidget = widgetCursor.widget;
 
-    if (refresh) {
-        drawRectangle(
-            widgetCursor.x, widgetCursor.y, overlay->width, overlay->height, 
-            getStyle(widget->style), flags.active, false, true
-        );
-    }
+	int xOffset = 0;
+	int yOffset = 0;
+	getOverlayOffset(widgetCursor, xOffset, yOffset);
 
-    WidgetState *childCurrentState = this;
-	WidgetState *childPreviousState = previousState;
-    WidgetCursor childWidgetCursor = getFirstChildWidgetCursor(widgetCursor, childCurrentState, childPreviousState);
+	g_xOverlayOffset = xOffset;
+	g_yOverlayOffset = yOffset;
 
-    if (previousState && previousState->overlayState != overlayState) {
-		childPreviousState = 0;
-    }
-
-    auto &widgets = widget->widgets;
-
-    WidgetState *endOfContainerInPreviousState = 0;
-    if (previousState) {
-        endOfContainerInPreviousState = nextWidgetState(previousState);
-    }
+	auto widget = (const ContainerWidget *)widgetCursor.widget;
+	auto &widgets = widget->widgets;
 
     auto widgetOverrides = overlay->widgetOverrides;
     auto widgetPtr = widgets.itemsPtr(widgetCursor.assets);
@@ -139,60 +130,58 @@ void ContainerWidgetState::drawOverlay(WidgetState *previousStateBase, Overlay *
 			}
         }
 
-        childWidgetCursor.widget = (const Widget *)widgetPtr->ptr(widgetCursor.assets);
+		widgetCursor.widget = (const Widget *)widgetPtr->ptr(widgetCursor.assets);
 
-        int xSaved = childWidgetCursor.widget->x;
-        int ySaved = childWidgetCursor.widget->y;
-        int wSaved = childWidgetCursor.widget->w;
-        int hSaved = childWidgetCursor.widget->h;
+        int xSaved = 0;
+        int ySaved = 0;
+        int wSaved = 0;
+        int hSaved = 0;
 
 		if (widgetOverrides) {
-			((Widget*)childWidgetCursor.widget)->x = widgetOverrides->x;
-			((Widget*)childWidgetCursor.widget)->y = widgetOverrides->y;
-			((Widget*)childWidgetCursor.widget)->w = widgetOverrides->w;
-			((Widget*)childWidgetCursor.widget)->h = widgetOverrides->h;
+			xSaved = widgetCursor.widget->x;
+			ySaved = widgetCursor.widget->y;
+			wSaved = widgetCursor.widget->w;
+			hSaved = widgetCursor.widget->h;
+
+			((Widget*)widgetCursor.widget)->x = widgetOverrides->x;
+			((Widget*)widgetCursor.widget)->y = widgetOverrides->y;
+			((Widget*)widgetCursor.widget)->w = widgetOverrides->w;
+			((Widget*)widgetCursor.widget)->h = widgetOverrides->h;
 		}
 
-        enumWidget(childWidgetCursor, childCurrentState, childPreviousState);
+        enumWidget(widgetCursor);
 
 		if (widgetOverrides) {
-			((Widget*)childWidgetCursor.widget)->x = xSaved;
-			((Widget*)childWidgetCursor.widget)->y = ySaved;
-			((Widget*)childWidgetCursor.widget)->w = wSaved;
-			((Widget*)childWidgetCursor.widget)->h = hSaved;
+			((Widget*)widgetCursor.widget)->x = xSaved;
+			((Widget*)widgetCursor.widget)->y = ySaved;
+			((Widget*)widgetCursor.widget)->w = wSaved;
+			((Widget*)widgetCursor.widget)->h = hSaved;
 			
 			widgetOverrides++;
 		}
-
-        if (childPreviousState) {
-            childPreviousState = nextWidgetState(childPreviousState);
-            if (childPreviousState > endOfContainerInPreviousState) {
-                childPreviousState = 0;
-            }
-        }
-        childCurrentState = nextWidgetState(childCurrentState);
     }
 
-    widgetStateSize = (uint8_t *)childCurrentState - (uint8_t *)this;
+	g_xOverlayOffset = 0;
+	g_yOverlayOffset = 0;
 
-    int xOffset = 0;
-    int yOffset = 0;
-    getOverlayOffset(widgetCursor, xOffset, yOffset);
+	if (g_findCallback == nullptr) {
+		const Style *style = getStyle(widgetCursor.widget->style);
 
-    const Style *style = getStyle(widgetCursor.widget->style);
+		display::setBufferBounds(
+			displayBufferIndex,
+			widgetCursor.x,
+			widgetCursor.y,
+			overlay->width,
+			overlay->height,
+			(widget->flags & SHADOW_FLAG) != 0,
+			style->opacity,
+			xOffset,
+			yOffset,
+			nullptr
+		);
+	}
 
-    display::setBufferBounds(
-        displayBufferIndex,
-        widgetCursor.x,
-        widgetCursor.y,
-        overlay->width,
-        overlay->height,
-        (widget->flags & SHADOW_FLAG) != 0, 
-        style->opacity,
-        xOffset,
-        yOffset,
-        nullptr
-    );
+	widgetCursor.widget = savedWidget;
 }
 
 } // namespace gui

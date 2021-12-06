@@ -33,74 +33,72 @@ int getLayoutId(const WidgetCursor &widgetCursor) {
     return layoutView->layout;
 }
 
-void LayoutViewWidgetState::draw(WidgetState *previousState) {
-	auto widget = (const LayoutViewWidget *)widgetCursor.widget;
+bool LayoutViewWidgetState::updateState(const WidgetCursor &widgetCursor) {
+    bool hasPreviousState = widgetCursor.hasPreviousState;
+    auto widget = (const LayoutViewWidget *)widgetCursor.widget;
 
     Value oldContext;
     Value newContext;
     if (widget->context) {
         setContext((WidgetCursor &)widgetCursor, widget->context, oldContext, newContext);
-        context = newContext;
+        WIDGET_STATE(context, newContext);
     } else {
-        context = Value();
+        WIDGET_STATE(context, Value());
     }
 
-    data = getLayoutId(widgetCursor);
-
-    bool refresh =
-        !previousState ||
-        previousState->flags.active != flags.active ||
-        previousState->data != data ||
-        ((LayoutViewWidgetState *)previousState)->context != context;
-
-    if (refresh) {
-        const Style* style = getStyle(widget->style);
-        drawRectangle(widgetCursor.x, widgetCursor.y, (int)widget->w, (int)widget->h, style, flags.active, false, true);
-    }
+    WIDGET_STATE(flags.active, g_isActiveWidget);
 
     int layoutId = getLayoutId(widgetCursor);
-    auto layout = getPageAsset(layoutId, widgetCursor);
+	auto layout = getPageAsset(layoutId);
+	if (layout) {
+		WIDGET_STATE(data, layoutId);
+	} else {
+		WIDGET_STATE(data, 0);
+	}
 
-    if (layout) {
-        WidgetState *childCurrentState = this;
-        WidgetState *childPreviousState = previousState;
-        WidgetCursor childWidgetCursor = getFirstChildWidgetCursor(widgetCursor, childCurrentState, childPreviousState);
+    return !hasPreviousState;
+}
+
+void LayoutViewWidgetState::render(WidgetCursor &widgetCursor) {
+    auto widget = (const LayoutViewWidget *)widgetCursor.widget;
+    const Style* style = getStyle(widget->style);
+    drawRectangle(widgetCursor.x, widgetCursor.y, (int)widget->w, (int)widget->h, style, flags.active, false, true);
+	repainted = true;
+}
+
+void LayoutViewWidgetState::enumChildren(WidgetCursor &widgetCursor) {
+	if (repainted) {
+		repainted = false;
+		if (widgetCursor.hasPreviousState) {
+			freeWidgetStates(widgetCursor.currentState);
+			widgetCursor.hasPreviousState = false;
+		}
+	}
+
+	if (g_findCallback != nullptr) {
+		auto widget = (const LayoutViewWidget *)widgetCursor.widget;
+		if (widget->context) {
+			Value oldContext;
+			Value newContext;
+			setContext((WidgetCursor &)widgetCursor, widget->context, oldContext, newContext);
+		}
+	}
+
+	auto layoutId = data.getInt();
+    if (layoutId) {
+		auto layout = getPageAsset(layoutId, widgetCursor);
+
+		auto savedWidget = widgetCursor.widget;
         
-        if (
-            previousState && 
-            (
-                previousState->data != data || 
-                ((LayoutViewWidgetState *)previousState)->context != context
-            )
-        ) {
-            childPreviousState = 0;
-        }
-
-		auto layoutView = (PageAsset *)layout;
-
-        auto &widgets = layoutView->widgets;
-
-        WidgetState *endOfContainerInPreviousState = 0;
-        if (previousState) {
-            endOfContainerInPreviousState = nextWidgetState(previousState);
-        }
-
+        auto &widgets = layout->widgets;
         auto widgetPtr = widgets.itemsPtr(widgetCursor.assets);
         for (uint32_t index = 0; index < widgets.count; ++index, ++widgetPtr) {
-            childWidgetCursor.widget = (const Widget *)widgetPtr->ptr(widgetCursor.assets);
+			widgetCursor.widget = (const Widget *)widgetPtr->ptr(widgetCursor.assets);
 
-            enumWidget(childWidgetCursor, childCurrentState, childPreviousState);
-
-            if (childPreviousState) {
-                childPreviousState = nextWidgetState(childPreviousState);
-                if (childPreviousState > endOfContainerInPreviousState) {
-                    childPreviousState = 0;
-                }
-            }
-            childCurrentState = nextWidgetState(childCurrentState);
+            enumWidget(widgetCursor);
         }
 
-        widgetStateSize = (uint8_t *)childCurrentState - (uint8_t *)this;
+		widgetCursor.widget = savedWidget;
 	}
 }
 

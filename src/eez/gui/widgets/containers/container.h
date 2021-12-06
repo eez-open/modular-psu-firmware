@@ -28,15 +28,16 @@ struct ContainerWidget : public Widget {
 };
 
 struct ContainerWidgetState : public WidgetState {
+	WidgetStateFlags flags;
+	Overlay *overlay;
     int overlayState;
     int displayBufferIndex;
+	bool displayBufferSelected;
 
-    ContainerWidgetState(const WidgetCursor &widgetCursor) : WidgetState(widgetCursor) {
-    }
-
-	void draw(WidgetState *previousState) override;
-
-	void drawOverlay(WidgetState *previousState, Overlay *overlay);
+    bool updateState(const WidgetCursor &widgetCursor) override;
+	void render(WidgetCursor &widgetCursor) override;
+	void enumChildren(WidgetCursor &widgetCursor) override;
+	void renderOverlayChildren(WidgetCursor &widgetCursor);
 };
 
 } // namespace gui

@@ -25,17 +25,10 @@ struct CanvasWidget : public Widget {
 };
 
 struct CanvasWidgetState : public WidgetState {
-    CanvasWidgetState(const WidgetCursor &widgetCursor) : WidgetState(widgetCursor) {
-        auto widget = (const CanvasWidget *)widgetCursor.widget;
+	Value data;
 
-        data = get(widgetCursor, widget->data);
-    }
-
-    bool operator!=(const CanvasWidgetState& previousState) {
-        return data != previousState.data;
-    }
-
-    void draw(WidgetState *previousState) override;
+    bool updateState(const WidgetCursor &widgetCursor) override;
+    void render(WidgetCursor &widgetCursor) override;
 };
 
 } // namespace gui

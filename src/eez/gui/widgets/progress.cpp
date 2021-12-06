@@ -24,41 +24,46 @@
 namespace eez {
 namespace gui {
 
-void ProgressWidgetState::draw(WidgetState *previousStateBase) {
-    auto previousState = (ProgressWidgetState *)previousStateBase;
-    bool refresh = !previousState || *this != *previousState;
-    if (refresh) {
-        auto widget = (const ProgressWidget *)widgetCursor.widget;
-        const Style* style = getStyle(widget->style);
+bool ProgressWidgetState::updateState(const WidgetCursor &widgetCursor) {
+    bool hasPreviousState = widgetCursor.hasPreviousState;
+    auto widget = (const ProgressWidget *)widgetCursor.widget;
+    
+    WIDGET_STATE(data, get(widgetCursor, widget->data));
 
-        drawRectangle(widgetCursor.x, widgetCursor.y, (int)widget->w, (int)widget->h, style, false, false, true);
+    return !hasPreviousState;
+}
 
-        int percentFrom;
-        int percentTo;
-        if (data.getType() == VALUE_TYPE_RANGE) {
-            percentFrom = data.getRangeFrom();
-            percentTo = data.getRangeTo();
-        } else {
-            percentFrom = 0;
-            percentTo = data.getInt();
-        }
+void ProgressWidgetState::render(WidgetCursor &widgetCursor) {
+    auto widget = (const ProgressWidget *)widgetCursor.widget;
+    const Style* style = getStyle(widget->style);
 
-		percentFrom = clamp(percentFrom, 0, 100.0f);
-		percentTo = clamp(percentTo, 0, 100.0f);
-		if (percentFrom > percentTo) {
-			percentFrom = percentTo;
-		}
+    drawRectangle(widgetCursor.x, widgetCursor.y, (int)widget->w, (int)widget->h, style, false, false, true);
 
-        auto isHorizontal = widget->w > widget->h;
-        if (isHorizontal) {
-            auto xFrom = percentFrom * widget->w / 100;
-            auto xTo = percentTo * widget->w / 100;
-            drawRectangle(widgetCursor.x + xFrom, widgetCursor.y, xTo - xFrom, (int)widget->h, style, true, false, true);
-        } else {
-            auto yFrom = percentFrom * widget->h / 100;
-            auto yTo = percentTo * widget->h / 100;
-            drawRectangle(widgetCursor.x, widgetCursor.y - yFrom, yTo - yFrom, (int)widget->h, getStyle(widget->style), true, false, true);
-        }
+    int percentFrom;
+    int percentTo;
+    if (data.getType() == VALUE_TYPE_RANGE) {
+        percentFrom = data.getRangeFrom();
+        percentTo = data.getRangeTo();
+    } else {
+        percentFrom = 0;
+        percentTo = data.getInt();
+    }
+
+    percentFrom = clamp(percentFrom, 0, 100.0f);
+    percentTo = clamp(percentTo, 0, 100.0f);
+    if (percentFrom > percentTo) {
+        percentFrom = percentTo;
+    }
+
+    auto isHorizontal = widget->w > widget->h;
+    if (isHorizontal) {
+        auto xFrom = percentFrom * widget->w / 100;
+        auto xTo = percentTo * widget->w / 100;
+        drawRectangle(widgetCursor.x + xFrom, widgetCursor.y, xTo - xFrom, (int)widget->h, style, true, false, true);
+    } else {
+        auto yFrom = percentFrom * widget->h / 100;
+        auto yTo = percentTo * widget->h / 100;
+        drawRectangle(widgetCursor.x, widgetCursor.y - yFrom, yTo - yFrom, (int)widget->h, getStyle(widget->style), true, false, true);
     }
 }
 

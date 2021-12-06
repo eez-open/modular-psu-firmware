@@ -71,8 +71,6 @@ void executeAction(int actionId);
 int16_t getAppContextId(AppContext *pAppContext);
 AppContext *getAppContextFromId(int16_t id);
 
-int getCurrentStateBufferIndex();
-
 ////////////////////////////////////////////////////////////////////////////////
 
 enum Buffer {

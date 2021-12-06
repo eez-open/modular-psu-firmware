@@ -28,19 +28,11 @@ struct MultilineTextWidget : public Widget {
 };
 
 struct MultilineTextWidgetState : public WidgetState {
-    MultilineTextWidgetState(const WidgetCursor &widgetCursor) : WidgetState(widgetCursor) {
-        auto widget = (const MultilineTextWidget *)widgetCursor.widget;
+	WidgetStateFlags flags;
+	Value data;
 
-        data = widget->data ? get(widgetCursor, widget->data) : 0;
-    }
-
-    bool operator!=(const MultilineTextWidgetState& previousState) {
-        return 
-            flags.active != previousState.flags.active ||
-            data != previousState.data;
-    }
-
-    void draw(WidgetState *previousState) override;
+    bool updateState(const WidgetCursor &widgetCursor) override;
+    void render(WidgetCursor &widgetCursor) override;
 };
 
 } // namespace gui

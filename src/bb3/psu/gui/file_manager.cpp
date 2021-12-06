@@ -27,7 +27,7 @@
 #include <bb3/fs_driver.h>
 
 #include <eez/gui/gui.h>
-#include <eez/gui/widgets/container.h>
+#include <eez/gui/widgets/containers/container.h>
 
 #include <bb3/psu/psu.h>
 #include <bb3/psu/serial_psu.h>

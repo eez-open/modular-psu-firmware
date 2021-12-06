@@ -28,19 +28,15 @@ struct UpDownWidget : public Widget {
 };
 
 struct UpDownWidgetState : public WidgetState {
-    UpDownWidgetState(const WidgetCursor &widgetCursor);
+	WidgetStateFlags flags;
+	Value data;
 
-    bool operator!=(const UpDownWidgetState& previousState) {
-        return
-            flags.active != previousState.flags.active ||
-            data != previousState.data;
-    }
-
-    void draw(WidgetState *previousState) override;
+	bool updateState(const WidgetCursor &widgetCursor) override;
+    void render(WidgetCursor &widgetCursor) override;
 	bool hasOnTouch() override;
-	void onTouch(Event &touchEvent) override;
+	void onTouch(const WidgetCursor &widgetCursor, Event &touchEvent) override;
 	bool hasOnKeyboard() override;
-	bool onKeyboard(uint8_t key, uint8_t mod) override;
+	bool onKeyboard(const WidgetCursor &widgetCursor, uint8_t key, uint8_t mod) override;
 };
 
 } // namespace gui

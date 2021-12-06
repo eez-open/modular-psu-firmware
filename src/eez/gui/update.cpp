@@ -19,61 +19,82 @@
 #include <eez/debug.h>
 
 #include <eez/gui/gui.h>
-#include <eez/gui/widgets/app_view.h>
+#include <eez/gui/widgets/containers/app_view.h>
 
 namespace eez {
 namespace gui {
 
 static uint8_t g_stateBuffer[GUI_STATE_BUFFER_SIZE];
-static WidgetState *g_previousState;
-WidgetState *g_currentState;
 static bool g_refreshScreen;
+static Widget *g_rootWidget;
 
-int getCurrentStateBufferIndex() {
-    return (uint8_t *)g_currentState == g_stateBuffer ? 0 : 1;
-}
+WidgetState *g_widgetStateStart;
+WidgetState *g_widgetStateEnd;
 
 void refreshScreen() {
-    g_refreshScreen = true;
+	g_refreshScreen = true;
 }
 
 void updateScreen() {
-    if (g_refreshScreen) {
-        g_refreshScreen = false;
+	if (!g_rootWidget) {
+		static AppViewWidget g_rootAppViewWidget;
 
-		if (g_currentState != nullptr) {
-			freeWidgetStates(g_currentState);
-			g_currentState = nullptr;
+		g_rootWidget = &g_rootAppViewWidget;
+
+		g_rootWidget->type = WIDGET_TYPE_APP_VIEW;
+		g_rootWidget->data = DATA_ID_NONE;
+		g_rootWidget->action = ACTION_ID_NONE;
+		g_rootWidget->x = 0;
+		g_rootWidget->y = 0;
+		g_rootWidget->w = display::getDisplayWidth();
+		g_rootWidget->h = display::getDisplayHeight();
+		g_rootWidget->style = 0;
+	}
+
+	if (g_refreshScreen) {
+		g_refreshScreen = false;
+
+		if (g_widgetStateStart) {
+			// invalidate widget states
+			freeWidgetStates(g_widgetStateStart);
+			g_widgetStateStart = nullptr;
 		}
 
 		display::freeAllBuffers();
-    }
-
-    g_isActiveWidget = false;
-
-	if (g_previousState) {
-		freeWidgetStates(g_previousState);
 	}
 
-    g_previousState = g_currentState;
-    g_currentState = (WidgetState *)(g_stateBuffer + CONF_MAX_STATE_SIZE * (getCurrentStateBufferIndex() == 0 ? 1 : 0));;
+	bool hasPreviousState = g_widgetStateStart != nullptr;
+	g_widgetStateStart = (WidgetState *)g_stateBuffer;
 
-	static AppViewWidget widget;
-	widget.type = WIDGET_TYPE_APP_VIEW;
-	widget.data = DATA_ID_NONE;
-	widget.action = ACTION_ID_NONE;
-	widget.x = 0;
-	widget.y = 0;
-	widget.w = display::getDisplayWidth();
-	widget.h = display::getDisplayHeight();
-	widget.style = 0;
+    g_isActiveWidget = false;
 
 	WidgetCursor widgetCursor;
 	widgetCursor.assets = g_mainAssets;
 	widgetCursor.appContext = &getRootAppContext();
-	widgetCursor.widget = &widget;
+	widgetCursor.widget = g_rootWidget;
+	widgetCursor.currentState = g_widgetStateStart;
+	widgetCursor.hasPreviousState = hasPreviousState;
 
-    enumWidget(widgetCursor, g_currentState, g_previousState);
+    enumWidget(widgetCursor);
+
+	g_widgetStateEnd = widgetCursor.currentState;
+}
+
+void enumRootWidget() {
+	if (!g_widgetStateStart || g_refreshScreen) {
+		return;
+	}
+
+    g_isActiveWidget = false;
+
+	WidgetCursor widgetCursor;
+	widgetCursor.assets = g_mainAssets;
+	widgetCursor.appContext = &getRootAppContext();
+	widgetCursor.widget = g_rootWidget;
+	widgetCursor.currentState = g_widgetStateStart;
+	widgetCursor.hasPreviousState = true;
+
+    enumWidget(widgetCursor);
 }
 
 } // namespace gui

@@ -26,10 +26,12 @@ struct SelectWidget : public Widget {
 };
 
 struct SelectWidgetState : public WidgetState {
-    SelectWidgetState(const WidgetCursor &widgetCursor) : WidgetState(widgetCursor) {
-    }
+    int widgetIndex;
+	bool repainted;
 
-    void draw(WidgetState *previousState) override;
+    bool updateState(const WidgetCursor &widgetCursor) override;
+	void render(WidgetCursor &widgetCursor) override;
+    void enumChildren(WidgetCursor &widgetCursor) override;
 };
 
 } // namespace gui

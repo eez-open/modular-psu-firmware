@@ -285,7 +285,7 @@ protected:
     void onPageTouch(const WidgetCursor &foundWidget, Event &touchEvent) override;
     bool testExecuteActionOnTouchDown(int action) override;
     bool canExecuteActionWhenTouchedOutsideOfActivePage(int pageId, int action) override;
-    void updatePage(int i, WidgetCursor &widgetCursor, WidgetState *currentState, WidgetState *previousState) override;
+    void updatePage(int i, WidgetCursor &widgetCursor) override;
 
 private:
     void doShowProgressPage();

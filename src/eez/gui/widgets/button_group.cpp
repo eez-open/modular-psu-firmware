@@ -90,24 +90,30 @@ void drawButtons(const Widget *widget, int x, int y, const Style *style, const S
     }
 }
 
-void ButtonGroupWidgetState::draw(WidgetState *previousStateBase) {
-    auto previousState = (ButtonGroupWidgetState *)previousStateBase;
-    bool refresh = !previousState || *this != *previousState;
-    if (refresh) {
-        auto widget = (const ButtonGroupWidget *)widgetCursor.widget;
+bool ButtonGroupWidgetState::updateState(const WidgetCursor &widgetCursor) {
+    bool hasPreviousState = widgetCursor.hasPreviousState;
+    auto widget = (const ButtonGroupWidget *)widgetCursor.widget;
+    
+    WIDGET_STATE(flags.active, g_isActiveWidget);
+    WIDGET_STATE(data, get(widgetCursor, widget->data));
 
-        const Style* style = getStyle(widget->style);
-        const Style* selectedStyle = getStyle(widget->selectedStyle);
+    return !hasPreviousState;
+}
 
-        drawButtons(widget, widgetCursor.x, widgetCursor.y, style, selectedStyle, data.getInt(), count(widgetCursor, widget->data));
-    }
+void ButtonGroupWidgetState::render(WidgetCursor &widgetCursor) {
+    auto widget = (const ButtonGroupWidget *)widgetCursor.widget;
+
+    const Style* style = getStyle(widget->style);
+    const Style* selectedStyle = getStyle(widget->selectedStyle);
+
+    drawButtons(widget, widgetCursor.x, widgetCursor.y, style, selectedStyle, data.getInt(), count(widgetCursor, widget->data));
 }
 
 bool ButtonGroupWidgetState::hasOnTouch() {
     return true;
 }
 
-void ButtonGroupWidgetState::onTouch(Event &touchEvent) {
+void ButtonGroupWidgetState::onTouch(const WidgetCursor &widgetCursor, Event &touchEvent) {
     if (touchEvent.type == EVENT_TYPE_TOUCH_DOWN) {
         const Widget *widget = widgetCursor.widget;
 

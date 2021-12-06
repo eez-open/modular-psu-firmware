@@ -24,20 +24,26 @@
 namespace eez {
 namespace gui {
 
-void ToggleButtonWidgetState::draw(WidgetState *previousStateBase) {
-    auto previousState = (ToggleButtonWidgetState *)previousStateBase;
-    bool refresh = !previousState || *this != *previousState;
-    if (refresh) {
-        auto widget = (const ToggleButtonWidget *)widgetCursor.widget;
-        const Style* style = getStyle(widget->style);
-        drawText(
-            flags.enabled ? 
-                widget->text2.ptr(widgetCursor.assets): 
-                widget->text1.ptr(widgetCursor.assets),
-            -1,
-			widgetCursor.x, widgetCursor.y, (int)widget->w, (int)widget->h, style,
-            flags.active, false, false, nullptr, nullptr, nullptr, nullptr);
-    }
+bool ToggleButtonWidgetState::updateState(const WidgetCursor &widgetCursor) {
+    bool hasPreviousState = widgetCursor.hasPreviousState;
+    auto widget = (const ToggleButtonWidget *)widgetCursor.widget;
+
+    WIDGET_STATE(flags.active, g_isActiveWidget);
+    WIDGET_STATE(flags.enabled, get(widgetCursor, widget->data).getInt() ? 1 : 0);
+
+    return !hasPreviousState;
+}
+
+void ToggleButtonWidgetState::render(WidgetCursor &widgetCursor) {
+    auto widget = (const ToggleButtonWidget *)widgetCursor.widget;
+    const Style* style = getStyle(widget->style);
+    drawText(
+        flags.enabled ? 
+            widget->text2.ptr(widgetCursor.assets): 
+            widget->text1.ptr(widgetCursor.assets),
+        -1,
+        widgetCursor.x, widgetCursor.y, (int)widget->w, (int)widget->h, style,
+        flags.active, false, false, nullptr, nullptr, nullptr, nullptr);
 }
 
 } // namespace gui

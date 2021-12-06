@@ -22,35 +22,47 @@
 namespace eez {
 namespace gui {
 
-void SelectWidgetState::draw(WidgetState *previousState) {
-    Value indexValue = get(widgetCursor, widgetCursor.widget->data);
-    data = indexValue;
-
-	auto selectWidget = (const SelectWidget *)widgetCursor.widget;
-    if (selectWidget->widgets.count > 0) {
-        int err;
+bool SelectWidgetState::updateState(const WidgetCursor &widgetCursor) {
+	bool hasPreviousState = widgetCursor.hasPreviousState;
+	auto widget = (const SelectWidget *)widgetCursor.widget;
+	if (widget->widgets.count > 0) {
+		Value indexValue = get(widgetCursor, widgetCursor.widget->data);
+		int err;
 		int index = indexValue.toInt32(&err);
-        if (err) {
-            index = indexValue.getInt();
-        }
+		if (err) {
+			index = indexValue.getInt();
+		}
+		WIDGET_STATE(widgetIndex, index < 0 || index >= (int)widget->widgets.count ? 0 : index);
+	} else {
+		WIDGET_STATE(widgetIndex, -1);
+	}
 
-	    auto widgetIndex = index < 0 || index >= (int)selectWidget->widgets.count ? 0 : index;
+	return !hasPreviousState;
+}
 
-        WidgetState *childCurrentState = this;
-        WidgetState *childPreviousState = previousState;
-        WidgetCursor childWidgetCursor = getFirstChildWidgetCursor(widgetCursor, childCurrentState, childPreviousState);
+void SelectWidgetState::render(WidgetCursor &widgetCursor) {
+	repainted = true;
+}
 
-        childWidgetCursor.widget = selectWidget->widgets.item(widgetCursor.assets, widgetIndex);
+void SelectWidgetState::enumChildren(WidgetCursor &widgetCursor) {
+	if (repainted) {
+		repainted = false;
+		if (widgetCursor.hasPreviousState) {
+			freeWidgetStates(widgetCursor.currentState);
+			widgetCursor.hasPreviousState = false;
+		}
+	}
+	
+	if (widgetIndex != -1) {
+		auto widget = (const SelectWidget *)widgetCursor.widget;
 
-        if (previousState && previousState->data != data) {
-            childPreviousState = 0;
-        }
+		auto savedWidget = widgetCursor.widget;
+		widgetCursor.widget = widget->widgets.item(widgetCursor.assets, widgetIndex);
 
-        enumWidget(childWidgetCursor, childCurrentState, childPreviousState);
+        enumWidget(widgetCursor);
 
-        childCurrentState = nextWidgetState(childCurrentState);
-        widgetStateSize = (uint8_t *)childCurrentState - (uint8_t *)this;
-    }
+		widgetCursor.widget = savedWidget;
+	}
 }
 
 } // namespace gui

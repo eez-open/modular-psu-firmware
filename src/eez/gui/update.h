@@ -21,9 +21,12 @@
 namespace eez {
 namespace gui {
 
-extern WidgetState *g_currentState;
+extern WidgetState *g_widgetStateStart;
+extern WidgetState *g_widgetStateEnd;
 
 void updateScreen();
+
+void enumRootWidget();
 
 } // namespace gui
 } // namespace eez

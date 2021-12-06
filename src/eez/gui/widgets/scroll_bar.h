@@ -38,28 +38,18 @@ enum ScrollBarWidgetSegment {
 };
 
 struct ScrollBarWidgetState : public WidgetState {
+	WidgetStateFlags flags;
     int size;
     int position;
     int pageSize;
     ScrollBarWidgetSegment segment;
 
-	ScrollBarWidgetState(const WidgetCursor &widgetCursor);
-
-    bool operator!=(const ScrollBarWidgetState& previousState) {
-        return
-            flags.active != previousState.flags.active ||
-            flags.focused != previousState.flags.focused ||
-            size != previousState.size ||
-            position != previousState.position ||
-            pageSize != previousState.pageSize ||
-            segment != previousState.segment;
-    }
-
-    void draw(WidgetState *previousState) override;
+	bool updateState(const WidgetCursor &widgetCursor) override;
+    void render(WidgetCursor &widgetCursor) override;
 	bool hasOnTouch() override;
-	void onTouch(Event &touchEvent) override;
+	void onTouch(const WidgetCursor &widgetCursor, Event &touchEvent) override;
 	bool hasOnKeyboard() override;
-	bool onKeyboard(uint8_t key, uint8_t mod) override;
+	bool onKeyboard(const WidgetCursor &widgetCursor, uint8_t key, uint8_t mod) override;
 };
 
 } // namespace gui

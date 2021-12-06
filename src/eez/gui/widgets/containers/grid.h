@@ -27,10 +27,11 @@ struct GridWidget : public Widget {
 };
 
 struct GridWidgetState : public WidgetState {
-    GridWidgetState(const WidgetCursor &widgetCursor) : WidgetState(widgetCursor) {
-    }
+    int startPosition;
+    int count;
 
-    void draw(WidgetState *previousState) override;
+    bool updateState(const WidgetCursor &widgetCursor) override;
+    void enumChildren(WidgetCursor &widgetCursor) override;
 };
 
 } // namespace gui

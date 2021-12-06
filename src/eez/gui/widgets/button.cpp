@@ -26,32 +26,45 @@ static const size_t MAX_TEXT_LEN = 128;
 namespace eez {
 namespace gui {
 
-void ButtonWidgetState::draw(WidgetState *previousStateBase) {
-    auto previousState = (ButtonWidgetState *)previousStateBase;
-    bool refresh = !previousState || *this != *previousState;
-    if (refresh) {
-        auto widget = (const ButtonWidget *)widgetCursor.widget;
-        const Style *style = getStyle(flags.enabled ? widget->style : widget->disabledStyle);
-        
-        if (widget->data) {
-            if (data.isString()) {
-                drawText(data.getString(), -1, widgetCursor.x,
-                         widgetCursor.y, (int)widget->w, (int)widget->h, style,
-                         flags.active,
-                         flags.blinking, false, nullptr, nullptr, nullptr, nullptr);
-            } else {
-				char text[MAX_TEXT_LEN + 1];
-				data.toText(text, sizeof(text));
+bool ButtonWidgetState::updateState(const WidgetCursor &widgetCursor) {
+    bool hasPreviousState = widgetCursor.hasPreviousState;
+    auto widget = (const ButtonWidget *)widgetCursor.widget;
+    const Style *style = getStyle(flags.enabled ? widget->style : widget->disabledStyle);
 
-                drawText(text, -1, widgetCursor.x, widgetCursor.y, (int)widget->w, (int)widget->h,
-                         style, flags.active,
-                         flags.blinking, false, nullptr, nullptr, nullptr, nullptr);
-            }
+    WIDGET_STATE(flags.active, g_isActiveWidget);
+
+    auto enabled = get(widgetCursor, widget->enabled);
+    WIDGET_STATE(flags.enabled, enabled.getType() == VALUE_TYPE_UNDEFINED || enabled.getInt() ? 1 : 0);
+
+    WIDGET_STATE(flags.blinking, g_isBlinkTime && (isBlinking(widgetCursor, widget->data) || styleIsBlink(style)));
+
+    WIDGET_STATE(data, widget->data ? get(widgetCursor, widget->data) : 0);
+    
+    return !hasPreviousState;
+}
+
+void ButtonWidgetState::render(WidgetCursor &widgetCursor) {
+    auto widget = (const ButtonWidget *)widgetCursor.widget;
+    const Style *style = getStyle(flags.enabled ? widget->style : widget->disabledStyle);
+    
+    if (widget->data) {
+        if (data.isString()) {
+            drawText(data.getString(), -1, widgetCursor.x,
+                        widgetCursor.y, (int)widget->w, (int)widget->h, style,
+                        flags.active,
+                        flags.blinking, false, nullptr, nullptr, nullptr, nullptr);
         } else {
-            drawText(widget->text.ptr(widgetCursor.assets), -1, widgetCursor.x, widgetCursor.y, (int)widget->w, (int)widget->h,
-                     style, flags.active,
-                     flags.blinking, false, nullptr, nullptr, nullptr, nullptr);
+            char text[MAX_TEXT_LEN + 1];
+            data.toText(text, sizeof(text));
+
+            drawText(text, -1, widgetCursor.x, widgetCursor.y, (int)widget->w, (int)widget->h,
+                        style, flags.active,
+                        flags.blinking, false, nullptr, nullptr, nullptr, nullptr);
         }
+    } else {
+        drawText(widget->text.ptr(widgetCursor.assets), -1, widgetCursor.x, widgetCursor.y, (int)widget->w, (int)widget->h,
+                    style, flags.active,
+                    flags.blinking, false, nullptr, nullptr, nullptr, nullptr);
     }
 }
 

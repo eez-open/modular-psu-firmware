@@ -201,7 +201,7 @@ struct YTGraphDrawHelper {
 
 // used for YT_GRAPH_UPDATE_METHOD_STATIC
 struct YTGraphStaticDrawHelper {
-    YTGraphWidgetState *currentState;
+    YTGraphWidgetState *widgetState;
     const WidgetCursor &widgetCursor;
     const Widget *widget;
 
@@ -232,8 +232,8 @@ struct YTGraphStaticDrawHelper {
     int xLabels[MAX_NUM_OF_Y_VALUES];
     int yLabels[MAX_NUM_OF_Y_VALUES];
 
-    YTGraphStaticDrawHelper(YTGraphWidgetState *currentState_, const WidgetCursor &widgetCursor_) 
-        : currentState(currentState_), widgetCursor(widgetCursor_), widget(widgetCursor.widget) 
+    YTGraphStaticDrawHelper(YTGraphWidgetState *widgetState_, const WidgetCursor &widgetCursor_) 
+        : widgetState(widgetState_), widgetCursor(widgetCursor_), widget(widgetCursor.widget) 
     {
         ytDataGetValue = ytDataGetGetValueFunc(widgetCursor, widget->data);
     }
@@ -338,8 +338,8 @@ struct YTGraphStaticDrawHelper {
         if (ytDataDataValueIsVisible(widgetCursor, widget->data, m_valueIndex)) {
             position = currentHistoryValuePosition;
 
-            scale = (widget->h - 1) / currentState->valueDiv[m_valueIndex] / vertDivisions;
-            offset = currentState->valueOffset[m_valueIndex];
+            scale = (widget->h - 1) / widgetState->valueDiv[m_valueIndex] / vertDivisions;
+            offset = widgetState->valueOffset[m_valueIndex];
 
             const Style* style = ytDataGetStyle(widgetCursor, widget->data, m_valueIndex);
             dataColor16 = display::getColor16FromIndex(style->color);
@@ -454,7 +454,7 @@ struct YTGraphStaticDrawHelper {
 
 			drawText(text, -1,
 				xCursorText, yCursorText, cursorTextWidth, cursorTextHeight,
-				style, currentState->flags.focused, false, false, nullptr, nullptr, nullptr, nullptr
+				style, widgetState->flags.focused, false, false, nullptr, nullptr, nullptr, nullptr
 			);
 		}
 		
@@ -481,68 +481,91 @@ struct YTGraphStaticDrawHelper {
 
 ////////////////////////////////////////////////////////////////////////////////
 
-void YTGraphWidgetState::draw(WidgetState *previousStateBase) {
-    auto previousState = (YTGraphWidgetState *)previousStateBase;
-    bool refresh = !previousState || *this != *previousState;
-    if (refresh) {
-        auto widget = (const YTGraphWidget *)widgetCursor.widget;
+bool YTGraphWidgetState::updateState(const WidgetCursor &widgetCursor) {
+    bool hasPreviousState = widgetCursor.hasPreviousState;
+    auto widget = (const YTGraphWidget *)widgetCursor.widget;
 
-        uint16_t graphWidth = (uint16_t)widget->w;
+    WIDGET_STATE(flags.focused, isFocusWidget(widgetCursor));
 
-        uint32_t previousHistoryValuePosition;
-        if (
-			previousState && 
-            (
-                previousState->iChannel == iChannel &&
-                previousState->ytGraphUpdateMethod == ytGraphUpdateMethod &&
-                previousState->refreshCounter == refreshCounter
-            )
-        ) {
-            previousHistoryValuePosition = previousState->historyValuePosition;
-        } else {
-            previousHistoryValuePosition = historyValuePosition - graphWidth;
+    WIDGET_STATE(refreshCounter, ytDataGetRefreshCounter(widgetCursor, widget->data));
+    WIDGET_STATE(iChannel, widgetCursor.cursor);
+    WIDGET_STATE(ytGraphUpdateMethod, ytDataGetGraphUpdateMethod(widgetCursor, widget->data));
+    WIDGET_STATE(numHistoryValues, ytDataGetSize(widgetCursor, widget->data));
+    WIDGET_STATE(bookmarks, ytDataGetBookmarks(widgetCursor, widget->data));
+    WIDGET_STATE(showLabels, ytDataGetShowLabels(widgetCursor, widget->data));
+    WIDGET_STATE(selectedValueIndex, ytDataGetSelectedValueIndex(widgetCursor, widget->data));
+
+    if (ytGraphUpdateMethod == YT_GRAPH_UPDATE_METHOD_STATIC) {
+        for (int valueIndex = 0; valueIndex < MAX_NUM_OF_Y_VALUES; valueIndex++) {
+            WIDGET_STATE(valueIsVisible[valueIndex], ytDataDataValueIsVisible(widgetCursor, widget->data, valueIndex));
+            WIDGET_STATE(valueDiv[valueIndex], ytDataGetDiv(widgetCursor, widget->data, valueIndex));
+            WIDGET_STATE(valueOffset[valueIndex], ytDataGetOffset(widgetCursor, widget->data, valueIndex));
+        }
+    }
+
+    WIDGET_STATE(historyValuePosition, ytDataGetPosition(widgetCursor, widget->data));
+    WIDGET_STATE(cursorPosition, historyValuePosition + ytDataGetCursorOffset(widgetCursor, widget->data));
+
+    // if (hasPreviousState && ytGraphUpdateMethod == YT_GRAPH_UPDATE_METHOD_SCAN_LINE) {
+    // 	previousHistoryValuePosition = historyValuePosition;
+    // 	refreshBackground = false;
+    // } else {
+    //     hasPreviousState = false;
+    //     uint16_t graphWidth = (uint16_t)widget->w;
+    // 	previousHistoryValuePosition = new_historyValuePosition - graphWidth;
+    // 	refreshBackground = true;
+    // }
+
+    uint16_t graphWidth = (uint16_t)widget->w;
+    previousHistoryValuePosition = historyValuePosition - graphWidth;
+
+    return !hasPreviousState;
+}
+
+void YTGraphWidgetState::render(WidgetCursor &widgetCursor) {
+    auto widget = (const YTGraphWidget *)widgetCursor.widget;
+
+    uint16_t graphWidth = (uint16_t)widget->w;
+
+    if (ytGraphUpdateMethod == YT_GRAPH_UPDATE_METHOD_STATIC) {
+        YTGraphStaticDrawHelper drawHelper(this, widgetCursor);
+
+        drawHelper.cursorPosition = cursorPosition;
+        drawHelper.bookmarks = bookmarks;
+        drawHelper.drawStatic(previousHistoryValuePosition, historyValuePosition, numHistoryValues, graphWidth, showLabels, selectedValueIndex);
+    } else {
+        const Style* style = getStyle(widget->style);
+
+        if (!refreshBackground) {
+            display::setColor(style->background_color);
+            display::fillRect(widgetCursor.x, widgetCursor.y, widgetCursor.x + (int)widget->w - 1, widgetCursor.y + (int)widget->h - 1);
         }
 
-        if (ytGraphUpdateMethod == YT_GRAPH_UPDATE_METHOD_STATIC) {
-            YTGraphStaticDrawHelper drawHelper(this, widgetCursor);
+        YTGraphDrawHelper drawHelper(widgetCursor);
+        drawHelper.color16 = display::getColor16FromIndex(flags.active ? style->color : style->background_color);
+        if (ytGraphUpdateMethod == YT_GRAPH_UPDATE_METHOD_SCAN_LINE) {
+            drawHelper.drawScanLine(previousHistoryValuePosition, historyValuePosition, graphWidth);
 
-            drawHelper.cursorPosition = cursorPosition;
-            drawHelper.bookmarks = bookmarks;
-            drawHelper.drawStatic(previousHistoryValuePosition, historyValuePosition, numHistoryValues, graphWidth, showLabels, selectedValueIndex);
-        } else {
-            const Style* style = getStyle(widget->style);
+            int x = widgetCursor.x;
 
-            if (!previousState) {
-                display::setColor(style->background_color);
-                display::fillRect(widgetCursor.x, widgetCursor.y, widgetCursor.x + (int)widget->w - 1, widgetCursor.y + (int)widget->h - 1);
+            // draw cursor
+            display::setColor(style->color);
+            display::drawVLine(x + historyValuePosition % graphWidth, widgetCursor.y, (int)widget->h - 1);
+            display::drawVLine(x + (historyValuePosition + 1) % graphWidth, widgetCursor.y, (int)widget->h - 1);
+
+            // draw blank lines
+            int x1 = x + (historyValuePosition + 2) % graphWidth;
+            int x2 = x + (historyValuePosition + CONF_GUI_YT_GRAPH_BLANK_PIXELS_AFTER_CURSOR) % graphWidth;
+
+            display::setColor(style->background_color);
+            if (x1 < x2) {
+                display::fillRect(x1, widgetCursor.y, x2, widgetCursor.y + (int)widget->h - 1);
+            } else {
+                display::fillRect(x1, widgetCursor.y, x + graphWidth - 1, widgetCursor.y + (int)widget->h - 1);
+                display::fillRect(x, widgetCursor.y, x2, widgetCursor.y + (int)widget->h - 1);
             }
-
-            YTGraphDrawHelper drawHelper(widgetCursor);
-            drawHelper.color16 = display::getColor16FromIndex(flags.active ? style->color : style->background_color);
-            if (ytGraphUpdateMethod == YT_GRAPH_UPDATE_METHOD_SCAN_LINE) {
-                drawHelper.drawScanLine(previousHistoryValuePosition, historyValuePosition, graphWidth);
-
-                int x = widgetCursor.x;
-
-                // draw cursor
-                display::setColor(style->color);
-                display::drawVLine(x + historyValuePosition % graphWidth, widgetCursor.y, (int)widget->h - 1);
-                display::drawVLine(x + (historyValuePosition + 1) % graphWidth, widgetCursor.y, (int)widget->h - 1);
-
-                // draw blank lines
-                int x1 = x + (historyValuePosition + 2) % graphWidth;
-                int x2 = x + (historyValuePosition + CONF_GUI_YT_GRAPH_BLANK_PIXELS_AFTER_CURSOR) % graphWidth;
-
-                display::setColor(style->background_color);
-                if (x1 < x2) {
-                    display::fillRect(x1, widgetCursor.y, x2, widgetCursor.y + (int)widget->h - 1);
-                } else {
-                    display::fillRect(x1, widgetCursor.y, x + graphWidth - 1, widgetCursor.y + (int)widget->h - 1);
-                    display::fillRect(x, widgetCursor.y, x2, widgetCursor.y + (int)widget->h - 1);
-                }
-            } else if (ytGraphUpdateMethod == YT_GRAPH_UPDATE_METHOD_SCROLL) {
-                drawHelper.drawScrolling(previousHistoryValuePosition, historyValuePosition, numHistoryValues, graphWidth);
-            }
+        } else if (ytGraphUpdateMethod == YT_GRAPH_UPDATE_METHOD_SCROLL) {
+            drawHelper.drawScrolling(previousHistoryValuePosition, historyValuePosition, numHistoryValues, graphWidth);
         }
     }
 }
@@ -551,7 +574,7 @@ bool YTGraphWidgetState::hasOnTouch() {
     return true;
 }
 
-void YTGraphWidgetState::onTouch(Event &touchEvent) {
+void YTGraphWidgetState::onTouch(const WidgetCursor &widgetCursor, Event &touchEvent) {
     if (ytDataGetGraphUpdateMethod(widgetCursor, widgetCursor.widget->data) == YT_GRAPH_UPDATE_METHOD_STATIC) {
         if (touchEvent.type == EVENT_TYPE_TOUCH_DOWN || touchEvent.type == EVENT_TYPE_TOUCH_MOVE) {
 			TouchDrag touchDrag = {

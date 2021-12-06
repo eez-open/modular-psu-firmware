@@ -24,17 +24,22 @@
 namespace eez {
 namespace gui {
 
-void CanvasWidgetState::draw(WidgetState *previousStateBase) {
-    auto previousState = (CanvasWidgetState *)previousStateBase;
-    bool refresh = !previousState || *this != *previousState;
-    if (refresh) {
-        auto widget = (const CanvasWidget *)widgetCursor.widget;
+bool CanvasWidgetState::updateState(const WidgetCursor &widgetCursor) {
+    bool hasPreviousState = widgetCursor.hasPreviousState;
+    auto widget = (const CanvasWidget *)widgetCursor.widget;
 
-        Value value;
-        DATA_OPERATION_FUNCTION(widget->data, DATA_OPERATION_GET_CANVAS_DRAW_FUNCTION, widgetCursor, value);
-        auto drawFunction = (void (*)(const WidgetCursor &widgetCursor))value.getVoidPointer();
-        drawFunction(widgetCursor);
-    }
+    WIDGET_STATE(data, get(widgetCursor, widget->data));
+
+    return !hasPreviousState;
+}
+
+void CanvasWidgetState::render(WidgetCursor &widgetCursor) {
+    auto widget = (const CanvasWidget *)widgetCursor.widget;
+
+    Value value;
+    DATA_OPERATION_FUNCTION(widget->data, DATA_OPERATION_GET_CANVAS_DRAW_FUNCTION, widgetCursor, value);
+    auto drawFunction = (void (*)(const WidgetCursor &widgetCursor))value.getVoidPointer();
+    drawFunction(widgetCursor);
 }
 
 } // namespace gui

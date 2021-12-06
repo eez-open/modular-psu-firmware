@@ -100,6 +100,9 @@ struct WidgetCursor {
     int16_t x;
     int16_t y;
 
+	WidgetState *currentState;
+	bool hasPreviousState;
+
 	WidgetCursor()
 		: assets(nullptr)
 		, appContext(nullptr)
@@ -108,6 +111,8 @@ struct WidgetCursor {
 		, flowState(nullptr)
 		, x(0)
 		, y(0)
+		, currentState(nullptr)
+		, hasPreviousState(false)
 	{
 		iterators[0] = -1; iterators[1] = -1; iterators[2] = -1; iterators[3] = -1;
 	}
@@ -117,7 +122,9 @@ struct WidgetCursor {
 		AppContext *appContext_,
 		const Widget *widget_,
 		int16_t x_,
-		int16_t y_
+		int16_t y_,
+		WidgetState *currentState_,
+		bool hasPreviousState_
     )
 		: assets(assets_)
 		, appContext(appContext_)
@@ -126,6 +133,8 @@ struct WidgetCursor {
 		, flowState(nullptr)
 		, x(x_)
 		, y(y_)
+		, currentState(currentState_)
+		, hasPreviousState(hasPreviousState_)
     {
 		iterators[0] = -1; iterators[1] = -1; iterators[2] = -1; iterators[3] = -1;
 	}
@@ -138,6 +147,8 @@ struct WidgetCursor {
 		, flowState(nullptr)
 		, x(0)
 		, y(0)
+		, currentState(nullptr)
+		, hasPreviousState(false)
 	{
 		iterators[0] = -1; iterators[1] = -1; iterators[2] = -1; iterators[3] = -1;
 	}
@@ -174,45 +185,46 @@ struct WidgetCursor {
 extern bool g_isActiveWidget;
 
 struct WidgetState {
-	WidgetCursor widgetCursor;
-	size_t widgetStateSize;
-	WidgetStateFlags flags;
-	Value data;
-
-	WidgetState(const WidgetCursor& widgetCursor_) : widgetCursor(widgetCursor_) {
-		flags.active = g_isActiveWidget;
-		flags.focused = 0;
-		flags.blinking = 0;
-		flags.enabled = 0;
-	}
+	uint16_t type;
 
 	virtual ~WidgetState() {}
 
-	WidgetCursor getFirstChildWidgetCursor(WidgetCursor &widgetCursor, WidgetState *&currentState, WidgetState *&previousState);
+	virtual bool updateState(const WidgetCursor &widgetCursor);
 
-	virtual void draw(WidgetState *previousState);
+	virtual void render(WidgetCursor &widgetCursor);
+	virtual void enumChildren(WidgetCursor &widgetCursor);
 	
 	virtual bool hasOnTouch();
-	virtual void onTouch(Event &touchEvent);
+	virtual void onTouch(const WidgetCursor &widgetCursor, Event &touchEvent);
 	
 	virtual bool hasOnKeyboard();
-	virtual bool onKeyboard(uint8_t key, uint8_t mod);
+	virtual bool onKeyboard(const WidgetCursor &widgetCursor, uint8_t key, uint8_t mod);
 };
+
+#define WIDGET_STATE(A, B) \
+	if (hasPreviousState) { \
+		auto temp = B; \
+		if (A != temp) { \
+			hasPreviousState = false; \
+			A = temp; \
+		} \
+	} else { \
+		A = B; \
+	}
 
 ////////////////////////////////////////////////////////////////////////////////
 
-#define nextWidgetState(p) (WidgetState *)(((uint8_t *)p) + p->widgetStateSize)
-
-void enumWidget(WidgetCursor &widgetCursor, WidgetState *currentState, WidgetState *previousState);
-void enumNoneWidget(WidgetCursor &widgetCursor, WidgetState *currentState, WidgetState *previousState);
-
-typedef bool (*EnumWidgetsCallback)(WidgetState *widgetState);
-void forEachWidget(AppContext* appContext, EnumWidgetsCallback callback);
-WidgetState *getWidgetState(const WidgetCursor &widgetCursor);
+void enumRootWidget();
+void enumWidget(WidgetCursor &widgetCursor);
+void enumNoneWidget(WidgetCursor &widgetCursor);
 
 void freeWidgetStates(WidgetState *topWidgetState);
 
-WidgetCursor findWidget(AppContext* appContext, int16_t x, int16_t y, bool clicked = true);
+typedef void (*EnumWidgetsCallback)(const WidgetCursor &widgetCursor);
+extern EnumWidgetsCallback g_findCallback;
+void forEachWidget(EnumWidgetsCallback callback);
+
+WidgetCursor findWidget(int16_t x, int16_t y, bool clicked = true);
 
 OnTouchFunctionType getWidgetTouchFunction(const WidgetCursor &widgetCursor);
 

@@ -25,43 +25,49 @@
 namespace eez {
 namespace gui {
 
-void BitmapWidgetState::draw(WidgetState *previousStateBase) {
-    auto previousState = (BitmapWidgetState *)previousStateBase;
-    bool refresh = !previousState || *this != *previousState;
-    if (refresh) {
-	    auto widget = (const BitmapWidget *)widgetCursor.widget;
-        const Style* style = getStyle(widget->style);
+bool BitmapWidgetState::updateState(const WidgetCursor &widgetCursor) {
+    bool hasPreviousState = widgetCursor.hasPreviousState;
+    auto widget = (const BitmapWidget *)widgetCursor.widget;
+    
+    WIDGET_STATE(flags.active, g_isActiveWidget);
+    WIDGET_STATE(data, widget->data ? getBitmapImage(widgetCursor, widget->data) : 0);
 
-        const Bitmap *bitmap = nullptr;
+    return !hasPreviousState;
+}
 
-        if (widget->data) {
-            if (data.getType() != VALUE_TYPE_UNDEFINED) {
-                drawRectangle(widgetCursor.x, widgetCursor.y, (int)widget->w, (int)widget->h, style, flags.active, true, true);
-                auto image = (Image *)data.getVoidPointer();
-                if (image) {
-                    drawBitmap(image, widgetCursor.x, widgetCursor.y, (int)widget->w, (int)widget->h, style, flags.active);
-                }
-                return;
-            } else {
-                Value valueBitmapId;
-                DATA_OPERATION_FUNCTION(widget->data,  DATA_OPERATION_GET, widgetCursor, valueBitmapId);
-                bitmap = getBitmap(valueBitmapId.getInt());
+void BitmapWidgetState::render(WidgetCursor &widgetCursor) {
+    auto widget = (const BitmapWidget *)widgetCursor.widget;
+    const Style* style = getStyle(widget->style);
+
+    const Bitmap *bitmap = nullptr;
+
+    if (widget->data) {
+        if (data.getType() != VALUE_TYPE_UNDEFINED) {
+            drawRectangle(widgetCursor.x, widgetCursor.y, (int)widget->w, (int)widget->h, style, flags.active, true, true);
+            auto image = (Image *)data.getVoidPointer();
+            if (image) {
+                drawBitmap(image, widgetCursor.x, widgetCursor.y, (int)widget->w, (int)widget->h, style, flags.active);
             }
-        } else if (widget->bitmap != 0) {
-            bitmap = getBitmap(widget->bitmap);
+            return;
+        } else {
+            Value valueBitmapId;
+            DATA_OPERATION_FUNCTION(widget->data,  DATA_OPERATION_GET, widgetCursor, valueBitmapId);
+            bitmap = getBitmap(valueBitmapId.getInt());
         }
+    } else if (widget->bitmap != 0) {
+        bitmap = getBitmap(widget->bitmap);
+    }
 
-        if (bitmap) {
-            Image image;
+    if (bitmap) {
+        Image image;
 
-            image.width = bitmap->w;
-            image.height = bitmap->h;
-            image.bpp = bitmap->bpp;
-            image.lineOffset = 0;
-            image.pixels = (uint8_t *)bitmap->pixels;
+        image.width = bitmap->w;
+        image.height = bitmap->h;
+        image.bpp = bitmap->bpp;
+        image.lineOffset = 0;
+        image.pixels = (uint8_t *)bitmap->pixels;
 
-            drawBitmap(&image, widgetCursor.x, widgetCursor.y, (int)widget->w, (int)widget->h, style, flags.active);
-        }
+        drawBitmap(&image, widgetCursor.x, widgetCursor.y, (int)widget->w, (int)widget->h, style, flags.active);
     }
 }
 

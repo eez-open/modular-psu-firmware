@@ -28,12 +28,14 @@ struct LayoutViewWidget : public Widget {
 };
 
 struct LayoutViewWidgetState : public WidgetState {
+	WidgetStateFlags flags;
+	Value data;
     Value context;
+	bool repainted;
 
-    LayoutViewWidgetState(const WidgetCursor &widgetCursor) : WidgetState(widgetCursor) {
-    }
-
-	void draw(WidgetState *previousState) override;
+    bool updateState(const WidgetCursor &widgetCursor) override;
+    void render(WidgetCursor &widgetCursor) override;
+	void enumChildren(WidgetCursor &widgetCursor) override;
 };
 
 } // namespace gui

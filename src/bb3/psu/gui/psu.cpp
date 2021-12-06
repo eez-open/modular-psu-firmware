@@ -1149,8 +1149,8 @@ bool PsuAppContext::canExecuteActionWhenTouchedOutsideOfActivePage(int pageId, i
     return false;
 }
 
-void PsuAppContext::updatePage(int i, WidgetCursor &widgetCursor, WidgetState *currentState, WidgetState *previousState) {
-    AppContext::updatePage(i, widgetCursor, currentState, previousState);
+void PsuAppContext::updatePage(int i, WidgetCursor &widgetCursor) {
+    AppContext::updatePage(i, widgetCursor);
 
     if (getActivePageId() == PAGE_ID_TOUCH_CALIBRATION_YES_NO || getActivePageId() == PAGE_ID_TOUCH_CALIBRATION_YES_NO_CANCEL) {
         auto eventType = touch::getEventType();
@@ -1162,21 +1162,23 @@ void PsuAppContext::updatePage(int i, WidgetCursor &widgetCursor, WidgetState *c
             eez::display::fillRect(x - 1, y - 1, x + 1, y + 1);
         }
     } else if (getActivePageId() == PAGE_ID_TOUCH_TEST) {
-        display::selectBuffer(m_pageNavigationStack[i].displayBufferIndex);
+		if (g_findCallback == nullptr) {
+			display::selectBuffer(m_pageNavigationStack[i].displayBufferIndex);
 
-        if (get(widgetCursor, DATA_ID_TOUCH_CALIBRATED_PRESSED).getInt()) {
-            int x = MIN(MAX(get(widgetCursor, DATA_ID_TOUCH_CALIBRATED_X).getInt(), 1), eez::display::getDisplayWidth() - 2);
-            int y = MIN(MAX(get(widgetCursor, DATA_ID_TOUCH_CALIBRATED_Y).getInt(), 1), eez::display::getDisplayHeight() - 2);
-            eez::display::setColor(0, 0, 255);
-            eez::display::fillRect(x - 1, y - 1, x + 1, y + 1);
-        }
+			if (get(widgetCursor, DATA_ID_TOUCH_CALIBRATED_PRESSED).getInt()) {
+				int x = MIN(MAX(get(widgetCursor, DATA_ID_TOUCH_CALIBRATED_X).getInt(), 1), eez::display::getDisplayWidth() - 2);
+				int y = MIN(MAX(get(widgetCursor, DATA_ID_TOUCH_CALIBRATED_Y).getInt(), 1), eez::display::getDisplayHeight() - 2);
+				eez::display::setColor(0, 0, 255);
+				eez::display::fillRect(x - 1, y - 1, x + 1, y + 1);
+			}
 
-        if (get(widgetCursor, DATA_ID_TOUCH_FILTERED_PRESSED).getInt()) {
-            int x = MIN(MAX(get(widgetCursor, DATA_ID_TOUCH_FILTERED_X).getInt(), 1), eez::display::getDisplayWidth() - 2);
-            int y = MIN(MAX(get(widgetCursor, DATA_ID_TOUCH_FILTERED_Y).getInt(), 1), eez::display::getDisplayHeight() - 2);
-            eez::display::setColor(0, 255, 0);
-            eez::display::fillRect(x - 1, y - 1, x + 1, y + 1);
-        }
+			if (get(widgetCursor, DATA_ID_TOUCH_FILTERED_PRESSED).getInt()) {
+				int x = MIN(MAX(get(widgetCursor, DATA_ID_TOUCH_FILTERED_X).getInt(), 1), eez::display::getDisplayWidth() - 2);
+				int y = MIN(MAX(get(widgetCursor, DATA_ID_TOUCH_FILTERED_Y).getInt(), 1), eez::display::getDisplayHeight() - 2);
+				eez::display::setColor(0, 255, 0);
+				eez::display::fillRect(x - 1, y - 1, x + 1, y + 1);
+			}
+		}
     }
 }
 
@@ -1518,8 +1520,7 @@ static bool isEncoderEnabledForWidget(const WidgetCursor &widgetCursor) {
 static bool g_focusCursorIsEnabled;
 static int16_t g_focusCursorAction;
 
-bool isEnabledFocusCursorStep(WidgetState *widgetState) {
-    const WidgetCursor &widgetCursor = widgetState->widgetCursor;
+void isEnabledFocusCursorStep(const WidgetCursor &widgetCursor) {
     if (isEncoderEnabledForWidget(widgetCursor)) {
         if (g_focusCursor == widgetCursor && g_focusDataId == widgetCursor.widget->data) {
             g_focusCursorIsEnabled = true;
@@ -1527,30 +1528,27 @@ bool isEnabledFocusCursorStep(WidgetState *widgetState) {
             g_focusCursorAction = action;
         }
     }
-    return true;
 }
 
 bool isEnabledFocusCursor(const WidgetCursor& cursor, int16_t dataId) {
     g_focusCursorIsEnabled = false;
     g_focusCursorAction = ACTION_ID_NONE;
-    forEachWidget(&g_psuAppContext, isEnabledFocusCursorStep);
+    forEachWidget(isEnabledFocusCursorStep);
     return g_focusCursorIsEnabled;
 }
 
-bool isEncoderEnabledInActivePageCheckWidget(WidgetState *widgetState) {
-    const WidgetCursor &widgetCursor = widgetState->widgetCursor;
+void isEncoderEnabledInActivePageCheckWidget(const WidgetCursor &widgetCursor) {
     if (widgetCursor.isPage()) {
         g_isEncoderEnabledInActivePage = false;
     } else if (isEncoderEnabledForWidget(widgetCursor)) {
         g_isEncoderEnabledInActivePage = true;
     }
-    return true;
 }
 
 void testIsEncoderEnabledInActivePage() {
     // encoder is enabled if active page contains widget with "edit" action
     g_isEncoderEnabledInActivePage = false;
-    forEachWidget(&g_psuAppContext, isEncoderEnabledInActivePageCheckWidget);
+    forEachWidget(isEncoderEnabledInActivePageCheckWidget);
 }
 
 bool isEncoderEnabledInActivePage() {
@@ -1859,8 +1857,7 @@ static int g_findNextFocusCursorState = 0;
 static WidgetCursor g_nextFocusCursor = 0;
 static uint16_t g_nextFocusDataId = DATA_ID_CHANNEL_U_EDIT;
 
-bool findNextFocusCursor(WidgetState *widgetState) {
-    const WidgetCursor &widgetCursor = widgetState->widgetCursor;
+void findNextFocusCursor(const WidgetCursor &widgetCursor) {
     if (isEncoderEnabledForWidget(widgetCursor)) {
         if (g_findNextFocusCursorState == 0) {
             g_nextFocusCursor = widgetCursor;
@@ -1878,12 +1875,11 @@ bool findNextFocusCursor(WidgetState *widgetState) {
             g_findNextFocusCursorState = 3;
         }
     }
-    return true;
 }
 
 static void moveToNextFocusCursor() {
     g_findNextFocusCursorState = 0;
-    forEachWidget(&g_psuAppContext, findNextFocusCursor);
+    forEachWidget(findNextFocusCursor);
     if (g_findNextFocusCursorState > 0) {
         g_focusCursor = g_nextFocusCursor;
         g_focusDataId = g_nextFocusDataId;

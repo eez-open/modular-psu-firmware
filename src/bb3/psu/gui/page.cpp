@@ -135,9 +135,9 @@ void ToastMessagePage::onEncoderClicked() {
     }
 }
 
-void ToastMessagePage::updateInternalPage(const WidgetCursor &widgetCursor, WidgetState *currentState, WidgetState *previousState) {
-	WidgetCursor toastPageWidgetCursor(widgetCursor.assets, appContext, &actionWidget, actionWidget.x, actionWidget.y);
-    if (previousState && actionWidgetIsActive == isActiveWidget(toastPageWidgetCursor)) {
+void ToastMessagePage::updateInternalPage(const WidgetCursor &widgetCursor) {
+	WidgetCursor toastPageWidgetCursor(widgetCursor.assets, appContext, &actionWidget, actionWidget.x, actionWidget.y, widgetCursor.currentState, widgetCursor.hasPreviousState);
+    if (widgetCursor.hasPreviousState && actionWidgetIsActive == isActiveWidget(toastPageWidgetCursor)) {
         return;
     }
 
@@ -284,7 +284,7 @@ void ToastMessagePage::updateInternalPage(const WidgetCursor &widgetCursor, Widg
     }
 }
 
-WidgetCursor ToastMessagePage::findWidgetInternalPage(int x, int y, bool clicked) {
+WidgetCursor ToastMessagePage::findWidgetInternalPage(const WidgetCursor &widgetCursor, int x, int y, bool clicked) {
     if (x >= this->x && x < this->x + width && y >= this->y && y < this->y + height) {
         const Style *style = getStyle(type == INFO_TOAST ? STYLE_ID_INFO_ALERT : STYLE_ID_ERROR_ALERT);
         font::Font font = styleGetFont(style);
@@ -296,10 +296,10 @@ WidgetCursor ToastMessagePage::findWidgetInternalPage(int x, int y, bool clicked
             y >= (actionWidget.y - textHeight / 4) &&
             y < (actionWidget.y + actionWidget.h - 1 + textHeight / 4)
         ) {
-            return WidgetCursor(g_mainAssets, appContext, &actionWidget, actionWidget.x, actionWidget.y);
+            return WidgetCursor(g_mainAssets, appContext, &actionWidget, actionWidget.x, actionWidget.y, widgetCursor.currentState, widgetCursor.hasPreviousState);
         }
         widget.action = ACTION_ID_INTERNAL_DIALOG_CLOSE;
-        return WidgetCursor(g_mainAssets, appContext, &widget, x, y);
+        return WidgetCursor(g_mainAssets, appContext, &widget, x, y, widgetCursor.currentState, widgetCursor.hasPreviousState);
     }
     
     return WidgetCursor();
@@ -486,8 +486,8 @@ void SelectFromEnumPage::findPagePosition() {
     }
 }
 
-void SelectFromEnumPage::updateInternalPage(const WidgetCursor &widgetCursor, WidgetState *currentState, WidgetState *previousState) {
-    if (previousState && !dirty) {
+void SelectFromEnumPage::updateInternalPage(const WidgetCursor &widgetCursor) {
+    if (widgetCursor.hasPreviousState && !dirty) {
 		return;
     }
 
@@ -512,7 +512,7 @@ void SelectFromEnumPage::updateInternalPage(const WidgetCursor &widgetCursor, Wi
     dirty = false;
 }
 
-WidgetCursor SelectFromEnumPage::findWidgetInternalPage(int x, int y, bool clicked) {
+WidgetCursor SelectFromEnumPage::findWidgetInternalPage(const WidgetCursor &widgetCursor, int x, int y, bool clicked) {
     for (int i = 0; i < numItems; ++i) {
         int xItem, yItem;
         getItemPosition(i, xItem, yItem);
@@ -527,7 +527,7 @@ WidgetCursor SelectFromEnumPage::findWidgetInternalPage(int x, int y, bool click
 
         		widget.action = ACTION_ID_INTERNAL_SELECT_ENUM_ITEM;
         		widget.data = (uint16_t)i;
-        		return WidgetCursor(g_mainAssets, appContext, &widget, x, y);
+        		return WidgetCursor(g_mainAssets, appContext, &widget, x, y, widgetCursor.currentState, widgetCursor.hasPreviousState);
         	}
         }
     }
@@ -663,26 +663,25 @@ void MenuWithButtonsPage::init(AppContext *appContext, const char *message, cons
 
 }
 
-void MenuWithButtonsPage::updateInternalPage(const WidgetCursor &widgetCursor2, WidgetState *currentState, WidgetState *previousState) {
+void MenuWithButtonsPage::updateInternalPage(const WidgetCursor &widgetCursor2) {
     WidgetCursor widgetCursor;
 
     widgetCursor.appContext = m_appContext;
 
-    if (!previousState) {
+    if (!widgetCursor2.hasPreviousState) {
         widgetCursor.widget = &m_containerRectangleWidget;
         widgetCursor.x = x + m_containerRectangleWidget.x;
         widgetCursor.y = y + m_containerRectangleWidget.y;
-        currentState->flags.active = 0;
-
-		RectangleWidgetState rectangleWidgetState(widgetCursor);
-		rectangleWidgetState.draw(previousState);
+		RectangleWidgetState rectangleWidgetState;
+		rectangleWidgetState.flags.active = 0;
+		rectangleWidgetState.render(widgetCursor);
 
         widgetCursor.widget = &m_messageTextWidget;
         widgetCursor.x = x + m_messageTextWidget.x;
         widgetCursor.y = y + m_messageTextWidget.y;
-        currentState->flags.active = 0;
-		TextWidgetState textWidgetState(widgetCursor);
-		textWidgetState.draw(previousState);
+		TextWidgetState textWidgetState;
+		textWidgetState.flags.active = 0;
+		textWidgetState.render(widgetCursor);
     }
 
     for (size_t i = 0; i < m_numButtonTextWidgets; i++) {
@@ -690,14 +689,14 @@ void MenuWithButtonsPage::updateInternalPage(const WidgetCursor &widgetCursor2, 
         widgetCursor.x = x + m_buttonTextWidgets[i].x;
         widgetCursor.y = y + m_buttonTextWidgets[i].y;
         widgetCursor.cursor = i;
-        currentState->flags.active = isActiveWidget(widgetCursor);
-		TextWidgetState textWidgetState(widgetCursor);
-		textWidgetState.draw(previousState);
+		TextWidgetState textWidgetState;
+		textWidgetState.flags.active = isActiveWidget(widgetCursor);
+		textWidgetState.render(widgetCursor);
     }
 }
 
-WidgetCursor MenuWithButtonsPage::findWidgetInternalPage(int x, int y, bool clicked) {
-    WidgetCursor widgetCursor;
+WidgetCursor MenuWithButtonsPage::findWidgetInternalPage(const WidgetCursor &widgetCursor2, int x, int y, bool clicked) {
+    WidgetCursor widgetCursor = widgetCursor2;
 
     widgetCursor.appContext = m_appContext;
 

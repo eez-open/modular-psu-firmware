@@ -48,87 +48,103 @@ int findStartOfUnit(char *text, int i) {
     return i;
 }
 
-void DisplayDataWidgetState::refreshTextData(DisplayDataWidgetState *previousState) {
-    if (previousState && data != previousState->data) {
-		auto widget = (const DisplayDataWidget *)widgetCursor.widget;
+bool DisplayDataWidgetState::updateState(const WidgetCursor &widgetCursor) {
+    bool hasPreviousState = widgetCursor.hasPreviousState;
+    auto widget = (const DisplayDataWidget *)widgetCursor.widget;
+    const Style *style = getStyle(overrideStyleHook(widgetCursor, widget->style));
+
+    WIDGET_STATE(flags.active, g_isActiveWidget);
+    WIDGET_STATE(flags.focused, isFocusWidget(widgetCursor));
+    WIDGET_STATE(flags.blinking, g_isBlinkTime && isBlinking(widgetCursor, widget->data));
+    
+    bool refreshData = true;
+    auto newData = get(widgetCursor, widget->data);
+    if (hasPreviousState && data != newData) {
         uint32_t refreshRate = getTextRefreshRate(widgetCursor, widget->data);
-        if (refreshRate != 0) {
-            if (dataRefreshLastTime - previousState->dataRefreshLastTime < refreshRate) {
-                data = previousState->data;
-                dataRefreshLastTime = previousState->dataRefreshLastTime;
+        if (refreshRate != 0 && millis() - dataRefreshLastTime < refreshRate) {
+            refreshData = false;
+        }
+    }
+    if (refreshData) {
+        WIDGET_STATE(data, newData);
+    }
+
+    WIDGET_STATE(color, flags.focused ? style->focus_color : getColor(widgetCursor, widget->data, style));
+    WIDGET_STATE(backgroundColor, flags.focused ? style->focus_background_color : getBackgroundColor(widgetCursor, widget->data, style));
+    WIDGET_STATE(activeColor, flags.focused ? style->focus_background_color : getActiveColor(widgetCursor, widget->data, style));
+    WIDGET_STATE(activeBackgroundColor, flags.focused ? style->focus_color : getActiveBackgroundColor(widgetCursor, widget->data, style));
+
+    bool cursorVisible = millis() % (2 * CONF_GUI_TEXT_CURSOR_BLINK_TIME_MS) < CONF_GUI_TEXT_CURSOR_BLINK_TIME_MS;
+    WIDGET_STATE(cursorPosition, cursorVisible ? getTextCursorPosition(widgetCursor, widget->data) : -1);
+    
+    WIDGET_STATE(xScroll, getXScroll(widgetCursor));
+
+    return !hasPreviousState;
+}
+
+void DisplayDataWidgetState::render(WidgetCursor &widgetCursor) {
+    auto widget = (const DisplayDataWidget *)widgetCursor.widget;
+    const Style *style = getStyle(overrideStyleHook(widgetCursor, widget->style));
+
+    char text[64];
+    data.toText(text, sizeof(text));
+
+    char *start = text;
+
+    int length = -1;
+
+    if (widget->displayOption != DISPLAY_OPTION_ALL) {
+        if (data.getType() == VALUE_TYPE_FLOAT) {
+            if (widget->displayOption == DISPLAY_OPTION_INTEGER) {
+                int i = findStartOfFraction(text);
+                text[i] = 0;
+            } else if (widget->displayOption == DISPLAY_OPTION_FRACTION) {
+                int i = findStartOfFraction(text);
+                start = text + i;
+            } else if (widget->displayOption == DISPLAY_OPTION_FRACTION_AND_UNIT) {
+                int i = findStartOfFraction(text);
+                int k = findStartOfUnit(text, i);
+                if (i < k) {
+                    start = text + i;
+                    text[k] = 0;
+                }
+                else {
+                    stringCopy(text, sizeof(text), ".0");
+                }
+            } else if (widget->displayOption == DISPLAY_OPTION_UNIT) {
+                int i = findStartOfUnit(text, 0);
+                start = text + i;
+            } else if (widget->displayOption == DISPLAY_OPTION_INTEGER_AND_FRACTION) {
+                int i = findStartOfUnit(text, 0);
+                text[i] = 0;
+            }
+
+            // trim left
+            while (*start && *start == ' ') {
+                start++;
+            }
+
+            // trim right
+            length = strlen(start);
+            if (length > 0 && start[length - 1] == ' ') {
+                length--;
+            }
+        } else {
+            if (
+                widget->displayOption != DISPLAY_OPTION_INTEGER &&
+                widget->displayOption != DISPLAY_OPTION_INTEGER_AND_FRACTION
+            ) {
+                *text = 0;
             }
         }
     }
-}
 
-void DisplayDataWidgetState::draw(WidgetState *previousStateBase) {
-    auto previousState = (DisplayDataWidgetState *)previousStateBase;
-    refreshTextData(previousState);
-    bool refresh = !previousState || *this != *previousState;
-    if (refresh) {
-        auto widget = (const DisplayDataWidget *)widgetCursor.widget;
-        const Style *style = getStyle(overrideStyleHook(widgetCursor, widget->style));
-
-        char text[64];
-        data.toText(text, sizeof(text));
-
-        char *start = text;
-
-        int length = -1;
-
-        if (widget->displayOption != DISPLAY_OPTION_ALL) {
-			if (data.getType() == VALUE_TYPE_FLOAT) {
-				if (widget->displayOption == DISPLAY_OPTION_INTEGER) {
-					int i = findStartOfFraction(text);
-					text[i] = 0;
-				} else if (widget->displayOption == DISPLAY_OPTION_FRACTION) {
-					int i = findStartOfFraction(text);
-					start = text + i;
-				} else if (widget->displayOption == DISPLAY_OPTION_FRACTION_AND_UNIT) {
-					int i = findStartOfFraction(text);
-					int k = findStartOfUnit(text, i);
-					if (i < k) {
-						start = text + i;
-						text[k] = 0;
-					}
-					else {
-						stringCopy(text, sizeof(text), ".0");
-					}
-				} else if (widget->displayOption == DISPLAY_OPTION_UNIT) {
-					int i = findStartOfUnit(text, 0);
-					start = text + i;
-				} else if (widget->displayOption == DISPLAY_OPTION_INTEGER_AND_FRACTION) {
-					int i = findStartOfUnit(text, 0);
-					text[i] = 0;
-				}
-
-				// trim left
-				while (*start && *start == ' ') {
-					start++;
-				}
-
-				// trim right
-				length = strlen(start);
-				if (length > 0 && start[length - 1] == ' ') {
-					length--;
-				}
-			} else {
-				if (
-					widget->displayOption != DISPLAY_OPTION_INTEGER &&
-					widget->displayOption != DISPLAY_OPTION_INTEGER_AND_FRACTION
-				) {
-					*text = 0;
-				}
-			}
-        }
-
-        drawText(start, length, widgetCursor.x, widgetCursor.y, (int)widget->w, (int)widget->h,
-            style, flags.active,
-            flags.blinking, false,
-            &color, &backgroundColor, &activeColor, &activeBackgroundColor,
-            data.getType() == VALUE_TYPE_FLOAT || widget->data == EEZ_CONF_DATA_ID_EDIT_UNIT,
-            cursorPosition, xScroll);
-    }
+    drawText(start, length, widgetCursor.x, widgetCursor.y, (int)widget->w, (int)widget->h,
+        style, flags.active,
+        flags.blinking, false,
+        &color, &backgroundColor, &activeColor, &activeBackgroundColor,
+        data.getType() == VALUE_TYPE_FLOAT || widget->data == EEZ_CONF_DATA_ID_EDIT_UNIT,
+        cursorPosition, xScroll);
 }
 
 int DISPLAY_DATA_getCharIndexAtPosition(int xPos, const WidgetCursor &widgetCursor) {

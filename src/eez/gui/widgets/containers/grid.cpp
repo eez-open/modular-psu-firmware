@@ -25,32 +25,20 @@ namespace gui {
 #define GRID_FLOW_ROW 1
 #define GRID_FLOW_COLUMN 2
 
-void GridWidgetState::draw(WidgetState *previousState) {
+bool GridWidgetState::updateState(const WidgetCursor &widgetCursor) {
     auto widget = (const GridWidget *)widgetCursor.widget;
+    startPosition = ytDataGetPosition(widgetCursor, widget->data);
+    count = eez::gui::count(widgetCursor, widget->data);
+    return false;
+}
 
-    int startPosition = ytDataGetPosition(widgetCursor, widget->data);
-
-    // refresh when startPosition changes
-    data = startPosition;
-
-    int count = eez::gui::count(widgetCursor, widget->data);
-
+void GridWidgetState::enumChildren(WidgetCursor &widgetCursor) {
     if (count > 0) {
-        WidgetState *childCurrentState = this;
-        WidgetState *childPreviousState = previousState;
-        WidgetCursor childWidgetCursor = getFirstChildWidgetCursor(widgetCursor, childCurrentState, childPreviousState);
-
-		if (previousState && previousState->data != data) {
-			childPreviousState = 0;
-		}
-
-		WidgetState *endOfContainerInPreviousState = 0;
-        if (previousState) {
-            endOfContainerInPreviousState = nextWidgetState(previousState);
-        }
+        auto widget = (const GridWidget *)widgetCursor.widget;
 
         const Widget *childWidget = widget->itemWidget.ptr(widgetCursor.assets);
-        childWidgetCursor.widget = childWidget;
+		auto savedWidget = widgetCursor.widget;
+		widgetCursor.widget = childWidget;
 
         auto savedX = widgetCursor.x;
         auto savedY = widgetCursor.y;
@@ -61,22 +49,14 @@ void GridWidgetState::draw(WidgetState *previousState) {
         Value oldValue;
 
         for (int index = startPosition; index < count; ++index) {
-            select(childWidgetCursor, widget->data, index, oldValue);
+            select(widgetCursor, widget->data, index, oldValue);
 
-            childWidgetCursor.x = savedX + xOffset;
-            childWidgetCursor.y = savedY + yOffset;
+			widgetCursor.x = savedX + xOffset;
+			widgetCursor.y = savedY + yOffset;
 
-            childWidgetCursor.pushIterator(index);
-            enumWidget(childWidgetCursor, childCurrentState, childPreviousState);
-            childWidgetCursor.popIterator();
-
-            if (childPreviousState) {
-                childPreviousState = nextWidgetState(childPreviousState);
-                if (childPreviousState > endOfContainerInPreviousState) {
-                    childPreviousState = 0;
-                }
-            }
-            childCurrentState = nextWidgetState(childCurrentState);
+			widgetCursor.pushIterator(index);
+            enumWidget(widgetCursor);
+			widgetCursor.popIterator();
 
             if (widget->gridFlow == GRID_FLOW_ROW) {
                 if (xOffset + childWidget->w < widget->w) {
@@ -103,9 +83,12 @@ void GridWidgetState::draw(WidgetState *previousState) {
             }
         }
 
-        deselect(childWidgetCursor, widget->data, oldValue);
-	
-		widgetStateSize = (uint8_t *)childCurrentState - (uint8_t *)this;
+        deselect(widgetCursor, widget->data, oldValue);
+
+		widgetCursor.widget = savedWidget;
+
+		widgetCursor.x = savedX;
+		widgetCursor.y = savedY;
 	}
 }
 

@@ -47,13 +47,11 @@ static int g_mouseWasCursorX;
 static int g_mouseWasCursorY;
 
 static WidgetCursor g_foundWidgetAtMouse;
-static OnTouchFunctionType g_onTouchFunctionAtMouse;
 
 static bool g_lastMouseCursorVisible;
 static int g_lastMouseCursorX;
 static int g_lastMouseCursorY;
 static WidgetCursor g_lastFoundWidgetAtMouse;
-static OnTouchFunctionType g_lastOnTouchFunctionAtMouse;
 
 MouseInfo g_mouseInfo;
 
@@ -89,8 +87,12 @@ void getEvent(bool &mouseCursorVisible, EventType &mouseEventType, int &mouseX, 
 		g_mouseWasCursorX = g_mouseCursorX;
 		g_mouseWasCursorY = g_mouseCursorY;
 
-		g_foundWidgetAtMouse = findWidget(&getRootAppContext(), g_mouseCursorX, g_mouseCursorY, false);
-		g_onTouchFunctionAtMouse = getWidgetTouchFunction(g_foundWidgetAtMouse);
+		auto foundWidgetAtMouse = findWidget(g_mouseCursorX, g_mouseCursorY, false);
+		if (getWidgetTouchFunction(foundWidgetAtMouse)) {
+			g_foundWidgetAtMouse = foundWidgetAtMouse;
+		} else {
+			g_foundWidgetAtMouse = 0;
+		}
 
 	    mouseCursorVisible = true;
 	    mouseX = g_mouseCursorX;
@@ -101,7 +103,6 @@ void getEvent(bool &mouseCursorVisible, EventType &mouseEventType, int &mouseX, 
 		g_mouseWasCursorY = 0;
 
 		g_foundWidgetAtMouse = 0;
-		g_onTouchFunctionAtMouse = 0;
 
 	    mouseCursorVisible = false;
 	    mouseX = 0;
@@ -114,14 +115,12 @@ bool isDisplayDirty() {
         g_lastMouseCursorVisible != g_mouseCursorVisible ||
         g_lastMouseCursorX != g_mouseCursorX ||
         g_lastMouseCursorY != g_mouseCursorY ||
-        g_lastFoundWidgetAtMouse != g_foundWidgetAtMouse ||
-        g_lastOnTouchFunctionAtMouse != g_onTouchFunctionAtMouse
+        g_lastFoundWidgetAtMouse != g_foundWidgetAtMouse
     ) {
     	g_lastMouseCursorVisible = g_mouseCursorVisible;
     	g_lastMouseCursorX = g_mouseCursorX;
     	g_lastMouseCursorY = g_mouseCursorY;
         g_lastFoundWidgetAtMouse = g_foundWidgetAtMouse;
-        g_lastOnTouchFunctionAtMouse = g_onTouchFunctionAtMouse;
 
     	return true;
     }
@@ -153,7 +152,7 @@ void updateDisplay() {
                 image.height = getDisplayHeight() - g_lastMouseCursorY;
             }
 
-            if (g_foundWidgetAtMouse && g_onTouchFunctionAtMouse) {
+            if (g_foundWidgetAtMouse) {
                 int16_t w;
                 int16_t h;
 
@@ -176,7 +175,6 @@ void updateDisplay() {
 
 void onPageChanged() {
     g_foundWidgetAtMouse = 0;
-    g_onTouchFunctionAtMouse = 0;
 }
 
 void onMouseXMove(int x) {

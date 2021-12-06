@@ -59,17 +59,18 @@ void eventHandling() {
 		return;
 	}
 
+	touch::tick();
+
+	auto eventType = touch::getEventType();
+
     bool mouseCursorVisible = false;
     EventType mouseEventType = EVENT_TYPE_TOUCH_NONE;
     int mouseX = 0;
     int mouseY = 0;
-
 #if OPTION_MOUSE
     mouse::getEvent(mouseCursorVisible, mouseEventType, mouseX, mouseY);
 #endif
 
-    auto eventType = touch::getEventType();
-    
     int eventX;
     int eventY;
     if (eventType == EVENT_TYPE_TOUCH_NONE && mouseCursorVisible) {
@@ -120,7 +121,7 @@ void eventHandling() {
 
 static void processTouchEvent(EventType type, int x, int y) {
     if (type == EVENT_TYPE_TOUCH_DOWN) {
-        m_foundWidgetAtDown = findWidget(&getRootAppContext(), x, y);
+        m_foundWidgetAtDown = findWidget(x, y);
         m_onTouchFunction = getWidgetTouchFunction(m_foundWidgetAtDown);
         if (!m_onTouchFunction) {
             m_onTouchFunction = onPageTouch;
@@ -140,10 +141,7 @@ static void processTouchEvent(EventType type, int x, int y) {
 }
 
 static void onWidgetTouch(const WidgetCursor &widgetCursor, Event &touchEvent) {
-	auto widgetState = getWidgetState(widgetCursor);
-    if (widgetState) {
-        widgetState->onTouch(touchEvent);
-    }
+    widgetCursor.currentState->onTouch(widgetCursor, touchEvent);
 }
 
 OnTouchFunctionType getWidgetTouchFunction(const WidgetCursor &widgetCursor) {
@@ -153,11 +151,8 @@ OnTouchFunctionType getWidgetTouchFunction(const WidgetCursor &widgetCursor) {
             return nullptr;
         }
 
-		auto widgetState = getWidgetState(widgetCursor);
-		if (widgetState) {
-			if (widgetState->hasOnTouch()) {
-				return onWidgetTouch;
-			}
+        if (widgetCursor.currentState->hasOnTouch()) {
+			return onWidgetTouch;
 		}
 
         if (widgetCursor.appContext->isWidgetActionEnabled(widgetCursor)) {
@@ -171,7 +166,9 @@ OnTouchFunctionType getWidgetTouchFunction(const WidgetCursor &widgetCursor) {
 }
 
 static void onPageTouch(const WidgetCursor &foundWidget, Event &touchEvent) {
-    foundWidget.appContext->onPageTouch(foundWidget, touchEvent);
+	if (foundWidget) {
+		foundWidget.appContext->onPageTouch(foundWidget, touchEvent);
+	}
 }
 
 static void onWidgetDefaultTouch(const WidgetCursor &widgetCursor, Event &touchEvent) {

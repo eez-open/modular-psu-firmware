@@ -270,15 +270,16 @@ void AppContext::onPageTouch(const WidgetCursor &foundWidget, Event &touchEvent)
             if (!pointInsideRect(touchEvent.x, touchEvent.y, foundWidget.appContext->rect.x + page->x, foundWidget.appContext->rect.y + page->y, page->w, page->h)) {
                 int activePageId = getActivePageId();
                 
+                // clicked outside page, close page
                 popPage();
 
-                auto widgetCursor = findWidget(&getRootAppContext(), touchEvent.x, touchEvent.y);
+                auto widgetCursor = findWidget(touchEvent.x, touchEvent.y);
 
                 if (widgetCursor.widget) {
-                    auto action = getWidgetAction(widgetCursor);
-                    if (action != ACTION_ID_NONE && canExecuteActionWhenTouchedOutsideOfActivePage(activePageId, action)) {
-                        eventHandling();
-                    }
+                   auto action = getWidgetAction(widgetCursor);
+                   if (action != ACTION_ID_NONE && canExecuteActionWhenTouchedOutsideOfActivePage(activePageId, action)) {
+                       eventHandling();
+                   }
                 }
             }
         }
@@ -287,13 +288,14 @@ void AppContext::onPageTouch(const WidgetCursor &foundWidget, Event &touchEvent)
 
 ////////////////////////////////////////////////////////////////////////////////
 
-void AppContext::updatePage(int i, WidgetCursor &widgetCursor, WidgetState *currentState, WidgetState *previousState) {
-    if (!previousState || m_pageNavigationStack[i].displayBufferIndex == -1) {
-        m_pageNavigationStack[i].displayBufferIndex = display::allocBuffer();
-        previousState = nullptr;
-    }
+void AppContext::updatePage(int i, WidgetCursor &widgetCursor) {
+	if (g_findCallback == nullptr) {
+		if (!widgetCursor.hasPreviousState) {
+			m_pageNavigationStack[i].displayBufferIndex = display::allocBuffer();
+		}
 
-    display::selectBuffer(m_pageNavigationStack[i].displayBufferIndex);
+		display::selectBuffer(m_pageNavigationStack[i].displayBufferIndex);
+	}
 
     auto savedPageNavigationStackPointer = m_pageNavigationStackPointer;
     m_pageNavigationStackPointer = i;
@@ -307,29 +309,35 @@ void AppContext::updatePage(int i, WidgetCursor &widgetCursor, WidgetState *curr
     if (isPageInternal(m_pageNavigationStack[i].pageId)) {
         auto internalPage = ((InternalPage *)m_pageNavigationStack[i].page);
         
-        x = internalPage->x;
-        y = internalPage->y;
-        width = internalPage->width;
-        height = internalPage->height;
-        withShadow = true;
+		x = internalPage->x;
+		y = internalPage->y;
+		width = internalPage->width;
+		height = internalPage->height;
+		withShadow = true;
 
-        internalPage->updateInternalPage(widgetCursor, currentState, previousState);
+		if (g_findCallback == nullptr) {
+			internalPage->updateInternalPage(widgetCursor);
+		}
 
-        enumNoneWidget(widgetCursor, currentState, previousState);
+		enumNoneWidget(widgetCursor);
     } else {
         auto page = getPageAsset(m_pageNavigationStack[i].pageId, widgetCursor);
 
-        x = widgetCursor.x + page->x;
-        y = widgetCursor.y + page->y;
-        width = page->w;
-        height = page->h;
-        withShadow = page->x > 0;
+		x = widgetCursor.x + page->x;
+		y = widgetCursor.y + page->y;
+		width = page->w;
+		height = page->h;
+		withShadow = page->x > 0;
 
+		auto savedWidget = widgetCursor.widget;
         widgetCursor.widget = page;
-        enumWidget(widgetCursor, currentState, previousState);
+        enumWidget(widgetCursor);
+		widgetCursor.widget = savedWidget;
     }
 
-    display::setBufferBounds(m_pageNavigationStack[i].displayBufferIndex, x, y, width, height, withShadow, 255, 0, 0, withShadow && activePageHasBackdropHook() ? &rect : nullptr);
+	if (g_findCallback == nullptr) {
+		display::setBufferBounds(m_pageNavigationStack[i].displayBufferIndex, x, y, width, height, withShadow, 255, 0, 0, withShadow && activePageHasBackdropHook() ? &rect : nullptr);
+	}
 
     m_pageNavigationStackPointer = savedPageNavigationStackPointer;
 }

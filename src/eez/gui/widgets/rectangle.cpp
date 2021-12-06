@@ -24,19 +24,22 @@
 namespace eez {
 namespace gui {
 
-void RectangleWidgetState::draw(WidgetState *previousStateBase) {
-    auto previousState = (RectangleWidgetState *)previousStateBase;
-    bool refresh = !previousState || *this != *previousState;
-    if (refresh) {
-        auto widget = (const RectangleWidget *)widgetCursor.widget;
-        const Style* style = getStyle(widget->style);
-        drawRectangle(
-            widgetCursor.x, widgetCursor.y, (int)widget->w, (int)widget->h,
-            style, 
-            flags.active, 
-			widget->flags.ignoreLuminosity,
-			widget->flags.invertColors);
-    }
+bool RectangleWidgetState::updateState(const WidgetCursor &widgetCursor) {
+    bool hasPreviousState = widgetCursor.hasPreviousState;
+    WIDGET_STATE(flags.active, g_isActiveWidget);
+
+    return !hasPreviousState;
+}
+
+void RectangleWidgetState::render(WidgetCursor &widgetCursor) {
+    auto widget = (const RectangleWidget *)widgetCursor.widget;
+    const Style* style = getStyle(widget->style);
+    drawRectangle(
+        widgetCursor.x, widgetCursor.y, (int)widget->w, (int)widget->h,
+        style, 
+        flags.active, 
+        widget->flags.ignoreLuminosity,
+        widget->flags.invertColors);
 }
 
 } // namespace gui

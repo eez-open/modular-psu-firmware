@@ -39,41 +39,40 @@ enum UpDownWidgetSegment {
 static UpDownWidgetSegment g_segment;
 static WidgetCursor g_selectedWidget;
 
-UpDownWidgetState::UpDownWidgetState(const WidgetCursor &widgetCursor) : WidgetState(widgetCursor) {
+bool UpDownWidgetState::updateState(const WidgetCursor &widgetCursor) {
+    bool hasPreviousState = widgetCursor.hasPreviousState;
     auto widget = (const UpDownWidget *)widgetCursor.widget;
 
-    flags.active = g_selectedWidget == widgetCursor;
-    data = get(widgetCursor, widget->data);
+    WIDGET_STATE(flags.active, g_selectedWidget == widgetCursor);
+    WIDGET_STATE(data, get(widgetCursor, widget->data));
+
+        return !hasPreviousState;
 }
 
-void UpDownWidgetState::draw(WidgetState *previousStateBase) {
-    auto previousState = (UpDownWidgetState *)previousStateBase;
-    bool refresh = !previousState || *this != *previousState;
-    if (refresh) {
-        auto widget = (const UpDownWidget *)widgetCursor.widget;
-        const Style *buttonsStyle = getStyle(widget->buttonsStyle);
+void UpDownWidgetState::render(WidgetCursor &widgetCursor) {
+    auto widget = (const UpDownWidget *)widgetCursor.widget;
+    const Style *buttonsStyle = getStyle(widget->buttonsStyle);
 
-        font::Font buttonsFont = styleGetFont(buttonsStyle);
-        int buttonWidth = buttonsFont.getHeight();
+    font::Font buttonsFont = styleGetFont(buttonsStyle);
+    int buttonWidth = buttonsFont.getHeight();
 
-        drawText(widget->downButtonText.ptr(widgetCursor.assets), -1, widgetCursor.x, widgetCursor.y, buttonWidth, (int)widget->h,
-                 buttonsStyle,
-                 flags.active &&
-                     g_segment == UP_DOWN_WIDGET_SEGMENT_DOWN_BUTTON,
-                 false, false, nullptr, nullptr, nullptr, nullptr);
+    drawText(widget->downButtonText.ptr(widgetCursor.assets), -1, widgetCursor.x, widgetCursor.y, buttonWidth, (int)widget->h,
+                buttonsStyle,
+                flags.active &&
+                    g_segment == UP_DOWN_WIDGET_SEGMENT_DOWN_BUTTON,
+                false, false, nullptr, nullptr, nullptr, nullptr);
 
-        char text[64];
-        data.toText(text, sizeof(text));
-        const Style *style = getStyle(widget->style);
-        drawText(text, -1, widgetCursor.x + buttonWidth, widgetCursor.y,
-                 (int)(widget->w - 2 * buttonWidth), (int)widget->h, style, false, false,
-                 false, nullptr, nullptr, nullptr, nullptr);
+    char text[64];
+    data.toText(text, sizeof(text));
+    const Style *style = getStyle(widget->style);
+    drawText(text, -1, widgetCursor.x + buttonWidth, widgetCursor.y,
+                (int)(widget->w - 2 * buttonWidth), (int)widget->h, style, false, false,
+                false, nullptr, nullptr, nullptr, nullptr);
 
-        drawText(widget->upButtonText.ptr(widgetCursor.assets), -1, widgetCursor.x + widget->w - buttonWidth, widgetCursor.y,
-                 buttonWidth, (int)widget->h, buttonsStyle,
-                 flags.active && g_segment == UP_DOWN_WIDGET_SEGMENT_UP_BUTTON,
-                 false, false, nullptr, nullptr, nullptr, nullptr);
-    }
+    drawText(widget->upButtonText.ptr(widgetCursor.assets), -1, widgetCursor.x + widget->w - buttonWidth, widgetCursor.y,
+                buttonWidth, (int)widget->h, buttonsStyle,
+                flags.active && g_segment == UP_DOWN_WIDGET_SEGMENT_UP_BUTTON,
+                false, false, nullptr, nullptr, nullptr, nullptr);
 }
 
 void upDown(const WidgetCursor &widgetCursor, UpDownWidgetSegment segment) {
@@ -110,7 +109,7 @@ bool UpDownWidgetState::hasOnTouch() {
     return true;
 }
 
-void UpDownWidgetState::onTouch(Event &touchEvent) {
+void UpDownWidgetState::onTouch(const WidgetCursor &widgetCursor, Event &touchEvent) {
     const Widget *widget = widgetCursor.widget;
 
     if (touchEvent.type == EVENT_TYPE_TOUCH_DOWN || touchEvent.type == EVENT_TYPE_AUTO_REPEAT) {
@@ -138,7 +137,7 @@ bool UpDownWidgetState::hasOnKeyboard() {
 #endif
 }
 
-bool UpDownWidgetState::onKeyboard(uint8_t key, uint8_t mod) {
+bool UpDownWidgetState::onKeyboard(const WidgetCursor &widgetCursor, uint8_t key, uint8_t mod) {
 #if OPTION_KEYBOARD
     if (mod == 0) {
         if (key == KEY_LEFTARROW || key == KEY_DOWNARROW) {

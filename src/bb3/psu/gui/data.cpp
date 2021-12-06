@@ -2072,7 +2072,10 @@ void data_no_channel_index(int slotIndex, DataOperationEnum operation, const Wid
 }
 
 void data_slot_channel_index(int slotIndex, Channel *channel, DataOperationEnum operation, const WidgetCursor &widgetCursor, Value &value) {
-    auto testResult = g_slots[slotIndex]->getTestResult();
+	// TODO trtMrt
+	if (slotIndex == -1) return;
+
+	auto testResult = g_slots[slotIndex]->getTestResult();
     if (channel && g_slots[slotIndex]->enabled && (testResult == TEST_OK || testResult == TEST_SKIPPED)) {
         data_channel_index(*channel, operation, widgetCursor, value);
     } else {
@@ -4119,15 +4122,14 @@ void data_ethernet_dhcp(DataOperationEnum operation, const WidgetCursor &widgetC
 
 void data_ethernet_mac(DataOperationEnum operation, const WidgetCursor &widgetCursor, Value &value) {
 #if OPTION_ETHERNET
-    static uint8_t s_macAddressData[2][6];
+    static uint8_t g_macAddressData[6];
 
     if (operation == DATA_OPERATION_GET) {
         SysSettingsEthernetPage *page =
             (SysSettingsEthernetPage *)getPage(PAGE_ID_SYS_SETTINGS_ETHERNET);
         if (page) {
-            uint8_t *macAddress = &s_macAddressData[getCurrentStateBufferIndex()][0];
-            memcpy(macAddress, page->m_macAddress, 6);
-            value = MakeMacAddressValue(macAddress);
+            memcpy(g_macAddressData, page->m_macAddress, 6);
+            value = MakeMacAddressValue(g_macAddressData);
         }
     }
 #endif

@@ -31,14 +31,10 @@ struct RectangleWidget : public Widget {
 };
 
 struct RectangleWidgetState : public WidgetState {
-    RectangleWidgetState(const WidgetCursor &widgetCursor) : WidgetState(widgetCursor) {
-    }
+	WidgetStateFlags flags;
 
-    bool operator!=(const RectangleWidgetState& previousState) {
-        return flags.active != previousState.flags.active;
-    }
-
-    void draw(WidgetState *previousState) override;
+    bool updateState(const WidgetCursor &widgetCursor) override;
+    void render(WidgetCursor &widgetCursor) override;
 };
 
 } // namespace gui

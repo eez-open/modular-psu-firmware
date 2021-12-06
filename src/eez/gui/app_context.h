@@ -87,8 +87,6 @@ public:
 
     virtual bool isWidgetActionEnabled(const WidgetCursor &widgetCursor);
 
-    void updateAppView(WidgetCursor &widgetCursor);
-
     virtual int getLongTouchActionHook(const WidgetCursor &widgetCursor);
     virtual int getExtraLongTouchActionHook(const WidgetCursor &widgetCursor);
 
@@ -107,8 +105,8 @@ protected:
     void doShowPage(int index, Page *page, int previousPageId);
     void setPage(int pageId);
 
-    virtual void updatePage(int i, WidgetCursor &widgetCursor, WidgetState *currentState, WidgetState *previousState);
-
+    virtual void updatePage(int i, WidgetCursor &widgetCursor);
+    
     bool isPageFullyCovered(int pageNavigationStackIndex);
     
     virtual bool canExecuteActionWhenTouchedOutsideOfActivePage(int pageId, int action);
