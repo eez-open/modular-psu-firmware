@@ -27,9 +27,18 @@ struct UpDownWidget : public Widget {
     int16_t buttonsStyle;
 };
 
+enum UpDownWidgetSegment {
+    UP_DOWN_WIDGET_SEGMENT_TEXT,
+    UP_DOWN_WIDGET_SEGMENT_DOWN_BUTTON,
+    UP_DOWN_WIDGET_SEGMENT_UP_BUTTON
+};
+
 struct UpDownWidgetState : public WidgetState {
 	WidgetStateFlags flags;
 	Value data;
+	UpDownWidgetSegment segment;
+
+	static WidgetCursor g_selectedWidget;
 
 	bool updateState(const WidgetCursor &widgetCursor) override;
     void render(WidgetCursor &widgetCursor) override;
@@ -37,6 +46,9 @@ struct UpDownWidgetState : public WidgetState {
 	void onTouch(const WidgetCursor &widgetCursor, Event &touchEvent) override;
 	bool hasOnKeyboard() override;
 	bool onKeyboard(const WidgetCursor &widgetCursor, uint8_t key, uint8_t mod) override;
+
+private: 
+	void upDown(const WidgetCursor &widgetCursor, UpDownWidgetSegment segment_);
 };
 
 } // namespace gui

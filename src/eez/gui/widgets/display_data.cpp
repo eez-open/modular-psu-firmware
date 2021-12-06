@@ -59,14 +59,16 @@ bool DisplayDataWidgetState::updateState(const WidgetCursor &widgetCursor) {
     
     bool refreshData = true;
     auto newData = get(widgetCursor, widget->data);
+    auto currentTime = millis();
     if (hasPreviousState && data != newData) {
         uint32_t refreshRate = getTextRefreshRate(widgetCursor, widget->data);
-        if (refreshRate != 0 && millis() - dataRefreshLastTime < refreshRate) {
+        if (refreshRate != 0 && currentTime - dataRefreshLastTime < refreshRate) {
             refreshData = false;
         }
     }
     if (refreshData) {
         WIDGET_STATE(data, newData);
+        dataRefreshLastTime = currentTime;
     }
 
     WIDGET_STATE(color, flags.focused ? style->focus_color : getColor(widgetCursor, widget->data, style));

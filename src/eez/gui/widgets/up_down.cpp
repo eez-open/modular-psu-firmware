@@ -30,14 +30,7 @@
 namespace eez {
 namespace gui {
 
-enum UpDownWidgetSegment {
-    UP_DOWN_WIDGET_SEGMENT_TEXT,
-    UP_DOWN_WIDGET_SEGMENT_DOWN_BUTTON,
-    UP_DOWN_WIDGET_SEGMENT_UP_BUTTON
-};
-
-static UpDownWidgetSegment g_segment;
-static WidgetCursor g_selectedWidget;
+WidgetCursor UpDownWidgetState::g_selectedWidget;
 
 bool UpDownWidgetState::updateState(const WidgetCursor &widgetCursor) {
     bool hasPreviousState = widgetCursor.hasPreviousState;
@@ -46,7 +39,7 @@ bool UpDownWidgetState::updateState(const WidgetCursor &widgetCursor) {
     WIDGET_STATE(flags.active, g_selectedWidget == widgetCursor);
     WIDGET_STATE(data, get(widgetCursor, widget->data));
 
-        return !hasPreviousState;
+    return !hasPreviousState;
 }
 
 void UpDownWidgetState::render(WidgetCursor &widgetCursor) {
@@ -58,8 +51,7 @@ void UpDownWidgetState::render(WidgetCursor &widgetCursor) {
 
     drawText(widget->downButtonText.ptr(widgetCursor.assets), -1, widgetCursor.x, widgetCursor.y, buttonWidth, (int)widget->h,
                 buttonsStyle,
-                flags.active &&
-                    g_segment == UP_DOWN_WIDGET_SEGMENT_DOWN_BUTTON,
+                flags.active && segment == UP_DOWN_WIDGET_SEGMENT_DOWN_BUTTON,
                 false, false, nullptr, nullptr, nullptr, nullptr);
 
     char text[64];
@@ -71,12 +63,12 @@ void UpDownWidgetState::render(WidgetCursor &widgetCursor) {
 
     drawText(widget->upButtonText.ptr(widgetCursor.assets), -1, widgetCursor.x + widget->w - buttonWidth, widgetCursor.y,
                 buttonWidth, (int)widget->h, buttonsStyle,
-                flags.active && g_segment == UP_DOWN_WIDGET_SEGMENT_UP_BUTTON,
+                flags.active && segment == UP_DOWN_WIDGET_SEGMENT_UP_BUTTON,
                 false, false, nullptr, nullptr, nullptr, nullptr);
 }
 
-void upDown(const WidgetCursor &widgetCursor, UpDownWidgetSegment segment) {
-    g_segment = segment;
+void UpDownWidgetState::upDown(const WidgetCursor &widgetCursor, UpDownWidgetSegment segment_) {
+    segment = segment_;
 
     const Widget *widget = widgetCursor.widget;
 
@@ -84,9 +76,9 @@ void upDown(const WidgetCursor &widgetCursor, UpDownWidgetSegment segment) {
 
     int newValue = value;
 
-    if (g_segment == UP_DOWN_WIDGET_SEGMENT_DOWN_BUTTON) {
+    if (segment == UP_DOWN_WIDGET_SEGMENT_DOWN_BUTTON) {
         --newValue;
-    } else if (g_segment == UP_DOWN_WIDGET_SEGMENT_UP_BUTTON) {
+    } else if (segment == UP_DOWN_WIDGET_SEGMENT_UP_BUTTON) {
         ++newValue;
     }
 

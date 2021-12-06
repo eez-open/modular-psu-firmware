@@ -109,7 +109,7 @@ void processGuiQueue() {
 	    WATCHDOG_RESET(WATCHDOG_GUI_THREAD);
 
         guiMessageQueueObject obj;
-		if (!EEZ_MESSAGE_QUEUE_GET(gui, obj, 0)) {
+		if (!EEZ_MESSAGE_QUEUE_GET(gui, obj, 1)) {
             return;
         }
 

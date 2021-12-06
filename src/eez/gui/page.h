@@ -58,6 +58,7 @@ public:
     virtual void updateInternalPage(const WidgetCursor &widgetCursor) = 0;
 	virtual WidgetCursor findWidgetInternalPage(const WidgetCursor &widgetCursor, int x, int y, bool clicked) = 0;
     virtual bool canClickPassThrough();
+    virtual bool closeIfTouchedOutside();
 
     int x;
     int y;

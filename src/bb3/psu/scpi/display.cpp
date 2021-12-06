@@ -285,7 +285,7 @@ scpi_result_t scpi_cmd_displayWindowInputQ(scpi_t *context) {
         return SCPI_RES_ERR;
     }
 
-    char label[MAX_KEYPAD_LABEL_LENGTH + 1];
+    static char label[MAX_KEYPAD_LABEL_LENGTH + 1];
     memcpy(label, labelText, labelTextLen);
     if (type == INPUT_TYPE_TEXT || type == INPUT_TYPE_NUMBER) {
         if (labelTextLen > 0) {

@@ -58,6 +58,8 @@ ToastMessagePage *ToastMessagePage::create(ToastType type, const char *message, 
     page->actionWithoutParam = nullptr;
     page->appContext = &g_psuAppContext;
 
+	page->dirty = true;
+
     return page;
 }
 
@@ -72,6 +74,8 @@ ToastMessagePage *ToastMessagePage::create(ToastType type, Value messageValue)  
     page->actionWidget.action = type == ERROR_TOAST ? ACTION_ID_INTERNAL_TOAST_ACTION_WITHOUT_PARAM : 0;
     page->actionWithoutParam = nullptr;
     page->appContext = &g_psuAppContext;
+
+	page->dirty = true;
 
     return page;
 }
@@ -89,6 +93,8 @@ ToastMessagePage *ToastMessagePage::create(ToastType type, Value messageValue, v
     page->actionParam = actionParam;
     page->appContext = &g_psuAppContext;
 
+	page->dirty = true;
+
     return page;
 }
 
@@ -103,6 +109,8 @@ ToastMessagePage *ToastMessagePage::create(ToastType type, const char *message, 
     page->actionWidget.action = ACTION_ID_INTERNAL_TOAST_ACTION_WITHOUT_PARAM;
     page->actionWithoutParam = action;
     page->appContext = &g_psuAppContext;
+
+	page->dirty = true;
 
     return page;
 }
@@ -137,11 +145,13 @@ void ToastMessagePage::onEncoderClicked() {
 
 void ToastMessagePage::updateInternalPage(const WidgetCursor &widgetCursor) {
 	WidgetCursor toastPageWidgetCursor(widgetCursor.assets, appContext, &actionWidget, actionWidget.x, actionWidget.y, widgetCursor.currentState, widgetCursor.hasPreviousState);
-    if (widgetCursor.hasPreviousState && actionWidgetIsActive == isActiveWidget(toastPageWidgetCursor)) {
+
+    auto temp = isActiveWidget(toastPageWidgetCursor);
+    if (widgetCursor.hasPreviousState && actionWidgetIsActive == temp && !dirty) {
         return;
     }
 
-    actionWidgetIsActive = !actionWidgetIsActive;
+    actionWidgetIsActive = temp;
 
     const Style *style = getStyle(type == INFO_TOAST ? STYLE_ID_INFO_ALERT : STYLE_ID_ERROR_ALERT);
     const Style *actionStyle = getStyle(STYLE_ID_ERROR_ALERT_BUTTON);
@@ -307,6 +317,10 @@ WidgetCursor ToastMessagePage::findWidgetInternalPage(const WidgetCursor &widget
 
 bool ToastMessagePage::canClickPassThrough() {
     return !hasAction();
+}
+
+bool ToastMessagePage::closeIfTouchedOutside() {
+    return false;
 }
 
 void ToastMessagePage::executeAction() {
@@ -664,25 +678,23 @@ void MenuWithButtonsPage::init(AppContext *appContext, const char *message, cons
 }
 
 void MenuWithButtonsPage::updateInternalPage(const WidgetCursor &widgetCursor2) {
-    WidgetCursor widgetCursor;
+    WidgetCursor widgetCursor = widgetCursor2;
 
-    widgetCursor.appContext = m_appContext;
+    widgetCursor.widget = &m_containerRectangleWidget;
+    widgetCursor.x = x + m_containerRectangleWidget.x;
+    widgetCursor.y = y + m_containerRectangleWidget.y;
+    RectangleWidgetState rectangleWidgetState;
+    rectangleWidgetState.flags.active = 0;
+    rectangleWidgetState.render(widgetCursor);
 
-    if (!widgetCursor2.hasPreviousState) {
-        widgetCursor.widget = &m_containerRectangleWidget;
-        widgetCursor.x = x + m_containerRectangleWidget.x;
-        widgetCursor.y = y + m_containerRectangleWidget.y;
-		RectangleWidgetState rectangleWidgetState;
-		rectangleWidgetState.flags.active = 0;
-		rectangleWidgetState.render(widgetCursor);
-
-        widgetCursor.widget = &m_messageTextWidget;
-        widgetCursor.x = x + m_messageTextWidget.x;
-        widgetCursor.y = y + m_messageTextWidget.y;
-		TextWidgetState textWidgetState;
-		textWidgetState.flags.active = 0;
-		textWidgetState.render(widgetCursor);
-    }
+    widgetCursor.widget = &m_messageTextWidget;
+    widgetCursor.x = x + m_messageTextWidget.x;
+    widgetCursor.y = y + m_messageTextWidget.y;
+    TextWidgetState textWidgetState;
+    textWidgetState.flags.active = 0;
+	textWidgetState.flags.blinking = 0;
+	textWidgetState.flags.focused = 0;
+    textWidgetState.render(widgetCursor);
 
     for (size_t i = 0; i < m_numButtonTextWidgets; i++) {
         widgetCursor.widget = &m_buttonTextWidgets[i];
@@ -691,6 +703,8 @@ void MenuWithButtonsPage::updateInternalPage(const WidgetCursor &widgetCursor2) 
         widgetCursor.cursor = i;
 		TextWidgetState textWidgetState;
 		textWidgetState.flags.active = isActiveWidget(widgetCursor);
+		textWidgetState.flags.blinking = 0;
+		textWidgetState.flags.focused = 0;
 		textWidgetState.render(widgetCursor);
     }
 }

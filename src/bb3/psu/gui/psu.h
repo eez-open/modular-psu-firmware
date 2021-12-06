@@ -307,10 +307,6 @@ inline int getActivePageId() {
     return g_psuAppContext.getActivePageId();
 }
 
-inline bool isExternalPageActive() {
-    return getActivePageId() < 0;
-}
-
 inline Page *getActivePage() {
     return g_psuAppContext.getActivePage();
 }
@@ -321,6 +317,10 @@ inline int getPreviousPageId() {
 
 inline bool isPageOnStack(int pageId) {
     return g_psuAppContext.isPageOnStack(pageId);
+}
+
+inline bool isExternalPageOnStack() {
+    return g_psuAppContext.isExternalPageOnStack();
 }
 
 inline Page *getPage(int pageId) {

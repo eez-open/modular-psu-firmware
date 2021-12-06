@@ -127,6 +127,7 @@ bool showSetupWizardQuestion();
 void onEncoder(int counter, bool clicked);
 
 static void moveToNextFocusCursor();
+static void testIsEncoderEnabledInActivePage();
 
 ////////////////////////////////////////////////////////////////////////////////
 
@@ -141,8 +142,6 @@ PsuAppContext::PsuAppContext() {
     m_pushProgressPage = false;
     m_popProgressPage = false;
 }
-
-void testIsEncoderEnabledInActivePage();
 
 void PsuAppContext::stateManagment() {
     if (m_popProgressPage) {
@@ -392,7 +391,9 @@ void PsuAppContext::stateManagment() {
 		g_focusEditValue = Value();
 	}
 
-    testIsEncoderEnabledInActivePage();
+    if (g_widgetStateStructureChanged) {
+		testIsEncoderEnabledInActivePage();
+    }
 }
 
 bool PsuAppContext::isActiveWidget(const WidgetCursor &widgetCursor) {
@@ -958,7 +959,7 @@ void PsuAppContext::doShowIntegerInput() {
 
 bool PsuAppContext::dialogOpen(int *err) {
     if (isGuiThread()) {
-        if (!isExternalPageActive()) {
+        if (!isExternalPageOnStack()) {
             dialogResetDataItemValues();
             pushPage(getExternalAssetsMainPageId());
         }
@@ -966,7 +967,7 @@ bool PsuAppContext::dialogOpen(int *err) {
         sendMessageToGuiThread(GUI_QUEUE_MESSAGE_TYPE_DIALOG_OPEN);
         do {
             osDelay(1);
-        } while (!isExternalPageActive());
+        } while (!isExternalPageOnStack());
     }
     return true;
 }
@@ -982,7 +983,7 @@ DialogActionResult PsuAppContext::dialogAction(uint32_t timeoutMs, const char *&
     while (
         (timeoutMs == 0 || (int32_t)(millis() - timeoutMs) < 0) &&
         g_externalActionId == ACTION_ID_NONE &&
-        isExternalPageActive()
+        isExternalPageOnStack()
     ) {
         osDelay(5);
     }
@@ -993,7 +994,7 @@ DialogActionResult PsuAppContext::dialogAction(uint32_t timeoutMs, const char *&
         return DIALOG_ACTION_RESULT_SELECTED_ACTION;
     }
 
-    return isExternalPageActive() ? DIALOG_ACTION_RESULT_TIMEOUT : DIALOG_ACTION_RESULT_EXIT;
+    return isExternalPageOnStack() ? DIALOG_ACTION_RESULT_TIMEOUT : DIALOG_ACTION_RESULT_EXIT;
 }
 
 
@@ -1033,7 +1034,7 @@ void PsuAppContext::dialogSetDataItemValue(int16_t dataId, const char *str) {
 
 void PsuAppContext::dialogClose() {
     if (isGuiThread()) {
-        if (isExternalPageActive()) {
+        if (isExternalPageOnStack()) {
             removePageFromStack(getExternalAssetsMainPageId());
         }
     } else {
@@ -1520,7 +1521,7 @@ static bool isEncoderEnabledForWidget(const WidgetCursor &widgetCursor) {
 static bool g_focusCursorIsEnabled;
 static int16_t g_focusCursorAction;
 
-void isEnabledFocusCursorStep(const WidgetCursor &widgetCursor) {
+static void isEnabledFocusCursorStep(const WidgetCursor &widgetCursor) {
     if (isEncoderEnabledForWidget(widgetCursor)) {
         if (g_focusCursor == widgetCursor && g_focusDataId == widgetCursor.widget->data) {
             g_focusCursorIsEnabled = true;
@@ -1530,7 +1531,7 @@ void isEnabledFocusCursorStep(const WidgetCursor &widgetCursor) {
     }
 }
 
-bool isEnabledFocusCursor(const WidgetCursor& cursor, int16_t dataId) {
+static bool isEnabledFocusCursor(const WidgetCursor& cursor, int16_t dataId) {
     g_focusCursorIsEnabled = false;
     g_focusCursorAction = ACTION_ID_NONE;
     forEachWidget(isEnabledFocusCursorStep);
@@ -1545,10 +1546,14 @@ void isEncoderEnabledInActivePageCheckWidget(const WidgetCursor &widgetCursor) {
     }
 }
 
-void testIsEncoderEnabledInActivePage() {
+static void testIsEncoderEnabledInActivePage() {
     // encoder is enabled if active page contains widget with "edit" action
     g_isEncoderEnabledInActivePage = false;
     forEachWidget(isEncoderEnabledInActivePageCheckWidget);
+	
+	if (!isEnabledFocusCursor(g_focusCursor, g_focusDataId)) {
+		moveToNextFocusCursor();
+	}
 }
 
 bool isEncoderEnabledInActivePage() {
@@ -1918,10 +1923,6 @@ void onEncoder(int counter, bool clicked) {
     if (isFocusChanged() && tickCount - g_focusEditValueChangedTime >= ENCODER_CHANGE_TIMEOUT * 1000L) {
         // ... on timeout discard changed value
         g_focusEditValue = Value();
-    }
-
-    if (!isEnabledFocusCursor(g_focusCursor, g_focusDataId)) {
-        moveToNextFocusCursor();
     }
 
     int activePageId = getActivePageId();

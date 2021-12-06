@@ -82,14 +82,16 @@ bool BarGraphWidgetState::updateState(const WidgetCursor &widgetCursor) {
     WIDGET_STATE(line2Data, get(widgetCursor, widget->line2Data));
 
     bool refreshTextData = true;
+    auto currentTime = millis();
     if (hasPreviousState && textData != data) {
         uint32_t refreshRate = getTextRefreshRate(widgetCursor, widget->data);
-        if (refreshRate != 0 && millis() - textDataRefreshLastTime < refreshRate) {
+        if (refreshRate != 0 && currentTime - textDataRefreshLastTime < refreshRate) {
             refreshTextData = false;
         }
     }
     if (refreshTextData) {
         WIDGET_STATE(textData, data);
+        textDataRefreshLastTime = currentTime;
     }
 
     return !hasPreviousState;

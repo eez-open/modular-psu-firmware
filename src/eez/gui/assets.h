@@ -50,7 +50,7 @@ struct AssetsPtr {
 	}
 	
 	void operator=(T* ptr) {
-        offset = (uint8_t *)g_mainAssets - (uint8_t *)ptr;
+        offset = (uint8_t *)ptr - ((uint8_t *)g_mainAssets + 4);
     }
 
 private:

@@ -37,9 +37,8 @@ bool LayoutViewWidgetState::updateState(const WidgetCursor &widgetCursor) {
     bool hasPreviousState = widgetCursor.hasPreviousState;
     auto widget = (const LayoutViewWidget *)widgetCursor.widget;
 
-    Value oldContext;
-    Value newContext;
     if (widget->context) {
+        Value newContext;
         setContext((WidgetCursor &)widgetCursor, widget->context, oldContext, newContext);
         WIDGET_STATE(context, newContext);
     } else {
@@ -67,18 +66,16 @@ void LayoutViewWidgetState::render(WidgetCursor &widgetCursor) {
 }
 
 void LayoutViewWidgetState::enumChildren(WidgetCursor &widgetCursor) {
+    auto savedForceRefresh = widgetCursor.forceRefresh;
 	if (repainted) {
 		repainted = false;
-		if (widgetCursor.hasPreviousState) {
-			freeWidgetStates(widgetCursor.currentState);
-			widgetCursor.hasPreviousState = false;
-		}
+		widgetCursor.forceRefresh = true;
 	}
 
+	auto widget = (const LayoutViewWidget *)widgetCursor.widget;
+
 	if (g_findCallback != nullptr) {
-		auto widget = (const LayoutViewWidget *)widgetCursor.widget;
 		if (widget->context) {
-			Value oldContext;
 			Value newContext;
 			setContext((WidgetCursor &)widgetCursor, widget->context, oldContext, newContext);
 		}
@@ -100,6 +97,12 @@ void LayoutViewWidgetState::enumChildren(WidgetCursor &widgetCursor) {
 
 		widgetCursor.widget = savedWidget;
 	}
+
+    if (widget->context) {
+        restoreContext(widgetCursor, widget->context, oldContext);
+    }
+
+    widgetCursor.forceRefresh = savedForceRefresh;
 }
 
 } // namespace gui

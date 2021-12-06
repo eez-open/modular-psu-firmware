@@ -31,6 +31,8 @@ static Widget *g_rootWidget;
 WidgetState *g_widgetStateStart;
 WidgetState *g_widgetStateEnd;
 
+bool g_widgetStateStructureChanged;
+
 void refreshScreen() {
 	g_refreshScreen = true;
 }
@@ -74,10 +76,14 @@ void updateScreen() {
 	widgetCursor.widget = g_rootWidget;
 	widgetCursor.currentState = g_widgetStateStart;
 	widgetCursor.hasPreviousState = hasPreviousState;
+	widgetCursor.forceRefresh = false;
+
+	g_foundWidgetAtDownInvalid = false;
 
     enumWidget(widgetCursor);
 
 	g_widgetStateEnd = widgetCursor.currentState;
+	g_widgetStateStructureChanged = !widgetCursor.hasPreviousState;
 }
 
 void enumRootWidget() {

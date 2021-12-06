@@ -33,6 +33,8 @@ struct LayoutViewWidgetState : public WidgetState {
     Value context;
 	bool repainted;
 
+    Value oldContext;
+
     bool updateState(const WidgetCursor &widgetCursor) override;
     void render(WidgetCursor &widgetCursor) override;
 	void enumChildren(WidgetCursor &widgetCursor) override;

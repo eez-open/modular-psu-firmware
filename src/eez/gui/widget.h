@@ -102,6 +102,7 @@ struct WidgetCursor {
 
 	WidgetState *currentState;
 	bool hasPreviousState;
+	bool forceRefresh;
 
 	WidgetCursor()
 		: assets(nullptr)
@@ -218,6 +219,7 @@ void enumRootWidget();
 void enumWidget(WidgetCursor &widgetCursor);
 void enumNoneWidget(WidgetCursor &widgetCursor);
 
+extern bool g_foundWidgetAtDownInvalid;
 void freeWidgetStates(WidgetState *topWidgetState);
 
 typedef void (*EnumWidgetsCallback)(const WidgetCursor &widgetCursor);

@@ -54,6 +54,7 @@ public:
     void updateInternalPage(const WidgetCursor &widgetCursor);
     WidgetCursor findWidgetInternalPage(const WidgetCursor &widgetCursor, int x, int y, bool clicked);
     bool canClickPassThrough();
+    bool closeIfTouchedOutside();
 
     bool hasAction() {
       return actionWidget.action != 0;
@@ -80,6 +81,8 @@ private:
     void (*actionWithoutParam)();
 
     AppContext *appContext;
+
+    bool dirty;
 };
 
 ////////////////////////////////////////////////////////////////////////////////

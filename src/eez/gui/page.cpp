@@ -77,5 +77,9 @@ bool InternalPage::canClickPassThrough() {
     return false;
 }
 
+bool InternalPage::closeIfTouchedOutside() {
+    return true;
+}
+
 } // namespace gui
 } // namespace eez

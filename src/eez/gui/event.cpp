@@ -141,7 +141,9 @@ static void processTouchEvent(EventType type, int x, int y) {
 }
 
 static void onWidgetTouch(const WidgetCursor &widgetCursor, Event &touchEvent) {
-    widgetCursor.currentState->onTouch(widgetCursor, touchEvent);
+	if (widgetCursor) {
+		widgetCursor.currentState->onTouch(widgetCursor, touchEvent);
+	}
 }
 
 OnTouchFunctionType getWidgetTouchFunction(const WidgetCursor &widgetCursor) {

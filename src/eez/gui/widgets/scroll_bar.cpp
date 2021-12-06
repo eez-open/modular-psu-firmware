@@ -33,11 +33,6 @@
 namespace eez {
 namespace gui {
 
-static ScrollBarWidgetSegment g_segment;
-static WidgetCursor g_selectedWidget;
-static int g_dragStartX;
-static int g_dragStartPosition;
-
 int getSize(const WidgetCursor &widgetCursor) {
     return ytDataGetSize(widgetCursor, widgetCursor.widget->data);
 }
@@ -66,6 +61,8 @@ void getThumbGeometry(int size, int position, int pageSize, int xTrack, int wTra
     xThumb = xTrack + (int)round(remap(position, 0, 0, size - pageSize, wTrack - widthThumb));
 }
 
+WidgetCursor ScrollBarWidgetState::g_selectedWidget;
+
 bool ScrollBarWidgetState::updateState(const WidgetCursor &widgetCursor) {
     bool hasPreviousState = widgetCursor.hasPreviousState;
 
@@ -74,7 +71,7 @@ bool ScrollBarWidgetState::updateState(const WidgetCursor &widgetCursor) {
     WIDGET_STATE(size, getSize(widgetCursor));
     WIDGET_STATE(position, getPosition(widgetCursor));
     WIDGET_STATE(pageSize, getPageSize(widgetCursor));
-    WIDGET_STATE(segment, g_segment);
+    WIDGET_STATE(segment, dragSegment);
 
     return !hasPreviousState;
 }
@@ -184,22 +181,22 @@ void ScrollBarWidgetState::onTouch(const WidgetCursor &widgetCursor, Event &touc
         if (touchEvent.type == EVENT_TYPE_TOUCH_DOWN || touchEvent.type == EVENT_TYPE_AUTO_REPEAT) {
             if (touchEvent.type == EVENT_TYPE_TOUCH_DOWN) {
                 g_selectedWidget = widgetCursor;
-                g_segment = SCROLL_BAR_WIDGET_SEGMENT_NONE;
+                dragSegment = SCROLL_BAR_WIDGET_SEGMENT_NONE;
             }
 
-            if (touchEvent.type == EVENT_TYPE_AUTO_REPEAT && (g_segment == SCROLL_BAR_WIDGET_SEGMENT_NONE || g_segment == SCROLL_BAR_WIDGET_SEGMENT_THUMB)) {
+            if (touchEvent.type == EVENT_TYPE_AUTO_REPEAT && (dragSegment == SCROLL_BAR_WIDGET_SEGMENT_NONE || dragSegment == SCROLL_BAR_WIDGET_SEGMENT_THUMB)) {
                 return;
             }
 
             if ((isHorizontal && touchEvent.x < widgetCursor.x + buttonSize) || (!isHorizontal && touchEvent.y < widgetCursor.y + buttonSize)) {
                 setPosition(widgetCursor, getPosition(widgetCursor) - getPositionIncrement(widgetCursor));
-                g_segment = SCROLL_BAR_WIDGET_SEGMENT_LEFT_BUTTON;
+                dragSegment = SCROLL_BAR_WIDGET_SEGMENT_LEFT_BUTTON;
                 if (touchEvent.type == EVENT_TYPE_TOUCH_DOWN) {
                     sound::playClick();
                 }
             } else if ((isHorizontal && (touchEvent.x >= widgetCursor.x + widget->w - buttonSize)) || (!isHorizontal && (touchEvent.y >= widgetCursor.y + widget->h - buttonSize))) {
                 setPosition(widgetCursor, getPosition(widgetCursor) + getPositionIncrement(widgetCursor));
-                g_segment = SCROLL_BAR_WIDGET_SEGMENT_RIGHT_BUTTON;
+                dragSegment = SCROLL_BAR_WIDGET_SEGMENT_RIGHT_BUTTON;
                 if (touchEvent.type == EVENT_TYPE_TOUCH_DOWN) {
                     sound::playClick();
                 }
@@ -212,30 +209,30 @@ void ScrollBarWidgetState::onTouch(const WidgetCursor &widgetCursor, Event &touc
 
                 if (x < xThumb) {
                     setPosition(widgetCursor, getPosition(widgetCursor) - pageSize);
-                    g_segment = SCROLL_BAR_WIDGET_SEGMENT_TRACK_LEFT;
+                    dragSegment = SCROLL_BAR_WIDGET_SEGMENT_TRACK_LEFT;
                     if (touchEvent.type == EVENT_TYPE_TOUCH_DOWN) {
                         sound::playClick();
                     }
                 } else if (x >= xThumb + wThumb) {
                     setPosition(widgetCursor, getPosition(widgetCursor) + pageSize);
-                    g_segment = SCROLL_BAR_WIDGET_SEGMENT_TRACK_RIGHT;
+                    dragSegment = SCROLL_BAR_WIDGET_SEGMENT_TRACK_RIGHT;
                     if (touchEvent.type == EVENT_TYPE_TOUCH_DOWN) {
                         sound::playClick();
                     }
                 } else if (x >= xThumb || touchEvent.x < xThumb + wThumb) {
-                    g_segment = SCROLL_BAR_WIDGET_SEGMENT_THUMB;
-                    g_dragStartX = x;
-                    g_dragStartPosition = getPosition(widgetCursor);
+                    dragSegment = SCROLL_BAR_WIDGET_SEGMENT_THUMB;
+                    dragStartX = x;
+                    dragStartPosition = getPosition(widgetCursor);
                 }
             }
         } else if (touchEvent.type == EVENT_TYPE_TOUCH_MOVE) {
-            if (g_segment == SCROLL_BAR_WIDGET_SEGMENT_THUMB) {
+            if (dragSegment == SCROLL_BAR_WIDGET_SEGMENT_THUMB) {
                 int size = getSize(widgetCursor);
-                setPosition(widgetCursor, g_dragStartPosition + (int)round(1.0 * (x - g_dragStartX) * size / wTrack));
+                setPosition(widgetCursor, dragStartPosition + (int)round(1.0 * (x - dragStartX) * size / wTrack));
             }
         } else if (touchEvent.type == EVENT_TYPE_TOUCH_UP) {
             g_selectedWidget = 0;
-            g_segment = SCROLL_BAR_WIDGET_SEGMENT_NONE;
+            dragSegment = SCROLL_BAR_WIDGET_SEGMENT_NONE;
         }
 
         auto action = getWidgetAction(widgetCursor);        

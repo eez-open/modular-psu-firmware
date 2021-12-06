@@ -224,20 +224,20 @@ void stateManagment() {
 	auto isExecuting = dlog_record::isExecuting();
 	if (!isExecuting && g_wasExecuting) {
 		if (psu::gui::isPageOnStack(PAGE_ID_DLOG_VIEW)) {
-			if (psu::gui::isExternalPageActive()) {
+			if (psu::gui::isExternalPageOnStack()) {
 				psu::gui::removePageFromStack(PAGE_ID_DLOG_VIEW);
 			} else {
 				openFile(dlog_record::getLatestFilePath());
 			}
 		} else {
-			if (psu::gui::isExternalPageActive()) {
+			if (psu::gui::isExternalPageOnStack()) {
 			} else {
 				gui::showPage(PAGE_ID_DLOG_VIEW);
 				openFile(dlog_record::getLatestFilePath());
 			}
 		}
 	} else if (isExecuting && !g_wasExecuting) {
-		if (!psu::gui::isExternalPageActive()) {
+		if (!psu::gui::isExternalPageOnStack()) {
             g_showLatest = true;
             if (!psu::gui::isPageOnStack(PAGE_ID_DLOG_VIEW)) {
                 gui::showPage(PAGE_ID_DLOG_VIEW);

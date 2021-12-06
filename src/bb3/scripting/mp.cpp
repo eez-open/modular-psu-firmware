@@ -176,8 +176,6 @@ bool loadMpScript(int *err) {
 		goto ErrorNoClose;
 	}
 
-	psu::gui::hideAsyncOperationInProgress();
-
 	startMpScriptInScriptingThread();
 
 	return true;

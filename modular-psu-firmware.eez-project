@@ -12714,6 +12714,28 @@
     {
       "components": [
         {
+          "type": "ScrollBar",
+          "left": 448,
+          "top": 0,
+          "width": 32,
+          "height": 238,
+          "wireID": "cd4f180c-c284-4ceb-f16c-baf685fa4532",
+          "customInputs": [],
+          "customOutputs": [],
+          "data": "event_queue_events",
+          "style": {
+            "inheritFrom": "default_inverse"
+          },
+          "thumbStyle": {
+            "inheritFrom": "scrollbar_thumb"
+          },
+          "buttonsStyle": {
+            "inheritFrom": "scrollbar_button"
+          },
+          "leftButtonText": "\\u0083",
+          "rightButtonText": "\\u0084"
+        },
+        {
           "type": "List",
           "left": 0,
           "top": 0,
@@ -13219,28 +13241,6 @@
             ]
           },
           "listType": "vertical"
-        },
-        {
-          "type": "ScrollBar",
-          "left": 448,
-          "top": 0,
-          "width": 32,
-          "height": 238,
-          "wireID": "cd4f180c-c284-4ceb-f16c-baf685fa4532",
-          "customInputs": [],
-          "customOutputs": [],
-          "data": "event_queue_events",
-          "style": {
-            "inheritFrom": "default_inverse"
-          },
-          "thumbStyle": {
-            "inheritFrom": "scrollbar_thumb"
-          },
-          "buttonsStyle": {
-            "inheritFrom": "scrollbar_button"
-          },
-          "leftButtonText": "\\u0083",
-          "rightButtonText": "\\u0084"
         },
         {
           "type": "Container",

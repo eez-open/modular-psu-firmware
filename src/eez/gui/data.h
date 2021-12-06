@@ -548,6 +548,7 @@ enum DataOperationEnum {
     DATA_OPERATION_GET_CONTEXT,
     DATA_OPERATION_SET_CONTEXT,
     DATA_OPERATION_GET_CONTEXT_CURSOR,
+    DATA_OPERATION_RESTORE_CONTEXT,
     DATA_OPERATION_GET_TEXT_REFRESH_RATE,
     DATA_OPERATION_GET_COLOR,
     DATA_OPERATION_GET_BACKGROUND_COLOR,
@@ -594,6 +595,7 @@ void select(WidgetCursor &widgetCursor, int16_t id, int index, Value &oldValue);
 void deselect(WidgetCursor &widgetCursor, int16_t id, Value &oldValue);
 
 void setContext(WidgetCursor &widgetCursor, int16_t id, Value &oldContext, Value &newContext);
+void restoreContext(WidgetCursor &widgetCursor, int16_t id, Value &oldContext);
 
 int getFloatListLength(const WidgetCursor &widgetCursor, int16_t id);
 float *getFloatList(const WidgetCursor &widgetCursor, int16_t id);

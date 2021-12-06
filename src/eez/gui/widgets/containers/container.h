@@ -33,6 +33,7 @@ struct ContainerWidgetState : public WidgetState {
     int overlayState;
     int displayBufferIndex;
 	bool displayBufferSelected;
+	bool repainted;
 
     bool updateState(const WidgetCursor &widgetCursor) override;
 	void render(WidgetCursor &widgetCursor) override;

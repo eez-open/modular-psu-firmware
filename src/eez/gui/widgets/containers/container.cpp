@@ -72,11 +72,21 @@ void ContainerWidgetState::render(WidgetCursor &widgetCursor) {
 		widgetCursor.x, widgetCursor.y, (int)widget->w, (int)widget->h,
 		getStyle(widget->style), flags.active, false, true
 	);
+	
+	repainted = true;
 }
 
 void ContainerWidgetState::enumChildren(WidgetCursor &widgetCursor) {
-    if (overlay) {
+	auto savedForceRefresh = widgetCursor.forceRefresh;
+	if (repainted) {
+		repainted = false;
+		widgetCursor.forceRefresh = true;
+	}
+	
+	if (overlay) {
         renderOverlayChildren(widgetCursor);
+
+		widgetCursor.forceRefresh = savedForceRefresh;
         return;
     }
 
@@ -93,6 +103,8 @@ void ContainerWidgetState::enumChildren(WidgetCursor &widgetCursor) {
     }
 
 	widgetCursor.widget = savedWidget;
+
+	widgetCursor.forceRefresh = savedForceRefresh;
 }
 
 void ContainerWidgetState::renderOverlayChildren(WidgetCursor &widgetCursor) {

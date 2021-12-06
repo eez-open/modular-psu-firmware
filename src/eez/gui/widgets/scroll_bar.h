@@ -44,6 +44,12 @@ struct ScrollBarWidgetState : public WidgetState {
     int pageSize;
     ScrollBarWidgetSegment segment;
 
+    ScrollBarWidgetSegment dragSegment;
+    int dragStartX;
+    int dragStartPosition;
+
+    static WidgetCursor g_selectedWidget;
+
 	bool updateState(const WidgetCursor &widgetCursor) override;
     void render(WidgetCursor &widgetCursor) override;
 	bool hasOnTouch() override;

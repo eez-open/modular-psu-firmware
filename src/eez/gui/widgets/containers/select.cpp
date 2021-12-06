@@ -45,12 +45,10 @@ void SelectWidgetState::render(WidgetCursor &widgetCursor) {
 }
 
 void SelectWidgetState::enumChildren(WidgetCursor &widgetCursor) {
+    auto savedForceRefresh = widgetCursor.forceRefresh;
 	if (repainted) {
 		repainted = false;
-		if (widgetCursor.hasPreviousState) {
-			freeWidgetStates(widgetCursor.currentState);
-			widgetCursor.hasPreviousState = false;
-		}
+		widgetCursor.forceRefresh = true;
 	}
 	
 	if (widgetIndex != -1) {
@@ -63,6 +61,8 @@ void SelectWidgetState::enumChildren(WidgetCursor &widgetCursor) {
 
 		widgetCursor.widget = savedWidget;
 	}
+
+	widgetCursor.forceRefresh = savedForceRefresh;
 }
 
 } // namespace gui

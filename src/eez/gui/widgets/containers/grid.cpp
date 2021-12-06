@@ -43,6 +43,8 @@ void GridWidgetState::enumChildren(WidgetCursor &widgetCursor) {
         auto savedX = widgetCursor.x;
         auto savedY = widgetCursor.y;
 
+        auto savedCursor = widgetCursor.cursor;
+
         int xOffset = 0;
         int yOffset = 0;
 
@@ -89,6 +91,8 @@ void GridWidgetState::enumChildren(WidgetCursor &widgetCursor) {
 
 		widgetCursor.x = savedX;
 		widgetCursor.y = savedY;
+
+        widgetCursor.cursor = savedCursor;
 	}
 }
 

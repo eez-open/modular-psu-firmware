@@ -97,7 +97,7 @@ static size_t g_widgetStateSizes[] = {
 
 bool WidgetState::updateState(const WidgetCursor &widgetCursor) {
 	return false;
-    }
+}
 
 void WidgetState::render(WidgetCursor &widgetCursor) {
 }
@@ -128,6 +128,8 @@ bool WidgetCursor::isPage() const {
 
 ////////////////////////////////////////////////////////////////////////////////
 
+bool g_foundWidgetAtDownInvalid;
+
 void enumWidget(WidgetCursor &widgetCursor) {
     const Widget *widget = widgetCursor.widget;
 
@@ -146,7 +148,8 @@ void enumWidget(WidgetCursor &widgetCursor) {
 		g_findCallback(widgetCursor);
 	} else {
 		if (widgetCursor.hasPreviousState && widget->type == widgetState->type) {
-			if (widgetState->updateState(widgetCursor)) {
+            bool refresh = widgetState->updateState(widgetCursor);
+			if (refresh || widgetCursor.forceRefresh) {
 				widgetState->render(widgetCursor);
 			}
 		}
@@ -160,6 +163,14 @@ void enumWidget(WidgetCursor &widgetCursor) {
 			
 			widgetState->updateState(widgetCursor);
 			widgetState->render(widgetCursor);
+
+			if (g_foundWidgetAtDownInvalid) {
+				auto &foundWidgetAtDown = getFoundWidgetAtDown();
+				if (foundWidgetAtDown == widgetCursor) {
+					foundWidgetAtDown = widgetCursor;
+					g_foundWidgetAtDownInvalid = false;
+				}
+			}
 		}
 	}
 
@@ -192,6 +203,11 @@ void freeWidgetStates(WidgetState *widgetStateStart) {
         widgetState->~WidgetState();
         widgetState = nextWidgetState;
     }
+
+	auto &widgetCursor = getFoundWidgetAtDown();
+	if (widgetCursor.currentState >= widgetStateStart) {
+		g_foundWidgetAtDownInvalid = true;
+	}
 }
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -223,7 +239,7 @@ static void findWidgetStep(const WidgetCursor &widgetCursor) {
 	}
 
 	if (widgetCursor.appContext->isActivePageInternal()) {
-		auto internalPage = ((InternalPage *)widgetCursor.appContext->getActivePage());
+		auto internalPage = (InternalPage *)widgetCursor.appContext->getActivePage();
 
 		WidgetCursor foundWidget = internalPage->findWidgetInternalPage(widgetCursor, g_findWidgetAtX, g_findWidgetAtY, g_clicked);
 		if (foundWidget) {
@@ -233,8 +249,10 @@ static void findWidgetStep(const WidgetCursor &widgetCursor) {
         }
 
         if (g_clicked) {
-            // clicked outside internal page, close internal page
-            g_popPageAppContext = widgetCursor.appContext;
+            if (internalPage->closeIfTouchedOutside()) {
+                // clicked outside internal page, close internal page (if not toast)
+                g_popPageAppContext = widgetCursor.appContext;
+            }
         }
 
         bool passThrough = internalPage->canClickPassThrough();

@@ -2,11 +2,13 @@
   "flows": [],
   "constants": [
     {
-      "type": 0
+      "type": 0,
+      "valueType": "undefined"
     },
     {
       "type": 1,
-      "value": null
+      "value": null,
+      "valueType": "null"
     }
   ],
   "globalVariables": []

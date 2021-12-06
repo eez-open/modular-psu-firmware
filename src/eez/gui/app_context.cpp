@@ -230,6 +230,15 @@ bool AppContext::isPageOnStack(int pageId) {
     return false;
 }
 
+bool AppContext::isExternalPageOnStack() {
+    for (int i = 0; i <= m_pageNavigationStackPointer; ++i) {
+        if (m_pageNavigationStack[i].pageId < 0) {
+            return true;
+        }
+    }
+    return false;
+}
+
 void AppContext::showPage(int pageId) {
     if (showPageThreadHook(this, pageId)) {
         return;
