@@ -49,22 +49,28 @@ void UpDownWidgetState::render(WidgetCursor &widgetCursor) {
     font::Font buttonsFont = styleGetFont(buttonsStyle);
     int buttonWidth = buttonsFont.getHeight();
 
-    drawText(widget->downButtonText.ptr(widgetCursor.assets), -1, widgetCursor.x, widgetCursor.y, buttonWidth, (int)widget->h,
-                buttonsStyle,
-                flags.active && segment == UP_DOWN_WIDGET_SEGMENT_DOWN_BUTTON,
-                false, false, nullptr, nullptr, nullptr, nullptr);
+    drawText(
+        widget->downButtonText.ptr(widgetCursor.assets), -1,
+        widgetCursor.x, widgetCursor.y, buttonWidth, (int)widget->h,
+        buttonsStyle,
+        flags.active && segment == UP_DOWN_WIDGET_SEGMENT_DOWN_BUTTON
+    );
 
     char text[64];
     data.toText(text, sizeof(text));
     const Style *style = getStyle(widget->style);
-    drawText(text, -1, widgetCursor.x + buttonWidth, widgetCursor.y,
-                (int)(widget->w - 2 * buttonWidth), (int)widget->h, style, false, false,
-                false, nullptr, nullptr, nullptr, nullptr);
+    drawText(
+        text, -1,
+        widgetCursor.x + buttonWidth, widgetCursor.y, (int)(widget->w - 2 * buttonWidth), (int)widget->h,
+        style
+    );
 
-    drawText(widget->upButtonText.ptr(widgetCursor.assets), -1, widgetCursor.x + widget->w - buttonWidth, widgetCursor.y,
-                buttonWidth, (int)widget->h, buttonsStyle,
-                flags.active && segment == UP_DOWN_WIDGET_SEGMENT_UP_BUTTON,
-                false, false, nullptr, nullptr, nullptr, nullptr);
+    drawText(
+        widget->upButtonText.ptr(widgetCursor.assets), -1, 
+        widgetCursor.x + widget->w - buttonWidth, widgetCursor.y, buttonWidth, (int)widget->h,
+        buttonsStyle,
+        flags.active && segment == UP_DOWN_WIDGET_SEGMENT_UP_BUTTON
+    );
 }
 
 void UpDownWidgetState::upDown(const WidgetCursor &widgetCursor, UpDownWidgetSegment segment_) {

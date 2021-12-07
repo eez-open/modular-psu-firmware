@@ -56,11 +56,15 @@ bool styleIsBlink(const Style *style) {
 
 ////////////////////////////////////////////////////////////////////////////////
 
-void drawText(const char *text, int textLength, int x, int y, int w, int h, const Style *style,
-              bool active, bool blink, bool ignoreLuminocity,
-              uint16_t *overrideColor, uint16_t *overrideBackgroundColor,
-              uint16_t *overrideActiveColor, uint16_t *overrideActiveBackgroundColor,
-              bool useSmallerFontIfDoesNotFit, int cursorPosition, int xScroll) {
+void drawText(
+    const char *text, int textLength,
+    int x, int y, int w, int h,
+    const Style *style,
+    bool active, bool blink, bool ignoreLuminocity,
+    uint16_t *overrideColor, uint16_t *overrideBackgroundColor,
+    uint16_t *overrideActiveColor, uint16_t *overrideActiveBackgroundColor,
+    bool useSmallerFontIfDoesNotFit, int cursorPosition, int xScroll
+) {
     int x1 = x;
     int y1 = y;
     int x2 = x + w - 1;

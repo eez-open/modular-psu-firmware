@@ -71,10 +71,10 @@ bool DisplayDataWidgetState::updateState(const WidgetCursor &widgetCursor) {
         dataRefreshLastTime = currentTime;
     }
 
-    WIDGET_STATE(color, flags.focused ? style->focus_color : getColor(widgetCursor, widget->data, style));
-    WIDGET_STATE(backgroundColor, flags.focused ? style->focus_background_color : getBackgroundColor(widgetCursor, widget->data, style));
-    WIDGET_STATE(activeColor, flags.focused ? style->focus_background_color : getActiveColor(widgetCursor, widget->data, style));
-    WIDGET_STATE(activeBackgroundColor, flags.focused ? style->focus_color : getActiveBackgroundColor(widgetCursor, widget->data, style));
+    WIDGET_STATE(color,                 flags.focused ? style->focus_color            : getColor(widgetCursor, widget->data, style));
+    WIDGET_STATE(backgroundColor,       flags.focused ? style->focus_background_color : getBackgroundColor(widgetCursor, widget->data, style));
+    WIDGET_STATE(activeColor,           flags.focused ? style->focus_background_color : getActiveColor(widgetCursor, widget->data, style));
+    WIDGET_STATE(activeBackgroundColor, flags.focused ? style->focus_color            : getActiveBackgroundColor(widgetCursor, widget->data, style));
 
     bool cursorVisible = millis() % (2 * CONF_GUI_TEXT_CURSOR_BLINK_TIME_MS) < CONF_GUI_TEXT_CURSOR_BLINK_TIME_MS;
     WIDGET_STATE(cursorPosition, cursorVisible ? getTextCursorPosition(widgetCursor, widget->data) : -1);
@@ -141,12 +141,16 @@ void DisplayDataWidgetState::render(WidgetCursor &widgetCursor) {
         }
     }
 
-    drawText(start, length, widgetCursor.x, widgetCursor.y, (int)widget->w, (int)widget->h,
-        style, flags.active,
-        flags.blinking, false,
+    drawText(
+        start, length,
+        widgetCursor.x, widgetCursor.y, (int)widget->w, (int)widget->h,
+        style,
+        flags.active, flags.blinking, false,
         &color, &backgroundColor, &activeColor, &activeBackgroundColor,
         data.getType() == VALUE_TYPE_FLOAT || widget->data == EEZ_CONF_DATA_ID_EDIT_UNIT,
-        cursorPosition, xScroll);
+        cursorPosition,
+        xScroll
+    );
 }
 
 int DISPLAY_DATA_getCharIndexAtPosition(int xPos, const WidgetCursor &widgetCursor) {

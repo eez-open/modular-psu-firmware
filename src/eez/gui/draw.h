@@ -24,7 +24,15 @@ namespace gui {
 font::Font styleGetFont(const Style *style);
 bool styleIsBlink(const Style *style);
 
-void drawText(const char *text, int textLength, int x, int y, int w, int h, const Style *style, bool active, bool blink, bool ignoreLuminocity, uint16_t *overrideColor, uint16_t *overrideBackgroundColor, uint16_t *overrideActiveColor, uint16_t *overrideActiveBackgroundColor, bool useSmallerFontIfDoesNotFit = false, int cursorPosition = -1, int xScroll = 0);
+void drawText(
+    const char *text, int textLength,
+    int x, int y, int w, int h,
+    const Style *style,
+    bool active = false, bool blink = false, bool ignoreLuminocity = false,
+    uint16_t *overrideColor = nullptr, uint16_t *overrideBackgroundColor = nullptr,
+    uint16_t *overrideActiveColor = nullptr, uint16_t *overrideActiveBackgroundColor = nullptr,
+    bool useSmallerFontIfDoesNotFit = false, int cursorPosition = -1, int xScroll = 0
+);
 int getCharIndexAtPosition(int xPos, const char *text, int textLength, int x, int y, int w, int h, const Style *style);
 int getCursorXPosition(int cursorPosition, const char *text, int textLength, int x, int y, int w, int h, const Style *style);
 

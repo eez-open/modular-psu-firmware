@@ -49,22 +49,14 @@ void ButtonWidgetState::render(WidgetCursor &widgetCursor) {
     
     if (widget->data) {
         if (data.isString()) {
-            drawText(data.getString(), -1, widgetCursor.x,
-                        widgetCursor.y, (int)widget->w, (int)widget->h, style,
-                        flags.active,
-                        flags.blinking, false, nullptr, nullptr, nullptr, nullptr);
+            drawText(data.getString(), -1, widgetCursor.x, widgetCursor.y, (int)widget->w, (int)widget->h, style, flags.active, flags.blinking);
         } else {
             char text[MAX_TEXT_LEN + 1];
             data.toText(text, sizeof(text));
-
-            drawText(text, -1, widgetCursor.x, widgetCursor.y, (int)widget->w, (int)widget->h,
-                        style, flags.active,
-                        flags.blinking, false, nullptr, nullptr, nullptr, nullptr);
+            drawText(text, -1, widgetCursor.x, widgetCursor.y, (int)widget->w, (int)widget->h, style, flags.active, flags.blinking);
         }
     } else {
-        drawText(widget->text.ptr(widgetCursor.assets), -1, widgetCursor.x, widgetCursor.y, (int)widget->w, (int)widget->h,
-                    style, flags.active,
-                    flags.blinking, false, nullptr, nullptr, nullptr, nullptr);
+        drawText(widget->text.ptr(widgetCursor.assets), -1, widgetCursor.x, widgetCursor.y, (int)widget->w, (int)widget->h, style, flags.active, flags.blinking);
     }
 }
 

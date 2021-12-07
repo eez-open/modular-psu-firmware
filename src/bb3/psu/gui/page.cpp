@@ -520,7 +520,12 @@ void SelectFromEnumPage::updateInternalPage(const WidgetCursor &widgetCursor) {
         getItemPosition(i, xItem, yItem);
 
         getItemLabel(i, text, sizeof(text));
-        drawText(text, -1, xItem, yItem, itemWidth, itemHeight, isDisabled(i) ? disabledItemStyle : itemStyle, i == activeItemIndex, false, false, nullptr, nullptr, nullptr, nullptr);
+        drawText(
+            text, -1,
+            xItem, yItem, itemWidth, itemHeight,
+            isDisabled(i) ? disabledItemStyle : itemStyle,
+            i == activeItemIndex
+        );
     }
 
     dirty = false;

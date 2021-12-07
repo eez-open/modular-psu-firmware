@@ -85,12 +85,14 @@ void ScrollBarWidgetState::render(WidgetCursor &widgetCursor) {
         int buttonSize = isHorizontal ? widget->h : widget->w;
 
         // draw left button
-        drawText(widget->leftButtonText.ptr(widgetCursor.assets), -1, 
+        drawText(
+            widget->leftButtonText.ptr(widgetCursor.assets), -1, 
             widgetCursor.x, 
             widgetCursor.y, 
             isHorizontal ? buttonSize : (int)widget->w, 
             isHorizontal ? (int)widget->h : buttonSize, buttonsStyle, 
-            segment == SCROLL_BAR_WIDGET_SEGMENT_LEFT_BUTTON, false, false, nullptr, nullptr, nullptr, nullptr);
+            segment == SCROLL_BAR_WIDGET_SEGMENT_LEFT_BUTTON
+        );
 
         // draw track
         int xTrack;
@@ -128,12 +130,15 @@ void ScrollBarWidgetState::render(WidgetCursor &widgetCursor) {
         }
 
         // draw right button
-        drawText(widget->rightButtonText.ptr(widgetCursor.assets), -1,
+        drawText(
+            widget->rightButtonText.ptr(widgetCursor.assets), -1,
             isHorizontal ? widgetCursor.x + widget->w - buttonSize : widgetCursor.x, 
             isHorizontal ? widgetCursor.y : widgetCursor.y + widget->h - buttonSize, 
             isHorizontal ? buttonSize : (int)widget->w, 
-            isHorizontal ? (int)widget->h : buttonSize, buttonsStyle, 
-            segment == SCROLL_BAR_WIDGET_SEGMENT_RIGHT_BUTTON, false, false, nullptr, nullptr, nullptr, nullptr);
+            isHorizontal ? (int)widget->h : buttonSize,
+            buttonsStyle, 
+            segment == SCROLL_BAR_WIDGET_SEGMENT_RIGHT_BUTTON
+        );
 
         auto action = getWidgetAction(widgetCursor);        
         if (flags.focused && action == EEZ_CONF_ACTION_ID_SCROLL) {

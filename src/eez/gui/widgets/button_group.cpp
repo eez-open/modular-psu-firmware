@@ -39,7 +39,7 @@ void drawButtons(const Widget *widget, int x, int y, const Style *style, const S
 			WidgetCursor widgetCursor;
 			widgetCursor.cursor = i;
             getLabel(widgetCursor, widget->data, text, 32);
-            drawText(text, -1, x, y, w, h, i == selectedButton ? selectedStyle : style, false, false, false, nullptr, nullptr, nullptr, nullptr);
+            drawText(text, -1, x, y, w, h, i == selectedButton ? selectedStyle : style);
             x += w;
         }
     } else {
@@ -71,7 +71,7 @@ void drawButtons(const Widget *widget, int x, int y, const Style *style, const S
             char text[32];
 			widgetCursor.cursor = i;
             getLabel(widgetCursor, widget->data, text, 32);
-            drawText(text, -1, x, y + yOffset, w, labelHeight, i == selectedButton ? selectedStyle: style, false, false, false, nullptr, nullptr, nullptr, nullptr);
+            drawText(text, -1, x, y + yOffset, w, labelHeight, i == selectedButton ? selectedStyle: style);
 
             int b = y + yOffset + labelHeight;
 

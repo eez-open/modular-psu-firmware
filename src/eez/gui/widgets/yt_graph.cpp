@@ -449,9 +449,11 @@ struct YTGraphStaticDrawHelper {
 			}
 			int yCursorText = widgetCursor.y + widgetCursor.widget->h - cursorTextHeight - PADDING;
 
-			drawText(text, -1,
+			drawText(
+                text, -1,
 				xCursorText, yCursorText, cursorTextWidth, cursorTextHeight,
-				style, widgetState->flags.focused, false, false, nullptr, nullptr, nullptr, nullptr
+				style,
+                widgetState->flags.focused
 			);
 		}
 		

@@ -58,17 +58,20 @@ void TextWidgetState::render(WidgetCursor &widgetCursor) {
     const Style *style = getStyle(overrideStyleHook(widgetCursor, widget->style));
     const char *text = widget->text.ptr(widgetCursor.assets);
 
-    uint16_t overrideColor = flags.focused ? style->focus_color : overrideStyleColorHook(widgetCursor, style);
-    uint16_t overrideBackgroundColor = flags.focused ? style->focus_background_color : style->background_color;
-    uint16_t overrideActiveColor = flags.focused ? style->focus_background_color : overrideActiveStyleColorHook(widgetCursor, style);
-    uint16_t overrideActiveBackgroundColor = flags.focused ? style->focus_color : style->active_background_color;
+    uint16_t overrideColor                 = flags.focused ? style->focus_color            : overrideStyleColorHook(widgetCursor, style);
+    uint16_t overrideBackgroundColor       = flags.focused ? style->focus_background_color : style->background_color;
+    uint16_t overrideActiveColor           = flags.focused ? style->focus_background_color : overrideActiveStyleColorHook(widgetCursor, style);
+    uint16_t overrideActiveBackgroundColor = flags.focused ? style->focus_color            : style->active_background_color;
 
     bool ignoreLuminosity = (widget->flags & IGNORE_LUMINOSITY_FLAG) != 0;
     if (text && text[0]) {
-        drawText(text, -1, widgetCursor.x, widgetCursor.y, (int)widget->w, (int)widget->h,
-            style, flags.active,
-            flags.blinking,
-            ignoreLuminosity, &overrideColor, &overrideBackgroundColor, &overrideActiveColor, &overrideActiveBackgroundColor);
+        drawText(
+            text, -1,
+            widgetCursor.x, widgetCursor.y, (int)widget->w, (int)widget->h,
+            style,
+            flags.active, flags.blinking, ignoreLuminosity,
+            &overrideColor, &overrideBackgroundColor, &overrideActiveColor, &overrideActiveBackgroundColor
+        );
     } else if (widget->data) {
         if (data.isString()) {
             if (data.getOptions() & STRING_OPTIONS_FILE_ELLIPSIS) {
@@ -77,12 +80,13 @@ void TextWidgetState::render(WidgetCursor &widgetCursor) {
                 font::Font font = styleGetFont(style);
                 int fullTextWidth = display::measureStr(fullText, fullTextLength, font);
                 if (fullTextWidth <= widget->w) {
-                    drawText(fullText, fullTextLength, widgetCursor.x,
-                        widgetCursor.y, (int)widget->w, (int)widget->h, style,
-                        flags.active,
-                        flags.blinking,
-                        ignoreLuminosity, &overrideColor, &overrideBackgroundColor, &overrideActiveColor, &overrideActiveBackgroundColor);
-
+                    drawText(
+                        fullText, fullTextLength,
+                        widgetCursor.x, widgetCursor.y, (int)widget->w, (int)widget->h,
+                        style,
+                        flags.active, flags.blinking, ignoreLuminosity,
+                        &overrideColor, &overrideBackgroundColor, &overrideActiveColor, &overrideActiveBackgroundColor
+                    );
                 } else {
                     char text[MAX_TEXT_LEN + 1];
                     int ellipsisWidth = display::measureStr("...", 3, font);
@@ -113,29 +117,36 @@ void TextWidgetState::render(WidgetCursor &widgetCursor) {
                     stringAppendString(text, sizeof(text), "...");
                     stringAppendString(text, sizeof(text), fullText + iRight + 1);
 
-                    drawText(text, textLength, widgetCursor.x,
-                        widgetCursor.y, (int)widget->w, (int)widget->h, style,
-                        flags.active,
-                        flags.blinking,
-                        ignoreLuminosity, &overrideColor, &overrideBackgroundColor, &overrideActiveColor, &overrideActiveBackgroundColor);
+                    drawText(
+                        text, textLength,
+                        widgetCursor.x, widgetCursor.y, (int)widget->w, (int)widget->h,
+                        style,
+                        flags.active, flags.blinking, ignoreLuminosity,
+                        &overrideColor, &overrideBackgroundColor, &overrideActiveColor, &overrideActiveBackgroundColor
+                    );
                 }
 
             } else {
                 const char *str = data.getString();
-                drawText(str ? str : "", -1, widgetCursor.x,
-                    widgetCursor.y, (int)widget->w, (int)widget->h, style,
-                    flags.active,
-                    flags.blinking,
-                    ignoreLuminosity, &overrideColor, &overrideBackgroundColor, &overrideActiveColor, &overrideActiveBackgroundColor);
+                drawText(
+                    str ? str : "", -1,
+                    widgetCursor.x, widgetCursor.y, (int)widget->w, (int)widget->h,
+                    style,
+                    flags.active, flags.blinking, ignoreLuminosity,
+                    &overrideColor, &overrideBackgroundColor, &overrideActiveColor, &overrideActiveBackgroundColor
+                );
             }
         } else {
             char text[MAX_TEXT_LEN + 1];
             data.toText(text, sizeof(text));
-            drawText(text, -1, widgetCursor.x, widgetCursor.y, (int)widget->w, (int)widget->h,
-                style, flags.active,
-                flags.blinking,
-                ignoreLuminosity, &overrideColor, &overrideBackgroundColor, &overrideActiveColor, &overrideActiveBackgroundColor,
-                data.getType() == VALUE_TYPE_FLOAT);
+            drawText(
+                text, -1,
+                widgetCursor.x, widgetCursor.y, (int)widget->w, (int)widget->h,
+                style,
+                flags.active, flags.blinking, ignoreLuminosity,
+                &overrideColor, &overrideBackgroundColor, &overrideActiveColor, &overrideActiveBackgroundColor,
+                data.getType() == VALUE_TYPE_FLOAT
+            );
         }
     }
 }

@@ -42,8 +42,10 @@ void ToggleButtonWidgetState::render(WidgetCursor &widgetCursor) {
             widget->text2.ptr(widgetCursor.assets): 
             widget->text1.ptr(widgetCursor.assets),
         -1,
-        widgetCursor.x, widgetCursor.y, (int)widget->w, (int)widget->h, style,
-        flags.active, false, false, nullptr, nullptr, nullptr, nullptr);
+        widgetCursor.x, widgetCursor.y, (int)widget->w, (int)widget->h,
+        style,
+        flags.active
+    );
 }
 
 } // namespace gui

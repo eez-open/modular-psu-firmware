@@ -256,13 +256,7 @@ void GaugeWidgetState::render(WidgetCursor &widgetCursor) {
 					tickTextWidth,
 					ticksFont.getAscent(),
 					ticksStyle,
-					isActive,
-					false,
-					false,
-					nullptr,
-					nullptr,
-					nullptr,
-					nullptr
+					isActive
 				);
 			} else if (tickAngleDeg > 90.0) {
 				drawText(
@@ -273,13 +267,7 @@ void GaugeWidgetState::render(WidgetCursor &widgetCursor) {
 					tickTextWidth,
 					ticksFont.getAscent(),
 					ticksStyle,
-					isActive,
-					false,
-					false,
-					nullptr,
-					nullptr,
-					nullptr,
-					nullptr
+					isActive
 				);
 			} else if (tickAngleDeg == 90.0) {
 				drawText(
@@ -290,13 +278,7 @@ void GaugeWidgetState::render(WidgetCursor &widgetCursor) {
 					tickTextWidth,
 					ticksFont.getAscent(),
 					ticksStyle,
-					isActive,
-					false,
-					false,
-					nullptr,
-					nullptr,
-					nullptr,
-					nullptr
+					isActive
 				);
 			} else if (tickAngleDeg > 0) {
 				drawText(
@@ -307,13 +289,7 @@ void GaugeWidgetState::render(WidgetCursor &widgetCursor) {
 					tickTextWidth,
 					ticksFont.getAscent(),
 					ticksStyle,
-					isActive,
-					false,
-					false,
-					nullptr,
-					nullptr,
-					nullptr,
-					nullptr
+					isActive
 				);
 			} else {
 				drawText(
@@ -324,13 +300,7 @@ void GaugeWidgetState::render(WidgetCursor &widgetCursor) {
 					tickTextWidth,
 					ticksFont.getAscent(),
 					ticksStyle,
-					isActive,
-					false,
-					false,
-					nullptr,
-					nullptr,
-					nullptr,
-					nullptr
+					isActive
 				);
 			}
 		}
@@ -353,13 +323,7 @@ void GaugeWidgetState::render(WidgetCursor &widgetCursor) {
 		valueTextWidth,
 		valueFont.getHeight(),
 		valueStyle,
-		isActive,
-		false,
-		false,
-		nullptr,
-		nullptr,
-		nullptr,
-		nullptr
+		isActive
 	);
 }
 

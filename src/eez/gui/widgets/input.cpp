@@ -175,19 +175,21 @@ void InputWidgetState::render(WidgetCursor &widgetCursor) {
 
 	const Style *style = getStyle(overrideStyleHook(widgetCursor, widget->style));
 
-	uint16_t overrideColor = flags.focused ? style->focus_color : overrideStyleColorHook(widgetCursor, style);
-	uint16_t overrideBackgroundColor = flags.focused ? style->focus_background_color : style->background_color;
-	uint16_t overrideActiveColor = flags.focused ? style->focus_background_color : overrideActiveStyleColorHook(widgetCursor, style);
-	uint16_t overrideActiveBackgroundColor = flags.focused ? style->focus_color : style->active_background_color;
+	uint16_t overrideColor                 = flags.focused ? style->focus_color            : overrideStyleColorHook(widgetCursor, style);
+	uint16_t overrideBackgroundColor       = flags.focused ? style->focus_background_color : style->background_color;
+	uint16_t overrideActiveColor           = flags.focused ? style->focus_background_color : overrideActiveStyleColorHook(widgetCursor, style);
+	uint16_t overrideActiveBackgroundColor = flags.focused ? style->focus_color            : style->active_background_color;
 
 	char text[MAX_TEXT_LEN + 1];
 	data.toText(text, sizeof(text));
 
-	drawText(text, -1, widgetCursor.x, widgetCursor.y, (int)widget->w, (int)widget->h,
-		style, flags.active,
-		flags.blinking,
-		false, &overrideColor, &overrideBackgroundColor, &overrideActiveColor, &overrideActiveBackgroundColor,
-		false);
+	drawText(
+		text, -1,
+		widgetCursor.x, widgetCursor.y, (int)widget->w, (int)widget->h,
+		style,
+		flags.active, flags.blinking, false,
+		&overrideColor, &overrideBackgroundColor, &overrideActiveColor, &overrideActiveBackgroundColor
+	);
 }
 
 } // namespace gui
