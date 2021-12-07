@@ -52,18 +52,23 @@ public:
     void popPage();
     void removePageFromStack(int pageId);
 
+    int getActivePageStackPointer() {
+        return m_updatePageIndex != -1 ? m_updatePageIndex : m_pageNavigationStackPointer;
+    }
+
     int getActivePageId() {
-        return m_pageNavigationStack[m_pageNavigationStackPointer].pageId;
+        return m_pageNavigationStack[getActivePageStackPointer()].pageId;
     }
 
     Page *getActivePage() {
-        return m_pageNavigationStack[m_pageNavigationStackPointer].page;
+        return m_pageNavigationStack[getActivePageStackPointer()].page;
     }
 
     bool isActivePageInternal();
 
     int getPreviousPageId() {
-        return m_pageNavigationStackPointer == 0 ? PAGE_ID_NONE : m_pageNavigationStack[m_pageNavigationStackPointer - 1].pageId;
+        int index = getActivePageStackPointer();
+        return index == 0 ? PAGE_ID_NONE : m_pageNavigationStack[index - 1].pageId;
     }
 
     void replacePage(int pageId, Page *page = nullptr);
@@ -79,7 +84,6 @@ public:
 
     virtual bool isBlinking(const WidgetCursor &widgetCursor, int16_t id);
 
-    virtual bool isActiveWidget(const WidgetCursor &widgetCursor);
     virtual void onPageTouch(const WidgetCursor &foundWidget, Event &touchEvent);
 
     virtual bool testExecuteActionOnTouchDown(int action);
@@ -97,6 +101,7 @@ public:
 protected:
     PageOnStack m_pageNavigationStack[CONF_GUI_PAGE_NAVIGATION_STACK_SIZE];
     int m_pageNavigationStackPointer = 0;
+    int m_updatePageIndex;
 
     uint32_t m_showPageTime;
 
@@ -106,8 +111,9 @@ protected:
     void doShowPage(int index, Page *page, int previousPageId);
     void setPage(int pageId);
 
-    virtual void updatePage(int i, WidgetCursor &widgetCursor);
-    
+    void updatePage(int i, WidgetCursor &widgetCursor);
+    virtual void pageRenderCustom(int i, WidgetCursor &widgetCursor);
+
     bool isPageFullyCovered(int pageNavigationStackIndex);
     
     virtual bool canExecuteActionWhenTouchedOutsideOfActivePage(int pageId, int action);

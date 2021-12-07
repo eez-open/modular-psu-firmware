@@ -39,14 +39,6 @@ bool ContainerWidgetState::updateState(const WidgetCursor &widgetCursor) {
 		DATA_OPERATION_FUNCTION(containerWidget->overlay, DATA_OPERATION_UPDATE_OVERLAY_DATA, widgetCursor, widgetCursorValue);
 
 		WIDGET_STATE(overlayState, overlay->state);
-
-		if (overlayState == 0) {
-			displayBufferIndex = -1;
-		} else {
-			if (!hasPreviousState) {
-				displayBufferIndex = -1;
-			}
-		}
 	}
 
 	return !hasPreviousState;
@@ -55,17 +47,12 @@ bool ContainerWidgetState::updateState(const WidgetCursor &widgetCursor) {
 void ContainerWidgetState::render(WidgetCursor &widgetCursor) {
 	auto widget = (const ContainerWidget *)widgetCursor.widget;
 
+	displayBufferIndex = -1;
 	if (overlay) {
 		if (overlayState == 0) {
 			return;
 		}
-		
-		if (displayBufferIndex == -1) {
-			displayBufferIndex = display::allocBuffer();
-		}
-
-		display::selectBuffer(displayBufferIndex);
-		displayBufferSelected = true;
+		displayBufferIndex = display::beginBufferRendering();
 	}
 
 	drawRectangle(
@@ -108,15 +95,13 @@ void ContainerWidgetState::enumChildren(WidgetCursor &widgetCursor) {
 }
 
 void ContainerWidgetState::renderOverlayChildren(WidgetCursor &widgetCursor) {
-    if (displayBufferIndex == -1) {
+    if (overlayState == 0) {
         return;
     }
 
 	if (g_findCallback == nullptr) {
-		if (!displayBufferSelected) {
-			display::selectBuffer(displayBufferIndex);
-		} else {
-			displayBufferSelected = false;
+		if (displayBufferIndex == -1) {
+			displayBufferIndex = display::beginBufferRendering();
 		}
 	}
 
@@ -179,7 +164,7 @@ void ContainerWidgetState::renderOverlayChildren(WidgetCursor &widgetCursor) {
 	if (g_findCallback == nullptr) {
 		const Style *style = getStyle(widgetCursor.widget->style);
 
-		display::setBufferBounds(
+		display::endBufferRendering(
 			displayBufferIndex,
 			widgetCursor.x,
 			widgetCursor.y,
@@ -191,6 +176,8 @@ void ContainerWidgetState::renderOverlayChildren(WidgetCursor &widgetCursor) {
 			yOffset,
 			nullptr
 		);
+
+		displayBufferIndex = -1;
 	}
 
 	widgetCursor.widget = savedWidget;

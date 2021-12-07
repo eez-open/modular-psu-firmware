@@ -62,30 +62,13 @@ enum WidgetTypes {
 };
 #undef WIDGET_TYPE
 
-
 struct Widget;
 struct Assets;
 
-typedef void (*EnumFunctionType)(WidgetCursor &widgetCursor);
-typedef void (*DrawFunctionType)(const WidgetCursor &widgetCursor);
-typedef void (*OnTouchFunctionType)(const WidgetCursor &widgetCursor, Event &touchEvent);
-typedef bool (*OnKeyboardFunctionType)(const WidgetCursor &widgetCursor, uint8_t key, uint8_t mod);
-
 ////////////////////////////////////////////////////////////////////////////////
-
-struct WidgetStateFlags {
-    unsigned active : 1;
-    unsigned focused : 1;
-    unsigned blinking : 1;
-    unsigned enabled : 1;
-};
 
 struct WidgetState;
-
-////////////////////////////////////////////////////////////////////////////////
-
 class AppContext;
-
 typedef int Cursor;
 
 static const size_t MAX_ITERATORS = 4;
@@ -114,6 +97,7 @@ struct WidgetCursor {
 		, y(0)
 		, currentState(nullptr)
 		, hasPreviousState(false)
+		, forceRefresh(false)
 	{
 		iterators[0] = -1; iterators[1] = -1; iterators[2] = -1; iterators[3] = -1;
 	}
@@ -136,6 +120,7 @@ struct WidgetCursor {
 		, y(y_)
 		, currentState(currentState_)
 		, hasPreviousState(hasPreviousState_)
+		, forceRefresh(false)
     {
 		iterators[0] = -1; iterators[1] = -1; iterators[2] = -1; iterators[3] = -1;
 	}
@@ -150,6 +135,7 @@ struct WidgetCursor {
 		, y(0)
 		, currentState(nullptr)
 		, hasPreviousState(false)
+		, forceRefresh(false)
 	{
 		iterators[0] = -1; iterators[1] = -1; iterators[2] = -1; iterators[3] = -1;
 	}
@@ -183,7 +169,12 @@ struct WidgetCursor {
 	bool isPage() const;
 };
 
-extern bool g_isActiveWidget;
+struct WidgetStateFlags {
+    unsigned active : 1;
+    unsigned focused : 1;
+    unsigned blinking : 1;
+    unsigned enabled : 1;
+};
 
 struct WidgetState {
 	uint16_t type;
@@ -215,6 +206,8 @@ struct WidgetState {
 
 ////////////////////////////////////////////////////////////////////////////////
 
+extern bool g_isActiveWidget;
+
 void enumRootWidget();
 void enumWidget(WidgetCursor &widgetCursor);
 void enumNoneWidget(WidgetCursor &widgetCursor);
@@ -228,6 +221,7 @@ void forEachWidget(EnumWidgetsCallback callback);
 
 WidgetCursor findWidget(int16_t x, int16_t y, bool clicked = true);
 
+typedef void (*OnTouchFunctionType)(const WidgetCursor &widgetCursor, Event &touchEvent);
 OnTouchFunctionType getWidgetTouchFunction(const WidgetCursor &widgetCursor);
 
 } // namespace gui

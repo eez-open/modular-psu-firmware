@@ -126,18 +126,35 @@ void selectTouchCalibrationPoint() {
     }
 }
 
+bool isTouchPointActivated() {
+    return millis() - g_pointStartTime > TOUCH_POINT_ACTIVATION_THRESHOLD;
+}
+
+void findActiveWidget(const WidgetCursor &widgetCursor) {
+    if (g_activeWidget) {
+        return;
+    }
+
+    if (widgetCursor.appContext->getActivePageId() == PAGE_ID_TOUCH_CALIBRATION) {
+        if (widgetCursor.widget->type == WIDGET_TYPE_TEXT) {
+            g_activeWidget = widgetCursor;
+        }
+    }    
+}
+
 void onTouchCalibrationPageTouch(const WidgetCursor &foundWidget, Event &touchEvent) {
     if (touchEvent.type == EVENT_TYPE_TOUCH_DOWN) {
         g_pointStartTime = millis();
+    } else if (touchEvent.type == EVENT_TYPE_TOUCH_MOVE) {
+        if (!g_activeWidget && isTouchPointActivated()) {
+			forEachWidget(findActiveWidget);
+        }
     } else if (touchEvent.type == EVENT_TYPE_TOUCH_UP) {
-        if (millis() - g_pointStartTime > TOUCH_POINT_ACTIVATION_THRESHOLD) {
+        if (isTouchPointActivated()) {
+            g_activeWidget = 0;
             selectTouchCalibrationPoint();
         }
     }
-}
-
-bool isTouchPointActivated() {
-    return millis() - g_pointStartTime > TOUCH_POINT_ACTIVATION_THRESHOLD;
 }
 
 } // namespace gui

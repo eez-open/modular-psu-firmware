@@ -61,8 +61,6 @@ void updateScreen() {
 			freeWidgetStates(g_widgetStateStart);
 			g_widgetStateStart = nullptr;
 		}
-
-		display::freeAllBuffers();
 	}
 
 	bool hasPreviousState = g_widgetStateStart != nullptr;

@@ -54,9 +54,9 @@ void guiTick() {
 	stateManagmentHook();
 
 	if (display::isOn()) {
-		display::beginBuffersDrawing();
+		display::beginRendering();
 		updateScreen();
-		display::endBuffersDrawing();
+		display::endRendering();
 	}
 }
 

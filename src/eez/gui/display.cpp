@@ -40,9 +40,6 @@
 
 using namespace eez::gui;
 
-volatile static uint32_t g_debugMaxDisplayAuxBufferSize;
-
-
 namespace eez {
 namespace gui {
 namespace display {
@@ -66,10 +63,7 @@ static const uint16_t *g_colors;
 bool g_dirty;
 
 Buffer g_buffers[NUM_BUFFERS];
-
 static void *g_mainBufferPointer;
-
-static int g_bufferToDrawIndexes[NUM_BUFFERS];
 static int g_numBuffersToDraw;
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -533,35 +527,19 @@ int getCursorXPosition(int cursorPosition, const char *text, int textLength, int
 
 ////////////////////////////////////////////////////////////////////////////////
 
-int allocBuffer() {
-    int bufferIndex;
+void beginRendering() {
+    g_mainBufferPointer = getBufferPointer();
+    g_numBuffersToDraw = 0;
+}
 
-    for (bufferIndex = 0; bufferIndex < NUM_BUFFERS; bufferIndex++) {
-        if (!g_buffers[bufferIndex].flags.allocated) {
-            break;
-        }
-    }
-
-    if (bufferIndex == NUM_BUFFERS) {
-        bufferIndex = NUM_BUFFERS - 1;
-    }
-
-    g_buffers[bufferIndex].flags.allocated = true;
-
+int beginBufferRendering() {
+    int bufferIndex = g_numBuffersToDraw++;
+    g_buffers[bufferIndex].previousBuffer = getBufferPointer();
+    setBufferPointer(g_buffers[bufferIndex].bufferPointer);
     return bufferIndex;
 }
 
-void freeBuffer(int bufferIndex) {
-    g_buffers[bufferIndex].flags.allocated = false;
-}
-
-void selectBuffer(int bufferIndex) {
-    g_buffers[bufferIndex].flags.used = true;
-    g_bufferToDrawIndexes[g_numBuffersToDraw++] = bufferIndex;
-    setBufferPointer(g_buffers[bufferIndex].bufferPointer);
-}
-
-void setBufferBounds(int bufferIndex, int x, int y, int width, int height, bool withShadow, uint8_t opacity, int xOffset, int yOffset, Rect *backdrop) {
+void endBufferRendering(int bufferIndex, int x, int y, int width, int height, bool withShadow, uint8_t opacity, int xOffset, int yOffset, Rect *backdrop) {
     Buffer &buffer = g_buffers[bufferIndex];
     
     buffer.x = x;
@@ -574,43 +552,10 @@ void setBufferBounds(int bufferIndex, int x, int y, int width, int height, bool 
     buffer.yOffset = yOffset;
     buffer.backdrop = backdrop;
 
-    for (int i = 0; i < g_numBuffersToDraw; i++) {
-        if (g_bufferToDrawIndexes[i] == bufferIndex) {
-            if (i > 0) {
-                setBufferPointer(g_buffers[g_bufferToDrawIndexes[i - 1]].bufferPointer);
-            }
-            break;
-        }
-    }
+    setBufferPointer(buffer.previousBuffer);
 }
 
-void clearBufferUsage() {
-    for (int bufferIndex = 0; bufferIndex < NUM_BUFFERS; bufferIndex++) {
-        g_buffers[bufferIndex].flags.used = false;
-    }
-}
-
-void freeUnusedBuffers() {
-    for (int bufferIndex = 0; bufferIndex < NUM_BUFFERS; bufferIndex++) {
-        if (g_buffers[bufferIndex].flags.allocated && !g_buffers[bufferIndex].flags.used) {
-            g_buffers[bufferIndex].flags.allocated = false;
-        }
-    }
-    
-    clearBufferUsage();
-}
-
-void freeAllBuffers() {
-    for (int bufferIndex = 0; bufferIndex < NUM_BUFFERS; bufferIndex++) {
-        g_buffers[bufferIndex].flags.allocated = 0;
-    }
-}
-
-void beginBuffersDrawing() {
-    g_mainBufferPointer = getBufferPointer();
-}
-
-void endBuffersDrawing() {
+void endRendering() {
     setBufferPointer(g_mainBufferPointer);
 
 #if OPTION_KEYBOARD
@@ -626,13 +571,7 @@ void endBuffersDrawing() {
 #endif
 
     if (isDirty()) {
-        uint32_t numBytes = 0;
-
-        for (int i = 0; i < g_numBuffersToDraw; i++) {
-            int bufferIndex = g_bufferToDrawIndexes[i];
-			if (bufferIndex == -1) {
-				continue;
-			}
+        for (int bufferIndex = 0; bufferIndex < g_numBuffersToDraw; bufferIndex++) {
             Buffer &buffer = g_buffers[bufferIndex];
 
             int sx = buffer.x;
@@ -655,13 +594,7 @@ void endBuffersDrawing() {
                 drawShadow(x1, y1, x2, y2);
             }
 
-            bitBlt(buffer.bufferPointer, nullptr, sx, sy, x2 - x1 + 1, y2 - y1 + 1, x1, y1, buffer.opacity);
-
-            numBytes += 2 * (x2 - x1 + 1) * (y2 - y1 + 1);
-        }
-
-        if (numBytes > g_debugMaxDisplayAuxBufferSize) {
-            g_debugMaxDisplayAuxBufferSize = numBytes;
+            bitBlt(g_buffers[bufferIndex].bufferPointer, nullptr, sx, sy, x2 - x1 + 1, y2 - y1 + 1, x1, y1, buffer.opacity);
         }
 
 #if OPTION_KEYBOARD
@@ -672,10 +605,6 @@ void endBuffersDrawing() {
         mouse::updateDisplay();
 #endif
     }
-
-    g_numBuffersToDraw = 0;
-
-    freeUnusedBuffers();
 }
 
 } // namespace display

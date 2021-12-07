@@ -59,6 +59,7 @@ namespace gui {
 
 bool g_isActiveWidget;
 EnumWidgetsCallback g_findCallback;
+bool g_foundWidgetAtDownInvalid;
 
 ////////////////////////////////////////////////////////////////////////////////
 
@@ -128,8 +129,6 @@ bool WidgetCursor::isPage() const {
 
 ////////////////////////////////////////////////////////////////////////////////
 
-bool g_foundWidgetAtDownInvalid;
-
 void enumWidget(WidgetCursor &widgetCursor) {
     const Widget *widget = widgetCursor.widget;
 
@@ -142,38 +141,43 @@ void enumWidget(WidgetCursor &widgetCursor) {
 	auto widgetState = widgetCursor.currentState;
 
 	bool savedIsActiveWidget = g_isActiveWidget;
-	g_isActiveWidget = g_isActiveWidget || isActiveWidget(widgetCursor);
+	g_isActiveWidget = g_isActiveWidget || widgetCursor == g_activeWidget;
 
 	if (g_findCallback) {
 		g_findCallback(widgetCursor);
 	} else {
-		if (widgetCursor.hasPreviousState && widget->type == widgetState->type) {
-            bool refresh = widgetState->updateState(widgetCursor);
-			if (refresh || widgetCursor.forceRefresh) {
-				widgetState->render(widgetCursor);
-			}
+		if (widgetCursor.hasPreviousState) {
+            if (widget->type == widgetState->type) {
+                // reuse widget state
+                bool refresh = widgetState->updateState(widgetCursor);
+                if (refresh || widgetCursor.forceRefresh) {
+                    widgetState->render(widgetCursor);
+                }
+                goto EnumChildren;
+            }
+            // clear old state from current state
+            freeWidgetStates(widgetState);
+            widgetCursor.hasPreviousState = false;
 		}
-		else {
-			if (widgetCursor.hasPreviousState) {
-				freeWidgetStates(widgetState);
-				widgetCursor.hasPreviousState = false;
-			}
-			g_widgetStatePlacementNewFunctions[widget->type](widgetState);
-			widgetState->type = widget->type;
-			
-			widgetState->updateState(widgetCursor);
-			widgetState->render(widgetCursor);
 
-			if (g_foundWidgetAtDownInvalid) {
-				auto &foundWidgetAtDown = getFoundWidgetAtDown();
-				if (foundWidgetAtDown == widgetCursor) {
-					foundWidgetAtDown = widgetCursor;
-					g_foundWidgetAtDownInvalid = false;
-				}
-			}
-		}
+        // create widget state
+        g_widgetStatePlacementNewFunctions[widget->type](widgetState);
+        widgetState->type = widget->type;
+        
+        widgetState->updateState(widgetCursor);
+        widgetState->render(widgetCursor);
+
+        if (g_foundWidgetAtDownInvalid) {
+            // find new cursor for g_foundWidgetAtDown
+            auto &foundWidgetAtDown = getFoundWidgetAtDown();
+            if (foundWidgetAtDown == widgetCursor) {
+                foundWidgetAtDown = widgetCursor;
+                g_foundWidgetAtDownInvalid = false;
+            }
+        }
 	}
 
+EnumChildren:
 	widgetCursor.currentState = (WidgetState *)((uint8_t *)widgetCursor.currentState + g_widgetStateSizes[widget->type]);
 
 	uint32_t stateSize = (uint8_t *)widgetCursor.currentState - (uint8_t *)g_widgetStateStart;
@@ -204,6 +208,7 @@ void freeWidgetStates(WidgetState *widgetStateStart) {
         widgetState = nextWidgetState;
     }
 
+    // invalidate g_foundWidgetAtDown if it was among freed widgets
 	auto &widgetCursor = getFoundWidgetAtDown();
 	if (widgetCursor.currentState >= widgetStateStart) {
 		g_foundWidgetAtDownInvalid = true;

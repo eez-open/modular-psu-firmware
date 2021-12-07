@@ -46,11 +46,11 @@ enum InternalActionsEnum {
 };
 
 namespace eez {
-
 namespace gui {
 
 ////////////////////////////////////////////////////////////////////////////////
 
+extern WidgetCursor g_activeWidget;
 extern bool g_isBlinkTime;
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -60,7 +60,6 @@ void guiTick();
 WidgetCursor &getFoundWidgetAtDown();
 void setFoundWidgetAtDown(WidgetCursor &widgetCursor);
 void clearFoundWidgetAtDown();
-bool isActiveWidget(const WidgetCursor &widgetCursor);
 bool isFocusWidget(const WidgetCursor &widgetCursor);
 void refreshScreen();
 bool isPageInternal(int pageId);

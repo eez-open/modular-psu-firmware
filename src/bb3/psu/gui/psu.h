@@ -197,8 +197,6 @@ public:
 
     void stateManagment() override;
 
-    bool isActiveWidget(const WidgetCursor &widgetCursor) override;
-
     bool isFocusWidget(const WidgetCursor &widgetCursor) override;
 
     bool isBlinking(const WidgetCursor &widgetCursor, int16_t id) override;
@@ -285,7 +283,7 @@ protected:
     void onPageTouch(const WidgetCursor &foundWidget, Event &touchEvent) override;
     bool testExecuteActionOnTouchDown(int action) override;
     bool canExecuteActionWhenTouchedOutsideOfActivePage(int pageId, int action) override;
-    void updatePage(int i, WidgetCursor &widgetCursor) override;
+    void pageRenderCustom(int i, WidgetCursor &widgetCursor) override;
 
 private:
     void doShowProgressPage();

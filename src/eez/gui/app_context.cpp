@@ -46,6 +46,7 @@ namespace gui {
 ////////////////////////////////////////////////////////////////////////////////
 
 AppContext::AppContext() {
+    m_updatePageIndex = -1;
 }
 
 void AppContext::stateManagment() {
@@ -263,10 +264,6 @@ bool AppContext::isBlinking(const WidgetCursor &widgetCursor, int16_t id) {
     return false;
 }
 
-bool AppContext::isActiveWidget(const WidgetCursor &widgetCursor) {
-    return false;
-}
-
 bool AppContext::canExecuteActionWhenTouchedOutsideOfActivePage(int pageId, int action) {
     return false;
 }
@@ -299,15 +296,10 @@ void AppContext::onPageTouch(const WidgetCursor &foundWidget, Event &touchEvent)
 
 void AppContext::updatePage(int i, WidgetCursor &widgetCursor) {
 	if (g_findCallback == nullptr) {
-		if (!widgetCursor.hasPreviousState) {
-			m_pageNavigationStack[i].displayBufferIndex = display::allocBuffer();
-		}
-
-		display::selectBuffer(m_pageNavigationStack[i].displayBufferIndex);
+		m_pageNavigationStack[i].displayBufferIndex = display::beginBufferRendering();
 	}
 
-    auto savedPageNavigationStackPointer = m_pageNavigationStackPointer;
-    m_pageNavigationStackPointer = i;
+    m_updatePageIndex = i;
 
     int x;
     int y;
@@ -345,10 +337,14 @@ void AppContext::updatePage(int i, WidgetCursor &widgetCursor) {
     }
 
 	if (g_findCallback == nullptr) {
-		display::setBufferBounds(m_pageNavigationStack[i].displayBufferIndex, x, y, width, height, withShadow, 255, 0, 0, withShadow && activePageHasBackdropHook() ? &rect : nullptr);
+        pageRenderCustom(i, widgetCursor);
+		display::endBufferRendering(m_pageNavigationStack[i].displayBufferIndex, x, y, width, height, withShadow, 255, 0, 0, withShadow && activePageHasBackdropHook() ? &rect : nullptr);
 	}
 
-    m_pageNavigationStackPointer = savedPageNavigationStackPointer;
+    m_updatePageIndex = -1;
+}
+
+void AppContext::pageRenderCustom(int i, WidgetCursor &widgetCursor) {
 }
 
 bool isRect1FullyCoveredByRect2(int xRect1, int yRect1, int wRect1, int hRect1, int xRect2, int yRect2, int wRect2, int hRect2) {

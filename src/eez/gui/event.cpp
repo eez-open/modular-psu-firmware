@@ -41,7 +41,7 @@ namespace eez {
 namespace gui {
 
 static WidgetCursor m_foundWidgetAtDown;
-static WidgetCursor g_activeWidget;
+WidgetCursor g_activeWidget;
 static bool m_touchActionExecuted;
 static bool m_touchActionExecutedAtDown;
 static OnTouchFunctionType m_onTouchFunction;
@@ -245,13 +245,6 @@ void setFoundWidgetAtDown(WidgetCursor &widgetCursor) {
 
 void clearFoundWidgetAtDown() {
     m_foundWidgetAtDown = 0;
-}
-
-bool isActiveWidget(const WidgetCursor &widgetCursor) {
-    if (widgetCursor.appContext->isActiveWidget(widgetCursor)) {
-        return true;
-    }
-    return widgetCursor == g_activeWidget;
 }
 
 bool isFocusWidget(const WidgetCursor &widgetCursor) {

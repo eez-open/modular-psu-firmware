@@ -27,7 +27,6 @@ namespace gui {
 bool isTouchCalibrated();
 void enterTouchCalibration();
 void onTouchCalibrationPageTouch(const WidgetCursor &foundWidget, Event &touchEvent);
-bool isTouchPointActivated();
 
 } // namespace gui
 } // namespace psu

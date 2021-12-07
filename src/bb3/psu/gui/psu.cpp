@@ -396,18 +396,6 @@ void PsuAppContext::stateManagment() {
     }
 }
 
-bool PsuAppContext::isActiveWidget(const WidgetCursor &widgetCursor) {
-    if (getActivePageId() == PAGE_ID_TOUCH_CALIBRATION) {
-        if (touch::getEventType() != EVENT_TYPE_TOUCH_NONE) {
-            if (widgetCursor.widget->type == WIDGET_TYPE_TEXT && isTouchPointActivated()) {
-                return true;
-            }
-        }
-    }
-
-    return false;
-}
-
 int PsuAppContext::getMainPageId() {
     return PAGE_ID_MAIN;
 }
@@ -831,17 +819,17 @@ void PsuAppContext::showUncaughtScriptExceptionMessage() {
 }
 
 void TextInputParams::onSet(char *value) {
-    popPage();
-
     g_psuAppContext.m_textInputParams.m_input = value;
     g_psuAppContext.m_inputReady = true;
+
+    popPage();
 }
 
 void TextInputParams::onCancel() {
-    popPage();
-
     g_psuAppContext.m_textInputParams.m_input = nullptr;
     g_psuAppContext.m_inputReady = true;
+
+    popPage();
 }
 
 const char *PsuAppContext::textInput(const char *label, size_t minChars, size_t maxChars, const char *value) {
@@ -866,17 +854,17 @@ void PsuAppContext::doShowTextInput() {
 }
 
 void NumberInputParams::onSet(float value) {
-    popPage();
-
     g_psuAppContext.m_numberInputParams.m_input = value;
     g_psuAppContext.m_inputReady = true;
+
+    popPage();
 }
 
 void NumberInputParams::onCancel() {
-    popPage();
-
     g_psuAppContext.m_numberInputParams.m_input = NAN;
     g_psuAppContext.m_inputReady = true;
+
+    popPage();
 }
 
 float PsuAppContext::numberInput(const char *label, Unit unit, float min, float max, float value) {
@@ -909,18 +897,18 @@ void PsuAppContext::doShowNumberInput() {
 }
 
 void IntegerInputParams::onSet(float value) {
-    popPage();
-
     g_psuAppContext.m_integerInputParams.m_input = (int32_t)value;
     g_psuAppContext.m_integerInputParams.canceled = false;
     g_psuAppContext.m_inputReady = true;
+
+    popPage();
 }
 
 void IntegerInputParams::onCancel() {
-    popPage();
-
     g_psuAppContext.m_integerInputParams.canceled = true;
     g_psuAppContext.m_inputReady = true;
+
+    popPage();
 }
 
 bool PsuAppContext::integerInput(const char *label, int32_t min, int32_t max, int32_t &value) {
@@ -1063,10 +1051,10 @@ int PsuAppContext::getExtraLongTouchActionHook(const WidgetCursor &widgetCursor)
 }
 
 void MenuInputParams::onSet(int value) {
-    popPage();
-
     g_psuAppContext.m_menuInputParams.m_input = value;
     g_psuAppContext.m_inputReady = true;
+
+    popPage();
 }
 
 int PsuAppContext::menuInput(const char *label, MenuType menuType, const char **menuItems) {
@@ -1123,12 +1111,11 @@ void SelectParams::enumDefinition(DataOperationEnum operation, const WidgetCurso
 }
 
 void SelectParams::onSelect(uint16_t value) {
-    popPage();
-
     g_psuAppContext.m_selectParams.m_input = value;
     g_psuAppContext.m_inputReady = true;
-}
 
+    popPage();
+}
 
 void PsuAppContext::doShowSelect() {
     pushSelectFromEnumPage(SelectParams::enumDefinition, m_selectParams.m_defaultSelection, nullptr, SelectParams::onSelect, false, true);
@@ -1150,13 +1137,10 @@ bool PsuAppContext::canExecuteActionWhenTouchedOutsideOfActivePage(int pageId, i
     return false;
 }
 
-void PsuAppContext::updatePage(int i, WidgetCursor &widgetCursor) {
-    AppContext::updatePage(i, widgetCursor);
-
+void PsuAppContext::pageRenderCustom(int i, WidgetCursor &widgetCursor) {
     if (getActivePageId() == PAGE_ID_TOUCH_CALIBRATION_YES_NO || getActivePageId() == PAGE_ID_TOUCH_CALIBRATION_YES_NO_CANCEL) {
         auto eventType = touch::getEventType();
         if (eventType == EVENT_TYPE_TOUCH_DOWN || eventType == EVENT_TYPE_TOUCH_MOVE) {
-            display::selectBuffer(m_pageNavigationStack[m_pageNavigationStackPointer].displayBufferIndex);
             int x = MIN(MAX(touch::getX(), 1), eez::display::getDisplayWidth() - 2);
             int y = MIN(MAX(touch::getY(), 1), eez::display::getDisplayHeight() - 2);
             eez::display::setColor(255, 255, 255);
@@ -1164,8 +1148,6 @@ void PsuAppContext::updatePage(int i, WidgetCursor &widgetCursor) {
         }
     } else if (getActivePageId() == PAGE_ID_TOUCH_TEST) {
 		if (g_findCallback == nullptr) {
-			display::selectBuffer(m_pageNavigationStack[i].displayBufferIndex);
-
 			if (get(widgetCursor, DATA_ID_TOUCH_CALIBRATED_PRESSED).getInt()) {
 				int x = MIN(MAX(get(widgetCursor, DATA_ID_TOUCH_CALIBRATED_X).getInt(), 1), eez::display::getDisplayWidth() - 2);
 				int y = MIN(MAX(get(widgetCursor, DATA_ID_TOUCH_CALIBRATED_Y).getInt(), 1), eez::display::getDisplayHeight() - 2);

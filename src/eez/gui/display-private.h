@@ -36,14 +36,10 @@ void drawStrInit();
 void drawGlyph(const uint8_t *src, uint32_t srcLineOffset, int x, int y, int width, int height);
 
 static const int NUM_BUFFERS = 6;
-struct BufferFlags {
-    unsigned allocated : 1;
-    unsigned used : 1;
-};
 
 struct Buffer {
     void *bufferPointer;
-    BufferFlags flags;
+    void *previousBuffer;
     int x;
     int y;
     int width;

@@ -146,7 +146,7 @@ void ToastMessagePage::onEncoderClicked() {
 void ToastMessagePage::updateInternalPage(const WidgetCursor &widgetCursor) {
 	WidgetCursor toastPageWidgetCursor(widgetCursor.assets, appContext, &actionWidget, actionWidget.x, actionWidget.y, widgetCursor.currentState, widgetCursor.hasPreviousState);
 
-    auto temp = isActiveWidget(toastPageWidgetCursor);
+    auto temp = toastPageWidgetCursor == g_activeWidget;
     if (widgetCursor.hasPreviousState && actionWidgetIsActive == temp && !dirty) {
         return;
     }
@@ -320,7 +320,7 @@ bool ToastMessagePage::canClickPassThrough() {
 }
 
 bool ToastMessagePage::closeIfTouchedOutside() {
-    return false;
+    return hasAction();
 }
 
 void ToastMessagePage::executeAction() {
@@ -702,7 +702,7 @@ void MenuWithButtonsPage::updateInternalPage(const WidgetCursor &widgetCursor2) 
         widgetCursor.y = y + m_buttonTextWidgets[i].y;
         widgetCursor.cursor = i;
 		TextWidgetState textWidgetState;
-		textWidgetState.flags.active = isActiveWidget(widgetCursor);
+		textWidgetState.flags.active = widgetCursor == g_activeWidget;
 		textWidgetState.flags.blinking = 0;
 		textWidgetState.flags.focused = 0;
 		textWidgetState.render(widgetCursor);
