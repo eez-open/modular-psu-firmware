@@ -24,7 +24,9 @@
 namespace eez {
 namespace gui {
 
-bool AppViewWidgetState::updateState(const WidgetCursor &widgetCursor) {
+bool AppViewWidgetState::updateState() {
+    const WidgetCursor &widgetCursor = g_widgetCursor;
+
     if (widgetCursor.widget->data != DATA_ID_NONE) {
         Value appContextValue;
         DATA_OPERATION_FUNCTION(widgetCursor.widget->data, DATA_OPERATION_GET, widgetCursor, appContextValue);
@@ -36,7 +38,9 @@ bool AppViewWidgetState::updateState(const WidgetCursor &widgetCursor) {
     return false;
 }
 
-void AppViewWidgetState::enumChildren(WidgetCursor &widgetCursor) {
+void AppViewWidgetState::enumChildren() {
+    WidgetCursor &widgetCursor = g_widgetCursor;
+
     appContext->rect.x = widgetCursor.x;
     appContext->rect.y = widgetCursor.y;
     appContext->rect.w = widgetCursor.widget->w;
@@ -54,7 +58,7 @@ void AppViewWidgetState::enumChildren(WidgetCursor &widgetCursor) {
             }
         }
     } else {
-        enumNoneWidget(widgetCursor);
+        enumNoneWidget();
     }
 
 	widgetCursor.appContext = savedAppContext;

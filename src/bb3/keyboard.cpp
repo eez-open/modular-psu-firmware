@@ -213,7 +213,9 @@ static bool isKeyboardEnabledForWidget(const WidgetCursor& widgetCursor) {
     return false;
 }
 
-static void findNextFocusCursor(const WidgetCursor& widgetCursor) {
+static void findNextFocusCursor() {
+    const WidgetCursor& widgetCursor = g_widgetCursor;
+
     if (isKeyboardEnabledForWidget(widgetCursor)) {
         if (g_findFocusCursorState == 0) {
             g_focusWidgetCursorIter = widgetCursor;
@@ -244,7 +246,9 @@ static void moveToNextFocusCursor() {
     }
 }
 
-static void findPreviousFocusCursor(const WidgetCursor& widgetCursor) {
+static void findPreviousFocusCursor() {
+    const WidgetCursor& widgetCursor = g_widgetCursor;
+
     if (isKeyboardEnabledForWidget(widgetCursor)) {
         if (g_findFocusCursorState == 0) {
             g_focusWidgetCursorIter = widgetCursor;

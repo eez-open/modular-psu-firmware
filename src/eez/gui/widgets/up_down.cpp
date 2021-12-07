@@ -32,7 +32,9 @@ namespace gui {
 
 WidgetCursor UpDownWidgetState::g_selectedWidget;
 
-bool UpDownWidgetState::updateState(const WidgetCursor &widgetCursor) {
+bool UpDownWidgetState::updateState() {
+    const WidgetCursor &widgetCursor = g_widgetCursor;
+
     bool hasPreviousState = widgetCursor.hasPreviousState;
     auto widget = (const UpDownWidget *)widgetCursor.widget;
 
@@ -42,7 +44,9 @@ bool UpDownWidgetState::updateState(const WidgetCursor &widgetCursor) {
     return !hasPreviousState;
 }
 
-void UpDownWidgetState::render(WidgetCursor &widgetCursor) {
+void UpDownWidgetState::render() {
+    const WidgetCursor &widgetCursor = g_widgetCursor;
+
     auto widget = (const UpDownWidget *)widgetCursor.widget;
     const Style *buttonsStyle = getStyle(widget->buttonsStyle);
 

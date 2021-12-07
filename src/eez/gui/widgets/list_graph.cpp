@@ -27,7 +27,9 @@
 namespace eez {
 namespace gui {
 
-bool ListGraphWidgetState::updateState(const WidgetCursor &widgetCursor) {
+bool ListGraphWidgetState::updateState() {
+    const WidgetCursor &widgetCursor = g_widgetCursor;
+
     bool hasPreviousState = widgetCursor.hasPreviousState;
     auto widget = (const ListGraphWidget *)widgetCursor.widget;
     
@@ -37,7 +39,9 @@ bool ListGraphWidgetState::updateState(const WidgetCursor &widgetCursor) {
     return !hasPreviousState;
 }
 
-void ListGraphWidgetState::render(WidgetCursor &widgetCursor) {
+void ListGraphWidgetState::render() {
+    const WidgetCursor &widgetCursor = g_widgetCursor;
+
     auto widget = (const ListGraphWidget *)widgetCursor.widget;
 
     const Style* style = getStyle(widget->style);

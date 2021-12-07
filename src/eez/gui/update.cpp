@@ -33,6 +33,8 @@ WidgetState *g_widgetStateEnd;
 
 bool g_widgetStateStructureChanged;
 
+WidgetCursor g_widgetCursor;
+
 void refreshScreen() {
 	g_refreshScreen = true;
 }
@@ -68,20 +70,20 @@ void updateScreen() {
 
     g_isActiveWidget = false;
 
-	WidgetCursor widgetCursor;
-	widgetCursor.assets = g_mainAssets;
-	widgetCursor.appContext = &getRootAppContext();
-	widgetCursor.widget = g_rootWidget;
-	widgetCursor.currentState = g_widgetStateStart;
-	widgetCursor.hasPreviousState = hasPreviousState;
-	widgetCursor.forceRefresh = false;
+	g_widgetCursor = WidgetCursor();
+	g_widgetCursor.assets = g_mainAssets;
+	g_widgetCursor.appContext = &getRootAppContext();
+	g_widgetCursor.widget = g_rootWidget;
+	g_widgetCursor.currentState = g_widgetStateStart;
+	g_widgetCursor.hasPreviousState = hasPreviousState;
+	g_widgetCursor.forceRefresh = false;
 
 	g_foundWidgetAtDownInvalid = false;
 
-    enumWidget(widgetCursor);
+    enumWidget();
 
-	g_widgetStateEnd = widgetCursor.currentState;
-	g_widgetStateStructureChanged = !widgetCursor.hasPreviousState;
+	g_widgetStateEnd = g_widgetCursor.currentState;
+	g_widgetStateStructureChanged = !g_widgetCursor.hasPreviousState;
 }
 
 void enumRootWidget() {
@@ -91,14 +93,14 @@ void enumRootWidget() {
 
     g_isActiveWidget = false;
 
-	WidgetCursor widgetCursor;
-	widgetCursor.assets = g_mainAssets;
-	widgetCursor.appContext = &getRootAppContext();
-	widgetCursor.widget = g_rootWidget;
-	widgetCursor.currentState = g_widgetStateStart;
-	widgetCursor.hasPreviousState = true;
+	g_widgetCursor = WidgetCursor();
+	g_widgetCursor.assets = g_mainAssets;
+	g_widgetCursor.appContext = &getRootAppContext();
+	g_widgetCursor.widget = g_rootWidget;
+	g_widgetCursor.currentState = g_widgetStateStart;
+	g_widgetCursor.hasPreviousState = true;
 
-    enumWidget(widgetCursor);
+    enumWidget();
 }
 
 } // namespace gui

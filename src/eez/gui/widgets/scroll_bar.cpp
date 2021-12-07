@@ -63,7 +63,9 @@ void getThumbGeometry(int size, int position, int pageSize, int xTrack, int wTra
 
 WidgetCursor ScrollBarWidgetState::g_selectedWidget;
 
-bool ScrollBarWidgetState::updateState(const WidgetCursor &widgetCursor) {
+bool ScrollBarWidgetState::updateState() {
+    const WidgetCursor &widgetCursor = g_widgetCursor;
+
     bool hasPreviousState = widgetCursor.hasPreviousState;
 
     WIDGET_STATE(flags.active, g_selectedWidget == widgetCursor);
@@ -76,7 +78,9 @@ bool ScrollBarWidgetState::updateState(const WidgetCursor &widgetCursor) {
     return !hasPreviousState;
 }
 
-void ScrollBarWidgetState::render(WidgetCursor &widgetCursor) {
+void ScrollBarWidgetState::render() {
+    const WidgetCursor &widgetCursor = g_widgetCursor;
+
     auto widget = (const ScrollBarWidget *)widgetCursor.widget;
     if (pageSize < size) {
         const Style *buttonsStyle = getStyle(widget->buttonsStyle);

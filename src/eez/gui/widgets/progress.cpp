@@ -24,7 +24,9 @@
 namespace eez {
 namespace gui {
 
-bool ProgressWidgetState::updateState(const WidgetCursor &widgetCursor) {
+bool ProgressWidgetState::updateState() {
+    const WidgetCursor &widgetCursor = g_widgetCursor;
+
     bool hasPreviousState = widgetCursor.hasPreviousState;
     auto widget = (const ProgressWidget *)widgetCursor.widget;
     
@@ -33,7 +35,9 @@ bool ProgressWidgetState::updateState(const WidgetCursor &widgetCursor) {
     return !hasPreviousState;
 }
 
-void ProgressWidgetState::render(WidgetCursor &widgetCursor) {
+void ProgressWidgetState::render() {
+    const WidgetCursor &widgetCursor = g_widgetCursor;
+
     auto widget = (const ProgressWidget *)widgetCursor.widget;
     const Style* style = getStyle(widget->style);
 

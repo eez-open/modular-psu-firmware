@@ -24,14 +24,18 @@
 namespace eez {
 namespace gui {
 
-bool RectangleWidgetState::updateState(const WidgetCursor &widgetCursor) {
+bool RectangleWidgetState::updateState() {
+    const WidgetCursor &widgetCursor = g_widgetCursor;
+
     bool hasPreviousState = widgetCursor.hasPreviousState;
     WIDGET_STATE(flags.active, g_isActiveWidget);
 
     return !hasPreviousState;
 }
 
-void RectangleWidgetState::render(WidgetCursor &widgetCursor) {
+void RectangleWidgetState::render() {
+    const WidgetCursor &widgetCursor = g_widgetCursor;
+
     auto widget = (const RectangleWidget *)widgetCursor.widget;
     const Style* style = getStyle(widget->style);
     drawRectangle(

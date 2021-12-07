@@ -33,7 +33,9 @@ int getLayoutId(const WidgetCursor &widgetCursor) {
     return layoutView->layout;
 }
 
-bool LayoutViewWidgetState::updateState(const WidgetCursor &widgetCursor) {
+bool LayoutViewWidgetState::updateState() {
+    const WidgetCursor &widgetCursor = g_widgetCursor;
+
     bool hasPreviousState = widgetCursor.hasPreviousState;
     auto widget = (const LayoutViewWidget *)widgetCursor.widget;
 
@@ -58,14 +60,17 @@ bool LayoutViewWidgetState::updateState(const WidgetCursor &widgetCursor) {
     return !hasPreviousState;
 }
 
-void LayoutViewWidgetState::render(WidgetCursor &widgetCursor) {
+void LayoutViewWidgetState::render() {
+	const WidgetCursor& widgetCursor = g_widgetCursor;
     auto widget = (const LayoutViewWidget *)widgetCursor.widget;
     const Style* style = getStyle(widget->style);
     drawRectangle(widgetCursor.x, widgetCursor.y, (int)widget->w, (int)widget->h, style, flags.active, false, true);
 	repainted = true;
 }
 
-void LayoutViewWidgetState::enumChildren(WidgetCursor &widgetCursor) {
+void LayoutViewWidgetState::enumChildren() {
+	WidgetCursor& widgetCursor = g_widgetCursor;
+
 	auto widget = (const LayoutViewWidget *)widgetCursor.widget;
 	const Style* style = getStyle(widget->style);
 	widgetCursor.pushBackground(style, flags.active, repainted);
@@ -94,7 +99,7 @@ void LayoutViewWidgetState::enumChildren(WidgetCursor &widgetCursor) {
         for (uint32_t index = 0; index < widgets.count; ++index, ++widgetPtr) {
 			widgetCursor.widget = (const Widget *)widgetPtr->ptr(widgetCursor.assets);
 
-            enumWidget(widgetCursor);
+            enumWidget();
         }
 
 		widgetCursor.widget = savedWidget;

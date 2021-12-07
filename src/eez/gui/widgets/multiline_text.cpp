@@ -24,7 +24,9 @@
 namespace eez {
 namespace gui {
 
-bool MultilineTextWidgetState::updateState(const WidgetCursor &widgetCursor) {
+bool MultilineTextWidgetState::updateState() {
+    const WidgetCursor &widgetCursor = g_widgetCursor;
+
     bool hasPreviousState = widgetCursor.hasPreviousState;
     auto widget = (const MultilineTextWidget *)widgetCursor.widget;
 
@@ -34,7 +36,9 @@ bool MultilineTextWidgetState::updateState(const WidgetCursor &widgetCursor) {
     return !hasPreviousState;
 }
 
-void MultilineTextWidgetState::render(WidgetCursor &widgetCursor) {
+void MultilineTextWidgetState::render() {
+    const WidgetCursor &widgetCursor = g_widgetCursor;
+
     auto widget = (const MultilineTextWidget *)widgetCursor.widget;
     const Style* style = getStyle(widget->style);
 

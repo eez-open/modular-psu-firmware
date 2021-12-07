@@ -27,8 +27,8 @@ struct AppViewWidget : public Widget {
 struct AppViewWidgetState : public WidgetState {
 	AppContext *appContext;
 
-    bool updateState(const WidgetCursor &widgetCursor) override;
-	void enumChildren(WidgetCursor &widgetCursor) override;
+    bool updateState() override;
+	void enumChildren() override;
 };
 
 } // namespace gui

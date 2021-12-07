@@ -62,7 +62,7 @@ void setFoundWidgetAtDown(WidgetCursor &widgetCursor);
 void clearFoundWidgetAtDown();
 bool isFocusWidget(const WidgetCursor &widgetCursor);
 void refreshScreen();
-bool isPageInternal(int pageId);
+inline bool isPageInternal(int pageId) { return pageId > FIRST_INTERNAL_PAGE_ID; }
 int getWidgetAction(const WidgetCursor &widgetCursor);
 void executeAction(const WidgetCursor &widgetCursor, int actionId);
 void executeAction(int actionId);

@@ -480,7 +480,9 @@ struct YTGraphStaticDrawHelper {
 
 ////////////////////////////////////////////////////////////////////////////////
 
-bool YTGraphWidgetState::updateState(const WidgetCursor &widgetCursor) {
+bool YTGraphWidgetState::updateState() {
+    const WidgetCursor &widgetCursor = g_widgetCursor;
+
     bool hasPreviousState = widgetCursor.hasPreviousState;
     auto widget = (const YTGraphWidget *)widgetCursor.widget;
 
@@ -521,7 +523,9 @@ bool YTGraphWidgetState::updateState(const WidgetCursor &widgetCursor) {
     return !hasPreviousState;
 }
 
-void YTGraphWidgetState::render(WidgetCursor &widgetCursor) {
+void YTGraphWidgetState::render() {
+    const WidgetCursor &widgetCursor = g_widgetCursor;
+
     auto widget = (const YTGraphWidget *)widgetCursor.widget;
 
     uint16_t graphWidth = (uint16_t)widget->w;

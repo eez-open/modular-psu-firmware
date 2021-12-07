@@ -25,7 +25,9 @@
 namespace eez {
 namespace gui {
 
-bool BitmapWidgetState::updateState(const WidgetCursor &widgetCursor) {
+bool BitmapWidgetState::updateState() {
+    const WidgetCursor &widgetCursor = g_widgetCursor;
+
     bool hasPreviousState = widgetCursor.hasPreviousState;
     auto widget = (const BitmapWidget *)widgetCursor.widget;
     
@@ -35,7 +37,9 @@ bool BitmapWidgetState::updateState(const WidgetCursor &widgetCursor) {
     return !hasPreviousState;
 }
 
-void BitmapWidgetState::render(WidgetCursor &widgetCursor) {
+void BitmapWidgetState::render() {
+    const WidgetCursor &widgetCursor = g_widgetCursor;
+    
     auto widget = (const BitmapWidget *)widgetCursor.widget;
     const Style* style = getStyle(widget->style);
 

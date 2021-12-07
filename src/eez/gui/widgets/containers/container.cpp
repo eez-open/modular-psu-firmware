@@ -25,7 +25,9 @@
 namespace eez {
 namespace gui {
 
-bool ContainerWidgetState::updateState(const WidgetCursor &widgetCursor) {
+bool ContainerWidgetState::updateState() {
+    const WidgetCursor &widgetCursor = g_widgetCursor;
+
 	bool hasPreviousState = widgetCursor.hasPreviousState;
 	WIDGET_STATE(flags.active, g_isActiveWidget);
 
@@ -44,7 +46,9 @@ bool ContainerWidgetState::updateState(const WidgetCursor &widgetCursor) {
 	return !hasPreviousState;
 }
 
-void ContainerWidgetState::render(WidgetCursor &widgetCursor) {
+void ContainerWidgetState::render() {
+    const WidgetCursor &widgetCursor = g_widgetCursor;
+
 	auto widget = (const ContainerWidget *)widgetCursor.widget;
 
 	displayBufferIndex = -1;
@@ -63,7 +67,9 @@ void ContainerWidgetState::render(WidgetCursor &widgetCursor) {
 	repainted = true;
 }
 
-void ContainerWidgetState::enumChildren(WidgetCursor &widgetCursor) {
+void ContainerWidgetState::enumChildren() {
+    WidgetCursor &widgetCursor = g_widgetCursor;
+
 	auto widget = (const ContainerWidget *)widgetCursor.widget;
 	const Style* style = getStyle(widget->style);
 	widgetCursor.pushBackground(style, flags.active, repainted);
@@ -75,7 +81,7 @@ void ContainerWidgetState::enumChildren(WidgetCursor &widgetCursor) {
 	}
 	
 	if (overlay) {
-        renderOverlayChildren(widgetCursor);
+        renderOverlayChildren();
 
 		widgetCursor.forceRefresh = savedForceRefresh;
 
@@ -91,7 +97,7 @@ void ContainerWidgetState::enumChildren(WidgetCursor &widgetCursor) {
 	for (uint32_t index = 0; index < widgets.count; ++index, ++widgetPtr) {
 		widgetCursor.widget = (const Widget *)widgetPtr->ptr(widgetCursor.assets);
 
-        enumWidget(widgetCursor);
+        enumWidget();
     }
 
 	widgetCursor.widget = savedWidget;
@@ -101,7 +107,9 @@ void ContainerWidgetState::enumChildren(WidgetCursor &widgetCursor) {
 	widgetCursor.popBackground();
 }
 
-void ContainerWidgetState::renderOverlayChildren(WidgetCursor &widgetCursor) {
+void ContainerWidgetState::renderOverlayChildren() {
+    WidgetCursor &widgetCursor = g_widgetCursor;
+
     if (overlayState == 0) {
         return;
     }
@@ -153,7 +161,7 @@ void ContainerWidgetState::renderOverlayChildren(WidgetCursor &widgetCursor) {
 			((Widget*)widgetCursor.widget)->h = widgetOverrides->h;
 		}
 
-        enumWidget(widgetCursor);
+        enumWidget();
 
 		if (widgetOverrides) {
 			((Widget*)widgetCursor.widget)->x = xSaved;

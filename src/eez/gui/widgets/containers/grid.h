@@ -30,8 +30,8 @@ struct GridWidgetState : public WidgetState {
     int startPosition;
     int count;
 
-    bool updateState(const WidgetCursor &widgetCursor) override;
-    void enumChildren(WidgetCursor &widgetCursor) override;
+    bool updateState() override;
+    void enumChildren() override;
 };
 
 } // namespace gui

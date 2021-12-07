@@ -85,7 +85,9 @@ float firstTick(float n) {
 
 ////////////////////////////////////////////////////////////////////////////////
 
-bool GaugeWidgetState::updateState(const WidgetCursor &widgetCursor) {
+bool GaugeWidgetState::updateState() {
+    const WidgetCursor &widgetCursor = g_widgetCursor;
+
 	bool hasPreviousState = widgetCursor.hasPreviousState;
 	auto widget = (const GaugeWidget *)widgetCursor.widget;
 	
@@ -95,7 +97,9 @@ bool GaugeWidgetState::updateState(const WidgetCursor &widgetCursor) {
 	return !hasPreviousState;
 }
 
-void GaugeWidgetState::render(WidgetCursor &widgetCursor) {
+void GaugeWidgetState::render() {
+    const WidgetCursor &widgetCursor = g_widgetCursor;
+
 	auto widget = (const GaugeWidget*)widgetCursor.widget;
 
 	using namespace display;

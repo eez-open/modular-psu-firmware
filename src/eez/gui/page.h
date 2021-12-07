@@ -55,8 +55,8 @@ protected:
 
 class InternalPage : public Page {
 public:
-    virtual void updateInternalPage(const WidgetCursor &widgetCursor) = 0;
-	virtual WidgetCursor findWidgetInternalPage(const WidgetCursor &widgetCursor, int x, int y, bool clicked) = 0;
+    virtual void updateInternalPage() = 0;
+	virtual WidgetCursor findWidgetInternalPage(int x, int y, bool clicked) = 0;
     virtual bool canClickPassThrough();
     virtual bool closeIfTouchedOutside();
 

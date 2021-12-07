@@ -130,10 +130,12 @@ bool isTouchPointActivated() {
     return millis() - g_pointStartTime > TOUCH_POINT_ACTIVATION_THRESHOLD;
 }
 
-void findActiveWidget(const WidgetCursor &widgetCursor) {
+void findActiveWidget() {
     if (g_activeWidget) {
         return;
     }
+
+    const WidgetCursor& widgetCursor = g_widgetCursor;
 
     if (widgetCursor.appContext->getActivePageId() == PAGE_ID_TOUCH_CALIBRATION) {
         if (widgetCursor.widget->type == WIDGET_TYPE_TEXT) {

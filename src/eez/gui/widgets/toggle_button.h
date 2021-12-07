@@ -29,8 +29,8 @@ struct ToggleButtonWidget : public Widget {
 struct ToggleButtonWidgetState : public WidgetState {
 	WidgetStateFlags flags;
 
-    bool updateState(const WidgetCursor &widgetCursor) override;
-    void render(WidgetCursor &widgetCursor) override;
+    bool updateState() override;
+    void render() override;
 };
 
 } // namespace gui

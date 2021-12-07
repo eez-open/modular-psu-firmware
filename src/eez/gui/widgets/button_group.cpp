@@ -90,7 +90,9 @@ void drawButtons(const Widget *widget, int x, int y, const Style *style, const S
     }
 }
 
-bool ButtonGroupWidgetState::updateState(const WidgetCursor &widgetCursor) {
+bool ButtonGroupWidgetState::updateState() {
+    const WidgetCursor &widgetCursor = g_widgetCursor;
+
     bool hasPreviousState = widgetCursor.hasPreviousState;
     auto widget = (const ButtonGroupWidget *)widgetCursor.widget;
     
@@ -100,7 +102,9 @@ bool ButtonGroupWidgetState::updateState(const WidgetCursor &widgetCursor) {
     return !hasPreviousState;
 }
 
-void ButtonGroupWidgetState::render(WidgetCursor &widgetCursor) {
+void ButtonGroupWidgetState::render() {
+    const WidgetCursor &widgetCursor = g_widgetCursor;
+
     auto widget = (const ButtonGroupWidget *)widgetCursor.widget;
 
     const Style* style = getStyle(widget->style);

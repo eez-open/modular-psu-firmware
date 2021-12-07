@@ -26,7 +26,9 @@ static const size_t MAX_TEXT_LEN = 128;
 namespace eez {
 namespace gui {
 
-bool ButtonWidgetState::updateState(const WidgetCursor &widgetCursor) {
+bool ButtonWidgetState::updateState() {
+    const WidgetCursor &widgetCursor = g_widgetCursor;
+
     bool hasPreviousState = widgetCursor.hasPreviousState;
     auto widget = (const ButtonWidget *)widgetCursor.widget;
     const Style *style = getStyle(flags.enabled ? widget->style : widget->disabledStyle);
@@ -43,7 +45,9 @@ bool ButtonWidgetState::updateState(const WidgetCursor &widgetCursor) {
     return !hasPreviousState;
 }
 
-void ButtonWidgetState::render(WidgetCursor &widgetCursor) {
+void ButtonWidgetState::render() {
+    const WidgetCursor &widgetCursor = g_widgetCursor;
+
     auto widget = (const ButtonWidget *)widgetCursor.widget;
     const Style *style = getStyle(flags.enabled ? widget->style : widget->disabledStyle);
     

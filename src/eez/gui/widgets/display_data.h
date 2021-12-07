@@ -38,8 +38,8 @@ struct DisplayDataWidgetState : public WidgetState {
     int16_t cursorPosition;
     uint8_t xScroll;
 
-    bool updateState(const WidgetCursor &widgetCursor) override;
-    void render(WidgetCursor &widgetCursor) override;
+    bool updateState() override;
+    void render() override;
 };
 
 int DISPLAY_DATA_getCharIndexAtPosition(int xPos, const WidgetCursor &widgetCursor);

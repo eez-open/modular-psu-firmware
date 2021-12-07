@@ -27,8 +27,8 @@ struct ProgressWidget : public Widget {
 struct ProgressWidgetState : public WidgetState {
 	Value data;
 
-    bool updateState(const WidgetCursor &widgetCursor) override;
-    void render(WidgetCursor &widgetCursor) override;
+    bool updateState() override;
+    void render() override;
 };
 
 } // namespace gui

@@ -48,7 +48,9 @@ int findStartOfUnit(char *text, int i) {
     return i;
 }
 
-bool DisplayDataWidgetState::updateState(const WidgetCursor &widgetCursor) {
+bool DisplayDataWidgetState::updateState() {
+    const WidgetCursor &widgetCursor = g_widgetCursor;
+
     bool hasPreviousState = widgetCursor.hasPreviousState;
     auto widget = (const DisplayDataWidget *)widgetCursor.widget;
     const Style *style = getStyle(overrideStyleHook(widgetCursor, widget->style));
@@ -84,7 +86,9 @@ bool DisplayDataWidgetState::updateState(const WidgetCursor &widgetCursor) {
     return !hasPreviousState;
 }
 
-void DisplayDataWidgetState::render(WidgetCursor &widgetCursor) {
+void DisplayDataWidgetState::render() {
+    const WidgetCursor &widgetCursor = g_widgetCursor;
+
     auto widget = (const DisplayDataWidget *)widgetCursor.widget;
     const Style *style = getStyle(overrideStyleHook(widgetCursor, widget->style));
 

@@ -25,14 +25,18 @@ namespace gui {
 #define GRID_FLOW_ROW 1
 #define GRID_FLOW_COLUMN 2
 
-bool GridWidgetState::updateState(const WidgetCursor &widgetCursor) {
+bool GridWidgetState::updateState() {
+    const WidgetCursor &widgetCursor = g_widgetCursor;
+
     auto widget = (const GridWidget *)widgetCursor.widget;
     startPosition = ytDataGetPosition(widgetCursor, widget->data);
     count = eez::gui::count(widgetCursor, widget->data);
     return false;
 }
 
-void GridWidgetState::enumChildren(WidgetCursor &widgetCursor) {
+void GridWidgetState::enumChildren() {
+    WidgetCursor &widgetCursor = g_widgetCursor;
+
     if (count > 0) {
         auto widget = (const GridWidget *)widgetCursor.widget;
 
@@ -57,7 +61,7 @@ void GridWidgetState::enumChildren(WidgetCursor &widgetCursor) {
 			widgetCursor.y = savedY + yOffset;
 
 			widgetCursor.pushIterator(index);
-            enumWidget(widgetCursor);
+            enumWidget();
 			widgetCursor.popIterator();
 
             if (widget->gridFlow == GRID_FLOW_ROW) {

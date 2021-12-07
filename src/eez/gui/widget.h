@@ -198,10 +198,9 @@ struct WidgetState {
 
 	virtual ~WidgetState() {}
 
-	virtual bool updateState(const WidgetCursor &widgetCursor);
-
-	virtual void render(WidgetCursor &widgetCursor);
-	virtual void enumChildren(WidgetCursor &widgetCursor);
+	virtual bool updateState();
+	virtual void render();
+	virtual void enumChildren();
 	
 	virtual bool hasOnTouch();
 	virtual void onTouch(const WidgetCursor &widgetCursor, Event &touchEvent);
@@ -226,13 +225,13 @@ struct WidgetState {
 extern bool g_isActiveWidget;
 
 void enumRootWidget();
-void enumWidget(WidgetCursor &widgetCursor);
-void enumNoneWidget(WidgetCursor &widgetCursor);
+void enumWidget();
+void enumNoneWidget();
 
 extern bool g_foundWidgetAtDownInvalid;
 void freeWidgetStates(WidgetState *topWidgetState);
 
-typedef void (*EnumWidgetsCallback)(const WidgetCursor &widgetCursor);
+typedef void (*EnumWidgetsCallback)();
 extern EnumWidgetsCallback g_findCallback;
 void forEachWidget(EnumWidgetsCallback callback);
 

@@ -51,8 +51,8 @@ public:
     void onEncoder(int counter);
     void onEncoderClicked();
 
-    void updateInternalPage(const WidgetCursor &widgetCursor);
-    WidgetCursor findWidgetInternalPage(const WidgetCursor &widgetCursor, int x, int y, bool clicked);
+    void updateInternalPage();
+    WidgetCursor findWidgetInternalPage(int x, int y, bool clicked);
     bool canClickPassThrough();
     bool closeIfTouchedOutside();
 
@@ -111,8 +111,8 @@ public:
 
     void init();
 
-    void updateInternalPage(const WidgetCursor &widgetCursor);
-    WidgetCursor findWidgetInternalPage(const WidgetCursor &widgetCursor, int x, int y, bool clicked);
+    void updateInternalPage();
+    WidgetCursor findWidgetInternalPage(int x, int y, bool clicked);
 
     void selectEnumItem();
 
@@ -168,8 +168,8 @@ class MenuWithButtonsPage : public InternalPage {
 public:
     static MenuWithButtonsPage *create(AppContext *appContext, const char *message, const char **menuItems, void (*callback)(int));
 
-    void updateInternalPage(const WidgetCursor &widgetCursor);
-    WidgetCursor findWidgetInternalPage(const WidgetCursor &widgetCursor, int x, int y, bool clicked);
+    void updateInternalPage();
+    WidgetCursor findWidgetInternalPage(int x, int y, bool clicked);
 
     static void executeAction();
 

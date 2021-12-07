@@ -143,7 +143,9 @@ void ToastMessagePage::onEncoderClicked() {
     }
 }
 
-void ToastMessagePage::updateInternalPage(const WidgetCursor &widgetCursor) {
+void ToastMessagePage::updateInternalPage() {
+    const WidgetCursor &widgetCursor = g_widgetCursor;
+
 	WidgetCursor toastPageWidgetCursor(widgetCursor.assets, appContext, &actionWidget, actionWidget.x, actionWidget.y, widgetCursor.currentState, widgetCursor.hasPreviousState);
 
     auto temp = toastPageWidgetCursor == g_activeWidget;
@@ -277,7 +279,9 @@ void ToastMessagePage::updateInternalPage(const WidgetCursor &widgetCursor) {
     }
 }
 
-WidgetCursor ToastMessagePage::findWidgetInternalPage(const WidgetCursor &widgetCursor, int x, int y, bool clicked) {
+WidgetCursor ToastMessagePage::findWidgetInternalPage(int x, int y, bool clicked) {
+    const WidgetCursor &widgetCursor = g_widgetCursor;
+
     if (x >= this->x && x < this->x + width && y >= this->y && y < this->y + height) {
         const Style *style = getStyle(type == INFO_TOAST ? STYLE_ID_INFO_ALERT : STYLE_ID_ERROR_ALERT);
         font::Font font = styleGetFont(style);
@@ -483,7 +487,9 @@ void SelectFromEnumPage::findPagePosition() {
     }
 }
 
-void SelectFromEnumPage::updateInternalPage(const WidgetCursor &widgetCursor) {
+void SelectFromEnumPage::updateInternalPage() {
+    const WidgetCursor &widgetCursor = g_widgetCursor;
+
     if (widgetCursor.hasPreviousState && !dirty) {
 		return;
     }
@@ -514,7 +520,9 @@ void SelectFromEnumPage::updateInternalPage(const WidgetCursor &widgetCursor) {
     dirty = false;
 }
 
-WidgetCursor SelectFromEnumPage::findWidgetInternalPage(const WidgetCursor &widgetCursor, int x, int y, bool clicked) {
+WidgetCursor SelectFromEnumPage::findWidgetInternalPage(int x, int y, bool clicked) {
+    const WidgetCursor &widgetCursor = g_widgetCursor;
+
     for (int i = 0; i < numItems; ++i) {
         int xItem, yItem;
         getItemPosition(i, xItem, yItem);
@@ -665,15 +673,19 @@ void MenuWithButtonsPage::init(AppContext *appContext, const char *message, cons
 
 }
 
-void MenuWithButtonsPage::updateInternalPage(const WidgetCursor &widgetCursor2) {
-    WidgetCursor widgetCursor = widgetCursor2;
+void MenuWithButtonsPage::updateInternalPage() {
+    WidgetCursor widgetCursor = g_widgetCursor;
+
+    auto savedWidgetCursor = g_widgetCursor;
+    g_widgetCursor = widgetCursor;
 
     widgetCursor.widget = &m_containerRectangleWidget;
     widgetCursor.x = x + m_containerRectangleWidget.x;
     widgetCursor.y = y + m_containerRectangleWidget.y;
     RectangleWidgetState rectangleWidgetState;
     rectangleWidgetState.flags.active = 0;
-    rectangleWidgetState.render(widgetCursor);
+
+    rectangleWidgetState.render();
 
     widgetCursor.widget = &m_messageTextWidget;
     widgetCursor.x = x + m_messageTextWidget.x;
@@ -682,7 +694,7 @@ void MenuWithButtonsPage::updateInternalPage(const WidgetCursor &widgetCursor2) 
     textWidgetState.flags.active = 0;
 	textWidgetState.flags.blinking = 0;
 	textWidgetState.flags.focused = 0;
-    textWidgetState.render(widgetCursor);
+    textWidgetState.render();
 
     for (size_t i = 0; i < m_numButtonTextWidgets; i++) {
         widgetCursor.widget = &m_buttonTextWidgets[i];
@@ -693,12 +705,14 @@ void MenuWithButtonsPage::updateInternalPage(const WidgetCursor &widgetCursor2) 
 		textWidgetState.flags.active = widgetCursor == g_activeWidget;
 		textWidgetState.flags.blinking = 0;
 		textWidgetState.flags.focused = 0;
-		textWidgetState.render(widgetCursor);
+		textWidgetState.render();
     }
+
+    g_widgetCursor = savedWidgetCursor;
 }
 
-WidgetCursor MenuWithButtonsPage::findWidgetInternalPage(const WidgetCursor &widgetCursor2, int x, int y, bool clicked) {
-    WidgetCursor widgetCursor = widgetCursor2;
+WidgetCursor MenuWithButtonsPage::findWidgetInternalPage(int x, int y, bool clicked) {
+    WidgetCursor widgetCursor = g_widgetCursor;
 
     widgetCursor.appContext = m_appContext;
 
@@ -718,6 +732,7 @@ WidgetCursor MenuWithButtonsPage::findWidgetInternalPage(const WidgetCursor &wid
     widgetCursor.widget = &m_containerRectangleWidget;
     widgetCursor.x = this->x + m_containerRectangleWidget.x;
     widgetCursor.y = this->y + m_containerRectangleWidget.y;
+
     return widgetCursor;
 }
 

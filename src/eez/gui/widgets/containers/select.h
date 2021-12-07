@@ -29,9 +29,9 @@ struct SelectWidgetState : public WidgetState {
     int widgetIndex;
 	bool repainted;
 
-    bool updateState(const WidgetCursor &widgetCursor) override;
-	void render(WidgetCursor &widgetCursor) override;
-    void enumChildren(WidgetCursor &widgetCursor) override;
+    bool updateState() override;
+	void render() override;
+    void enumChildren() override;
 };
 
 } // namespace gui

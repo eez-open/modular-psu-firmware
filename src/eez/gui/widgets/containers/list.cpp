@@ -25,14 +25,18 @@ namespace gui {
 #define LIST_TYPE_VERTICAL 1
 #define LIST_TYPE_HORIZONTAL 2
 
-bool ListWidgetState::updateState(const WidgetCursor &widgetCursor) {
+bool ListWidgetState::updateState() {
+    const WidgetCursor &widgetCursor = g_widgetCursor;
+
     auto widget = (const ListWidget *)widgetCursor.widget;
     startPosition = ytDataGetPosition(widgetCursor, widget->data);
     count = eez::gui::count(widgetCursor, widget->data);
     return false;
 }
 
-void ListWidgetState::enumChildren(WidgetCursor &widgetCursor) {
+void ListWidgetState::enumChildren() {
+    WidgetCursor &widgetCursor = g_widgetCursor;
+
     if (count > 0) {
         auto widget = (const ListWidget *)widgetCursor.widget;
 
@@ -56,7 +60,7 @@ void ListWidgetState::enumChildren(WidgetCursor &widgetCursor) {
                 if (offset < widget->h) {
 					widgetCursor.y = savedY + offset;
 					widgetCursor.pushIterator(index);
-                    enumWidget(widgetCursor);
+                    enumWidget();
 					widgetCursor.popIterator();
                     offset += childWidget->h + widget->gap;
                 } else {
@@ -66,7 +70,7 @@ void ListWidgetState::enumChildren(WidgetCursor &widgetCursor) {
                 if (offset < widget->w) {
 					widgetCursor.x = savedX + offset;
 					widgetCursor.pushIterator(index);
-                    enumWidget(widgetCursor);
+                    enumWidget();
 					widgetCursor.popIterator();
                     offset += childWidget->w + widget->gap;
                 } else {

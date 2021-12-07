@@ -63,15 +63,11 @@ bool g_foundWidgetAtDownInvalid;
 
 ////////////////////////////////////////////////////////////////////////////////
 
-struct NoneWidgetState : public WidgetState {
-	void render(WidgetCursor &widgetCursor) {}
-};
+struct NoneWidgetState : public WidgetState {};
 
 static Widget g_noneWidget = { WIDGET_TYPE_NONE };
 
-struct ReservedWidgetState : public WidgetState {
-	void render(WidgetCursor &widgetCursor) {}
-};
+struct ReservedWidgetState : public WidgetState {};
 
 // widget placementNew functions
 #define WIDGET_TYPE(NAME_PASCAL_CASE, NAME, ID) \
@@ -96,14 +92,14 @@ static size_t g_widgetStateSizes[] = {
 
 ////////////////////////////////////////////////////////////////////////////////
 
-bool WidgetState::updateState(const WidgetCursor &widgetCursor) {
+bool WidgetState::updateState() {
 	return false;
 }
 
-void WidgetState::render(WidgetCursor &widgetCursor) {
+void WidgetState::render() {
 }
 
-void WidgetState::enumChildren(WidgetCursor &widgetCursor) {
+void WidgetState::enumChildren() {
 }
 
 bool WidgetState::hasOnTouch() {
@@ -142,7 +138,9 @@ void WidgetCursor::popBackground() {
 
 ////////////////////////////////////////////////////////////////////////////////
 
-void enumWidget(WidgetCursor &widgetCursor) {
+void enumWidget() {
+    WidgetCursor &widgetCursor = g_widgetCursor;
+
     const Widget *widget = widgetCursor.widget;
 
     auto savedX = widgetCursor.x;
@@ -157,14 +155,14 @@ void enumWidget(WidgetCursor &widgetCursor) {
 	g_isActiveWidget = g_isActiveWidget || widgetCursor == g_activeWidget;
 
 	if (g_findCallback) {
-		g_findCallback(widgetCursor);
+		g_findCallback();
 	} else {
 		if (widgetCursor.hasPreviousState) {
             if (widget->type == widgetState->type) {
                 // reuse widget state
-                bool refresh = widgetState->updateState(widgetCursor);
+                bool refresh = widgetState->updateState();
                 if (refresh || widgetCursor.forceRefresh) {
-                    widgetState->render(widgetCursor);
+                    widgetState->render();
                 }
                 goto EnumChildren;
             }
@@ -177,8 +175,8 @@ void enumWidget(WidgetCursor &widgetCursor) {
         g_widgetStatePlacementNewFunctions[widget->type](widgetState);
         widgetState->type = widget->type;
         
-        widgetState->updateState(widgetCursor);
-        widgetState->render(widgetCursor);
+        widgetState->updateState();
+        widgetState->render();
 
         if (g_foundWidgetAtDownInvalid) {
             // find new cursor for g_foundWidgetAtDown
@@ -196,7 +194,7 @@ EnumChildren:
 	uint32_t stateSize = (uint8_t *)widgetCursor.currentState - (uint8_t *)g_widgetStateStart;
 	assert(stateSize <= CONF_MAX_STATE_SIZE);
 
-	widgetState->enumChildren(widgetCursor);
+	widgetState->enumChildren();
 
 	g_isActiveWidget = savedIsActiveWidget;
 
@@ -204,10 +202,11 @@ EnumChildren:
     widgetCursor.y = savedY;
 }
 
-void enumNoneWidget(WidgetCursor &widgetCursor) {
+void enumNoneWidget() {
+    WidgetCursor &widgetCursor = g_widgetCursor;
     auto savedWidget = widgetCursor.widget;
     widgetCursor.widget = &g_noneWidget;
-	enumWidget(widgetCursor);
+	enumWidget();
     widgetCursor.widget = savedWidget;
 }    
 
@@ -251,15 +250,17 @@ int g_yOverlayOffset = 0;
 
 static AppContext *g_popPageAppContext;
 
-static void findWidgetStep(const WidgetCursor &widgetCursor) {
+static void findWidgetStep() {
 	if (g_found) {
 		return;
 	}
 
+    WidgetCursor &widgetCursor = g_widgetCursor;
+
 	if (widgetCursor.appContext->isActivePageInternal()) {
 		auto internalPage = (InternalPage *)widgetCursor.appContext->getActivePage();
 
-		WidgetCursor foundWidget = internalPage->findWidgetInternalPage(widgetCursor, g_findWidgetAtX, g_findWidgetAtY, g_clicked);
+		WidgetCursor foundWidget = internalPage->findWidgetInternalPage(g_findWidgetAtX, g_findWidgetAtY, g_clicked);
 		if (foundWidget) {
 			g_foundWidget = foundWidget;
 			g_found = true;

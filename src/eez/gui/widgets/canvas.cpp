@@ -24,7 +24,9 @@
 namespace eez {
 namespace gui {
 
-bool CanvasWidgetState::updateState(const WidgetCursor &widgetCursor) {
+bool CanvasWidgetState::updateState() {
+    const WidgetCursor &widgetCursor = g_widgetCursor;
+
     bool hasPreviousState = widgetCursor.hasPreviousState;
     auto widget = (const CanvasWidget *)widgetCursor.widget;
 
@@ -33,7 +35,9 @@ bool CanvasWidgetState::updateState(const WidgetCursor &widgetCursor) {
     return !hasPreviousState;
 }
 
-void CanvasWidgetState::render(WidgetCursor &widgetCursor) {
+void CanvasWidgetState::render() {
+    const WidgetCursor &widgetCursor = g_widgetCursor;
+
     auto widget = (const CanvasWidget *)widgetCursor.widget;
 
     Value value;

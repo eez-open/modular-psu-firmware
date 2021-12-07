@@ -37,7 +37,9 @@ void TextWidget_autoSize(Assets *assets, TextWidget& widget) {
     widget.h = style->border_size_top + style->padding_top + font.getHeight() + style->border_size_bottom + style->padding_bottom;
 }
 
-bool TextWidgetState::updateState(const WidgetCursor &widgetCursor) {
+bool TextWidgetState::updateState() {
+    const WidgetCursor &widgetCursor = g_widgetCursor;
+
     bool hasPreviousState = widgetCursor.hasPreviousState;
     auto widget = (const TextWidget *)widgetCursor.widget;
     const Style *style = getStyle(overrideStyleHook(widgetCursor, widget->style));
@@ -53,7 +55,9 @@ bool TextWidgetState::updateState(const WidgetCursor &widgetCursor) {
     return !hasPreviousState;
 }
 
-void TextWidgetState::render(WidgetCursor &widgetCursor) {
+void TextWidgetState::render() {
+    const WidgetCursor &widgetCursor = g_widgetCursor;
+
     auto widget = (const TextWidget *)widgetCursor.widget;
     const Style *style = getStyle(overrideStyleHook(widgetCursor, widget->style));
     const char *text = widget->text.ptr(widgetCursor.assets);

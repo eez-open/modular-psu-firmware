@@ -141,7 +141,9 @@ Value getInputWidgetData(const gui::WidgetCursor &widgetCursor, const Value &dat
 	}
 }
 
-bool InputWidgetState::updateState(const WidgetCursor &widgetCursor) {
+bool InputWidgetState::updateState() {
+    const WidgetCursor &widgetCursor = g_widgetCursor;
+
 	bool hasPreviousState = widgetCursor.hasPreviousState;
 	auto widget = (const InputWidget*)widgetCursor.widget;
 	const Style *style = getStyle(overrideStyleHook(widgetCursor, widget->style));
@@ -154,7 +156,9 @@ bool InputWidgetState::updateState(const WidgetCursor &widgetCursor) {
 	return !hasPreviousState;
 }
 
-void InputWidgetState::render(WidgetCursor &widgetCursor) {
+void InputWidgetState::render() {
+    const WidgetCursor &widgetCursor = g_widgetCursor;
+
 	auto widget = (const InputWidget*)widgetCursor.widget;
 
 	if (widgetCursor.flowState) {

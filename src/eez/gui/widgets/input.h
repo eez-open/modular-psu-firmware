@@ -36,8 +36,8 @@ struct InputWidgetState : public WidgetState {
 	WidgetStateFlags flags;
 	Value data;
 
-    bool updateState(const WidgetCursor &widgetCursor) override;
-	void render(WidgetCursor &widgetCursor) override;
+    bool updateState() override;
+	void render() override;
 };
 
 struct InputWidgetExecutionState : public flow::ComponenentExecutionState {

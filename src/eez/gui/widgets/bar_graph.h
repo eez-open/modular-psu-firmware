@@ -42,8 +42,8 @@ struct BarGraphWidgetState : public WidgetState {
     Value textData;
     uint32_t textDataRefreshLastTime;
 
-    bool updateState(const WidgetCursor &widgetCursor) override;
-    void render(WidgetCursor &widgetCursor) override;
+    bool updateState() override;
+    void render() override;
 };
 
 } // namespace gui

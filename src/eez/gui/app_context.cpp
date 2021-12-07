@@ -317,10 +317,10 @@ void AppContext::updatePage(int i, WidgetCursor &widgetCursor) {
 		withShadow = true;
 
 		if (g_findCallback == nullptr) {
-			internalPage->updateInternalPage(widgetCursor);
+			internalPage->updateInternalPage();
 		}
 
-		enumNoneWidget(widgetCursor);
+		enumNoneWidget();
     } else {
         auto page = getPageAsset(m_pageNavigationStack[i].pageId, widgetCursor);
 
@@ -332,7 +332,7 @@ void AppContext::updatePage(int i, WidgetCursor &widgetCursor) {
 
 		auto savedWidget = widgetCursor.widget;
         widgetCursor.widget = page;
-        enumWidget(widgetCursor);
+        enumWidget();
 		widgetCursor.widget = savedWidget;
     }
 

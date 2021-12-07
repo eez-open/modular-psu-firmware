@@ -50,8 +50,9 @@ struct YTGraphWidgetState : public WidgetState {
 	uint32_t previousHistoryValuePosition;
 	bool refreshBackground;
 
-    bool updateState(const WidgetCursor &widgetCursor) override;
-    void render(WidgetCursor &widgetCursor) override;
+    bool updateState() override;
+    void render() override;
+
 	bool hasOnTouch() override;
 	void onTouch(const WidgetCursor &widgetCursor, Event &touchEvent) override;
 };

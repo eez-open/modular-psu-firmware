@@ -24,6 +24,7 @@ namespace gui {
 extern WidgetState *g_widgetStateStart;
 extern WidgetState *g_widgetStateEnd;
 extern bool g_widgetStateStructureChanged;
+extern WidgetCursor g_widgetCursor;
 
 void updateScreen();
 

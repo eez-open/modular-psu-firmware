@@ -35,10 +35,10 @@ struct ContainerWidgetState : public WidgetState {
 	bool displayBufferSelected;
 	bool repainted;
 
-    bool updateState(const WidgetCursor &widgetCursor) override;
-	void render(WidgetCursor &widgetCursor) override;
-	void enumChildren(WidgetCursor &widgetCursor) override;
-	void renderOverlayChildren(WidgetCursor &widgetCursor);
+    bool updateState() override;
+	void render() override;
+	void enumChildren() override;
+	void renderOverlayChildren();
 };
 
 } // namespace gui

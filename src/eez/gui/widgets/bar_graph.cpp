@@ -66,7 +66,9 @@ void drawLineInBarGraphWidget(const BarGraphWidget *barGraphWidget, int p, uint1
     }
 }
 
-bool BarGraphWidgetState::updateState(const WidgetCursor &widgetCursor) {
+bool BarGraphWidgetState::updateState() {
+    const WidgetCursor &widgetCursor = g_widgetCursor;
+
     bool hasPreviousState = widgetCursor.hasPreviousState;
     auto widget = (const BarGraphWidget *)widgetCursor.widget;
     const Style* style = getStyle(overrideStyleHook(widgetCursor, widget->style));
@@ -97,7 +99,9 @@ bool BarGraphWidgetState::updateState(const WidgetCursor &widgetCursor) {
     return !hasPreviousState;
 }
 
-void BarGraphWidgetState::render(WidgetCursor &widgetCursor) {
+void BarGraphWidgetState::render() {
+    const WidgetCursor &widgetCursor = g_widgetCursor;
+
     auto widget = (const BarGraphWidget *)widgetCursor.widget;
     const Style* style = getStyle(overrideStyleHook(widgetCursor, widget->style));
 

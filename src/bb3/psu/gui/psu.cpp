@@ -1503,7 +1503,9 @@ static bool isEncoderEnabledForWidget(const WidgetCursor &widgetCursor) {
 static bool g_focusCursorIsEnabled;
 static int16_t g_focusCursorAction;
 
-static void isEnabledFocusCursorStep(const WidgetCursor &widgetCursor) {
+static void isEnabledFocusCursorStep() {
+    const WidgetCursor& widgetCursor = g_widgetCursor;
+
     if (isEncoderEnabledForWidget(widgetCursor)) {
         if (g_focusCursor == widgetCursor && g_focusDataId == widgetCursor.widget->data) {
             g_focusCursorIsEnabled = true;
@@ -1520,7 +1522,9 @@ static bool isEnabledFocusCursor(const WidgetCursor& cursor, int16_t dataId) {
     return g_focusCursorIsEnabled;
 }
 
-void isEncoderEnabledInActivePageCheckWidget(const WidgetCursor &widgetCursor) {
+void isEncoderEnabledInActivePageCheckWidget() {
+    const WidgetCursor& widgetCursor = g_widgetCursor;
+
     if (widgetCursor.isPage()) {
         g_isEncoderEnabledInActivePage = false;
     } else if (isEncoderEnabledForWidget(widgetCursor)) {
@@ -1844,7 +1848,9 @@ static int g_findNextFocusCursorState = 0;
 static WidgetCursor g_nextFocusCursor = 0;
 static uint16_t g_nextFocusDataId = DATA_ID_CHANNEL_U_EDIT;
 
-void findNextFocusCursor(const WidgetCursor &widgetCursor) {
+void findNextFocusCursor() {
+    const WidgetCursor& widgetCursor = g_widgetCursor;
+
     if (isEncoderEnabledForWidget(widgetCursor)) {
         if (g_findNextFocusCursorState == 0) {
             g_nextFocusCursor = widgetCursor;

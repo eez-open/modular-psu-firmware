@@ -24,7 +24,9 @@
 namespace eez {
 namespace gui {
 
-bool ToggleButtonWidgetState::updateState(const WidgetCursor &widgetCursor) {
+bool ToggleButtonWidgetState::updateState() {
+    const WidgetCursor &widgetCursor = g_widgetCursor;
+
     bool hasPreviousState = widgetCursor.hasPreviousState;
     auto widget = (const ToggleButtonWidget *)widgetCursor.widget;
 
@@ -34,7 +36,9 @@ bool ToggleButtonWidgetState::updateState(const WidgetCursor &widgetCursor) {
     return !hasPreviousState;
 }
 
-void ToggleButtonWidgetState::render(WidgetCursor &widgetCursor) {
+void ToggleButtonWidgetState::render() {
+    const WidgetCursor &widgetCursor = g_widgetCursor;
+
     auto widget = (const ToggleButtonWidget *)widgetCursor.widget;
     const Style* style = getStyle(widget->style);
     drawText(

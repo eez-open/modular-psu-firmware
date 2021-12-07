@@ -22,7 +22,9 @@
 namespace eez {
 namespace gui {
 
-bool SelectWidgetState::updateState(const WidgetCursor &widgetCursor) {
+bool SelectWidgetState::updateState() {
+    const WidgetCursor &widgetCursor = g_widgetCursor;
+
 	bool hasPreviousState = widgetCursor.hasPreviousState;
 	auto widget = (const SelectWidget *)widgetCursor.widget;
 	if (widget->widgets.count > 0) {
@@ -40,11 +42,13 @@ bool SelectWidgetState::updateState(const WidgetCursor &widgetCursor) {
 	return !hasPreviousState;
 }
 
-void SelectWidgetState::render(WidgetCursor &widgetCursor) {
+void SelectWidgetState::render() {
 	repainted = true;
 }
 
-void SelectWidgetState::enumChildren(WidgetCursor &widgetCursor) {
+void SelectWidgetState::enumChildren() {
+    WidgetCursor &widgetCursor = g_widgetCursor;
+
     auto savedForceRefresh = widgetCursor.forceRefresh;
 	if (repainted) {
 		repainted = false;
@@ -57,7 +61,7 @@ void SelectWidgetState::enumChildren(WidgetCursor &widgetCursor) {
 		auto savedWidget = widgetCursor.widget;
 		widgetCursor.widget = widget->widgets.item(widgetCursor.assets, widgetIndex);
 
-        enumWidget(widgetCursor);
+        enumWidget();
 
 		widgetCursor.widget = savedWidget;
 	}
