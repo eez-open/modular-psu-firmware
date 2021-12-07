@@ -73,6 +73,14 @@ typedef int Cursor;
 
 static const size_t MAX_ITERATORS = 4;
 
+struct BackgroundStyle {
+	const Style *style;
+	bool active;
+	bool repainted;
+};
+
+static const size_t BACKGROUND_STYLE_STACK_SIZE = 10;
+
 struct WidgetCursor {
 	Assets *assets;
 	AppContext *appContext;
@@ -87,6 +95,9 @@ struct WidgetCursor {
 	bool hasPreviousState;
 	bool forceRefresh;
 
+	BackgroundStyle backgroundStyleStack[BACKGROUND_STYLE_STACK_SIZE];
+	size_t backgroundStyleStackPointer;
+
 	WidgetCursor()
 		: assets(nullptr)
 		, appContext(nullptr)
@@ -98,6 +109,7 @@ struct WidgetCursor {
 		, currentState(nullptr)
 		, hasPreviousState(false)
 		, forceRefresh(false)
+		, backgroundStyleStackPointer(0)
 	{
 		iterators[0] = -1; iterators[1] = -1; iterators[2] = -1; iterators[3] = -1;
 	}
@@ -121,6 +133,7 @@ struct WidgetCursor {
 		, currentState(currentState_)
 		, hasPreviousState(hasPreviousState_)
 		, forceRefresh(false)
+		, backgroundStyleStackPointer(0)
     {
 		iterators[0] = -1; iterators[1] = -1; iterators[2] = -1; iterators[3] = -1;
 	}
@@ -136,6 +149,7 @@ struct WidgetCursor {
 		, currentState(nullptr)
 		, hasPreviousState(false)
 		, forceRefresh(false)
+		, backgroundStyleStackPointer(0)
 	{
 		iterators[0] = -1; iterators[1] = -1; iterators[2] = -1; iterators[3] = -1;
 	}
@@ -167,6 +181,9 @@ struct WidgetCursor {
 	}
 
 	bool isPage() const;
+
+	void pushBackground(const Style *style, bool active, bool repainted);
+	void popBackground();
 };
 
 struct WidgetStateFlags {

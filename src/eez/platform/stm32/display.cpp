@@ -72,9 +72,6 @@ uint32_t vramOffset(uint32_t *vram, int x, int y) {
 }
 
 void fillRect(uint16_t *dst, int x, int y, int width, int height, uint16_t color) {
-    if (g_fcIsTransparent) {
-        return;
-    }
 	if (g_opacity == 255) {
 		hdma2d.Init.Mode = DMA2D_R2M;
 		hdma2d.Init.ColorMode = DMA2D_OUTPUT_RGB565;

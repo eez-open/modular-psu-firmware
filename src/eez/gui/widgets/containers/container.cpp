@@ -64,6 +64,10 @@ void ContainerWidgetState::render(WidgetCursor &widgetCursor) {
 }
 
 void ContainerWidgetState::enumChildren(WidgetCursor &widgetCursor) {
+	auto widget = (const ContainerWidget *)widgetCursor.widget;
+	const Style* style = getStyle(widget->style);
+	widgetCursor.pushBackground(style, flags.active, repainted);
+
 	auto savedForceRefresh = widgetCursor.forceRefresh;
 	if (repainted) {
 		repainted = false;
@@ -74,12 +78,13 @@ void ContainerWidgetState::enumChildren(WidgetCursor &widgetCursor) {
         renderOverlayChildren(widgetCursor);
 
 		widgetCursor.forceRefresh = savedForceRefresh;
+
+		widgetCursor.popBackground();
         return;
     }
 
 	auto savedWidget = widgetCursor.widget;
 	
-	auto widget = (const ContainerWidget *)widgetCursor.widget;
 	auto &widgets = widget->widgets;
 
 	auto widgetPtr = widgets.itemsPtr(widgetCursor.assets);
@@ -92,6 +97,8 @@ void ContainerWidgetState::enumChildren(WidgetCursor &widgetCursor) {
 	widgetCursor.widget = savedWidget;
 
 	widgetCursor.forceRefresh = savedForceRefresh;
+
+	widgetCursor.popBackground();
 }
 
 void ContainerWidgetState::renderOverlayChildren(WidgetCursor &widgetCursor) {

@@ -355,9 +355,6 @@ void drawPixel(int x, int y, uint8_t opacity) {
 }
 
 void fillRect(int x1, int y1, int x2, int y2, int r) {
-    if (g_fcIsTransparent) {
-        return;
-    }
     if (r == 0) {
         uint32_t color32 = color16to32(g_fc, g_opacity);
         uint32_t *dst = g_buffer + y1 * DISPLAY_WIDTH + x1;

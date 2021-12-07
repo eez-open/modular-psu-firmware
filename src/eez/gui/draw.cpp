@@ -56,20 +56,7 @@ bool styleIsBlink(const Style *style) {
 
 ////////////////////////////////////////////////////////////////////////////////
 
-void drawText(
-    const char *text, int textLength,
-    int x, int y, int w, int h,
-    const Style *style,
-    bool active, bool blink, bool ignoreLuminocity,
-    uint16_t *overrideColor, uint16_t *overrideBackgroundColor,
-    uint16_t *overrideActiveColor, uint16_t *overrideActiveBackgroundColor,
-    bool useSmallerFontIfDoesNotFit, int cursorPosition, int xScroll
-) {
-    int x1 = x;
-    int y1 = y;
-    int x2 = x + w - 1;
-    int y2 = y + h - 1;
-
+void drawBorderAndBackground(int &x1, int &y1, int &x2, int &y2, const Style *style, uint16_t color, bool ignoreLuminocity) {
     int borderRadius = style->border_radius;
     if (style->border_size_top > 0 || style->border_size_right > 0 || style->border_size_bottom > 0 || style->border_size_left > 0) {
         display::setColor(style->border_color);
@@ -84,6 +71,46 @@ void drawText(
         x2 -= style->border_size_right;
         y2 -= style->border_size_bottom;
     }
+
+    // if (color == TRANSPARENT_COLOR_INDEX) {
+    //     g_fcIsTransparent = true;
+    // } else {
+    //     g_fcIsTransparent = false;
+    // }
+
+    display::setColor(color, ignoreLuminocity);
+    display::fillRect(x1, y1, x2, y2, borderRadius);    
+}
+
+void drawText(
+    const char *text, int textLength,
+    int x, int y, int w, int h,
+    const Style *style,
+    bool active, bool blink, bool ignoreLuminocity,
+    uint16_t *overrideColor, uint16_t *overrideBackgroundColor,
+    uint16_t *overrideActiveColor, uint16_t *overrideActiveBackgroundColor,
+    bool useSmallerFontIfDoesNotFit, int cursorPosition, int xScroll
+) {
+    int x1 = x;
+    int y1 = y;
+    int x2 = x + w - 1;
+    int y2 = y + h - 1;
+
+    uint16_t backgroundColor;
+    if (active || blink) {
+        if (overrideActiveBackgroundColor) {
+            backgroundColor = *overrideActiveBackgroundColor;
+        } else {
+            backgroundColor = style->active_background_color;
+        }
+    } else {
+        if (overrideBackgroundColor) {
+            backgroundColor = *overrideBackgroundColor;
+        } else {
+            backgroundColor = style->background_color;
+        }
+    }
+    drawBorderAndBackground(x1, y1, x2, y2, style, backgroundColor, ignoreLuminocity);
 
     font::Font font = styleGetFont(style);
 
@@ -116,22 +143,6 @@ void drawText(
     if (y_offset < 0) {
         y_offset = y1;
     }
-
-    // fill background
-    if (active || blink) {
-        if (overrideActiveBackgroundColor) {
-            display::setColor(*overrideActiveBackgroundColor, ignoreLuminocity);
-        } else {
-            display::setColor(style->active_background_color, ignoreLuminocity);
-        }
-    } else {
-        if (overrideBackgroundColor) {
-            display::setColor(*overrideBackgroundColor, ignoreLuminocity);
-        } else {
-            display::setColor(style->background_color, ignoreLuminocity);
-        }
-    }
-    display::fillRect(x1, y1, x2, y2, borderRadius);
 
     // draw text
     if (active || blink) {
@@ -401,25 +412,7 @@ struct MultilineTextRender {
     }
 
     void render() {
-        int borderRadius = style->border_radius;
-        if (style->border_size_top > 0 || style->border_size_right > 0 || style->border_size_bottom > 0 || style->border_size_left > 0) {
-            display::setColor(style->border_color);
-            if ((style->border_size_top == 1 && style->border_size_right == 1 && style->border_size_bottom == 1 && style->border_size_left == 1) && borderRadius == 0) {
-                display::drawRect(x1, y1, x2, y2);
-            } else {
-                display::fillRect(x1, y1, x2, y2, style->border_radius);
-                borderRadius = MAX(borderRadius - MAX(style->border_size_top, MAX(style->border_size_right, MAX(style->border_size_bottom, style->border_size_left))), 0);
-            }
-            x1 += style->border_size_left;
-            y1 += style->border_size_top;
-            x2 -= style->border_size_right;
-            y2 -= style->border_size_bottom;
-        }
-
-        // fill background
-        uint16_t background_color = active ? style->active_background_color : style->background_color;
-        display::setColor(background_color);
-        display::fillRect(x1, y1, x2, y2, borderRadius);
+        drawBorderAndBackground(x1, y1, x2, y2, style, active ? style->active_background_color : style->background_color);
 
         //
         font = styleGetFont(style);
@@ -494,20 +487,6 @@ void drawBitmap(Image *image, int x, int y, int w, int h, const Style *style, bo
     int x2 = x + w - 1;
     int y2 = y + h - 1;
 
-	if (style->border_size_top > 0 || style->border_size_right > 0 || style->border_size_bottom > 0 || style->border_size_left > 0) {
-		display::setColor(style->border_color);
-		if (style->border_size_top == 1 && style->border_size_right == 1 && style->border_size_bottom == 1 && style->border_size_left == 1) {
-			display::drawRect(x1, y1, x2, y2);
-		}
-		else {
-			display::fillRect(x1, y1, x2, y2, 0);
-		}
-		x1 += style->border_size_left;
-		y1 += style->border_size_top;
-		x2 -= style->border_size_right;
-		y2 -= style->border_size_bottom;
-	}
-
     int width = image->width;
     int height = image->height;
 
@@ -559,28 +538,14 @@ void drawRectangle(int x, int y, int w, int h, const Style *style, bool active, 
         int x2 = x + w - 1;
         int y2 = y + h - 1;
 
-        int borderRadius = style->border_radius;
-		if (style->border_size_top > 0 || style->border_size_right > 0 || style->border_size_bottom > 0 || style->border_size_left > 0) {
-            display::setColor(style->border_color);
-			if ((style->border_size_top == 1 && style->border_size_right == 1 && style->border_size_bottom == 1 && style->border_size_left == 1) && borderRadius == 0) {
-                display::drawRect(x1, y1, x2, y2);
-            } else {
-                display::fillRect(x1, y1, x2, y2, style->border_radius);
-				borderRadius = MAX(borderRadius - MAX(style->border_size_top, MAX(style->border_size_right, MAX(style->border_size_bottom, style->border_size_left))), 0);
-            }
-			x1 += style->border_size_left;
-			y1 += style->border_size_top;
-			x2 -= style->border_size_right;
-			y2 -= style->border_size_bottom;
-		}
-
+        uint16_t backgroundColor;
         if (invertColors) {
-            display::setColor(active ? style->active_background_color : style->background_color, ignoreLuminocity);
+            backgroundColor = active ? style->active_background_color : style->background_color;
         } else {
-            display::setColor(active ? style->active_color : style->color, ignoreLuminocity);
+            backgroundColor = active ? style->active_color : style->color;
         }
-        
-        display::fillRect(x1, y1, x2, y2, borderRadius);
+
+        drawBorderAndBackground(x1, y1, x2, y2, style, backgroundColor, ignoreLuminocity);
     }
 }
 

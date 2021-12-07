@@ -24,6 +24,8 @@ namespace gui {
 font::Font styleGetFont(const Style *style);
 bool styleIsBlink(const Style *style);
 
+void drawBorderAndBackground(int &x1, int &y1, int &x2, int &y2, const Style *style, uint16_t color, bool ignoreLuminocity = false);
+
 void drawText(
     const char *text, int textLength,
     int x, int y, int w, int h,

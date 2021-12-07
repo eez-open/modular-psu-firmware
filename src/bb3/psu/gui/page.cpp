@@ -216,24 +216,7 @@ void ToastMessagePage::updateInternalPage(const WidgetCursor &widgetCursor) {
     int x2 = x + width - 1;
     int y2 = y + height - 1;
 
-    int borderRadius = style->border_radius;
-    if (style->border_size_top > 0 || style->border_size_right > 0 || style->border_size_bottom > 0 || style->border_size_left > 0) {
-        display::setColor(style->border_color);
-        if ((style->border_size_top == 1 && style->border_size_right == 1 && style->border_size_bottom == 1 && style->border_size_left == 1) && borderRadius == 0) {
-            display::drawRect(x, y, x2, y2);
-        } else {
-            display::fillRect(x1, y1, x2, y2, style->border_radius);
-			borderRadius = MAX(borderRadius - MAX(style->border_size_top, MAX(style->border_size_right, MAX(style->border_size_bottom, style->border_size_left))), 0);
-        }
-        x1 += style->border_size_left;
-        y1 += style->border_size_top;
-        x2 -= style->border_size_right;
-        y2 -= style->border_size_bottom;
-    }
-
-    // draw background
-    display::setColor(style->background_color);
-    display::fillRect(x1, y1, x2, y2, borderRadius);
+    drawBorderAndBackground(x1, y1, x2, y2, style, style->background_color);
 
     // draw text message
     display::setColor(style->color);

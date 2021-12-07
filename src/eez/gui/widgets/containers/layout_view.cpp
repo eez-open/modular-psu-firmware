@@ -66,13 +66,15 @@ void LayoutViewWidgetState::render(WidgetCursor &widgetCursor) {
 }
 
 void LayoutViewWidgetState::enumChildren(WidgetCursor &widgetCursor) {
+	auto widget = (const LayoutViewWidget *)widgetCursor.widget;
+	const Style* style = getStyle(widget->style);
+	widgetCursor.pushBackground(style, flags.active, repainted);
+
     auto savedForceRefresh = widgetCursor.forceRefresh;
 	if (repainted) {
 		repainted = false;
 		widgetCursor.forceRefresh = true;
 	}
-
-	auto widget = (const LayoutViewWidget *)widgetCursor.widget;
 
 	if (g_findCallback != nullptr) {
 		if (widget->context) {
@@ -103,6 +105,8 @@ void LayoutViewWidgetState::enumChildren(WidgetCursor &widgetCursor) {
     }
 
     widgetCursor.forceRefresh = savedForceRefresh;
+
+    widgetCursor.popBackground();
 }
 
 } // namespace gui

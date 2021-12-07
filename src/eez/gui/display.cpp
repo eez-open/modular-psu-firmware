@@ -45,7 +45,6 @@ namespace gui {
 namespace display {
 
 uint16_t g_fc, g_bc;
-bool g_fcIsTransparent;
 uint8_t g_opacity = 255;
 
 gui::font::Font g_font;
@@ -257,7 +256,6 @@ uint16_t getColor16FromIndex(uint16_t color) {
 
 void setColor(uint8_t r, uint8_t g, uint8_t b) {
     g_fc = RGB_TO_COLOR(r, g, b);
-    g_fcIsTransparent = false;
 	adjustColor(g_fc);
 }
 
@@ -267,13 +265,8 @@ void setColor16(uint16_t color) {
 }
 
 void setColor(uint16_t color, bool ignoreLuminocity) {
-    if (color == TRANSPARENT_COLOR_INDEX) {
-        g_fcIsTransparent = true;
-    } else {
-        g_fcIsTransparent = false;
-        g_fc = getColor16FromIndex(color);
-	    adjustColor(g_fc);
-    }
+    g_fc = getColor16FromIndex(color);
+    adjustColor(g_fc);
 }
 
 uint16_t getColor() {

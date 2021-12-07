@@ -127,6 +127,19 @@ bool WidgetCursor::isPage() const {
     return widget->type == WIDGET_TYPE_CONTAINER && ((((ContainerWidget *)widget)->flags & PAGE_CONTAINER) != 0);
 }
 
+void WidgetCursor::pushBackground(const Style *style, bool active, bool repainted) {
+    if (backgroundStyleStackPointer < BACKGROUND_STYLE_STACK_SIZE) {
+        backgroundStyleStack[backgroundStyleStackPointer].style = style;
+        backgroundStyleStack[backgroundStyleStackPointer].active = active;
+        backgroundStyleStack[backgroundStyleStackPointer].repainted = repainted;
+        backgroundStyleStackPointer++;
+    }
+}
+
+void WidgetCursor::popBackground() {
+    backgroundStyleStackPointer--;
+}
+
 ////////////////////////////////////////////////////////////////////////////////
 
 void enumWidget(WidgetCursor &widgetCursor) {
