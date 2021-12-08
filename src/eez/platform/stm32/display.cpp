@@ -57,7 +57,9 @@ static bool g_takeScreenshot;
 
 ////////////////////////////////////////////////////////////////////////////////
 
-#define DMA2D_WAIT while (HAL_DMA2D_PollForTransfer(&hdma2d, 1000) != HAL_OK)
+static bool g_waitDMA;
+
+#define DMA2D_WAIT if (g_waitDMA) { while (HAL_DMA2D_PollForTransfer(&hdma2d, 1000) != HAL_OK); g_waitDMA = false; }
 
 uint32_t vramOffset(uint16_t *vram, int x, int y) {
     return (uint32_t)(vram + y * DISPLAY_WIDTH + x);
@@ -72,70 +74,73 @@ uint32_t vramOffset(uint32_t *vram, int x, int y) {
 }
 
 void fillRect(uint16_t *dst, int x, int y, int width, int height, uint16_t color) {
-	if (g_opacity == 255) {
-		hdma2d.Init.Mode = DMA2D_R2M;
-		hdma2d.Init.ColorMode = DMA2D_OUTPUT_RGB565;
-		hdma2d.Init.OutputOffset = DISPLAY_WIDTH - width;
+    if (g_opacity == 255) {
+        hdma2d.Init.Mode = DMA2D_R2M;
+        hdma2d.Init.ColorMode = DMA2D_OUTPUT_RGB565;
+        hdma2d.Init.OutputOffset = DISPLAY_WIDTH - width;
 
-		uint32_t colorBGRA;
-		uint8_t *pcolorBGRA = (uint8_t *)&colorBGRA;
-		pcolorBGRA[0] = COLOR_TO_B(color);
-		pcolorBGRA[1] = COLOR_TO_G(color);
-		pcolorBGRA[2] = COLOR_TO_R(color);
-		pcolorBGRA[3] = 255;
+        uint32_t colorBGRA;
+        uint8_t *pcolorBGRA = (uint8_t *)&colorBGRA;
+        pcolorBGRA[0] = COLOR_TO_B(color);
+        pcolorBGRA[1] = COLOR_TO_G(color);
+        pcolorBGRA[2] = COLOR_TO_R(color);
+        pcolorBGRA[3] = 255;
 
-		DMA2D_WAIT;
-		HAL_DMA2D_Init(&hdma2d);
-		HAL_DMA2D_Start(&hdma2d, colorBGRA, vramOffset(dst, x, y), width, height);
-	} else {
-		// fill aux. buffer with BGRA color
-		auto auxBuffer = (uint32_t *)VRAM_AUX_BUFFER7_START_ADDRESS;
+        DMA2D_WAIT;
+        HAL_DMA2D_Init(&hdma2d);
+        HAL_DMA2D_Start(&hdma2d, colorBGRA, vramOffset(dst, x, y), width, height);
+        g_waitDMA = true;
+    } else {
+        // fill aux. buffer with BGRA color
+        auto auxBuffer = (uint32_t *)VRAM_AUX_BUFFER7_START_ADDRESS;
 
-		hdma2d.Init.Mode = DMA2D_R2M;
-		hdma2d.Init.ColorMode = DMA2D_OUTPUT_ARGB8888;
-		hdma2d.Init.OutputOffset = DISPLAY_WIDTH - width;
+        hdma2d.Init.Mode = DMA2D_R2M;
+        hdma2d.Init.ColorMode = DMA2D_OUTPUT_ARGB8888;
+        hdma2d.Init.OutputOffset = DISPLAY_WIDTH - width;
 
-		uint32_t colorBGRA;
-		uint8_t *pcolorBGRA = (uint8_t *)&colorBGRA;
-		pcolorBGRA[0] = COLOR_TO_B(color);
-		pcolorBGRA[1] = COLOR_TO_G(color);
-		pcolorBGRA[2] = COLOR_TO_R(color);
-		pcolorBGRA[3] = g_opacity;
+        uint32_t colorBGRA;
+        uint8_t *pcolorBGRA = (uint8_t *)&colorBGRA;
+        pcolorBGRA[0] = COLOR_TO_B(color);
+        pcolorBGRA[1] = COLOR_TO_G(color);
+        pcolorBGRA[2] = COLOR_TO_R(color);
+        pcolorBGRA[3] = g_opacity;
 
-		auto auxBufferOffset = vramOffset(auxBuffer, x, y);
+        auto auxBufferOffset = vramOffset(auxBuffer, x, y);
 
-		DMA2D_WAIT;
-		HAL_DMA2D_Init(&hdma2d);
-		HAL_DMA2D_Start(&hdma2d, colorBGRA, auxBufferOffset, width, height);
+        DMA2D_WAIT;
+        HAL_DMA2D_Init(&hdma2d);
+        HAL_DMA2D_Start(&hdma2d, colorBGRA, auxBufferOffset, width, height);
+        g_waitDMA = true;
 
-		// blend aux. buffer with dst buffer
-	    hdma2d.Init.Mode = DMA2D_M2M_BLEND;
-	    hdma2d.Init.ColorMode = DMA2D_OUTPUT_RGB565;
-	    hdma2d.Init.OutputOffset = DISPLAY_WIDTH - width;
+        // blend aux. buffer with dst buffer
+        hdma2d.Init.Mode = DMA2D_M2M_BLEND;
+        hdma2d.Init.ColorMode = DMA2D_OUTPUT_RGB565;
+        hdma2d.Init.OutputOffset = DISPLAY_WIDTH - width;
 
-		hdma2d.LayerCfg[0].InputOffset = DISPLAY_WIDTH - width;
-		hdma2d.LayerCfg[0].InputColorMode = DMA2D_INPUT_RGB565;
-		hdma2d.LayerCfg[0].AlphaMode = DMA2D_NO_MODIF_ALPHA;
-		hdma2d.LayerCfg[0].InputAlpha = 0;
+        hdma2d.LayerCfg[0].InputOffset = DISPLAY_WIDTH - width;
+        hdma2d.LayerCfg[0].InputColorMode = DMA2D_INPUT_RGB565;
+        hdma2d.LayerCfg[0].AlphaMode = DMA2D_NO_MODIF_ALPHA;
+        hdma2d.LayerCfg[0].InputAlpha = 0;
 
-		hdma2d.LayerCfg[1].InputOffset = DISPLAY_WIDTH - width;
-		hdma2d.LayerCfg[1].InputColorMode = DMA2D_INPUT_ARGB8888;
-		hdma2d.LayerCfg[1].AlphaMode = DMA2D_NO_MODIF_ALPHA;
-		hdma2d.LayerCfg[1].InputAlpha = 0;
+        hdma2d.LayerCfg[1].InputOffset = DISPLAY_WIDTH - width;
+        hdma2d.LayerCfg[1].InputColorMode = DMA2D_INPUT_ARGB8888;
+        hdma2d.LayerCfg[1].AlphaMode = DMA2D_NO_MODIF_ALPHA;
+        hdma2d.LayerCfg[1].InputAlpha = 0;
 
-	    auto dstOffset = vramOffset(dst, x, y);
+        auto dstOffset = vramOffset(dst, x, y);
 
-	    DMA2D_WAIT;
+        DMA2D_WAIT;
 
-	    HAL_DMA2D_Init(&hdma2d);
-	    HAL_DMA2D_ConfigLayer(&hdma2d, 1);
-		HAL_DMA2D_ConfigLayer(&hdma2d, 0);
-		HAL_DMA2D_BlendingStart(&hdma2d, auxBufferOffset, dstOffset, dstOffset, width, height);
-	}
+        HAL_DMA2D_Init(&hdma2d);
+        HAL_DMA2D_ConfigLayer(&hdma2d, 1);
+        HAL_DMA2D_ConfigLayer(&hdma2d, 0);
+        HAL_DMA2D_BlendingStart(&hdma2d, auxBufferOffset, dstOffset, dstOffset, width, height);
+        g_waitDMA = true;
+    }
 }
 
 void fillRect(void *dst, int x1, int y1, int x2, int y2) {
-	fillRect((uint16_t *)dst, x1, y1, x2 - x1 + 1, y2 - y1 + 1, g_fc);
+    fillRect((uint16_t *)dst, x1, y1, x2 - x1 + 1, y2 - y1 + 1, g_fc);
     setDirty();
 }
 
@@ -156,7 +161,7 @@ void bitBlt(void *src, int srcBpp, uint32_t srcLineOffset, uint16_t *dst, int x,
         hdma2d.LayerCfg[1].AlphaMode = DMA2D_NO_MODIF_ALPHA;
         hdma2d.LayerCfg[1].InputAlpha = 0;
     } else if (srcBpp == 24) {
-    	hdma2d.Init.Mode = DMA2D_M2M_PFC;
+        hdma2d.Init.Mode = DMA2D_M2M_PFC;
         hdma2d.Init.RedBlueSwap = DMA2D_RB_SWAP;
 
         hdma2d.LayerCfg[1].InputOffset = srcLineOffset;
@@ -164,7 +169,7 @@ void bitBlt(void *src, int srcBpp, uint32_t srcLineOffset, uint16_t *dst, int x,
         hdma2d.LayerCfg[1].AlphaMode = DMA2D_NO_MODIF_ALPHA;
         hdma2d.LayerCfg[1].InputAlpha = 0;
     } else {
-    	hdma2d.Init.Mode = DMA2D_M2M;
+        hdma2d.Init.Mode = DMA2D_M2M;
 
         hdma2d.LayerCfg[1].InputOffset = srcLineOffset;
         hdma2d.LayerCfg[1].InputColorMode = DMA2D_INPUT_RGB565;
@@ -184,6 +189,7 @@ void bitBlt(void *src, int srcBpp, uint32_t srcLineOffset, uint16_t *dst, int x,
     } else {
         HAL_DMA2D_Start(&hdma2d, (uint32_t)src, dstOffset, width, height);
     }
+    g_waitDMA = true;
 
     if (srcBpp == 24) {
         hdma2d.Init.RedBlueSwap = DMA2D_RB_REGULAR;
@@ -210,6 +216,7 @@ void bitBlt(uint16_t *src, uint16_t *dst, int x, int y, int width, int height) {
     HAL_DMA2D_Init(&hdma2d);
     HAL_DMA2D_ConfigLayer(&hdma2d, 1);
     HAL_DMA2D_Start(&hdma2d, vramOffset(src, x, y), vramOffset(dst, x, y), width, height);
+    g_waitDMA = true;
 }
 
 void bitBltRGB888(uint16_t *src, uint8_t *dst, int x, int y, int width, int height) {
@@ -228,6 +235,7 @@ void bitBltRGB888(uint16_t *src, uint8_t *dst, int x, int y, int width, int heig
     HAL_DMA2D_Init(&hdma2d);
     HAL_DMA2D_ConfigLayer(&hdma2d, 1);
     HAL_DMA2D_Start(&hdma2d, vramOffset(src, x, y), vramOffsetRGB888(dst, x, y), width, height);
+    g_waitDMA = true;
 
     hdma2d.Init.RedBlueSwap = DMA2D_RB_REGULAR;
 }
@@ -252,6 +260,7 @@ void bitBlt(uint16_t *src, uint16_t *dst, int x, int y, int width, int height, i
     HAL_DMA2D_Init(&hdma2d);
     HAL_DMA2D_ConfigLayer(&hdma2d, 1);
     HAL_DMA2D_Start(&hdma2d, vramOffset(src, x, y), vramOffset(dst, dstx, dsty), width, height);
+    g_waitDMA = true;
 }
 
 void bitBlt(void *src, void *dst, int sx, int sy, int sw, int sh, int dx, int dy, uint8_t opacity) {
@@ -259,46 +268,48 @@ void bitBlt(void *src, void *dst, int sx, int sy, int sw, int sh, int dx, int dy
         dst = g_buffer;
     }
 
-	auto srcOffset = vramOffset((uint16_t *)src, sx, sy);
-	auto dstOffset = vramOffset((uint16_t *)dst, dx, dy);
+    auto srcOffset = vramOffset((uint16_t *)src, sx, sy);
+    auto dstOffset = vramOffset((uint16_t *)dst, dx, dy);
 
-	if (opacity == 255) {
-	    hdma2d.Init.Mode = DMA2D_M2M;
-	    hdma2d.Init.ColorMode = DMA2D_OUTPUT_RGB565;
-	    hdma2d.Init.OutputOffset = DISPLAY_WIDTH - sw;
+    if (opacity == 255) {
+        hdma2d.Init.Mode = DMA2D_M2M;
+        hdma2d.Init.ColorMode = DMA2D_OUTPUT_RGB565;
+        hdma2d.Init.OutputOffset = DISPLAY_WIDTH - sw;
 
-	    hdma2d.LayerCfg[1].InputOffset = DISPLAY_WIDTH - sw;
-	    hdma2d.LayerCfg[1].InputColorMode = DMA2D_INPUT_RGB565;
-	    hdma2d.LayerCfg[1].AlphaMode = DMA2D_NO_MODIF_ALPHA;
-	    hdma2d.LayerCfg[1].InputAlpha = 0;
+        hdma2d.LayerCfg[1].InputOffset = DISPLAY_WIDTH - sw;
+        hdma2d.LayerCfg[1].InputColorMode = DMA2D_INPUT_RGB565;
+        hdma2d.LayerCfg[1].AlphaMode = DMA2D_NO_MODIF_ALPHA;
+        hdma2d.LayerCfg[1].InputAlpha = 0;
 
-	    DMA2D_WAIT;
+        DMA2D_WAIT;
 
-	    HAL_DMA2D_Init(&hdma2d);
-	    HAL_DMA2D_ConfigLayer(&hdma2d, 1);
-	    HAL_DMA2D_Start(&hdma2d, srcOffset, dstOffset, sw, sh);
-	} else {
-		hdma2d.Init.Mode = DMA2D_M2M_BLEND;
-		hdma2d.Init.ColorMode = DMA2D_OUTPUT_RGB565;
-		hdma2d.Init.OutputOffset = DISPLAY_WIDTH - sw;
+        HAL_DMA2D_Init(&hdma2d);
+        HAL_DMA2D_ConfigLayer(&hdma2d, 1);
+        HAL_DMA2D_Start(&hdma2d, srcOffset, dstOffset, sw, sh);
+        g_waitDMA = true;
+    } else {
+        hdma2d.Init.Mode = DMA2D_M2M_BLEND;
+        hdma2d.Init.ColorMode = DMA2D_OUTPUT_RGB565;
+        hdma2d.Init.OutputOffset = DISPLAY_WIDTH - sw;
 
-		hdma2d.LayerCfg[0].InputOffset = DISPLAY_WIDTH - sw;
-		hdma2d.LayerCfg[0].InputColorMode = DMA2D_INPUT_RGB565;
-		hdma2d.LayerCfg[0].AlphaMode = DMA2D_COMBINE_ALPHA;
-		hdma2d.LayerCfg[0].InputAlpha = 0xFF;
+        hdma2d.LayerCfg[0].InputOffset = DISPLAY_WIDTH - sw;
+        hdma2d.LayerCfg[0].InputColorMode = DMA2D_INPUT_RGB565;
+        hdma2d.LayerCfg[0].AlphaMode = DMA2D_COMBINE_ALPHA;
+        hdma2d.LayerCfg[0].InputAlpha = 0xFF;
 
-		hdma2d.LayerCfg[1].InputOffset = DISPLAY_WIDTH - sw;
-		hdma2d.LayerCfg[1].InputColorMode = DMA2D_INPUT_RGB565;
-		hdma2d.LayerCfg[1].AlphaMode = DMA2D_COMBINE_ALPHA;
-		hdma2d.LayerCfg[1].InputAlpha = opacity;
+        hdma2d.LayerCfg[1].InputOffset = DISPLAY_WIDTH - sw;
+        hdma2d.LayerCfg[1].InputColorMode = DMA2D_INPUT_RGB565;
+        hdma2d.LayerCfg[1].AlphaMode = DMA2D_COMBINE_ALPHA;
+        hdma2d.LayerCfg[1].InputAlpha = opacity;
 
-		DMA2D_WAIT;
+        DMA2D_WAIT;
 
-		HAL_DMA2D_Init(&hdma2d);
-		HAL_DMA2D_ConfigLayer(&hdma2d, 1);
-		HAL_DMA2D_ConfigLayer(&hdma2d, 0);
-		HAL_DMA2D_BlendingStart(&hdma2d, srcOffset, dstOffset, dstOffset, sw, sh);
-	}
+        HAL_DMA2D_Init(&hdma2d);
+        HAL_DMA2D_ConfigLayer(&hdma2d, 1);
+        HAL_DMA2D_ConfigLayer(&hdma2d, 0);
+        HAL_DMA2D_BlendingStart(&hdma2d, srcOffset, dstOffset, dstOffset, sw, sh);
+        g_waitDMA = true;
+    }
 }
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -311,12 +322,12 @@ void setBufferPointer(void *buffer) {
     g_buffer = (uint16_t *)buffer;
 }
 
-static void setAddress(void *buffer) {
+static inline void setAddress(void *buffer) {
     // Configure the color frame buffer start address
-	auto layer = (LTDC_Layer_TypeDef *)((uint32_t)hltdc.Instance + 0x84U);
-	layer->CFBAR = (uint32_t)buffer;
+    auto layer = (LTDC_Layer_TypeDef *)((uint32_t)hltdc.Instance + 0x84U);
+    layer->CFBAR = (uint32_t)buffer;
     // Set the Immediate Reload type
-	hltdc.Instance->SRCR = LTDC_SRCR_IMR;
+    hltdc.Instance->SRCR = LTDC_SRCR_IMR;
 }
 
 void turnOn() {
@@ -328,15 +339,17 @@ void turnOn() {
         g_bufferNew = (uint16_t *)VRAM_BUFFER1_START_ADDRESS;
         g_buffer = g_bufferNew;
 
-		g_buffers[0].bufferPointer = (uint16_t *)(VRAM_AUX_BUFFER1_START_ADDRESS);
-		g_buffers[1].bufferPointer = (uint16_t *)(VRAM_AUX_BUFFER2_START_ADDRESS);
-		g_buffers[2].bufferPointer = (uint16_t *)(VRAM_AUX_BUFFER3_START_ADDRESS);
-		g_buffers[3].bufferPointer = (uint16_t *)(VRAM_AUX_BUFFER4_START_ADDRESS);
-		g_buffers[4].bufferPointer = (uint16_t *)(VRAM_AUX_BUFFER5_START_ADDRESS);
-		g_buffers[5].bufferPointer = (uint16_t *)(VRAM_AUX_BUFFER6_START_ADDRESS);
+        g_buffers[0].bufferPointer = (uint16_t *)(VRAM_AUX_BUFFER1_START_ADDRESS);
+        g_buffers[1].bufferPointer = (uint16_t *)(VRAM_AUX_BUFFER2_START_ADDRESS);
+        g_buffers[2].bufferPointer = (uint16_t *)(VRAM_AUX_BUFFER3_START_ADDRESS);
+        g_buffers[3].bufferPointer = (uint16_t *)(VRAM_AUX_BUFFER4_START_ADDRESS);
+        g_buffers[4].bufferPointer = (uint16_t *)(VRAM_AUX_BUFFER5_START_ADDRESS);
+        g_buffers[5].bufferPointer = (uint16_t *)(VRAM_AUX_BUFFER6_START_ADDRESS);
 
         fillRect(g_bufferOld, 0, 0, DISPLAY_WIDTH, DISPLAY_HEIGHT, 0);
         fillRect(g_bufferNew, 0, 0, DISPLAY_WIDTH, DISPLAY_HEIGHT, 0);
+
+        DMA2D_WAIT;
 
         // set video RAM address
         setAddress(g_buffer);
@@ -358,31 +371,33 @@ bool isOn() {
 ////////////////////////////////////////////////////////////////////////////////
 
 void animate() {
-	float t = (millis() - g_animationState.startTime) / (1000.0f * g_animationState.duration);
-	if (t < 1.0f) {
-		g_animationBuffer = g_animationBuffer == (uint16_t *)VRAM_ANIMATION_BUFFER1_START_ADDRESS
-						 ? (uint16_t *)VRAM_ANIMATION_BUFFER2_START_ADDRESS
-						 : (uint16_t *)VRAM_ANIMATION_BUFFER1_START_ADDRESS;
+    float t = (millis() - g_animationState.startTime) / (1000.0f * g_animationState.duration);
+    if (t < 1.0f) {
+        g_animationBuffer = g_animationBuffer == (uint16_t *)VRAM_ANIMATION_BUFFER1_START_ADDRESS
+                         ? (uint16_t *)VRAM_ANIMATION_BUFFER2_START_ADDRESS
+                         : (uint16_t *)VRAM_ANIMATION_BUFFER1_START_ADDRESS;
 
-		g_animationState.callback(t, g_bufferOld, g_buffer, g_animationBuffer);
+        g_animationState.callback(t, g_bufferOld, g_buffer, g_animationBuffer);
 
-		DMA2D_WAIT;
+        DMA2D_WAIT;
 
-		// wait for VSYNC
-		while (!(LTDC->CDSR & LTDC_CDSR_VSYNCS)) {
-			//osDelay(0);
-		}
+        // wait for VSYNC
+        while (!(LTDC->CDSR & LTDC_CDSR_VSYNCS)) {
+            //osDelay(0);
+        }
 
-		setAddress(g_animationBuffer);
-	} else {
-		g_animationState.enabled = false;
-	}
+        setAddress(g_animationBuffer);
+    } else {
+        g_animationState.enabled = false;
+    }
 }
 
 void swapBuffers() {
+    DMA2D_WAIT;
+
     // wait for VSYNC
     while (!(LTDC->CDSR & LTDC_CDSR_VSYNCS)) {
-    	//osDelay(0);
+        //osDelay(0);
     }
 
     setAddress(g_buffer);
@@ -400,15 +415,13 @@ void sync() {
     }
 
     if (g_displayState == TURNING_OFF) {
-    	turnOffTickHook();
+        turnOffTickHook();
         return;
     }
 
     if (g_displayState == TURNING_ON) {
-    	turnOnTickHook();
+        turnOnTickHook();
     }
-
-    DMA2D_WAIT;
 
     if (g_animationState.enabled) {
         animate();
@@ -427,9 +440,9 @@ void sync() {
     }
 
     if (g_takeScreenshot) {
-    	bitBltRGB888(g_bufferOld, SCREENSHOOT_BUFFER_START_ADDRESS, 0, 0, DISPLAY_WIDTH, DISPLAY_HEIGHT);
+        bitBltRGB888(g_bufferOld, SCREENSHOOT_BUFFER_START_ADDRESS, 0, 0, DISPLAY_WIDTH, DISPLAY_HEIGHT);
         DMA2D_WAIT;
-    	g_takeScreenshot = false;
+        g_takeScreenshot = false;
     }
 }
 
@@ -452,12 +465,12 @@ int getDisplayHeight() {
 ////////////////////////////////////////////////////////////////////////////////
 
 const uint8_t *takeScreenshot() {
-	g_takeScreenshot = true;
-	do {
-		osDelay(0);
-	} while (g_takeScreenshot);
+    g_takeScreenshot = true;
+    do {
+        osDelay(0);
+    } while (g_takeScreenshot);
 
-	return SCREENSHOOT_BUFFER_START_ADDRESS;
+    return SCREENSHOOT_BUFFER_START_ADDRESS;
 }
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -474,11 +487,11 @@ void drawPixel(int x, int y, uint8_t opacity) {
 
     auto dest = g_buffer + y * DISPLAY_WIDTH + x;
     *dest = color32to16(
-		blendColor(
-			color16to32(g_fc, opacity),
-			color16to32(*dest, 255 - opacity)
-		)
-	);
+        blendColor(
+            color16to32(g_fc, opacity),
+            color16to32(*dest, 255 - opacity)
+        )
+    );
 
     setDirty();
 }
@@ -538,7 +551,7 @@ void drawStrInit() {
     HAL_DMA2D_Init(&hdma2d);
     HAL_DMA2D_ConfigLayer(&hdma2d, 0);
     HAL_DMA2D_ConfigLayer(&hdma2d, 1);
-
+    g_waitDMA = true;
 }
 
 void drawGlyph(const uint8_t *src, uint32_t srcLineOffset, int x, int y, int width, int height) {
@@ -553,6 +566,7 @@ void drawGlyph(const uint8_t *src, uint32_t srcLineOffset, int x, int y, int wid
     WRITE_REG(hdma2d.Instance->FGOR, srcLineOffset);
 
     HAL_DMA2D_BlendingStart(&hdma2d, (uint32_t)src, dst, dst, width, height);
+    g_waitDMA = true;
 }
 
 } // namespace display

@@ -1,7 +1,7 @@
 {
   "settings": {
     "general": {
-      "projectVersion": "v2",
+      "projectVersion": "v3",
       "projectType": "firmware-module",
       "namespace": "dib_mux14d",
       "imports": [
@@ -3866,7 +3866,7 @@
                   "customOutputs": [],
                   "style": {
                     "inheritFrom": "default",
-                    "color": "status_line_background"
+                    "backgroundColor": "status_line_background"
                   }
                 },
                 {
@@ -4210,8 +4210,7 @@
           "customOutputs": [],
           "style": {
             "inheritFrom": "labels_and_colors_slot"
-          },
-          "invertColors": true
+          }
         },
         {
           "type": "Rectangle",
@@ -4224,8 +4223,7 @@
           "customOutputs": [],
           "style": {
             "inheritFrom": "labels_and_colors_slot"
-          },
-          "invertColors": true
+          }
         },
         {
           "type": "Rectangle",
@@ -4238,8 +4236,7 @@
           "customOutputs": [],
           "style": {
             "inheritFrom": "labels_and_colors_slot"
-          },
-          "invertColors": true
+          }
         }
       ],
       "connectionLines": [],
@@ -5169,7 +5166,7 @@
                   "customOutputs": [],
                   "style": {
                     "inheritFrom": "default",
-                    "color": "status_line_background"
+                    "backgroundColor": "status_line_background"
                   }
                 },
                 {

@@ -123,13 +123,40 @@ bool WidgetCursor::isPage() const {
     return widget->type == WIDGET_TYPE_CONTAINER && ((((ContainerWidget *)widget)->flags & PAGE_CONTAINER) != 0);
 }
 
-void WidgetCursor::pushBackground(const Style *style, bool active, bool repainted) {
-    if (backgroundStyleStackPointer < BACKGROUND_STYLE_STACK_SIZE) {
-        backgroundStyleStack[backgroundStyleStackPointer].style = style;
-        backgroundStyleStack[backgroundStyleStackPointer].active = active;
-        backgroundStyleStack[backgroundStyleStackPointer].repainted = repainted;
-        backgroundStyleStackPointer++;
+void WidgetCursor::pushBackground(int x, int y, const Style *style, bool active) {
+    auto color = active ? style->activeBackgroundColor : style->backgroundColor;
+    if (color != TRANSPARENT_COLOR_INDEX) {
+        // non-transparent color
+        resetBackgrounds();
+    } else if (style->backgroundImage) {
+        auto bitmap = getBitmap(style->backgroundImage);
+        if (bitmap) {
+            if (bitmap->bpp != 32) {
+                // non-transparent bitmap
+                resetBackgrounds();
+            }
+        } else {
+            // transparent color and "no" background image
+            return;
+        }
+    } else {
+        // transparent color and no background image
+        return;
     }
+
+    if (backgroundStyleStackPointer == BACKGROUND_STYLE_STACK_SIZE) {
+        // make space: remove item at the bottom of stack
+        for (size_t i = 1; i < BACKGROUND_STYLE_STACK_SIZE; i++) {
+            backgroundStyleStack[i - 1] = backgroundStyleStack[i];
+        }
+        backgroundStyleStackPointer--;
+    }
+
+    backgroundStyleStack[backgroundStyleStackPointer].x = x;
+    backgroundStyleStack[backgroundStyleStackPointer].y = y;
+    backgroundStyleStack[backgroundStyleStackPointer].style = style;
+    backgroundStyleStack[backgroundStyleStackPointer].active = active;
+    backgroundStyleStackPointer++;
 }
 
 void WidgetCursor::popBackground() {

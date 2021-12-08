@@ -75,6 +75,7 @@ void updateScreen() {
 	g_widgetCursor.appContext = &getRootAppContext();
 	g_widgetCursor.widget = g_rootWidget;
 	g_widgetCursor.currentState = g_widgetStateStart;
+	g_widgetCursor.refreshed = !hasPreviousState;
 	g_widgetCursor.hasPreviousState = hasPreviousState;
 	g_widgetCursor.forceRefresh = false;
 
@@ -98,6 +99,7 @@ void enumRootWidget() {
 	g_widgetCursor.appContext = &getRootAppContext();
 	g_widgetCursor.widget = g_rootWidget;
 	g_widgetCursor.currentState = g_widgetStateStart;
+	g_widgetCursor.refreshed = false;
 	g_widgetCursor.hasPreviousState = true;
 
     enumWidget();

@@ -1376,7 +1376,7 @@ void SysSettingsRampAndDelayPage::draw(const WidgetCursor &widgetCursor) {
 
     const Widget *widget = widgetCursor.widget;
     const Style* style = getStyle(widget->style);
-    drawRectangle(widgetCursor.x, widgetCursor.y, (int)widget->w, (int)widget->h, style, false, false, true);
+    drawRectangle(widgetCursor.x, widgetCursor.y, (int)widget->w, (int)widget->h, style);
 
     float drawVoltageRamps = (g_focusDataId != DATA_ID_CHANNEL_I_TRIGGER_VALUE && g_focusDataId != DATA_ID_CHANNEL_CURRENT_RAMP_DURATION);
     float T = 1E-3f;

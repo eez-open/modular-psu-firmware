@@ -42,8 +42,8 @@ void RectangleWidgetState::render() {
         widgetCursor.x, widgetCursor.y, (int)widget->w, (int)widget->h,
         style, 
         flags.active, 
-        widget->flags.ignoreLuminosity,
-        widget->flags.invertColors);
+        widget->flags.ignoreLuminosity
+    );
 }
 
 } // namespace gui

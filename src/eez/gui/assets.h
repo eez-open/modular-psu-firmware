@@ -129,28 +129,38 @@ struct PageAsset : public Widget {
 
 struct Style {
     uint16_t flags; // STYLE_FLAGS_...
-    uint16_t background_color;
+
+    uint16_t backgroundColor;
     uint16_t color;
-    uint16_t active_background_color;
-    uint16_t active_color;
-    uint16_t focus_background_color;
-    uint16_t focus_color;
-    uint8_t border_size_top;
-    uint8_t border_size_right;
-    uint8_t border_size_bottom;
-    uint8_t border_size_left;
-    uint16_t border_radius;
-    uint16_t border_color;
+
+    uint16_t activeBackgroundColor;
+    uint16_t activeColor;
+
+    uint16_t focusBackgroundColor;
+    uint16_t focusColor;
+
+    uint8_t borderSizeTop;
+    uint8_t borderSizeRight;
+    uint8_t borderSizeBottom;
+    uint8_t borderSizeLeft;
+
+    uint16_t borderRadius;
+    uint16_t borderColor;
+
     uint8_t font;
     uint8_t opacity; // 0 - 255
-    uint8_t padding_top;
-    uint8_t padding_right;
-    uint8_t padding_bottom;
-    uint8_t padding_left;
-    uint8_t margin_top;
-    uint8_t margin_right;
-    uint8_t margin_bottom;
-    uint8_t margin_left;
+
+    uint8_t paddingTop;
+    uint8_t paddingRight;
+    uint8_t paddingBottom;
+    uint8_t paddingLeft;
+
+    uint8_t marginTop;
+    uint8_t marginRight;
+    uint8_t marginBottom;
+    uint8_t marginLeft;
+
+	int16_t backgroundImage;
 };
 
 ////////////////////////////////////////////////////////////////////////////////

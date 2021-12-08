@@ -132,14 +132,14 @@ void GaugeWidgetState::render() {
 	auto isActive = flags.active;
 
 	// auto colorBackground = getColor16FromIndex(style->background_color);
-	auto colorBorder = getColor16FromIndex(isActive ? style->active_color : style->color);
-	auto colorBar = getColor16FromIndex(isActive ? barStyle->active_color : barStyle->color);
+	auto colorBorder = getColor16FromIndex(isActive ? style->activeColor : style->color);
+	auto colorBar = getColor16FromIndex(isActive ? barStyle->activeColor : barStyle->color);
 
 	auto xCenter = widget->w / 2;
 	auto yCenter = widget->h - 8;
 
 	// clear background
-	setColor(isActive ? style->active_background_color : style->background_color);
+	setColor(isActive ? style->activeBackgroundColor : style->backgroundColor);
 	fillRect(widgetCursor.x, widgetCursor.y, widgetCursor.x + widget->w - 1, widgetCursor.y + widget->h - 1, 0);
 
 	// init AGG
@@ -151,16 +151,16 @@ void GaugeWidgetState::render() {
 	graphics.translate(widgetCursor.x, widgetCursor.y);
 
 	// draw frame
-	if (style->border_size_left > 0) {
-		graphics.lineWidth(style->border_size_left);
+	if (style->borderSizeLeft > 0) {
+		graphics.lineWidth(style->borderSizeLeft);
 		graphics.lineColor(COLOR_TO_R(colorBorder), COLOR_TO_G(colorBorder), COLOR_TO_B(colorBorder));
 		graphics.noFill();
 		graphics.roundedRect(
-			style->border_size_left / 2.0,
-			style->border_size_left / 2.0,
-			widget->w - style->border_size_left,
-			widget->h - style->border_size_left,
-			style->border_radius
+			style->borderSizeLeft / 2.0,
+			style->borderSizeLeft / 2.0,
+			widget->w - style->borderSizeLeft,
+			widget->h - style->borderSizeLeft,
+			style->borderRadius
 		);
 	}
 
@@ -208,7 +208,7 @@ void GaugeWidgetState::render() {
 
 		graphics.resetPath();
 		graphics.noFill();
-		auto thresholdColor = getColor16FromIndex(isActive ? thresholdStyle->active_color : thresholdStyle->color);
+		auto thresholdColor = getColor16FromIndex(isActive ? thresholdStyle->activeColor : thresholdStyle->color);
 		graphics.lineColor(COLOR_TO_R(thresholdColor), COLOR_TO_G(thresholdColor), COLOR_TO_B(thresholdColor));
 		graphics.lineWidth(THRESHOLD_LINE_WIDTH);
 		graphics.moveTo(x1, y1);
@@ -233,7 +233,7 @@ void GaugeWidgetState::render() {
 
 			graphics.resetPath();
 			graphics.noFill();
-			auto tickColor = getColor16FromIndex(isActive ? ticksStyle->active_color : ticksStyle->color);
+			auto tickColor = getColor16FromIndex(isActive ? ticksStyle->activeColor : ticksStyle->color);
 			graphics.lineColor(COLOR_TO_R(tickColor), COLOR_TO_G(tickColor), COLOR_TO_B(tickColor));
 			graphics.lineWidth(TICK_LINE_WIDTH);
 			graphics.moveTo(x1, y1);

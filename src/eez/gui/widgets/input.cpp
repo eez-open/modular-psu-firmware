@@ -179,10 +179,10 @@ void InputWidgetState::render() {
 
 	const Style *style = getStyle(overrideStyleHook(widgetCursor, widget->style));
 
-	uint16_t overrideColor                 = flags.focused ? style->focus_color            : overrideStyleColorHook(widgetCursor, style);
-	uint16_t overrideBackgroundColor       = flags.focused ? style->focus_background_color : style->background_color;
-	uint16_t overrideActiveColor           = flags.focused ? style->focus_background_color : overrideActiveStyleColorHook(widgetCursor, style);
-	uint16_t overrideActiveBackgroundColor = flags.focused ? style->focus_color            : style->active_background_color;
+	uint16_t overrideColor                 = flags.focused ? style->focusColor           : overrideStyleColorHook(widgetCursor, style);
+	uint16_t overrideBackgroundColor       = flags.focused ? style->focusBackgroundColor : style->backgroundColor;
+	uint16_t overrideActiveColor           = flags.focused ? style->focusBackgroundColor : overrideActiveStyleColorHook(widgetCursor, style);
+	uint16_t overrideActiveBackgroundColor = flags.focused ? style->focusColor           : style->activeBackgroundColor;
 
 	char text[MAX_TEXT_LEN + 1];
 	data.toText(text, sizeof(text));

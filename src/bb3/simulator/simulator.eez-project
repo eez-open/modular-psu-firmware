@@ -1,7 +1,7 @@
 {
   "settings": {
     "general": {
-      "projectVersion": "v2",
+      "projectVersion": "v3",
       "projectType": "firmware-module",
       "namespace": "",
       "imports": [
@@ -293,12 +293,11 @@
           "action": "user_switch_clicked",
           "style": {
             "inheritFrom": "default",
-            "color": "#c0c0c0",
-            "backgroundColor": "#808080",
-            "activeColor": "#808080",
-            "activeBackgroundColor": "#c0c0c0"
-          },
-          "invertColors": false
+            "color": "#808080",
+            "backgroundColor": "#c0c0c0",
+            "activeColor": "#c0c0c0",
+            "activeBackgroundColor": "#808080"
+          }
         },
         {
           "type": "AppView",
@@ -346,8 +345,7 @@
             "backgroundColor": "#ffffff",
             "activeColor": "#ffffff",
             "activeBackgroundColor": "#ffffff"
-          },
-          "invertColors": false
+          }
         }
       ],
       "connectionLines": [],
@@ -374,7 +372,7 @@
           "customOutputs": [],
           "style": {
             "inheritFrom": "default",
-            "color": "#62563e",
+            "backgroundColor": "#62563e",
             "activeBackgroundColor": "#62563e"
           }
         },
@@ -797,7 +795,7 @@
           "customOutputs": [],
           "style": {
             "inheritFrom": "bottom_button_background",
-            "color": "#f2f0ec",
+            "backgroundColor": "#f2f0ec",
             "activeBackgroundColor": "#f2f0ec"
           }
         },

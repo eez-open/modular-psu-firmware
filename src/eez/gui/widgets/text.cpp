@@ -33,8 +33,8 @@ namespace gui {
 void TextWidget_autoSize(Assets *assets, TextWidget& widget) {
     const Style *style = getStyle(widget.style);
     font::Font font = styleGetFont(style);
-    widget.w = style->border_size_left + style->padding_left + display::measureStr(widget.text.ptr(assets), -1, font, 0) + style->border_size_right + style->padding_right;
-    widget.h = style->border_size_top + style->padding_top + font.getHeight() + style->border_size_bottom + style->padding_bottom;
+    widget.w = style->borderSizeLeft + style->paddingLeft + display::measureStr(widget.text.ptr(assets), -1, font, 0) + style->borderSizeRight + style->paddingRight;
+    widget.h = style->borderSizeTop + style->paddingTop + font.getHeight() + style->borderSizeBottom + style->paddingBottom;
 }
 
 bool TextWidgetState::updateState() {
@@ -62,10 +62,10 @@ void TextWidgetState::render() {
     const Style *style = getStyle(overrideStyleHook(widgetCursor, widget->style));
     const char *text = widget->text.ptr(widgetCursor.assets);
 
-    uint16_t overrideColor                 = flags.focused ? style->focus_color            : overrideStyleColorHook(widgetCursor, style);
-    uint16_t overrideBackgroundColor       = flags.focused ? style->focus_background_color : style->background_color;
-    uint16_t overrideActiveColor           = flags.focused ? style->focus_background_color : overrideActiveStyleColorHook(widgetCursor, style);
-    uint16_t overrideActiveBackgroundColor = flags.focused ? style->focus_color            : style->active_background_color;
+    uint16_t overrideColor                 = flags.focused ? style->focusColor           : overrideStyleColorHook(widgetCursor, style);
+    uint16_t overrideBackgroundColor       = flags.focused ? style->focusBackgroundColor : style->backgroundColor;
+    uint16_t overrideActiveColor           = flags.focused ? style->focusBackgroundColor : overrideActiveStyleColorHook(widgetCursor, style);
+    uint16_t overrideActiveBackgroundColor = flags.focused ? style->focusColor           : style->activeBackgroundColor;
 
     bool ignoreLuminosity = (widget->flags & IGNORE_LUMINOSITY_FLAG) != 0;
     if (text && text[0]) {

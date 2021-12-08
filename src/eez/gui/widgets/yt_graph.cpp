@@ -375,7 +375,7 @@ struct YTGraphStaticDrawHelper {
             }
 
             if (!transparent) {
-                display::setColor(labelStyle->background_color, false);
+                display::setColor(labelStyle->backgroundColor, false);
                 display::fillRect(xLabel, yLabels[m_valueIndex], xLabel + labelWidth - 1, yLabels[m_valueIndex] + font.getHeight() - 1);
             }
 
@@ -387,7 +387,7 @@ struct YTGraphStaticDrawHelper {
     void drawStatic(uint32_t previousHistoryValuePosition, uint32_t currentHistoryValuePosition, uint32_t numPositions_, uint16_t graphWidth, bool showLabels, int selectedValueIndex) {
         // draw background
         const Style* style = getStyle(widget->style);
-        display::setColor(style->background_color);
+        display::setColor(style->backgroundColor);
         display::fillRect(widgetCursor.x, widgetCursor.y, widgetCursor.x + (int)widget->w - 1, widgetCursor.y + (int)widget->h - 1);
 
         numPositions = numPositions_;
@@ -399,7 +399,7 @@ struct YTGraphStaticDrawHelper {
         int vertDivisions = ytDataGetVertDivisions(widgetCursor, widget->data);
 
         // draw grid
-        display::setColor(style->border_color);
+        display::setColor(style->borderColor);
         for (int x = 1; x < horzDivisions; x++) {
             display::drawVLine(widgetCursor.x + x * widget->w / horzDivisions, widgetCursor.y, widget->h - 1);
         }
@@ -496,7 +496,7 @@ bool YTGraphWidgetState::updateState() {
 
 	auto new_historyValuePosition = ytDataGetPosition(widgetCursor, widget->data);
 
-    if (hasPreviousState) {
+    if (false && hasPreviousState) {
     	previousHistoryValuePosition = historyValuePosition;
     } else {
         uint16_t graphWidth = (uint16_t)widget->w;
@@ -537,12 +537,12 @@ void YTGraphWidgetState::render() {
         const Style* style = getStyle(widget->style);
 
         if (refreshBackground) {
-            display::setColor(style->background_color);
+            display::setColor(style->backgroundColor);
             display::fillRect(widgetCursor.x, widgetCursor.y, widgetCursor.x + (int)widget->w - 1, widgetCursor.y + (int)widget->h - 1);
         }
 
         YTGraphDrawHelper drawHelper(widgetCursor);
-        drawHelper.color16 = display::getColor16FromIndex(flags.active ? style->color : style->background_color);
+        drawHelper.color16 = display::getColor16FromIndex(flags.active ? style->color : style->backgroundColor);
         if (ytGraphUpdateMethod == YT_GRAPH_UPDATE_METHOD_SCAN_LINE) {
             drawHelper.drawScanLine(previousHistoryValuePosition, historyValuePosition, graphWidth);
 
@@ -557,7 +557,7 @@ void YTGraphWidgetState::render() {
             int x1 = x + (historyValuePosition + 2) % graphWidth;
             int x2 = x + (historyValuePosition + CONF_GUI_YT_GRAPH_BLANK_PIXELS_AFTER_CURSOR) % graphWidth;
 
-            display::setColor(style->background_color);
+            display::setColor(style->backgroundColor);
             if (x1 < x2) {
                 display::fillRect(x1, widgetCursor.y, x2, widgetCursor.y + (int)widget->h - 1);
             } else {

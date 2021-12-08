@@ -28,7 +28,7 @@ namespace gui {
 void drawButtons(const Widget *widget, int x, int y, const Style *style, const Style *selectedStyle, int selectedButton, int count) {
     if (widget->w > widget->h) {
         // horizontal orientation
-        display::setColor(style->background_color);
+        display::setColor(style->backgroundColor);
         display::fillRect(x, y, x + widget->w - 1, y + widget->h - 1);
 
         int w = widget->w / count;
@@ -51,7 +51,7 @@ void drawButtons(const Widget *widget, int x, int y, const Style *style, const S
         int topPadding = (widget->h - h * count) / 2;
 
         if (topPadding > 0) {
-            display::setColor(style->background_color);
+            display::setColor(style->backgroundColor);
             display::fillRect(x, y, x + widget->w - 1, y + topPadding - 1);
 
             y += topPadding;
@@ -64,7 +64,7 @@ void drawButtons(const Widget *widget, int x, int y, const Style *style, const S
 		
 		for (Cursor i = 0; i < count; i++) {
             if (yOffset > 0) {
-                display::setColor(style->background_color);
+                display::setColor(style->backgroundColor);
                 display::fillRect(x, y, x + widget->w - 1, y + yOffset - 1);
             }
 
@@ -78,13 +78,13 @@ void drawButtons(const Widget *widget, int x, int y, const Style *style, const S
             y += h;
 
             if (b < y) {
-                display::setColor(style->background_color);
+                display::setColor(style->backgroundColor);
                 display::fillRect(x, b, x + widget->w - 1, y - 1);
             }
         }
 
         if (y <= bottom) {
-            display::setColor(style->background_color);
+            display::setColor(style->backgroundColor);
             display::fillRect(x, y, x + widget->w - 1, bottom);
         }
     }

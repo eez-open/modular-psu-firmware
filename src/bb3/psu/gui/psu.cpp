@@ -144,6 +144,10 @@ PsuAppContext::PsuAppContext() {
 }
 
 void PsuAppContext::stateManagment() {
+    if (m_pageIdToSetOnNextIter == PAGE_ID_WELCOME) {
+        playPowerUp(sound::PLAY_POWER_UP_CONDITION_WELCOME_PAGE_IS_ACTIVE);
+    } 
+
     if (m_popProgressPage) {
         doHideProgressPage();
     }
@@ -2440,7 +2444,7 @@ uint16_t overrideActiveStyleColorHook(const WidgetCursor &widgetCursor, const St
             ? recording.selectedValueIndex : psu::dlog_view::getDlogValueIndex(recording, widgetCursor.cursor);
         style = ytDataGetStyle(widgetCursor, DATA_ID_RECORDING, dlogValueIndex);
     }
-    return style->active_color;
+    return style->activeColor;
 }
 
 uint16_t transformColorHook(uint16_t color) {

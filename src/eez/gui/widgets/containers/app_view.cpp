@@ -50,6 +50,10 @@ void AppViewWidgetState::enumChildren() {
     widgetCursor.appContext = appContext;
 
     if (appContext->getActivePageId() != PAGE_ID_NONE) {
+		if (g_findCallback == nullptr) {
+			widgetCursor.resetBackgrounds();
+		}
+
         for (int i = 0; i <= appContext->m_pageNavigationStackPointer; i++) {
 			if (!appContext->isPageFullyCovered(i)) {
 				appContext->updatePage(i, widgetCursor);

@@ -61,7 +61,7 @@ void ContainerWidgetState::render() {
 
 	drawRectangle(
 		widgetCursor.x, widgetCursor.y, (int)widget->w, (int)widget->h,
-		getStyle(widget->style), flags.active, false, true
+		getStyle(widget->style), flags.active
 	);
 	
 	repainted = true;
@@ -71,8 +71,11 @@ void ContainerWidgetState::enumChildren() {
     WidgetCursor &widgetCursor = g_widgetCursor;
 
 	auto widget = (const ContainerWidget *)widgetCursor.widget;
-	const Style* style = getStyle(widget->style);
-	widgetCursor.pushBackground(style, flags.active, repainted);
+
+	if (g_findCallback == nullptr) {
+		const Style* style = getStyle(widget->style);
+		widgetCursor.pushBackground(widgetCursor.x, widgetCursor.y, style, flags.active);
+	}
 
 	auto savedForceRefresh = widgetCursor.forceRefresh;
 	if (repainted) {
@@ -85,7 +88,9 @@ void ContainerWidgetState::enumChildren() {
 
 		widgetCursor.forceRefresh = savedForceRefresh;
 
-		widgetCursor.popBackground();
+		if (g_findCallback == nullptr) {
+			widgetCursor.popBackground();
+		}
         return;
     }
 
@@ -104,7 +109,9 @@ void ContainerWidgetState::enumChildren() {
 
 	widgetCursor.forceRefresh = savedForceRefresh;
 
-	widgetCursor.popBackground();
+	if (g_findCallback == nullptr) {
+		widgetCursor.popBackground();
+	}
 }
 
 void ContainerWidgetState::renderOverlayChildren() {

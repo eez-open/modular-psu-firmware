@@ -146,7 +146,7 @@ void ToastMessagePage::onEncoderClicked() {
 void ToastMessagePage::updateInternalPage() {
     const WidgetCursor &widgetCursor = g_widgetCursor;
 
-	WidgetCursor toastPageWidgetCursor(widgetCursor.assets, appContext, &actionWidget, actionWidget.x, actionWidget.y, widgetCursor.currentState, widgetCursor.hasPreviousState);
+	WidgetCursor toastPageWidgetCursor(widgetCursor.assets, appContext, &actionWidget, actionWidget.x, actionWidget.y, widgetCursor.currentState, widgetCursor.refreshed, widgetCursor.hasPreviousState);
 
     auto temp = toastPageWidgetCursor == g_activeWidget;
     if (widgetCursor.hasPreviousState && actionWidgetIsActive == temp && !dirty) {
@@ -194,21 +194,21 @@ void ToastMessagePage::updateInternalPage() {
     int textWidth1 = display::measureStr(message1, message1Len, font, 0);
     int textWidth2 = message2 ? display::measureStr(message2, message2Len, font, 0) : 0;
     int textWidth3 = message3 ? display::measureStr(message3, message3Len, font, 0) : 0;
-    int actionLabelWidth = actionLabel ? (actionStyle->padding_left + display::measureStr(actionLabel, -1, font, 0) + actionStyle->padding_right) : 0;
+    int actionLabelWidth = actionLabel ? (actionStyle->paddingLeft + display::measureStr(actionLabel, -1, font, 0) + actionStyle->paddingRight) : 0;
 
     int textWidth = MAX(MAX(MAX(MAX(minTextWidth, textWidth1), textWidth2), textWidth3), actionLabelWidth);
   
     int textHeight = font.getHeight();
 
-    width = style->border_size_left + style->padding_left +
+    width = style->borderSizeLeft + style->paddingLeft +
         textWidth +
-        style->padding_right + style->border_size_right;
+        style->paddingRight + style->borderSizeRight;
 
     int numLines = (message3 ? 3 : message2 ? 2 : 1);
 
-    height = style->border_size_top + style->padding_top +
-        numLines * textHeight + (actionLabel ? (style->padding_top + textHeight) : 0) +
-        style->padding_bottom + style->border_size_bottom;
+    height = style->borderSizeTop + style->paddingTop +
+        numLines * textHeight + (actionLabel ? (style->paddingTop + textHeight) : 0) +
+        style->paddingBottom + style->borderSizeBottom;
 
 	x = appContext->rect.x + (appContext->rect.w - width) / 2;
 	y = appContext->rect.y + (appContext->rect.h - height) / 2;
@@ -218,15 +218,15 @@ void ToastMessagePage::updateInternalPage() {
     int x2 = x + width - 1;
     int y2 = y + height - 1;
 
-    drawBorderAndBackground(x1, y1, x2, y2, style, style->background_color);
+    drawBorderAndBackground(x1, y1, x2, y2, style, style->backgroundColor);
 
     // draw text message
     display::setColor(style->color);
 
-    int yText = y1 + style->padding_top;
+    int yText = y1 + style->paddingTop;
 
     display::drawStr(message1, message1Len, 
-        x1 + style->padding_left + (textWidth - textWidth1) / 2, 
+        x1 + style->paddingLeft + (textWidth - textWidth1) / 2, 
         yText, 
         x1, y1, x2, y2, font, -1);
 
@@ -234,7 +234,7 @@ void ToastMessagePage::updateInternalPage() {
 
     if (message2) {
         display::drawStr(message2, message2Len,
-            x1 + style->padding_left + (textWidth - textWidth2) / 2,
+            x1 + style->paddingLeft + (textWidth - textWidth2) / 2,
             yText,
             x1, y1, x2, y2, font, -1);
 
@@ -243,7 +243,7 @@ void ToastMessagePage::updateInternalPage() {
 
     if (message3) {
         display::drawStr(message3, message3Len, 
-            x1 + style->padding_left + (textWidth - textWidth2) / 2, 
+            x1 + style->paddingLeft + (textWidth - textWidth2) / 2, 
             yText, 
             x1, y1, x2, y2, font, -1);
 
@@ -251,8 +251,8 @@ void ToastMessagePage::updateInternalPage() {
     }
 
     if (actionLabel) {
-        actionWidget.x = x1 + style->padding_left + (textWidth - actionLabelWidth) / 2;
-        actionWidget.y = yText + style->padding_top;
+        actionWidget.x = x1 + style->paddingLeft + (textWidth - actionLabelWidth) / 2;
+        actionWidget.y = yText + style->paddingTop;
         actionWidget.w = actionLabelWidth;
         actionWidget.h = textHeight;
         
@@ -267,14 +267,14 @@ void ToastMessagePage::updateInternalPage() {
                 0);
 
             display::setBackColor(actionStyle->color);
-            display::setColor(actionStyle->background_color);
+            display::setColor(actionStyle->backgroundColor);
         } else {
-            display::setBackColor(actionStyle->background_color);
+            display::setBackColor(actionStyle->backgroundColor);
             display::setColor(actionStyle->color);
         }
 
         display::drawStr(actionLabel, -1,
-            actionWidget.x + actionStyle->padding_left, actionWidget.y,
+            actionWidget.x + actionStyle->paddingLeft, actionWidget.y,
             x1, y1, x2, y2, font, -1);
     }
 }
@@ -293,10 +293,10 @@ WidgetCursor ToastMessagePage::findWidgetInternalPage(int x, int y, bool clicked
             y >= (actionWidget.y - textHeight / 4) &&
             y < (actionWidget.y + actionWidget.h - 1 + textHeight / 4)
         ) {
-            return WidgetCursor(g_mainAssets, appContext, &actionWidget, actionWidget.x, actionWidget.y, widgetCursor.currentState, widgetCursor.hasPreviousState);
+            return WidgetCursor(g_mainAssets, appContext, &actionWidget, actionWidget.x, actionWidget.y, widgetCursor.currentState, widgetCursor.refreshed, widgetCursor.hasPreviousState);
         }
         widget.action = ACTION_ID_INTERNAL_DIALOG_CLOSE;
-        return WidgetCursor(g_mainAssets, appContext, &widget, x, y, widgetCursor.currentState, widgetCursor.hasPreviousState);
+        return WidgetCursor(g_mainAssets, appContext, &widget, x, y, widgetCursor.currentState, widgetCursor.refreshed, widgetCursor.hasPreviousState);
     }
     
     return WidgetCursor();
@@ -429,7 +429,7 @@ bool SelectFromEnumPage::calcSize() {
     font::Font font = styleGetFont(itemStyle);
 
     // calculate geometry
-    itemHeight = itemStyle->padding_top + font.getHeight() + itemStyle->padding_bottom;
+    itemHeight = itemStyle->paddingTop + font.getHeight() + itemStyle->paddingBottom;
     itemWidth = 0;
 
     char text[64];
@@ -447,14 +447,14 @@ bool SelectFromEnumPage::calcSize() {
         }
     }
 
-    itemWidth = itemStyle->padding_left + itemWidth + itemStyle->padding_right;
+    itemWidth = itemStyle->paddingLeft + itemWidth + itemStyle->paddingRight;
 
-    width = containerStyle->padding_left + (numColumns == 2 ? itemWidth + containerStyle->padding_left + itemWidth : itemWidth) + containerStyle->padding_right;
+    width = containerStyle->paddingLeft + (numColumns == 2 ? itemWidth + containerStyle->paddingLeft + itemWidth : itemWidth) + containerStyle->paddingRight;
     if (width > appContext->rect.w) {
         width = appContext->rect.w;
     }
 
-    height = containerStyle->padding_top + (numColumns == 2 ? (numItems + 1) / 2 : numItems) * itemHeight + containerStyle->padding_bottom;
+    height = containerStyle->paddingTop + (numColumns == 2 ? (numItems + 1) / 2 : numItems) * itemHeight + containerStyle->paddingBottom;
     if (height > appContext->rect.h) {
         if (numColumns == 1) {
             return false;
@@ -499,7 +499,7 @@ void SelectFromEnumPage::updateInternalPage() {
 	const Style *disabledItemStyle = getStyle(smallFont ? STYLE_ID_SELECT_ENUM_ITEM_POPUP_DISABLED_ITEM_S : STYLE_ID_SELECT_ENUM_ITEM_POPUP_DISABLED_ITEM);
 
     // draw background
-    display::setColor(containerStyle->background_color);
+    display::setColor(containerStyle->backgroundColor);
     display::fillRect(x, y, x + width - 1, y + height - 1);
 
     // draw labels
@@ -537,7 +537,7 @@ WidgetCursor SelectFromEnumPage::findWidgetInternalPage(int x, int y, bool click
 
         		widget.action = ACTION_ID_INTERNAL_SELECT_ENUM_ITEM;
         		widget.data = (uint16_t)i;
-        		return WidgetCursor(g_mainAssets, appContext, &widget, x, y, widgetCursor.currentState, widgetCursor.hasPreviousState);
+        		return WidgetCursor(g_mainAssets, appContext, &widget, x, y, widgetCursor.currentState, widgetCursor.refreshed, widgetCursor.hasPreviousState);
         	}
         }
     }
@@ -558,11 +558,11 @@ void SelectFromEnumPage::getItemPosition(int itemIndex, int &xItem, int &yItem) 
     const Style *containerStyle = getStyle(smallFont ? STYLE_ID_SELECT_ENUM_ITEM_POPUP_CONTAINER_S : STYLE_ID_SELECT_ENUM_ITEM_POPUP_CONTAINER);
 
     if (numColumns == 1 || itemIndex < (numItems + 1) / 2) {
-        xItem = x + containerStyle->padding_left;
-        yItem = y + containerStyle->padding_top + itemIndex * itemHeight;
+        xItem = x + containerStyle->paddingLeft;
+        yItem = y + containerStyle->paddingTop + itemIndex * itemHeight;
     } else {
-        xItem = x + containerStyle->padding_left + itemWidth + containerStyle->padding_left / 2;
-        yItem = y + containerStyle->padding_top + (itemIndex - (numItems + 1) / 2) * itemHeight;
+        xItem = x + containerStyle->paddingLeft + itemWidth + containerStyle->paddingLeft / 2;
+        yItem = y + containerStyle->paddingTop + (itemIndex - (numItems + 1) / 2) * itemHeight;
     }
 }
 
@@ -610,7 +610,6 @@ void MenuWithButtonsPage::init(AppContext *appContext, const char *message, cons
     m_containerRectangleWidget.data = DATA_ID_NONE;
     m_containerRectangleWidget.action = ACTION_ID_NONE;
     m_containerRectangleWidget.style = STYLE_ID_MENU_WITH_BUTTONS_CONTAINER;
-    m_containerRectangleWidget.flags.invertColors = 1;
     m_containerRectangleWidget.flags.ignoreLuminosity = 0;
 
     m_messageTextWidget.type = WIDGET_TYPE_TEXT;
@@ -643,13 +642,13 @@ void MenuWithButtonsPage::init(AppContext *appContext, const char *message, cons
         maxMenuItemWidth = MAX(maxMenuItemWidth, m_buttonTextWidgets[i].w);
     }
 
-    int menuItemsWidth = maxMenuItemWidth * m_numButtonTextWidgets + (m_numButtonTextWidgets - 1) * styleButton->padding_left;
+    int menuItemsWidth = maxMenuItemWidth * m_numButtonTextWidgets + (m_numButtonTextWidgets - 1) * styleButton->paddingLeft;
 
     int contentWidth = MAX(m_messageTextWidget.w, menuItemsWidth);
     int contentHeight = m_messageTextWidget.h + m_buttonTextWidgets[0].h;
 
-    width = styleContainer->border_size_left + styleContainer->padding_left + contentWidth + styleContainer->padding_right + styleContainer->border_size_right;
-    height = styleContainer->border_size_top + styleContainer->padding_top + contentHeight + styleContainer->padding_bottom + styleContainer->border_size_bottom;
+    width = styleContainer->borderSizeLeft + styleContainer->paddingLeft + contentWidth + styleContainer->paddingRight + styleContainer->borderSizeRight;
+    height = styleContainer->borderSizeTop + styleContainer->paddingTop + contentHeight + styleContainer->paddingBottom + styleContainer->borderSizeBottom;
 
     x = m_appContext->rect.x + (m_appContext->rect.w - width) / 2;
     y = m_appContext->rect.y + (m_appContext->rect.h - height) / 2;
@@ -659,16 +658,16 @@ void MenuWithButtonsPage::init(AppContext *appContext, const char *message, cons
     m_containerRectangleWidget.w = width;
     m_containerRectangleWidget.h = height;
 
-    m_messageTextWidget.x = styleContainer->border_size_left + styleContainer->padding_left + (contentWidth - m_messageTextWidget.w) / 2;
-    m_messageTextWidget.y = styleContainer->border_size_top + styleContainer->padding_top;
+    m_messageTextWidget.x = styleContainer->borderSizeLeft + styleContainer->paddingLeft + (contentWidth - m_messageTextWidget.w) / 2;
+    m_messageTextWidget.y = styleContainer->borderSizeTop + styleContainer->paddingTop;
 
-    int xButtonTextWidget = styleContainer->border_size_left + styleContainer->padding_left + (contentWidth - menuItemsWidth) / 2;
-    int yButtonTextWidget = styleContainer->border_size_top + styleContainer->padding_top + m_messageTextWidget.h;
+    int xButtonTextWidget = styleContainer->borderSizeLeft + styleContainer->paddingLeft + (contentWidth - menuItemsWidth) / 2;
+    int yButtonTextWidget = styleContainer->borderSizeTop + styleContainer->paddingTop + m_messageTextWidget.h;
     for (size_t i = 0; i < m_numButtonTextWidgets; i++) {
         m_buttonTextWidgets[i].x = xButtonTextWidget;
         m_buttonTextWidgets[i].y = yButtonTextWidget;
         m_buttonTextWidgets[i].w = maxMenuItemWidth;
-        xButtonTextWidget += maxMenuItemWidth + styleButton->padding_left;
+        xButtonTextWidget += maxMenuItemWidth + styleButton->paddingLeft;
     }
 
 }

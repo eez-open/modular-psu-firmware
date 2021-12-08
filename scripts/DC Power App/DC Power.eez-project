@@ -1274,8 +1274,7 @@
               "customOutputs": [],
               "style": {
                 "inheritFrom": "unsel_tab"
-              },
-              "invertColors": true
+              }
             },
             {
               "type": "ListWidget",
@@ -1315,8 +1314,7 @@
                     "customOutputs": [],
                     "style": {
                       "inheritFrom": "unsel_tab"
-                    },
-                    "invertColors": true
+                    }
                   },
                   {
                     "type": "Select",
@@ -1384,8 +1382,7 @@
               "customOutputs": [],
               "style": {
                 "inheritFrom": "unsel_tab"
-              },
-              "invertColors": true
+              }
             }
           ]
         },

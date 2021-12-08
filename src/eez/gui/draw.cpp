@@ -46,40 +46,104 @@ bool styleIsVertAlignBottom(const Style *style) {
     return (style->flags & STYLE_FLAGS_VERT_ALIGN_MASK) == STYLE_FLAGS_VERT_ALIGN_BOTTOM;
 }
 
-font::Font styleGetFont(const Style *style) {
-    return font::Font(getFontData(style->font));
-}
-
-bool styleIsBlink(const Style *style) {
-    return style->flags & STYLE_FLAGS_BLINK ? true : false;
-}
-
 ////////////////////////////////////////////////////////////////////////////////
 
 void drawBorderAndBackground(int &x1, int &y1, int &x2, int &y2, const Style *style, uint16_t color, bool ignoreLuminocity) {
-    int borderRadius = style->border_radius;
-    if (style->border_size_top > 0 || style->border_size_right > 0 || style->border_size_bottom > 0 || style->border_size_left > 0) {
-        display::setColor(style->border_color);
-        if ((style->border_size_top == 1 && style->border_size_right == 1 && style->border_size_bottom == 1 && style->border_size_left == 1) && borderRadius == 0) {
+    int borderRadius = style->borderRadius;
+    if (style->borderSizeTop > 0 || style->borderSizeRight > 0 || style->borderSizeBottom > 0 || style->borderSizeLeft > 0) {
+        display::setColor(style->borderColor);
+        if ((style->borderSizeTop == 1 && style->borderSizeRight == 1 && style->borderSizeBottom == 1 && style->borderSizeLeft == 1) && borderRadius == 0) {
             display::drawRect(x1, y1, x2, y2);
         } else {
-            display::fillRect(x1, y1, x2, y2, style->border_radius);
-			borderRadius = MAX(borderRadius - MAX(style->border_size_top, MAX(style->border_size_right, MAX(style->border_size_bottom, style->border_size_left))), 0);
+            display::fillRect(x1, y1, x2, y2, style->borderRadius);
+			borderRadius = MAX(borderRadius - MAX(style->borderSizeTop, MAX(style->borderSizeRight, MAX(style->borderSizeBottom, style->borderSizeLeft))), 0);
         }
-        x1 += style->border_size_left;
-        y1 += style->border_size_top;
-        x2 -= style->border_size_right;
-        y2 -= style->border_size_bottom;
+        x1 += style->borderSizeLeft;
+        y1 += style->borderSizeTop;
+        x2 -= style->borderSizeRight;
+        y2 -= style->borderSizeBottom;
     }
 
-    // if (color == TRANSPARENT_COLOR_INDEX) {
-    //     g_fcIsTransparent = true;
-    // } else {
-    //     g_fcIsTransparent = false;
-    // }
+    const WidgetCursor& widgetCursor = g_widgetCursor;
 
-    display::setColor(color, ignoreLuminocity);
-    display::fillRect(x1, y1, x2, y2, borderRadius);    
+	bool isTransparent = true;
+	if (color != TRANSPARENT_COLOR_INDEX) {
+		// non-transparent color
+		isTransparent = false;
+	}
+	else if (style->backgroundImage) {
+		auto bitmap = getBitmap(style->backgroundImage);
+		if (bitmap->bpp != 32) {
+			// non-transparent bitmap
+			isTransparent = false;
+		}
+	}
+
+	if (isTransparent && !widgetCursor.refreshed) {
+		for (size_t i = 0; i < widgetCursor.backgroundStyleStackPointer; i++) {
+			auto &backgroundStyle = widgetCursor.backgroundStyleStack[i];
+
+			auto color = backgroundStyle.active ? backgroundStyle.style->activeBackgroundColor : backgroundStyle.style->backgroundColor;
+			if (color != TRANSPARENT_COLOR_INDEX) {
+				display::setColor(color, ignoreLuminocity);
+				display::fillRect(x1, y1, x2, y2, borderRadius);
+			}
+
+			if (backgroundStyle.style->backgroundImage) {
+				auto bitmap = getBitmap(backgroundStyle.style->backgroundImage);
+				if (bitmap) {
+                    int x = backgroundStyle.x;
+                    int y = backgroundStyle.y;
+                    int w = MIN(x2 - x1 + 1, x + bitmap->w - x1);
+                    int h = MIN(y2 - y1 + 1, y + bitmap->h - y1);
+
+                    if (w >= 0 && h > 0) {
+                        auto bytesPerPixel = bitmap->bpp  / 8;
+
+                        uint32_t offset = 0;
+
+                        if (x < x1) {
+                            offset += (x1 - x) * bytesPerPixel;
+                        }
+
+                        if (y < y1) {
+                            offset += (y1 - y) * bitmap->w * bytesPerPixel;
+                        }
+
+                        Image image;
+
+                        image.width = w;
+                        image.height = h;
+                        image.bpp = bitmap->bpp;
+                        image.lineOffset = bitmap->w - w;
+                        image.pixels = (uint8_t *)bitmap->pixels + offset;
+
+                        display::drawBitmap(&image, x1, y1);
+                    }
+				}
+			}
+		}
+	}
+
+	if (color != TRANSPARENT_COLOR_INDEX) {
+		display::setColor(color, ignoreLuminocity);
+		display::fillRect(x1, y1, x2, y2, borderRadius);
+	}
+
+    if (style->backgroundImage) {
+        auto bitmap = getBitmap(style->backgroundImage);
+		if (bitmap) {
+            Image image;
+
+            image.width = bitmap->w;
+            image.height = bitmap->h;
+            image.bpp = bitmap->bpp;
+            image.lineOffset = 0;
+            image.pixels = (uint8_t *)bitmap->pixels;
+
+            display::drawBitmap(&image, x1, y1);
+        }
+    }
 }
 
 void drawText(
@@ -101,13 +165,13 @@ void drawText(
         if (overrideActiveBackgroundColor) {
             backgroundColor = *overrideActiveBackgroundColor;
         } else {
-            backgroundColor = style->active_background_color;
+            backgroundColor = style->activeBackgroundColor;
         }
     } else {
         if (overrideBackgroundColor) {
             backgroundColor = *overrideBackgroundColor;
         } else {
-            backgroundColor = style->background_color;
+            backgroundColor = style->backgroundColor;
         }
     }
     drawBorderAndBackground(x1, y1, x2, y2, style, backgroundColor, ignoreLuminocity);
@@ -122,9 +186,9 @@ void drawText(
 
     int x_offset;
     if (styleIsHorzAlignLeft(style)) {
-        x_offset = x1 + style->padding_left;
+        x_offset = x1 + style->paddingLeft;
     } else if (styleIsHorzAlignRight(style)) {
-        x_offset = x2 - style->padding_right - width;
+        x_offset = x2 - style->paddingRight - width;
     } else {
         x_offset = x1 + ((x2 - x1 + 1) - width) / 2;
         if (x_offset < x1) {
@@ -134,9 +198,9 @@ void drawText(
 
     int y_offset;
     if (styleIsVertAlignTop(style)) {
-        y_offset = y1 + style->padding_top;
+        y_offset = y1 + style->paddingTop;
     } else if (styleIsVertAlignBottom(style)) {
-        y_offset = y2 - style->padding_bottom - height;
+        y_offset = y2 - style->paddingBottom - height;
     } else {
         y_offset = y1 + ((y2 - y1 + 1) - height) / 2;
     }
@@ -149,7 +213,7 @@ void drawText(
         if (overrideActiveColor) {
             display::setColor(*overrideActiveColor, ignoreLuminocity);
         } else {
-            display::setColor(style->active_color, ignoreLuminocity);
+            display::setColor(style->activeColor, ignoreLuminocity);
         }
     }  else {
         if (overrideColor) {
@@ -169,12 +233,10 @@ int getCharIndexAtPosition(int xPos, const char *text, int textLength, int x, in
     int x2 = x + w - 1;
     int y2 = y + h - 1;
 
-    if (style->border_size_top > 0 || style->border_size_right > 0 || style->border_size_bottom > 0 || style->border_size_left > 0) {
-        x1 += style->border_size_left;
-        y1 += style->border_size_top;
-        x2 -= style->border_size_right;
-        y2 -= style->border_size_bottom;
-    }
+    x1 += style->borderSizeLeft;
+    y1 += style->borderSizeTop;
+    x2 -= style->borderSizeRight;
+    y2 -= style->borderSizeBottom;
 
     font::Font font = styleGetFont(style);
 
@@ -183,9 +245,9 @@ int getCharIndexAtPosition(int xPos, const char *text, int textLength, int x, in
 
     int x_offset;
     if (styleIsHorzAlignLeft(style)) {
-        x_offset = x1 + style->padding_left;
+        x_offset = x1 + style->paddingLeft;
     } else if (styleIsHorzAlignRight(style)) {
-        x_offset = x2 - style->padding_right - width;
+        x_offset = x2 - style->paddingRight - width;
     } else {
         x_offset = x1 + ((x2 - x1 + 1) - width) / 2;
         if (x_offset < x1) {
@@ -195,9 +257,9 @@ int getCharIndexAtPosition(int xPos, const char *text, int textLength, int x, in
 
     int y_offset;
     if (styleIsVertAlignTop(style)) {
-        y_offset = y1 + style->padding_top;
+        y_offset = y1 + style->paddingTop;
     } else if (styleIsVertAlignBottom(style)) {
-        y_offset = y2 - style->padding_bottom - height;
+        y_offset = y2 - style->paddingBottom - height;
     } else {
         y_offset = y1 + ((y2 - y1 + 1) - height) / 2;
     }
@@ -214,12 +276,10 @@ int getCursorXPosition(int cursorPosition, const char *text, int textLength, int
     int x2 = x + w - 1;
     int y2 = y + h - 1;
 
-    if (style->border_size_top > 0 || style->border_size_right > 0 || style->border_size_bottom > 0 || style->border_size_left > 0) {
-        x1 += style->border_size_left;
-        y1 += style->border_size_top;
-        x2 -= style->border_size_right;
-        y2 -= style->border_size_bottom;
-    }
+    x1 += style->borderSizeLeft;
+    y1 += style->borderSizeTop;
+    x2 -= style->borderSizeRight;
+    y2 -= style->borderSizeBottom;
 
     font::Font font = styleGetFont(style);
 
@@ -228,9 +288,9 @@ int getCursorXPosition(int cursorPosition, const char *text, int textLength, int
 
     int x_offset;
     if (styleIsHorzAlignLeft(style)) {
-        x_offset = x1 + style->padding_left;
+        x_offset = x1 + style->paddingLeft;
     } else if (styleIsHorzAlignRight(style)) {
-        x_offset = x2 - style->padding_right - width;
+        x_offset = x2 - style->paddingRight - width;
     } else {
         x_offset = x1 + ((x2 - x1 + 1) - width) / 2;
         if (x_offset < x1) {
@@ -240,9 +300,9 @@ int getCursorXPosition(int cursorPosition, const char *text, int textLength, int
 
     int y_offset;
     if (styleIsVertAlignTop(style)) {
-        y_offset = y1 + style->padding_top;
+        y_offset = y1 + style->paddingTop;
     } else if (styleIsVertAlignBottom(style)) {
-        y_offset = y2 - style->padding_bottom - height;
+        y_offset = y2 - style->paddingBottom - height;
     } else {
         y_offset = y1 + ((y2 - y1 + 1) - height) / 2;
     }
@@ -386,12 +446,10 @@ struct MultilineTextRender {
     }
 
     int measure() {
-        if (style->border_size_top > 0 || style->border_size_right > 0 || style->border_size_bottom > 0 || style->border_size_left > 0) {
-            x1 += style->border_size_left;
-            y1 += style->border_size_top;
-            x2 -= style->border_size_right;
-            y2 -= style->border_size_bottom;
-        }
+        x1 += style->borderSizeLeft;
+        y1 += style->borderSizeTop;
+        x2 -= style->borderSizeRight;
+        y2 -= style->borderSizeBottom;
 
         font = styleGetFont(style);
         
@@ -403,16 +461,16 @@ struct MultilineTextRender {
         auto spaceGlyph = font.getGlyph(' ');
         spaceWidth = spaceGlyph->dx;
 
-        x1 += style->padding_left;
-        x2 -= style->padding_right;
-        y1 += style->padding_top;
-        y2 -= style->padding_bottom;
+        x1 += style->paddingLeft;
+        x2 -= style->paddingRight;
+        y1 += style->paddingTop;
+        y2 -= style->paddingBottom;
 
         return executeStep(MEASURE);
     }
 
     void render() {
-        drawBorderAndBackground(x1, y1, x2, y2, style, active ? style->active_background_color : style->background_color);
+        drawBorderAndBackground(x1, y1, x2, y2, style, active ? style->activeBackgroundColor : style->backgroundColor);
 
         //
         font = styleGetFont(style);
@@ -426,12 +484,12 @@ struct MultilineTextRender {
         spaceWidth = spaceGlyph->dx;
 
         // draw text
-        display::setColor(active ? style->active_color : style->color);
+        display::setColor(active ? style->activeColor : style->color);
 
-        x1 += style->padding_left;
-        x2 -= style->padding_right;
-        y1 += style->padding_top;
-        y2 -= style->padding_bottom;
+        x1 += style->paddingLeft;
+        x2 -= style->paddingRight;
+        y1 += style->paddingTop;
+        y2 -= style->paddingBottom;
 
         int textHeight = executeStep(MEASURE);
 
@@ -492,9 +550,9 @@ void drawBitmap(Image *image, int x, int y, int w, int h, const Style *style, bo
 
     int x_offset;
     if (styleIsHorzAlignLeft(style))
-        x_offset = x1 + style->padding_left;
+        x_offset = x1 + style->paddingLeft;
     else if (styleIsHorzAlignRight(style))
-        x_offset = x2 - style->padding_right - width;
+        x_offset = x2 - style->paddingRight - width;
     else
         x_offset = x1 + ((x2 - x1) - width) / 2;
     if (x_offset < 0)
@@ -502,9 +560,9 @@ void drawBitmap(Image *image, int x, int y, int w, int h, const Style *style, bo
 
     int y_offset;
     if (styleIsVertAlignTop(style))
-        y_offset = y1 + style->padding_top;
+        y_offset = y1 + style->paddingTop;
     else if (styleIsVertAlignBottom(style))
-        y_offset = y2 - style->padding_bottom - height;
+        y_offset = y2 - style->paddingBottom - height;
     else
         y_offset = y1 + ((y2 - y1) - height) / 2;
     if (y_offset < 0)
@@ -515,11 +573,11 @@ void drawBitmap(Image *image, int x, int y, int w, int h, const Style *style, bo
     uint8_t savedOpacity = display::getOpacity();
 
     if (active) {
-        display::setBackColor(style->active_background_color);
-        display::setColor(style->active_color);
+        display::setBackColor(style->activeBackgroundColor);
+        display::setColor(style->activeColor);
         display::setOpacity(style->opacity);
     } else {
-        display::setBackColor(style->background_color);
+        display::setBackColor(style->backgroundColor);
         display::setColor(style->color);
         display::setOpacity(style->opacity);
     }
@@ -531,21 +589,14 @@ void drawBitmap(Image *image, int x, int y, int w, int h, const Style *style, bo
 
 ////////////////////////////////////////////////////////////////////////////////
 
-void drawRectangle(int x, int y, int w, int h, const Style *style, bool active, bool ignoreLuminocity, bool invertColors) {
+void drawRectangle(int x, int y, int w, int h, const Style *style, bool active, bool ignoreLuminocity) {
     if (w > 0 && h > 0) {
         int x1 = x;
         int y1 = y;
         int x2 = x + w - 1;
         int y2 = y + h - 1;
 
-        uint16_t backgroundColor;
-        if (invertColors) {
-            backgroundColor = active ? style->active_background_color : style->background_color;
-        } else {
-            backgroundColor = active ? style->active_color : style->color;
-        }
-
-        drawBorderAndBackground(x1, y1, x2, y2, style, backgroundColor, ignoreLuminocity);
+        drawBorderAndBackground(x1, y1, x2, y2, style, active ? style->activeBackgroundColor : style->backgroundColor, ignoreLuminocity);
     }
 }
 

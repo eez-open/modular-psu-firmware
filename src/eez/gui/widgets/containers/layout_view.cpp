@@ -64,7 +64,7 @@ void LayoutViewWidgetState::render() {
 	const WidgetCursor& widgetCursor = g_widgetCursor;
     auto widget = (const LayoutViewWidget *)widgetCursor.widget;
     const Style* style = getStyle(widget->style);
-    drawRectangle(widgetCursor.x, widgetCursor.y, (int)widget->w, (int)widget->h, style, flags.active, false, true);
+    drawRectangle(widgetCursor.x, widgetCursor.y, (int)widget->w, (int)widget->h, style, flags.active);
 	repainted = true;
 }
 
@@ -72,20 +72,21 @@ void LayoutViewWidgetState::enumChildren() {
 	WidgetCursor& widgetCursor = g_widgetCursor;
 
 	auto widget = (const LayoutViewWidget *)widgetCursor.widget;
-	const Style* style = getStyle(widget->style);
-	widgetCursor.pushBackground(style, flags.active, repainted);
-
-    auto savedForceRefresh = widgetCursor.forceRefresh;
-	if (repainted) {
-		repainted = false;
-		widgetCursor.forceRefresh = true;
-	}
 
 	if (g_findCallback != nullptr) {
 		if (widget->context) {
 			Value newContext;
 			setContext((WidgetCursor &)widgetCursor, widget->context, oldContext, newContext);
 		}
+	} else {
+		const Style* style = getStyle(widget->style);
+		widgetCursor.pushBackground(widgetCursor.x, widgetCursor.y, style, flags.active);
+	}
+
+    auto savedForceRefresh = widgetCursor.forceRefresh;
+	if (repainted) {
+		repainted = false;
+		widgetCursor.forceRefresh = true;
 	}
 
 	auto layoutId = data.getInt();
@@ -111,7 +112,9 @@ void LayoutViewWidgetState::enumChildren() {
 
     widgetCursor.forceRefresh = savedForceRefresh;
 
-    widgetCursor.popBackground();
+    if (g_findCallback == nullptr) {
+        widgetCursor.popBackground();
+    }
 }
 
 } // namespace gui

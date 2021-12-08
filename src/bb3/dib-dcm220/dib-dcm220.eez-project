@@ -1,7 +1,7 @@
 {
   "settings": {
     "general": {
-      "projectVersion": "v2",
+      "projectVersion": "v3",
       "projectType": "firmware-module",
       "namespace": "dib_dcm220",
       "imports": [
@@ -294,7 +294,6 @@
               "customOutputs": [],
               "style": {
                 "inheritFrom": "default",
-                "color": "#ffffff",
                 "backgroundColor": "#ffffff",
                 "activeColor": "#ffffff",
                 "activeBackgroundColor": "#ffffff",
@@ -330,8 +329,7 @@
                   "customOutputs": [],
                   "style": {
                     "inheritFrom": "default",
-                    "color": "#00ff00",
-                    "backgroundColor": "#ffffff",
+                    "backgroundColor": "#00ff00",
                     "activeColor": "#ffffff",
                     "activeBackgroundColor": "#00ff00",
                     "borderSize": 2,
@@ -350,8 +348,7 @@
                   "customOutputs": [],
                   "style": {
                     "inheritFrom": "default",
-                    "color": "#ff040b",
-                    "backgroundColor": "#ffffff",
+                    "backgroundColor": "#ff040b",
                     "activeColor": "#ffffff",
                     "activeBackgroundColor": "#ff040b",
                     "borderSize": 2,
@@ -446,7 +443,7 @@
           "customOutputs": [],
           "style": {
             "inheritFrom": "default",
-            "color": "channel1"
+            "backgroundColor": "channel1"
           }
         },
         {
@@ -460,7 +457,7 @@
           "customOutputs": [],
           "style": {
             "inheritFrom": "default",
-            "color": "channel1"
+            "backgroundColor": "channel1"
           }
         },
         {
@@ -474,7 +471,7 @@
           "customOutputs": [],
           "style": {
             "inheritFrom": "default",
-            "color": "channel1"
+            "backgroundColor": "channel1"
           }
         }
       ],
@@ -929,7 +926,7 @@
           "customOutputs": [],
           "style": {
             "inheritFrom": "default",
-            "color": "channel1"
+            "backgroundColor": "channel1"
           }
         },
         {
@@ -943,7 +940,7 @@
           "customOutputs": [],
           "style": {
             "inheritFrom": "default",
-            "color": "channel1"
+            "backgroundColor": "channel1"
           }
         },
         {
@@ -957,7 +954,7 @@
           "customOutputs": [],
           "style": {
             "inheritFrom": "default",
-            "color": "channel1"
+            "backgroundColor": "channel1"
           }
         }
       ],
@@ -1412,7 +1409,7 @@
           "customOutputs": [],
           "style": {
             "inheritFrom": "default",
-            "color": "channel1"
+            "backgroundColor": "channel1"
           }
         },
         {
@@ -1426,7 +1423,7 @@
           "customOutputs": [],
           "style": {
             "inheritFrom": "default",
-            "color": "channel1"
+            "backgroundColor": "channel1"
           }
         },
         {
@@ -1440,7 +1437,7 @@
           "customOutputs": [],
           "style": {
             "inheritFrom": "default",
-            "color": "channel1"
+            "backgroundColor": "channel1"
           }
         }
       ],
@@ -1869,7 +1866,7 @@
           "customOutputs": [],
           "style": {
             "inheritFrom": "default",
-            "color": "channel1"
+            "backgroundColor": "channel1"
           }
         },
         {
@@ -1883,7 +1880,7 @@
           "customOutputs": [],
           "style": {
             "inheritFrom": "default",
-            "color": "channel1"
+            "backgroundColor": "channel1"
           }
         },
         {
@@ -1897,7 +1894,7 @@
           "customOutputs": [],
           "style": {
             "inheritFrom": "default",
-            "color": "channel1"
+            "backgroundColor": "channel1"
           }
         }
       ],
@@ -4172,8 +4169,7 @@
           "customOutputs": [],
           "style": {
             "inheritFrom": "labels_and_colors_channel"
-          },
-          "invertColors": true
+          }
         },
         {
           "type": "Rectangle",
@@ -4186,8 +4182,7 @@
           "customOutputs": [],
           "style": {
             "inheritFrom": "labels_and_colors_channel"
-          },
-          "invertColors": true
+          }
         },
         {
           "type": "Rectangle",
@@ -4200,8 +4195,7 @@
           "customOutputs": [],
           "style": {
             "inheritFrom": "labels_and_colors_channel"
-          },
-          "invertColors": true
+          }
         }
       ],
       "connectionLines": [],

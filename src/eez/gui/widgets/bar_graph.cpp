@@ -171,15 +171,15 @@ void BarGraphWidgetState::render() {
                 textData.toText(valueText, sizeof(valueText));
                 wText = display::measureStr(valueText, -1, font, w);
 
-                int padding = textStyle.padding_left;
+                int padding = textStyle.paddingLeft;
                 wText += padding;
 
                 if (pValue + wText <= d) {
-                    textStyle.background_color = bg;
+                    textStyle.backgroundColor = bg;
                     pText = pValue;
                 } else {
-                    textStyle.background_color = fg;
-                    textStyle.color = textStyle.active_color;
+                    textStyle.backgroundColor = fg;
+                    textStyle.color = textStyle.activeColor;
                     wText += padding;
                     pText = MAX(pValue - wText, 0);
                 }
@@ -283,15 +283,15 @@ void BarGraphWidgetState::render() {
             textData.toText(valueText, sizeof(valueText));
             hText = font.getHeight();
 
-            int padding = textStyle.padding_top;
+            int padding = textStyle.paddingTop;
             hText += padding;
 
             if (pValue + hText <= d) {
-                textStyle.background_color = bg;
+                textStyle.backgroundColor = bg;
                 pText = pValue;
             } else {
-                textStyle.background_color = fg;
-                textStyle.color = textStyle.active_color;
+                textStyle.backgroundColor = fg;
+                textStyle.color = textStyle.activeColor;
                 hText += padding;
                 pText = MAX(pValue - hText, 0);
             }

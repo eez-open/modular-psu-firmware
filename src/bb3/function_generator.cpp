@@ -421,7 +421,7 @@ public:
 	void draw(const WidgetCursor &widgetCursor) {
 		const Widget *widget = widgetCursor.widget;
 		const Style* style = getStyle(widget->style);
-		drawRectangle(widgetCursor.x, widgetCursor.y, (int)widget->w, (int)widget->h, style, false, false, true);
+		drawRectangle(widgetCursor.x, widgetCursor.y, (int)widget->w, (int)widget->h, style);
 
 		int D;
 		if (m_selectedResources.m_numResources <= 2) {
@@ -681,7 +681,7 @@ public:
 			int x2 = x1 + textWidth - 1;
 			int y2 = y1 + textHeight - 1;
 
-			display::setColor(style->background_color);
+			display::setColor(style->backgroundColor);
 			display::fillRect(x1, y1, x2, y2);
 
 			display::setColor(COLOR_ID_CHANNEL1);

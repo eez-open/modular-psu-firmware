@@ -1,7 +1,7 @@
 {
   "settings": {
     "general": {
-      "projectVersion": "v2",
+      "projectVersion": "v3",
       "projectType": "firmware-module",
       "namespace": "dib_dcm224",
       "imports": [
@@ -332,7 +332,6 @@
               "customOutputs": [],
               "style": {
                 "inheritFrom": "default",
-                "color": "#ffffff",
                 "backgroundColor": "#ffffff",
                 "activeColor": "#ffffff",
                 "activeBackgroundColor": "#ffffff",
@@ -368,8 +367,7 @@
                   "customOutputs": [],
                   "style": {
                     "inheritFrom": "default",
-                    "color": "#00ff00",
-                    "backgroundColor": "#ffffff",
+                    "backgroundColor": "#00ff00",
                     "activeColor": "#ffffff",
                     "activeBackgroundColor": "#00ff00",
                     "borderSize": 2,
@@ -388,8 +386,7 @@
                   "customOutputs": [],
                   "style": {
                     "inheritFrom": "default",
-                    "color": "#ff040b",
-                    "backgroundColor": "#ffffff",
+                    "backgroundColor": "#ff040b",
                     "activeColor": "#ffffff",
                     "activeBackgroundColor": "#ff040b",
                     "borderSize": 2,
@@ -530,8 +527,7 @@
                       "customOutputs": [],
                       "style": {
                         "inheritFrom": "default"
-                      },
-                      "invertColors": true
+                      }
                     },
                     {
                       "type": "Container",
@@ -872,8 +868,7 @@
                               "customOutputs": [],
                               "style": {
                                 "inheritFrom": "channel1"
-                              },
-                              "invertColors": true
+                              }
                             }
                           ]
                         },
@@ -1048,8 +1043,7 @@
                                 "backgroundColor": "status_line_background",
                                 "activeColor": "status_line_background",
                                 "activeBackgroundColor": "status_line_text"
-                              },
-                              "invertColors": true
+                              }
                             }
                           ]
                         },
@@ -1200,7 +1194,7 @@
           "customOutputs": [],
           "style": {
             "inheritFrom": "default",
-            "color": "channel1"
+            "backgroundColor": "channel1"
           }
         },
         {
@@ -1214,7 +1208,7 @@
           "customOutputs": [],
           "style": {
             "inheritFrom": "default",
-            "color": "channel1"
+            "backgroundColor": "channel1"
           }
         },
         {
@@ -1228,7 +1222,7 @@
           "customOutputs": [],
           "style": {
             "inheritFrom": "default",
-            "color": "channel1"
+            "backgroundColor": "channel1"
           }
         }
       ],
@@ -1809,7 +1803,7 @@
           "customOutputs": [],
           "style": {
             "inheritFrom": "default",
-            "color": "channel1"
+            "backgroundColor": "channel1"
           }
         },
         {
@@ -1823,7 +1817,7 @@
           "customOutputs": [],
           "style": {
             "inheritFrom": "default",
-            "color": "channel1"
+            "backgroundColor": "channel1"
           }
         },
         {
@@ -1837,7 +1831,7 @@
           "customOutputs": [],
           "style": {
             "inheritFrom": "default",
-            "color": "channel1"
+            "backgroundColor": "channel1"
           }
         }
       ],
@@ -2418,7 +2412,7 @@
           "customOutputs": [],
           "style": {
             "inheritFrom": "default",
-            "color": "channel1"
+            "backgroundColor": "channel1"
           }
         },
         {
@@ -2432,7 +2426,7 @@
           "customOutputs": [],
           "style": {
             "inheritFrom": "default",
-            "color": "channel1"
+            "backgroundColor": "channel1"
           }
         },
         {
@@ -2446,7 +2440,7 @@
           "customOutputs": [],
           "style": {
             "inheritFrom": "default",
-            "color": "channel1"
+            "backgroundColor": "channel1"
           }
         }
       ],
@@ -3001,7 +2995,7 @@
           "customOutputs": [],
           "style": {
             "inheritFrom": "default",
-            "color": "channel1"
+            "backgroundColor": "channel1"
           }
         },
         {
@@ -3015,7 +3009,7 @@
           "customOutputs": [],
           "style": {
             "inheritFrom": "default",
-            "color": "channel1"
+            "backgroundColor": "channel1"
           }
         },
         {
@@ -3029,7 +3023,7 @@
           "customOutputs": [],
           "style": {
             "inheritFrom": "default",
-            "color": "channel1"
+            "backgroundColor": "channel1"
           }
         }
       ],
@@ -5652,8 +5646,7 @@
           "customOutputs": [],
           "style": {
             "inheritFrom": "labels_and_colors_channel"
-          },
-          "invertColors": true
+          }
         },
         {
           "type": "Rectangle",
@@ -5666,8 +5659,7 @@
           "customOutputs": [],
           "style": {
             "inheritFrom": "labels_and_colors_channel"
-          },
-          "invertColors": true
+          }
         },
         {
           "type": "Rectangle",
@@ -5680,8 +5672,7 @@
           "customOutputs": [],
           "style": {
             "inheritFrom": "labels_and_colors_channel"
-          },
-          "invertColors": true
+          }
         }
       ],
       "connectionLines": [],

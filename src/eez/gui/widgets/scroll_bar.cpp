@@ -147,7 +147,7 @@ void ScrollBarWidgetState::render() {
         auto action = getWidgetAction(widgetCursor);        
         if (flags.focused && action == EEZ_CONF_ACTION_ID_SCROLL) {
             const Style *style = getStyle(widgetCursor.widget->style);
-            display::setColor(style->focus_color);
+            display::setColor(style->focusColor);
             display::drawRect(widgetCursor.x, widgetCursor.y, widgetCursor.x + widget->w - 1, widgetCursor.y + widget->h - 1);
             display::drawRect(widgetCursor.x + 1, widgetCursor.y + 1, widgetCursor.x + widget->w - 2, widgetCursor.y + widget->h - 2);
         }

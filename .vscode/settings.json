@@ -32,7 +32,9 @@
         "cstdlib": "cpp",
         "stddef.h": "c",
         "ios": "cpp",
-        "xhash": "cpp"
+        "xhash": "cpp",
+        "sd_diskio.h": "c",
+        "bsp_driver_sd.h": "c"
     },
     "C_Cpp.errorSquiggles": "Disabled",
     "cmake.configureOnOpen": true

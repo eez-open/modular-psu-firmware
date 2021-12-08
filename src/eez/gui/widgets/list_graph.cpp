@@ -53,7 +53,7 @@ void ListGraphWidgetState::render() {
     int iRow = iCursor / 3;
 
     // draw background
-    display::setColor(style->background_color);
+    display::setColor(style->backgroundColor);
     display::fillRect(widgetCursor.x, widgetCursor.y, widgetCursor.x + (int)widget->w - 1,
                         widgetCursor.y + (int)widget->h - 1);
 
@@ -109,7 +109,7 @@ void ListGraphWidgetState::render() {
                 x2 = widgetCursor.x + (int)widget->w - 1;
 
             if (i == iRow) {
-                display::setColor(cursorStyle->background_color);
+                display::setColor(cursorStyle->backgroundColor);
                 display::fillRect(x1, widgetCursor.y, x2 - 1,
                     widgetCursor.y + (int)widget->h - 1);
             }

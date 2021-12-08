@@ -1727,11 +1727,11 @@ void data_channel_u_mon(DataOperationEnum operation, const WidgetCursor &widgetC
         }
     } else if (operation == DATA_OPERATION_GET_ACTIVE_COLOR) {
         if (io_pins::isInhibited()) {
-            value = Value(((const Style *)value.getVoidPointer())->background_color, VALUE_TYPE_UINT16);
+            value = Value(((const Style *)value.getVoidPointer())->backgroundColor, VALUE_TYPE_UINT16);
         }
     } else if (operation == DATA_OPERATION_GET_ACTIVE_BACKGROUND_COLOR) {
         if (io_pins::isInhibited()) {
-            value = Value(((const Style *)value.getVoidPointer())->background_color, VALUE_TYPE_UINT16);
+            value = Value(((const Style *)value.getVoidPointer())->backgroundColor, VALUE_TYPE_UINT16);
         }
     } else if (operation == DATA_OPERATION_IS_BLINKING) {
         value = io_pins::isInhibited() ? 1 : 0;
@@ -1852,11 +1852,11 @@ void data_channel_i_mon(DataOperationEnum operation, const WidgetCursor &widgetC
         }
     } else if (operation == DATA_OPERATION_GET_ACTIVE_COLOR) {
         if (io_pins::isInhibited()) {
-            value = Value(((const Style *)value.getVoidPointer())->background_color, VALUE_TYPE_UINT16);
+            value = Value(((const Style *)value.getVoidPointer())->backgroundColor, VALUE_TYPE_UINT16);
         }
     } else if (operation == DATA_OPERATION_GET_ACTIVE_BACKGROUND_COLOR) {
         if (io_pins::isInhibited()) {
-            value = Value(((const Style *)value.getVoidPointer())->background_color, VALUE_TYPE_UINT16);
+            value = Value(((const Style *)value.getVoidPointer())->backgroundColor, VALUE_TYPE_UINT16);
         }
     } else if (operation == DATA_OPERATION_IS_BLINKING) {
         value = io_pins::isInhibited() ? 1 : 0;
@@ -1964,11 +1964,11 @@ void data_channel_p_mon(DataOperationEnum operation, const WidgetCursor &widgetC
         }
     } else if (operation == DATA_OPERATION_GET_ACTIVE_COLOR) {
         if (io_pins::isInhibited()) {
-            value = Value(((const Style *)value.getVoidPointer())->background_color, VALUE_TYPE_UINT16);
+            value = Value(((const Style *)value.getVoidPointer())->backgroundColor, VALUE_TYPE_UINT16);
         }
     } else if (operation == DATA_OPERATION_GET_ACTIVE_BACKGROUND_COLOR) {
         if (io_pins::isInhibited()) {
-            value = Value(((const Style *)value.getVoidPointer())->background_color, VALUE_TYPE_UINT16);
+            value = Value(((const Style *)value.getVoidPointer())->backgroundColor, VALUE_TYPE_UINT16);
         }
     } else if (operation == DATA_OPERATION_IS_BLINKING) {
         value = io_pins::isInhibited() ? 1 : 0;

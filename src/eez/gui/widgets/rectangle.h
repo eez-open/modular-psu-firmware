@@ -22,7 +22,7 @@ namespace eez {
 namespace gui {
 
 struct RectangleFlags {
-    unsigned invertColors : 1;
+    unsigned reserved : 1;
     unsigned ignoreLuminosity : 1;
 };
 

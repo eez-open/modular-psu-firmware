@@ -1,5 +1,4 @@
 {
-  "fullyLoaded": true,
   "settings": {
     "general": {
       "projectVersion": "v3",
@@ -201,7 +200,7 @@
               "customInputs": [],
               "customOutputs": [],
               "style": {
-                "inheritFrom": "default"
+                "inheritFrom": "default_inverse"
               }
             },
             {
@@ -214,7 +213,7 @@
               "customInputs": [],
               "customOutputs": [],
               "style": {
-                "inheritFrom": "default"
+                "inheritFrom": "default_inverse"
               }
             },
             {
@@ -227,7 +226,7 @@
               "customInputs": [],
               "customOutputs": [],
               "style": {
-                "inheritFrom": "default"
+                "inheritFrom": "default_inverse"
               }
             },
             {
@@ -240,7 +239,7 @@
               "customInputs": [],
               "customOutputs": [],
               "style": {
-                "inheritFrom": "default"
+                "inheritFrom": "default_inverse"
               }
             },
             {
@@ -406,7 +405,7 @@
               "customInputs": [],
               "customOutputs": [],
               "style": {
-                "inheritFrom": "default"
+                "inheritFrom": "default_inverse"
               }
             },
             {
@@ -419,7 +418,7 @@
               "customInputs": [],
               "customOutputs": [],
               "style": {
-                "inheritFrom": "default"
+                "inheritFrom": "default_inverse"
               }
             },
             {
@@ -432,7 +431,7 @@
               "customInputs": [],
               "customOutputs": [],
               "style": {
-                "inheritFrom": "default"
+                "inheritFrom": "default_inverse"
               }
             },
             {
@@ -445,7 +444,7 @@
               "customInputs": [],
               "customOutputs": [],
               "style": {
-                "inheritFrom": "default"
+                "inheritFrom": "default_inverse"
               }
             },
             {
@@ -611,7 +610,7 @@
               "customInputs": [],
               "customOutputs": [],
               "style": {
-                "inheritFrom": "default"
+                "inheritFrom": "default_inverse"
               }
             },
             {
@@ -624,7 +623,7 @@
               "customInputs": [],
               "customOutputs": [],
               "style": {
-                "inheritFrom": "default"
+                "inheritFrom": "default_inverse"
               }
             },
             {
@@ -637,7 +636,7 @@
               "customInputs": [],
               "customOutputs": [],
               "style": {
-                "inheritFrom": "default"
+                "inheritFrom": "default_inverse"
               }
             },
             {
@@ -650,7 +649,7 @@
               "customInputs": [],
               "customOutputs": [],
               "style": {
-                "inheritFrom": "default"
+                "inheritFrom": "default_inverse"
               }
             },
             {
@@ -860,9 +859,8 @@
                   "customInputs": [],
                   "customOutputs": [],
                   "style": {
-                    "inheritFrom": "status_title"
-                  },
-                  "invertColors": true
+                    "inheritFrom": "status_bgnd"
+                  }
                 },
                 {
                   "type": "Text",

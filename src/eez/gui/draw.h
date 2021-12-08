@@ -21,8 +21,13 @@
 namespace eez {
 namespace gui {
 
-font::Font styleGetFont(const Style *style);
-bool styleIsBlink(const Style *style);
+inline font::Font styleGetFont(const Style *style) {
+    return font::Font(getFontData(style->font));
+}
+
+inline bool styleIsBlink(const Style *style) {
+    return style->flags & STYLE_FLAGS_BLINK;
+}
 
 void drawBorderAndBackground(int &x1, int &y1, int &x2, int &y2, const Style *style, uint16_t color, bool ignoreLuminocity = false);
 
@@ -42,7 +47,7 @@ void drawMultilineText(const char *text, int x, int y, int w, int h, const Style
 int measureMultilineText(const char *text, int x, int y, int w, int h, const Style *style, int firstLineIndent, int hangingIndent);
 
 void drawBitmap(Image *image, int x, int y, int w, int h, const Style *style, bool active);
-void drawRectangle(int x, int y, int w, int h, const Style *style, bool active, bool ignoreLuminocity, bool invertColors);
+void drawRectangle(int x, int y, int w, int h, const Style *style, bool active = false, bool ignoreLuminocity = false);
 
 void drawShadow(int x1, int y1, int x2, int y2);
 void expandRectWithShadow(int &x1, int &y1, int &x2, int &y2);

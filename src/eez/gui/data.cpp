@@ -1410,7 +1410,7 @@ uint16_t getBackgroundColor(const WidgetCursor &widgetCursor,  int16_t id, const
     if (value.getType() == VALUE_TYPE_UINT16) {
         return value.getUInt16();
     }
-    return style->background_color;
+    return style->backgroundColor;
 }
 
 uint16_t getActiveColor(const WidgetCursor &widgetCursor,  int16_t id, const Style *style) {
@@ -1419,7 +1419,7 @@ uint16_t getActiveColor(const WidgetCursor &widgetCursor,  int16_t id, const Sty
     if (value.getType() == VALUE_TYPE_UINT16) {
         return value.getUInt16();
     }
-    return style->active_color;
+    return style->activeColor;
 }
 
 uint16_t getActiveBackgroundColor(const WidgetCursor &widgetCursor,  int16_t id, const Style *style) {
@@ -1428,7 +1428,7 @@ uint16_t getActiveBackgroundColor(const WidgetCursor &widgetCursor,  int16_t id,
     if (value.getType() == VALUE_TYPE_UINT16) {
         return value.getUInt16();
     }
-    return style->active_background_color;
+    return style->activeBackgroundColor;
 }
 
 bool isBlinking(const WidgetCursor &widgetCursor, int16_t id) {

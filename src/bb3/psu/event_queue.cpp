@@ -980,7 +980,7 @@ void data_event_queue_event_long_message_overlay(DataOperationEnum operation, co
 						getEventMessage(selectedEvent), 
 						0, 0, multiLineTextWidget->w, INT_MAX,
 						style, 0, 0
-					) + style->padding_top + style->padding_bottom + style->border_size_top + style->border_size_bottom,
+					) + style->paddingTop + style->paddingBottom + style->borderSizeTop + style->borderSizeBottom,
 					CONF_EVENTS_LIST_HEIGHT_PX
 				);
                 

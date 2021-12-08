@@ -73,10 +73,10 @@ bool DisplayDataWidgetState::updateState() {
         dataRefreshLastTime = currentTime;
     }
 
-    WIDGET_STATE(color,                 flags.focused ? style->focus_color            : getColor(widgetCursor, widget->data, style));
-    WIDGET_STATE(backgroundColor,       flags.focused ? style->focus_background_color : getBackgroundColor(widgetCursor, widget->data, style));
-    WIDGET_STATE(activeColor,           flags.focused ? style->focus_background_color : getActiveColor(widgetCursor, widget->data, style));
-    WIDGET_STATE(activeBackgroundColor, flags.focused ? style->focus_color            : getActiveBackgroundColor(widgetCursor, widget->data, style));
+    WIDGET_STATE(color,                 flags.focused ? style->focusColor           : getColor(widgetCursor, widget->data, style));
+    WIDGET_STATE(backgroundColor,       flags.focused ? style->focusBackgroundColor : getBackgroundColor(widgetCursor, widget->data, style));
+    WIDGET_STATE(activeColor,           flags.focused ? style->focusBackgroundColor : getActiveColor(widgetCursor, widget->data, style));
+    WIDGET_STATE(activeBackgroundColor, flags.focused ? style->focusColor           : getActiveBackgroundColor(widgetCursor, widget->data, style));
 
     bool cursorVisible = millis() % (2 * CONF_GUI_TEXT_CURSOR_BLINK_TIME_MS) < CONF_GUI_TEXT_CURSOR_BLINK_TIME_MS;
     WIDGET_STATE(cursorPosition, cursorVisible ? getTextCursorPosition(widgetCursor, widget->data) : -1);

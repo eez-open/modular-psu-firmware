@@ -60,7 +60,7 @@
           "customInputs": [],
           "customOutputs": [],
           "style": {
-            "inheritFrom": "default"
+            "inheritFrom": "default_inverse"
           }
         },
         {

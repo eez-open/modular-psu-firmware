@@ -102,7 +102,7 @@ void drawCalibrationChart(calibration::CalibrationBase &calibrationBase, const W
     int w = (int)widget->w;
     int h = (int)widget->h;
 
-    drawRectangle(x, y, w, h, style, false, false, true);
+    drawRectangle(x, y, w, h, style);
 
     font::Font font(getFontData(FONT_ID_ROBOTO_CONDENSED_REGULAR));
     auto glyphLabel = font.getGlyph('0');

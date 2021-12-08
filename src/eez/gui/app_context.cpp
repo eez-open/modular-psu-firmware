@@ -169,10 +169,7 @@ void AppContext::pushPage(int pageId, Page *page) {
 
 void AppContext::doShowPage() {
     setPage(m_pageIdToSetOnNextIter);
-    
-    if (m_pageIdToSetOnNextIter == EEZ_CONF_PAGE_ID_WELCOME) {
-        playPowerUp(sound::PLAY_POWER_UP_CONDITION_WELCOME_PAGE_IS_ACTIVE);
-    } 
+    m_pageIdToSetOnNextIter = PAGE_ID_NONE;
 }
 
 void AppContext::popPage() {
@@ -252,6 +249,7 @@ void AppContext::showPage(int pageId) {
 
 void AppContext::doPushPage() {
     pushPage(m_pageIdToSetOnNextIter, m_pageToSetOnNextIter);
+    m_pageIdToSetOnNextIter = PAGE_ID_NONE;
 }
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -332,7 +330,9 @@ void AppContext::updatePage(int i, WidgetCursor &widgetCursor) {
 
 		auto savedWidget = widgetCursor.widget;
         widgetCursor.widget = page;
+
         enumWidget();
+
 		widgetCursor.widget = savedWidget;
     }
 

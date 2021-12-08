@@ -1,7 +1,7 @@
 {
   "settings": {
     "general": {
-      "projectVersion": "v2",
+      "projectVersion": "v3",
       "projectType": "firmware-module",
       "namespace": "dib_smx46",
       "imports": [
@@ -575,8 +575,7 @@
                     "customOutputs": [],
                     "style": {
                       "inheritFrom": "default"
-                    },
-                    "invertColors": true
+                    }
                   },
                   {
                     "type": "RectangleWidget",
@@ -589,8 +588,7 @@
                     "customOutputs": [],
                     "style": {
                       "inheritFrom": "default"
-                    },
-                    "invertColors": true
+                    }
                   },
                   {
                     "type": "Container",
@@ -1144,8 +1142,7 @@
                     "customOutputs": [],
                     "style": {
                       "inheritFrom": "default"
-                    },
-                    "invertColors": true
+                    }
                   },
                   {
                     "type": "RectangleWidget",
@@ -1158,8 +1155,7 @@
                     "customOutputs": [],
                     "style": {
                       "inheritFrom": "default"
-                    },
-                    "invertColors": true
+                    }
                   },
                   {
                     "type": "Container",
@@ -1713,8 +1709,7 @@
                     "customOutputs": [],
                     "style": {
                       "inheritFrom": "default"
-                    },
-                    "invertColors": true
+                    }
                   },
                   {
                     "type": "RectangleWidget",
@@ -1727,8 +1722,7 @@
                     "customOutputs": [],
                     "style": {
                       "inheritFrom": "default"
-                    },
-                    "invertColors": true
+                    }
                   },
                   {
                     "type": "Container",
@@ -2283,8 +2277,7 @@
                     "customOutputs": [],
                     "style": {
                       "inheritFrom": "default"
-                    },
-                    "invertColors": true
+                    }
                   },
                   {
                     "type": "RectangleWidget",
@@ -2297,8 +2290,7 @@
                     "customOutputs": [],
                     "style": {
                       "inheritFrom": "default"
-                    },
-                    "invertColors": true
+                    }
                   },
                   {
                     "type": "Container",
@@ -2750,7 +2742,7 @@
                         "customOutputs": [],
                         "style": {
                           "inheritFrom": "default",
-                          "color": "action_color",
+                          "backgroundColor": "action_color",
                           "activeBackgroundColor": "action_color",
                           "borderSize": "0",
                           "borderRadius": 5
@@ -2782,7 +2774,7 @@
                         "customOutputs": [],
                         "style": {
                           "inheritFrom": "default",
-                          "color": "Background",
+                          "backgroundColor": "Background",
                           "borderSize": "1",
                           "borderRadius": 8,
                           "borderColor": "action_color"
@@ -3048,8 +3040,7 @@
                     "customOutputs": [],
                     "style": {
                       "inheritFrom": "default"
-                    },
-                    "invertColors": true
+                    }
                   },
                   {
                     "type": "RectangleWidget",
@@ -3062,8 +3053,7 @@
                     "customOutputs": [],
                     "style": {
                       "inheritFrom": "default"
-                    },
-                    "invertColors": true
+                    }
                   },
                   {
                     "type": "Container",
@@ -3553,7 +3543,7 @@
                   "customOutputs": [],
                   "style": {
                     "inheritFrom": "default",
-                    "color": "status_line_background"
+                    "backgroundColor": "status_line_background"
                   }
                 },
                 {
@@ -3706,8 +3696,7 @@
                   "customOutputs": [],
                   "style": {
                     "inheritFrom": "default"
-                  },
-                  "invertColors": true
+                  }
                 },
                 {
                   "type": "RectangleWidget",
@@ -3720,8 +3709,7 @@
                   "customOutputs": [],
                   "style": {
                     "inheritFrom": "default"
-                  },
-                  "invertColors": true
+                  }
                 },
                 {
                   "type": "RectangleWidget",
@@ -3734,8 +3722,7 @@
                   "customOutputs": [],
                   "style": {
                     "inheritFrom": "default"
-                  },
-                  "invertColors": true
+                  }
                 },
                 {
                   "type": "Text",
@@ -3893,8 +3880,7 @@
                       "customOutputs": [],
                       "style": {
                         "inheritFrom": "status_bgnd"
-                      },
-                      "invertColors": true
+                      }
                     }
                   ]
                 },
@@ -4068,7 +4054,7 @@
                             "customOutputs": [],
                             "style": {
                               "inheritFrom": "default",
-                              "color": "action_color",
+                              "backgroundColor": "action_color",
                               "activeBackgroundColor": "action_color",
                               "borderSize": "0",
                               "borderRadius": 7
@@ -4100,7 +4086,7 @@
                             "customOutputs": [],
                             "style": {
                               "inheritFrom": "default",
-                              "color": "Background",
+                              "backgroundColor": "Background",
                               "borderSize": "1",
                               "borderRadius": 8,
                               "borderColor": "action_color"
@@ -4372,8 +4358,7 @@
                       "customOutputs": [],
                       "style": {
                         "inheritFrom": "status_bgnd"
-                      },
-                      "invertColors": true
+                      }
                     }
                   ]
                 },
@@ -5102,8 +5087,7 @@
           "customOutputs": [],
           "style": {
             "inheritFrom": "labels_and_colors_slot"
-          },
-          "invertColors": true
+          }
         },
         {
           "type": "Rectangle",
@@ -5116,8 +5100,7 @@
           "customOutputs": [],
           "style": {
             "inheritFrom": "labels_and_colors_slot"
-          },
-          "invertColors": true
+          }
         },
         {
           "type": "Rectangle",
@@ -5130,8 +5113,7 @@
           "customOutputs": [],
           "style": {
             "inheritFrom": "labels_and_colors_slot"
-          },
-          "invertColors": true
+          }
         }
       ],
       "connectionLines": [],

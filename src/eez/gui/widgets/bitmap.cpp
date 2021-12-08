@@ -47,7 +47,7 @@ void BitmapWidgetState::render() {
 
     if (widget->data) {
         if (data.getType() != VALUE_TYPE_UNDEFINED) {
-            drawRectangle(widgetCursor.x, widgetCursor.y, (int)widget->w, (int)widget->h, style, flags.active, true, true);
+            drawRectangle(widgetCursor.x, widgetCursor.y, (int)widget->w, (int)widget->h, style, flags.active, true);
             auto image = (Image *)data.getVoidPointer();
             if (image) {
                 drawBitmap(image, widgetCursor.x, widgetCursor.y, (int)widget->w, (int)widget->h, style, flags.active);
