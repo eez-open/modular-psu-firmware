@@ -22,6 +22,7 @@
 #include <eez/gui/page.h>
 
 #include <eez/gui/display.h>
+#include <eez/gui_conf.h>
 
 enum {
 	PAGE_ID_NONE = 0,
@@ -52,9 +53,11 @@ namespace gui {
 
 extern WidgetCursor g_activeWidget;
 extern bool g_isBlinkTime;
+extern uint32_t g_fps;
 
 ////////////////////////////////////////////////////////////////////////////////
 
+void guiInit();
 void guiTick();
 
 WidgetCursor &getFoundWidgetAtDown();
@@ -63,7 +66,15 @@ void clearFoundWidgetAtDown();
 bool isFocusWidget(const WidgetCursor &widgetCursor);
 void refreshScreen();
 inline bool isPageInternal(int pageId) { return pageId > FIRST_INTERNAL_PAGE_ID; }
-int getWidgetAction(const WidgetCursor &widgetCursor);
+
+inline int getWidgetAction(const WidgetCursor &widgetCursor) {
+    if (widgetCursor.widget->type == WIDGET_TYPE_INPUT) {
+        return EEZ_CONF_ACTION_ID_EDIT;
+    } else {
+		return widgetCursor.widget->action;
+    }
+}
+
 void executeAction(const WidgetCursor &widgetCursor, int actionId);
 void executeAction(int actionId);
 

@@ -46,6 +46,7 @@ EEZ_MESSAGE_QUEUE_DECLARE(gui, {
 void startThread() {
     loadMainAssets(assets, sizeof(assets));
     display::onThemeChanged();
+    guiInit();
     mouse::init();
 	EEZ_MESSAGE_QUEUE_CREATE(gui, 10);
 	EEZ_THREAD_CREATE(gui, mainLoop);

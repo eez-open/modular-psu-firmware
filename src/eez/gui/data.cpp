@@ -658,18 +658,15 @@ const char *YT_DATA_GET_VALUE_FUNCTION_POINTER_value_type_name(const Value &valu
 #define VALUE_TYPE(NAME) bool compare_##NAME##_value(const Value &a, const Value &b);
 VALUE_TYPES
 #undef VALUE_TYPE
-
 #define VALUE_TYPE(NAME) compare_##NAME##_value,
 CompareValueFunction g_valueTypeCompareFunctions[] = {
 	VALUE_TYPES
 };
 #undef VALUE_TYPE
 
-
 #define VALUE_TYPE(NAME) void NAME##_value_to_text(const Value &value, char *text, int count);
 VALUE_TYPES
 #undef VALUE_TYPE
-
 #define VALUE_TYPE(NAME) NAME##_value_to_text,
 ValueToTextFunction g_valueTypeToTextFunctions[] = {
 	VALUE_TYPES
@@ -679,7 +676,6 @@ ValueToTextFunction g_valueTypeToTextFunctions[] = {
 #define VALUE_TYPE(NAME) const char * NAME##_value_type_name(const Value &value);
 VALUE_TYPES
 #undef VALUE_TYPE
-
 #define VALUE_TYPE(NAME) NAME##_value_type_name,
 ValueTypeNameFunction g_valueTypeNames[] = {
 	VALUE_TYPES
@@ -721,19 +717,6 @@ const char *Value::getString() const {
 		return ((StringRef *)refValue)->str;
 	}
 	return strValue;
-}
-
-
-void Value::toText(char *text, int count) const {
-    *text = 0;
-    g_valueTypeToTextFunctions[type](*this, text, count);
-}
-
-bool Value::operator==(const Value &other) const {
-    if (type != other.type) {
-        return false;
-    }
-    return g_valueTypeCompareFunctions[type](*this, other);
 }
 
 bool Value::isPico() const {
@@ -1205,18 +1188,18 @@ Value Value::makeStringRef(const char *str, size_t len, uint32_t id) {
 	return value;
 }
 
-Value Value::concatenateString(const char *str1, const char *str2) {
+Value Value::concatenateString(const Value &str1, const Value &str2) {
     Value value;
 
-    auto newStrLen = strlen(str1) + strlen(str2) + 1;
+    auto newStrLen = strlen(str1.getString()) + strlen(str2.getString()) + 1;
     
     auto stringRef = (StringRef *)alloc(sizeof(StringRef) + MAX(newStrLen - 4, 0), 0x66fa4fbf);
 	if (stringRef == nullptr) {
 		return Value(VALUE_TYPE_NULL);
 	}
 
-    stringCopy(stringRef->str, newStrLen, str1);
-    stringAppendString(stringRef->str, newStrLen, str2);
+    stringCopy(stringRef->str, newStrLen, str1.getString());
+    stringAppendString(stringRef->str, newStrLen, str2.getString());
 
     stringRef->refCounter = 1;
 

@@ -30,7 +30,6 @@
 
 #include <eez/gui/gui.h>
 #include <eez/gui/widget.h>
-#include <eez/gui_conf.h>
 
 #include <scpi/scpi.h>
 
@@ -131,9 +130,12 @@ const PageAsset* getPageAsset(int pageId) {
 const PageAsset* getPageAsset(int pageId, WidgetCursor& widgetCursor) {
 	if (pageId < 0) {
 		widgetCursor.assets = g_externalAssets;
-		widgetCursor.flowState = flow::getFlowState(pageId, widgetCursor);
+		widgetCursor.flowState = flow::getFlowState(-pageId - 1, widgetCursor);
 	} else {
 	    widgetCursor.assets = g_mainAssets;
+		if (g_mainAssets->flowDefinition) {
+			widgetCursor.flowState = flow::getFlowState(pageId - 1, widgetCursor);
+		}
     }
 	return getPageAsset(pageId);
 }

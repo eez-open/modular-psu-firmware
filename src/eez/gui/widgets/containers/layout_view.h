@@ -19,6 +19,11 @@
 #pragma once
 
 namespace eez {
+
+namespace flow {
+	struct FlowState;
+}
+
 namespace gui {
 
 struct LayoutViewWidget : public Widget {
@@ -29,9 +34,10 @@ struct LayoutViewWidget : public Widget {
 
 struct LayoutViewWidgetState : public WidgetState {
 	WidgetStateFlags flags;
-	Value data;
     Value context;
 	bool repainted;
+    const PageAsset* layout;
+    flow::FlowState *flowState;
 
     Value oldContext;
 

@@ -53,6 +53,10 @@ struct AssetsPtr {
         offset = (uint8_t *)ptr - ((uint8_t *)g_mainAssets + 4);
     }
 
+    explicit operator bool() const {
+        return offset != 0;
+    }
+
 private:
     uint32_t offset;
 };

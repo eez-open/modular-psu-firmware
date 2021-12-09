@@ -16,7 +16,6 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#include <stdio.h>
 #include <math.h>
 
 #include <eez/flow/operations.h>
@@ -32,7 +31,12 @@ Value op_add(const Value& a1, const Value& b1) {
 	if (a.isAnyStringType() || b.isAnyStringType()) {
 		Value value1 = a.toString(0x84eafaa8);
 		Value value2 = b.toString(0xd273cab6);
-		return Value::concatenateString(value1.getString(), value2.getString());
+		auto res = Value::concatenateString(value1, value2);
+
+		char str1[128];
+		res.toText(str1, sizeof(str1));
+
+		return res;
 	}
 
 	if (a.isDouble() || b.isDouble()) {
@@ -816,16 +820,16 @@ bool do_OPERATION_TYPE_STRING_FIND(EvalStack &stack) {
 		b = *b.pValueValue;
 	}
 
-	const char *aStr = a.toString(0xf616bf4d).getString();
-	const char *bStr = b.toString(0x81229133).getString();
-	if (!aStr || !bStr) {
+	Value aStr = a.toString(0xf616bf4d);
+	Value bStr = b.toString(0x81229133);
+	if (!aStr.getString() || !bStr.getString()) {
 		if (!stack.push(Value(-1, VALUE_TYPE_INT32))) {
 			return false;
 		}
 	} else {
-		const char *pos = strstr(aStr, bStr);
+		const char *pos = strstr(aStr.getString(), bStr.getString());
 		if (!pos) {
-			if (!stack.push(Value(pos - aStr, VALUE_TYPE_INT32))) {
+			if (!stack.push(Value(pos - aStr.getString(), VALUE_TYPE_INT32))) {
 				return false;
 			}
 		} else {
@@ -855,27 +859,26 @@ bool do_OPERATION_TYPE_STRING_PAD_START(EvalStack &stack) {
 		c = *c.pValueValue;
 	}
 
-	const char *str = a.toString(0xcf6aabe6).getString();
-	if (!str) {
+	auto str = a.toString(0xcf6aabe6);
+	if (!str.getString()) {
 		return false;
 	}
-	int strLen = strlen(str);
+	int strLen = strlen(str.getString());
 
-	int targetLength;
-	if (b.isInt32OrLess()) {
-		targetLength = b.int32Value;
-		if (targetLength < strLen) {
-			targetLength = strLen;
-		}
-	} else {
+	int err;
+	int targetLength = b.toInt32(&err);
+	if (err) {
 		return false;
+	}
+	if (targetLength < strLen) {
+		targetLength = strLen;
 	}
 
-	const char *padStr = c.toString(0x81353bd7).getString();
-	if (!padStr) {
+	auto padStr = c.toString(0x81353bd7);
+	if (!padStr.getString()) {
 		return false;
 	}
-	int padStrLen = strlen(padStr);
+	int padStrLen = strlen(padStr.getString());
 
 	Value resultValue = eez::gui::Value::makeStringRef("", targetLength, 0xf43b14dd);
 	if (resultValue.type == VALUE_TYPE_NULL) {
@@ -884,10 +887,10 @@ bool do_OPERATION_TYPE_STRING_PAD_START(EvalStack &stack) {
 	char *resultStr = (char *)resultValue.getString();
 
 	auto n = targetLength - strLen;
-	stringCopy(resultStr + (targetLength - strLen), targetLength, str);
+	stringCopy(resultStr + (targetLength - strLen), strLen + 1, str.getString());
 
 	for (int i = 0; i < n; i++) {
-		resultStr[i] = padStr[i % padStrLen];
+		resultStr[i] = padStr.getString()[i % padStrLen];
 	}
 
 	if (!stack.push(resultValue)) {

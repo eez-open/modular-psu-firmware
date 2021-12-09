@@ -70,6 +70,19 @@ const char *getWidgetLabel(EnumItem *enumDefinition, uint16_t value);
 
 ////////////////////////////////////////////////////////////////////////////////
 
+struct Value;
+
+typedef bool (*CompareValueFunction)(const Value &a, const Value &b);
+typedef void (*ValueToTextFunction)(const Value &value, char *text, int count);
+typedef const char * (*ValueTypeNameFunction)(const Value &value);
+typedef void (*CopyValueFunction)(Value &a, const Value &b);
+
+extern CompareValueFunction g_valueTypeCompareFunctions[];
+extern ValueToTextFunction g_valueTypeToTextFunctions[];
+extern ValueTypeNameFunction g_valueTypeNames[];
+
+////////////////////////////////////////////////////////////////////////////////
+
 struct PairOfUint8Value {
     uint8_t first;
     uint8_t second;
@@ -96,7 +109,7 @@ struct ArrayValue;
 struct Value {
   public:
     Value()
-        : type(VALUE_TYPE_UNDEFINED), unit(UNIT_UNKNOWN), options(0), pVoidValue(0)
+        : type(VALUE_TYPE_UNDEFINED), unit(UNIT_UNKNOWN), options(0), uint64Value(0)
     {
     }
 
@@ -110,7 +123,7 @@ struct Value {
     {
     }
 
-	Value(int version, const char *str)
+	Value(uint8_t version, const char *str)
         : type(VALUE_TYPE_VERSIONED_STRING), unit(version), options(0), strValue(str)
     {
     }
@@ -188,7 +201,7 @@ struct Value {
 		: type(type), unit(UNIT_UNKNOWN), options(0), doubleValue(value) {
 	}
 	
-	Value(const char *value, ValueType type, int16_t options)
+	Value(const char *value, ValueType type, uint16_t options)
         : type(type), unit(UNIT_UNKNOWN), options(options), strValue(value)
     {
     }
@@ -211,7 +224,7 @@ struct Value {
     }
 
 	Value(const Value& value)
-		: type(VALUE_TYPE_UNDEFINED), unit(UNIT_UNKNOWN), options(0), pVoidValue(0) 
+		: type(VALUE_TYPE_UNDEFINED), unit(UNIT_UNKNOWN), options(0), uint64Value(0)
 	{
 		*this = value;
 	}
@@ -224,14 +237,7 @@ struct Value {
 		}
 	}
 
-	void clear() {
-		type = VALUE_TYPE_UNDEFINED;
-		unit = UNIT_UNKNOWN;
-		options = 0;
-		pVoidValue = 0;
-	}
-
-    const Value& operator = (const Value &value) {
+    Value& operator = (const Value &value) {
 		if (options & VALUE_OPTIONS_REF) {
 			if (--refValue->refCounter == 0) {
 				free(refValue);
@@ -241,7 +247,8 @@ struct Value {
 		type = value.type;
 		unit = value.unit;
 		options = value.options;
-		int64Value = value.int64Value;
+        memcpy((void *)&int64Value, (const void *)&value.int64Value, sizeof(int64_t));
+
 		if (options & VALUE_OPTIONS_REF) {
 			refValue->refCounter++;
 		}
@@ -249,7 +256,10 @@ struct Value {
         return *this;
     }
 
-    bool operator==(const Value &other) const;
+    bool operator==(const Value &other) const {
+		return type == other.type && g_valueTypeCompareFunctions[type](*this, other);
+	}
+
 
     bool operator!=(const Value &other) const {
         return !(*this == other);
@@ -331,7 +341,7 @@ struct Value {
         return uint32Value;
     }
 
-	int32_t getInt64() const {
+	int64_t getInt64() const {
 		return int64Value;
 	}
 
@@ -411,9 +421,12 @@ struct Value {
         return pairOfInt16Value.second;
     }
 
-    void toText(char *text, int count) const;
+    void toText(char *text, int count) const {
+		*text = 0;
+		g_valueTypeToTextFunctions[type](*this, text, count);
+	}
 
-    uint16_t getOptions() const {
+	uint16_t getOptions() const {
         return options;
     }
 
@@ -434,7 +447,7 @@ struct Value {
 	Value toString(uint32_t id) const;
 
 	static Value makeStringRef(const char *str, size_t len, uint32_t id);
-	static Value concatenateString(const char *str1, const char *str2);
+	static Value concatenateString(const Value &str1, const Value &str2);
 
 	//////////
 
@@ -454,24 +467,18 @@ struct Value {
     union {
 		int8_t int8Value;
 		uint8_t uint8Value;
-
-		PairOfUint8Value pairOfUint8Value;
-
 		int16_t int16Value;
 		uint16_t uint16Value;
-
-		PairOfUint16Value pairOfUint16Value;
-		PairOfInt16Value pairOfInt16Value;
-
-		EnumValue enumValue;
-
 		int32_t int32Value;
 		uint32_t uint32Value;
+		int64_t int64Value;
+		uint64_t uint64Value;
 
 		float floatValue;
+		double doubleValue;
 
 		const char *strValue;
-        ArrayValue *arrayValue;
+		ArrayValue *arrayValue;
 		Ref *refValue;
 
 		uint8_t *puint8Value;
@@ -479,11 +486,12 @@ struct Value {
 		void *pVoidValue;
 		Value *pValueValue;
 
-		uint64_t int64Value;
-		uint64_t uint64Value;
+		EnumValue enumValue;
 
-		double doubleValue;
-    };
+		PairOfUint8Value pairOfUint8Value;
+		PairOfUint16Value pairOfUint16Value;
+		PairOfInt16Value pairOfInt16Value;
+	};
 };
 
 struct ArrayValue {
@@ -495,16 +503,6 @@ struct ArrayValue {
 struct StringRef : public Ref {
 	char str[4];
 };
-
-////////////////////////////////////////////////////////////////////////////////
-
-typedef bool (*CompareValueFunction)(const Value &a, const Value &b);
-typedef void (*ValueToTextFunction)(const Value &value, char *text, int count);
-typedef const char * (*ValueTypeNameFunction)(const Value &value);
-
-extern CompareValueFunction g_valueTypeCompareFunctions[];
-extern ValueToTextFunction g_valueTypeToTextFunctions[];
-extern ValueTypeNameFunction g_valueTypeNames[];
 
 ////////////////////////////////////////////////////////////////////////////////
 

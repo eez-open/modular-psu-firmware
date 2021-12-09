@@ -151,10 +151,10 @@ void ContainerWidgetState::renderOverlayChildren() {
 
 		widgetCursor.widget = (const Widget *)widgetPtr->ptr(widgetCursor.assets);
 
-        int xSaved = 0;
-        int ySaved = 0;
-        int wSaved = 0;
-        int hSaved = 0;
+        int16_t xSaved = 0;
+		int16_t ySaved = 0;
+		int16_t wSaved = 0;
+		int16_t hSaved = 0;
 
 		if (widgetOverrides) {
 			xSaved = widgetCursor.widget->x;

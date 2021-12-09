@@ -22,29 +22,29 @@
 #include <eez/unit.h>
 
 #define VALUE_TYPES \
-    VALUE_TYPE(UNDEFINED) \
-    VALUE_TYPE(NULL) \
-    VALUE_TYPE(BOOLEAN) \
-    VALUE_TYPE(INT8) \
-    VALUE_TYPE(UINT8) \
-    VALUE_TYPE(INT16) \
-    VALUE_TYPE(UINT16) \
-    VALUE_TYPE(INT32) \
-    VALUE_TYPE(UINT32) \
-    VALUE_TYPE(INT64) \
-    VALUE_TYPE(UINT64) \
-    VALUE_TYPE(FLOAT) \
-	VALUE_TYPE(DOUBLE) \
-    VALUE_TYPE(STRING) \
-    VALUE_TYPE(ARRAY) \
-	VALUE_TYPE(STRING_REF) \
-	VALUE_TYPE(VERSIONED_STRING) \
-	VALUE_TYPE(VALUE_PTR) \
-    VALUE_TYPE(FLOW_OUTPUT) \
-    VALUE_TYPE(RANGE) \
-    VALUE_TYPE(POINTER) \
-    VALUE_TYPE(ENUM) \
-    VALUE_TYPE(YT_DATA_GET_VALUE_FUNCTION_POINTER) \
+    VALUE_TYPE(UNDEFINED)                          /*  0 */ \
+    VALUE_TYPE(NULL)                               /*  1 */ \
+    VALUE_TYPE(BOOLEAN)                            /*  2 */ \
+    VALUE_TYPE(INT8)                               /*  3 */ \
+    VALUE_TYPE(UINT8)                              /*  4 */ \
+    VALUE_TYPE(INT16)                              /*  5 */ \
+    VALUE_TYPE(UINT16)                             /*  6 */ \
+    VALUE_TYPE(INT32)                              /*  7 */ \
+    VALUE_TYPE(UINT32)                             /*  8 */ \
+    VALUE_TYPE(INT64)                              /*  9 */ \
+    VALUE_TYPE(UINT64)                             /* 10 */ \
+    VALUE_TYPE(FLOAT)                              /* 11 */ \
+	VALUE_TYPE(DOUBLE)                             /* 12 */ \
+    VALUE_TYPE(STRING)                             /* 13 */ \
+    VALUE_TYPE(ARRAY)                              /* 14 */ \
+	VALUE_TYPE(STRING_REF)                         /* 15 */ \
+	VALUE_TYPE(VERSIONED_STRING)                   /* 16 */ \
+	VALUE_TYPE(VALUE_PTR)                          /* 17 */ \
+    VALUE_TYPE(FLOW_OUTPUT)                        /* 18 */ \
+    VALUE_TYPE(RANGE)                              /* 19 */ \
+    VALUE_TYPE(POINTER)                            /* 20 */ \
+    VALUE_TYPE(ENUM)                               /* 21 */ \
+    VALUE_TYPE(YT_DATA_GET_VALUE_FUNCTION_POINTER) /* 22 */ \
     CUSTOM_VALUE_TYPES
 
 namespace eez {

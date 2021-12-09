@@ -19,6 +19,8 @@
 #include <eez/flow/private.h>
 #include <eez/flow/operations.h>
 
+#include <eez/gui/gui.h>
+
 using namespace eez::gui;
 
 namespace eez {
@@ -47,8 +49,15 @@ bool evalExpression(FlowState *flowState, int componentIndex, const uint8_t *ins
 				return false;
 			}
 		} else if (instructionType == EXPR_EVAL_INSTRUCTION_TYPE_PUSH_GLOBAL_VAR) {
-			if (!stack.push(flowDefinition->globalVariables.item(assets, instructionArg))) {
-				return false;
+			if ((uint32_t)instructionArg < flowDefinition->globalVariables.count) {
+				if (!stack.push(flowDefinition->globalVariables.item(assets, instructionArg))) {
+					return false;
+				}
+			} else {
+				// native variable
+				if (!stack.push(get(g_widgetCursor, instructionArg + 1))) {
+					return false;
+				}
 			}
 		} else if (instructionType == EXPR_EVAL_INSTRUCTION_TYPE_PUSH_OUTPUT) {
 			if (!stack.push(Value((uint16_t)instructionArg, VALUE_TYPE_FLOW_OUTPUT))) {

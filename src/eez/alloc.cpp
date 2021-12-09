@@ -18,6 +18,7 @@
 
 #include <stdio.h>
 #include <math.h>
+#include <assert.h>
 
 #include <eez/alloc.h>
 #include <eez/os.h>
@@ -63,13 +64,14 @@ void *alloc(size_t size, uint32_t id) {
 		return nullptr;
 	}
 
-	size = ((size + ALIGNMENT - 1) / ALIGNMENT) * ALIGNMENT;
-
-	AllocBlock *first = (AllocBlock *)g_heap;
-
-	AllocBlock *block = first;
-
 	if (EEZ_MUTEX_WAIT(alloc, 0)) {
+		AllocBlock *firstBlock = (AllocBlock *)g_heap;
+
+		AllocBlock *block = firstBlock;
+		size = ((size + ALIGNMENT - 1) / ALIGNMENT) * ALIGNMENT;
+
+		// find free block with enough size
+		// TODO merge multiple free consecutive blocks into one that has enough size
 		while (block) {
 			if (block->free && block->size >= size) {
 				break;
@@ -82,13 +84,23 @@ void *alloc(size_t size, uint32_t id) {
 			return nullptr;
 		}
 
-		int nextBlockSize = block->size - size - sizeof(AllocBlock);
-		if (nextBlockSize >= (int)MIN_BLOCK_SIZE) {
-			auto nextBlock = (AllocBlock *)((uint8_t *)block + sizeof(AllocBlock) + size);
-			nextBlock->next = block->next;
-			nextBlock->free = 1;
-			nextBlock->size = nextBlockSize;
-			block->next = nextBlock;
+		int remainingSize = block->size - size - sizeof(AllocBlock);
+		if (remainingSize >= (int)MIN_BLOCK_SIZE) {
+			// remainingSize is enough to create a new block
+			auto newBlock = (AllocBlock *)((uint8_t *)block + sizeof(AllocBlock) + size);
+			newBlock->free = 1;
+
+			auto nextBlock = block->next;
+			if (nextBlock && nextBlock->free) {
+				// nextBlock is free, merge newBlock with nextBlock
+				newBlock->next = nextBlock->next;
+				newBlock->size = remainingSize + sizeof(AllocBlock) + nextBlock->size;
+			} else {
+				newBlock->next = nextBlock;
+				newBlock->size = remainingSize;
+			}
+
+			block->next = newBlock;
 			block->size = size;
 		}
 
@@ -96,9 +108,11 @@ void *alloc(size_t size, uint32_t id) {
 		block->id = id;
 
 		EEZ_MUTEX_RELEASE(alloc);
+
+		return block + 1;
 	}
-		
-	return block + 1;    
+
+	return nullptr;
 }
 
 void free(void *ptr) {
@@ -106,39 +120,46 @@ void free(void *ptr) {
 		return;
 	}
 
-	AllocBlock *first = (AllocBlock *)g_heap;
-
-	AllocBlock *block = first;
-
 	if (EEZ_MUTEX_WAIT(alloc, 0)) {
+		AllocBlock *firstBlock = (AllocBlock *)g_heap;
+
 		AllocBlock *prevBlock = nullptr;
+		AllocBlock *block = firstBlock;
+		
 		while (block && block + 1 < ptr) {
 			prevBlock = block;
 			block = block->next;
 		}
 
-		if (!block || block + 1 != ptr) {
-			// assert(0);
+		if (!block || block + 1 != ptr || block->free) {
+			assert(false);
 			EEZ_MUTEX_RELEASE(alloc);
 			return;
 		}
 
-		if (block->next && block->next->free) {
+		// reset memory to catch errors when memory is used after free is called
+		memset(ptr, 0xCC, block->size);
+
+		auto nextBlock = block->next;
+		if (nextBlock && nextBlock->free) {
 			if (prevBlock && prevBlock->free) {
-				prevBlock->next = block->next->next;
-				prevBlock->size += sizeof(AllocBlock) + block->size + sizeof(AllocBlock) + block->next->size;
+				// both next and prev blocks are free, merge 3 blocks into one
+				prevBlock->next = nextBlock->next;
+				prevBlock->size += sizeof(AllocBlock) + block->size + sizeof(AllocBlock) + nextBlock->size;
 			} else {
-				block->size += sizeof(AllocBlock) + block->next->size;
-				block->next = block->next->next;
+				// next block is free, merge 2 blocks into one
+				block->next = nextBlock->next;
+				block->size += sizeof(AllocBlock) + nextBlock->size;
 				block->free = 1;
 			}
 		} else if (prevBlock && prevBlock->free) {
-			prevBlock->next = block->next;
+			// prev block is free, merge 2 blocks into one
+			prevBlock->next = nextBlock;
 			prevBlock->size += sizeof(AllocBlock) + block->size;
 		} else {
+			// just free
 			block->free = 1;
 		}
-		block->free = 1;
 
 		EEZ_MUTEX_RELEASE(alloc);
 	}
@@ -164,7 +185,7 @@ void dumpAlloc(scpi_t *context) {
 	}
 }
 
-void getAllocInfo(int &free, int &alloc) {
+void getAllocInfo(uint32_t &free, uint32_t &alloc) {
 	free = 0;
 	alloc = 0;
 	if (EEZ_MUTEX_WAIT(alloc, 0)) {

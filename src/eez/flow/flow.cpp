@@ -110,8 +110,8 @@ void tick() {
 		if (--flowState->numActiveComponents == 0 && flowState->isAction) {
 			auto componentExecutionState = flowState->parentFlowState->componenentExecutionStates[flowState->parentComponentIndex];
 			if (componentExecutionState) {
-				ObjectAllocator<ComponenentExecutionState>::deallocate(componentExecutionState);
 				flowState->parentFlowState->componenentExecutionStates[flowState->parentComponentIndex] = nullptr;
+				ObjectAllocator<ComponenentExecutionState>::deallocate(componentExecutionState);
 			} else {
 				throwError(flowState, componentIndex, "Unexpected: no CallAction component state\n");
 				return;
@@ -141,8 +141,6 @@ FlowState *getFlowState(int16_t pageId, const WidgetCursor &widgetCursor) {
 	if (!g_mainPageFlowState) {
 		return nullptr;
 	}
-
-	pageId = -pageId - 1;
 
 	if (widgetCursor.widget && widgetCursor.widget->type == WIDGET_TYPE_LAYOUT_VIEW) {
 		if (widgetCursor.flowState) {

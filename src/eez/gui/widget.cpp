@@ -23,7 +23,6 @@
 #include <eez/debug.h>
 #include <eez/os.h>
 
-#include <eez/gui_conf.h>
 #include <eez/gui/gui.h>
 #include <eez/gui/assets.h>
 
@@ -184,38 +183,37 @@ void enumWidget() {
 	if (g_findCallback) {
 		g_findCallback();
 	} else {
-		if (widgetCursor.hasPreviousState) {
-            if (widget->type == widgetState->type) {
-                // reuse widget state
-                bool refresh = widgetState->updateState();
-                if (refresh || widgetCursor.forceRefresh) {
-                    widgetState->render();
-                }
-                goto EnumChildren;
+		if (widgetCursor.hasPreviousState && widget->type == widgetState->type) {
+            // reuse existing widget state
+            bool refresh = widgetState->updateState();
+            if (refresh || widgetCursor.forceRefresh) {
+                widgetState->render();
             }
-            // clear old state from current state
-            freeWidgetStates(widgetState);
-            widgetCursor.hasPreviousState = false;
+		} else {
+			if (widgetCursor.hasPreviousState) {
+				// clear old state from current state
+				freeWidgetStates(widgetState);
+				widgetCursor.hasPreviousState = false;
+			}
+
+			// create new widget state
+			g_widgetStatePlacementNewFunctions[widget->type](widgetState);
+			widgetState->type = widget->type;
+
+			widgetState->updateState();
+			widgetState->render();
+
+			if (g_foundWidgetAtDownInvalid) {
+				// find new cursor for g_foundWidgetAtDown
+				auto &foundWidgetAtDown = getFoundWidgetAtDown();
+				if (foundWidgetAtDown == widgetCursor) {
+					foundWidgetAtDown = widgetCursor;
+					g_foundWidgetAtDownInvalid = false;
+				}
+			}
 		}
-
-        // create widget state
-        g_widgetStatePlacementNewFunctions[widget->type](widgetState);
-        widgetState->type = widget->type;
-        
-        widgetState->updateState();
-        widgetState->render();
-
-        if (g_foundWidgetAtDownInvalid) {
-            // find new cursor for g_foundWidgetAtDown
-            auto &foundWidgetAtDown = getFoundWidgetAtDown();
-            if (foundWidgetAtDown == widgetCursor) {
-                foundWidgetAtDown = widgetCursor;
-                g_foundWidgetAtDownInvalid = false;
-            }
-        }
 	}
 
-EnumChildren:
 	widgetCursor.currentState = (WidgetState *)((uint8_t *)widgetCursor.currentState + g_widgetStateSizes[widget->type]);
 
 	uint32_t stateSize = (uint8_t *)widgetCursor.currentState - (uint8_t *)g_widgetStateStart;
@@ -375,8 +373,7 @@ static void findWidgetStep() {
                 // if found widget is AppView, make sure we set right AppContext
                 if (widget->type == WIDGET_TYPE_APP_VIEW) {
                     if (widget->data != DATA_ID_NONE) {
-                        Value appContextValue;
-                        DATA_OPERATION_FUNCTION(widget->data, DATA_OPERATION_GET, widgetCursor, appContextValue);
+                        Value appContextValue = get(widgetCursor, widget->data);
                         g_foundWidget.appContext = appContextValue.getAppContext();
                     }
                 }

@@ -16,7 +16,10 @@
 * along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
+#include <stdio.h>
+
 #include <eez/debug.h>
+#include <eez/os.h>
 
 #include <eez/gui/gui.h>
 #include <eez/gui/widgets/containers/app_view.h>

@@ -28,8 +28,7 @@ bool AppViewWidgetState::updateState() {
     const WidgetCursor &widgetCursor = g_widgetCursor;
 
     if (widgetCursor.widget->data != DATA_ID_NONE) {
-        Value appContextValue;
-        DATA_OPERATION_FUNCTION(widgetCursor.widget->data, DATA_OPERATION_GET, widgetCursor, appContextValue);
+        Value appContextValue = get(widgetCursor, widgetCursor.widget->data);
         appContext = appContextValue.getAppContext();
     } else {
         appContext = widgetCursor.appContext;

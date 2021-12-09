@@ -21,7 +21,6 @@
 #include <memory.h>
 
 #include <eez/conf.h>
-#include <eez/gui_conf.h>
 #include <eez/util.h>
 
 #if OPTION_KEYBOARD

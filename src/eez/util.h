@@ -21,6 +21,7 @@
 #include <stdint.h>
 #include <stdlib.h>
 
+#include <eez/os.h>
 #include <eez/unit.h>
 
 #define clear_bit(reg, bitmask) *reg &= ~bitmask
@@ -139,6 +140,31 @@ void formatBytes(uint64_t bytes, char *text, int count);
 
 void getFileName(const char *path, char *fileName, unsigned fileNameSize);
 void getBaseFileName(const char *path, char *baseName, unsigned baseNameSize);
+
+class Interval {
+public:
+	// Returns true when called for the first time,
+	// and later returns true after interval, interval * 2, interval * 3, ...
+	// Interval is in milliseconds.
+	bool test(uint32_t interval) {
+		auto time = millis();
+
+		if (lastTime == 0) {
+			lastTime = time == 0 ? 1 : time;
+			return true;
+		}
+
+		if (time >= lastTime + interval) {
+			lastTime += ((uint32_t)(time - lastTime) / interval) * interval;
+			return true;
+		}
+
+		return false;
+	}
+
+private:
+	uint32_t lastTime = 0;
+};
 
 template <typename T, typename Total, uint64_t N>
 class MovingAverage {

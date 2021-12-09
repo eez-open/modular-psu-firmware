@@ -32,7 +32,7 @@ bool BitmapWidgetState::updateState() {
     auto widget = (const BitmapWidget *)widgetCursor.widget;
     
     WIDGET_STATE(flags.active, g_isActiveWidget);
-    WIDGET_STATE(data, widget->data ? getBitmapImage(widgetCursor, widget->data) : 0);
+    WIDGET_STATE(data, widget->data ? getBitmapImage(widgetCursor, widget->data) : get(widgetCursor, widget->data));
 
     return !hasPreviousState;
 }
@@ -46,17 +46,14 @@ void BitmapWidgetState::render() {
     const Bitmap *bitmap = nullptr;
 
     if (widget->data) {
-        if (data.getType() != VALUE_TYPE_UNDEFINED) {
-            drawRectangle(widgetCursor.x, widgetCursor.y, (int)widget->w, (int)widget->h, style, flags.active, true);
+        if (data.getType() == VALUE_TYPE_POINTER) {
             auto image = (Image *)data.getVoidPointer();
             if (image) {
                 drawBitmap(image, widgetCursor.x, widgetCursor.y, (int)widget->w, (int)widget->h, style, flags.active);
             }
             return;
         } else {
-            Value valueBitmapId;
-            DATA_OPERATION_FUNCTION(widget->data,  DATA_OPERATION_GET, widgetCursor, valueBitmapId);
-            bitmap = getBitmap(valueBitmapId.getInt());
+            bitmap = getBitmap(data.getInt());
         }
     } else if (widget->bitmap != 0) {
         bitmap = getBitmap(widget->bitmap);

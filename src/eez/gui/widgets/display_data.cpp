@@ -21,7 +21,6 @@
 #include <eez/os.h>
 #include <eez/util.h>
 
-#include <eez/gui_conf.h>
 #include <eez/gui/gui.h>
 #include <eez/gui/widgets/display_data.h>
 

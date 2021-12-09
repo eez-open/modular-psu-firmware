@@ -152,7 +152,7 @@ static FlowState *initFlowState(Assets *assets, int flowIndex, FlowState *parent
 	flowState->componenentExecutionStates = (ComponenentExecutionState **)(flowState->values + nValues);
 
 	for (unsigned i = 0; i < nValues; i++) {
-		flowState->values[i].clear();
+		new (flowState->values + i) Value();
 	}
 
 	auto &undefinedValue = *flowDefinition->constants.item(assets, UNDEFINED_VALUE_INDEX);

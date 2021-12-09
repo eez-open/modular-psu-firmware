@@ -22,7 +22,6 @@
 #include <eez/conf.h>
 #include <eez/util.h>
 
-#include <eez/gui_conf.h>
 #include <eez/gui/gui.h>
 #include <eez/gui/widgets/yt_graph.h>
 
@@ -496,7 +495,7 @@ bool YTGraphWidgetState::updateState() {
 
 	auto new_historyValuePosition = ytDataGetPosition(widgetCursor, widget->data);
 
-    if (false && hasPreviousState) {
+    if (hasPreviousState) {
     	previousHistoryValuePosition = historyValuePosition;
     } else {
         uint16_t graphWidth = (uint16_t)widget->w;

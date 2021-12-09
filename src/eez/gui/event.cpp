@@ -19,7 +19,6 @@
 #include <stdio.h>
 
 #include <eez/conf.h>
-#include <eez/gui_conf.h>
 #include <eez/os.h>
 #include <eez/hmi.h>
 
@@ -30,7 +29,6 @@
 #include <eez/util.h>
 
 #include <eez/gui/gui.h>
-#include <eez/gui_conf.h>
 
 #define CONF_GUI_LONG_TOUCH_TIMEOUT_MS 1000
 #define CONF_GUI_KEYPAD_FIRST_AUTO_REPEAT_DELAY_MS 300

@@ -30,7 +30,6 @@
 #include <eez/util.h>
 
 #include <eez/gui/gui.h>
-#include <eez/gui_conf.h>
 
 #include <eez/flow/flow.h>
 
@@ -42,10 +41,29 @@ namespace gui {
 bool g_isBlinkTime;
 static bool g_wasBlinkTime;
 
+uint32_t g_fps;
+
 ////////////////////////////////////////////////////////////////////////////////
 
+void guiInit() {
+    if (g_mainAssets->flowDefinition) {
+        flow::start(g_mainAssets);
+    }
+}
+
 void guiTick() {
+    // calculate last FPS value
+	static uint32_t g_lastTimeFPS;
+	uint32_t time = millis();
+	auto diff = time - g_lastTimeFPS;
+	g_lastTimeFPS = time;
+	g_fps = diff > 0 ? 1000 / diff : 0;
+
 	display::sync();
+
+    if (g_mainAssets->flowDefinition) {
+        flow::tick();
+    }
 
 	g_wasBlinkTime = g_isBlinkTime;
 	g_isBlinkTime = (millis() % (2 * CONF_GUI_BLINK_TIME)) > CONF_GUI_BLINK_TIME;
@@ -64,14 +82,6 @@ void guiTick() {
 
 bool isInternalAction(int actionId) {
     return actionId > FIRST_INTERNAL_ACTION_ID;
-}
-
-int getWidgetAction(const WidgetCursor &widgetCursor) {
-    if (widgetCursor.widget->type == WIDGET_TYPE_INPUT) {
-        return EEZ_CONF_ACTION_ID_EDIT;
-    } else {
-		return widgetCursor.widget->action;
-    }
 }
 
 void executeAction(const WidgetCursor &widgetCursor, int actionId) {

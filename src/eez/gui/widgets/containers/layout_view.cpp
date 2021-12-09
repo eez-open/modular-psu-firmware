@@ -34,7 +34,7 @@ int getLayoutId(const WidgetCursor &widgetCursor) {
 }
 
 bool LayoutViewWidgetState::updateState() {
-    const WidgetCursor &widgetCursor = g_widgetCursor;
+    WidgetCursor &widgetCursor = g_widgetCursor;
 
     bool hasPreviousState = widgetCursor.hasPreviousState;
     auto widget = (const LayoutViewWidget *)widgetCursor.widget;
@@ -49,13 +49,10 @@ bool LayoutViewWidgetState::updateState() {
 
     WIDGET_STATE(flags.active, g_isActiveWidget);
 
-    int layoutId = getLayoutId(widgetCursor);
-	auto layout = getPageAsset(layoutId);
-	if (layout) {
-		WIDGET_STATE(data, layoutId);
-	} else {
-		WIDGET_STATE(data, 0);
-	}
+    auto savedFlowState = widgetCursor.flowState;
+    WIDGET_STATE(layout, getPageAsset(getLayoutId(widgetCursor), widgetCursor));
+    flowState = widgetCursor.flowState;
+    widgetCursor.flowState = savedFlowState;
 
     return !hasPreviousState;
 }
@@ -65,11 +62,18 @@ void LayoutViewWidgetState::render() {
     auto widget = (const LayoutViewWidget *)widgetCursor.widget;
     const Style* style = getStyle(widget->style);
     drawRectangle(widgetCursor.x, widgetCursor.y, (int)widget->w, (int)widget->h, style, flags.active);
+    if (layout) {
+        const Style* styleLayout = getStyle(layout->style);
+        drawRectangle(widgetCursor.x, widgetCursor.y, (int)layout->w, (int)layout->h, styleLayout, flags.active);
+    }
 	repainted = true;
 }
 
 void LayoutViewWidgetState::enumChildren() {
 	WidgetCursor& widgetCursor = g_widgetCursor;
+
+    auto savedFlowState = widgetCursor.flowState;
+    widgetCursor.flowState = flowState;
 
 	auto widget = (const LayoutViewWidget *)widgetCursor.widget;
 
@@ -81,6 +85,10 @@ void LayoutViewWidgetState::enumChildren() {
 	} else {
 		const Style* style = getStyle(widget->style);
 		widgetCursor.pushBackground(widgetCursor.x, widgetCursor.y, style, flags.active);
+        if (layout) {
+            const Style* styleLayout = getStyle(layout->style);
+		    widgetCursor.pushBackground(widgetCursor.x, widgetCursor.y, styleLayout, flags.active);
+        }
 	}
 
     auto savedForceRefresh = widgetCursor.forceRefresh;
@@ -89,10 +97,7 @@ void LayoutViewWidgetState::enumChildren() {
 		widgetCursor.forceRefresh = true;
 	}
 
-	auto layoutId = data.getInt();
-    if (layoutId) {
-		auto layout = getPageAsset(layoutId, widgetCursor);
-
+    if (layout) {
 		auto savedWidget = widgetCursor.widget;
         
         auto &widgets = layout->widgets;
@@ -110,9 +115,14 @@ void LayoutViewWidgetState::enumChildren() {
         restoreContext(widgetCursor, widget->context, oldContext);
     }
 
+    widgetCursor.flowState = savedFlowState;
+
     widgetCursor.forceRefresh = savedForceRefresh;
 
     if (g_findCallback == nullptr) {
+        if (layout) {
+            widgetCursor.popBackground();
+        }
         widgetCursor.popBackground();
     }
 }

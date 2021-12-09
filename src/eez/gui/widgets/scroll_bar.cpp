@@ -26,7 +26,6 @@
 #include <eez/keyboard.h>
 #endif
 
-#include <eez/gui_conf.h>
 #include <eez/gui/gui.h>
 #include <eez/gui/widgets/scroll_bar.h>
 

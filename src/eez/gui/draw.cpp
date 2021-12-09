@@ -20,7 +20,6 @@
 #define _USE_MATH_DEFINES
 #include <math.h>
 
-#include <eez/gui_conf.h>
 #include <eez/util.h>
 
 #include <eez/gui/gui.h>
@@ -177,6 +176,9 @@ void drawText(
     drawBorderAndBackground(x1, y1, x2, y2, style, backgroundColor, ignoreLuminocity);
 
     font::Font font = styleGetFont(style);
+	if (!font) {
+		return;
+	}
 
     int width = display::measureStr(text, textLength, font, 0);
     while (useSmallerFontIfDoesNotFit && width > x2 - x1 + 1 && styleGetSmallerFontHook(font)) {

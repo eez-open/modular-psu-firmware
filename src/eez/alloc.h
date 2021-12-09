@@ -43,6 +43,6 @@ template<class T> struct ObjectAllocator {
 
 void dumpAlloc(scpi_t *context);
 
-void getAllocInfo(int &free, int &alloc);
+void getAllocInfo(uint32_t &free, uint32_t &alloc);
 
 } // eez

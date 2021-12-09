@@ -32,6 +32,10 @@ struct Font {
     Font();
     Font(const FontData *fontData_);
 
+	explicit operator bool() const {
+		return fontData != nullptr;
+	}
+
     const GlyphData *getGlyph(uint8_t encoding);
 
     uint8_t getAscent();

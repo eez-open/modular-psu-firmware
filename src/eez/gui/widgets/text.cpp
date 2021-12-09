@@ -16,6 +16,7 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
+#include <stdio.h>
 #include <string.h>
 
 #include <eez/util.h>
@@ -50,7 +51,7 @@ bool TextWidgetState::updateState() {
     WIDGET_STATE(flags.blinking, g_isBlinkTime && styleIsBlink(style));
     
     const char *text = widget->text.ptr(widgetCursor.assets);
-    WIDGET_STATE(data, !(text && text[0]) && widget->data ? get(widgetCursor, widget->data) : 0);
+	WIDGET_STATE(data, !(text && text[0]) && widget->data ? get(widgetCursor, widget->data) : 0);
 
     return !hasPreviousState;
 }

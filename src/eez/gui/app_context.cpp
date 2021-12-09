@@ -21,7 +21,6 @@
 #include <memory.h>
 
 #include <eez/conf.h>
-#include <eez/gui_conf.h>
 #include <eez/sound.h>
 #include <eez/os.h>
 #include <eez/util.h>
@@ -35,7 +34,6 @@
 #endif
 
 #include <eez/gui/gui.h>
-#include <eez/gui_conf.h>
 #include <eez/gui/widgets/button.h>
 
 #include <eez/hmi.h>
