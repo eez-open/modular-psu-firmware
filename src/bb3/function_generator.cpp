@@ -984,6 +984,7 @@ void setProfileParameters(const psu::profile::Parameters &profileParams) {
 	}
 
 	g_selectedResources.m_numResources = j;
+	g_functionGeneratorPage.init();
 
 	for (int i = 0; i < AllResources::getNumResources(); i++) {
 		int slotIndex;
@@ -2154,9 +2155,9 @@ void data_function_generator_channels(DataOperationEnum operation, const WidgetC
 
 void data_function_generator_canvas(DataOperationEnum operation, const WidgetCursor &widgetCursor, Value &value) {
 	if (operation == DATA_OPERATION_GET) {
-		value = g_functionGeneratorPage.getRefreshState();
-	} else if (operation == DATA_OPERATION_GET_CANVAS_DRAW_FUNCTION) {
 		value = Value((void *)FunctionGeneratorPage::drawStatic, VALUE_TYPE_POINTER);
+	} else if (operation == DATA_OPERATION_GET_CANVAS_REFRESH_STATE) {
+		value = g_functionGeneratorPage.getRefreshState();
 	} 
 }
 

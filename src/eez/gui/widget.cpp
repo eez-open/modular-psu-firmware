@@ -159,7 +159,9 @@ void WidgetCursor::pushBackground(int x, int y, const Style *style, bool active)
 }
 
 void WidgetCursor::popBackground() {
-    backgroundStyleStackPointer--;
+	if (backgroundStyleStackPointer > 0) {
+		backgroundStyleStackPointer--;
+	}
 }
 
 ////////////////////////////////////////////////////////////////////////////////

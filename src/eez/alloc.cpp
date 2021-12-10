@@ -88,17 +88,9 @@ void *alloc(size_t size, uint32_t id) {
 		if (remainingSize >= (int)MIN_BLOCK_SIZE) {
 			// remainingSize is enough to create a new block
 			auto newBlock = (AllocBlock *)((uint8_t *)block + sizeof(AllocBlock) + size);
+			newBlock->next = block->next;
 			newBlock->free = 1;
-
-			auto nextBlock = block->next;
-			if (nextBlock && nextBlock->free) {
-				// nextBlock is free, merge newBlock with nextBlock
-				newBlock->next = nextBlock->next;
-				newBlock->size = remainingSize + sizeof(AllocBlock) + nextBlock->size;
-			} else {
-				newBlock->next = nextBlock;
-				newBlock->size = remainingSize;
-			}
+			newBlock->size = remainingSize;
 
 			block->next = newBlock;
 			block->size = size;

@@ -30,7 +30,7 @@ bool CanvasWidgetState::updateState() {
     bool hasPreviousState = widgetCursor.hasPreviousState;
     auto widget = (const CanvasWidget *)widgetCursor.widget;
 
-    WIDGET_STATE(data, get(widgetCursor, widget->data));
+    WIDGET_STATE(data, getCanvasRefreshState(widgetCursor, widget->data));
 
     return !hasPreviousState;
 }
@@ -40,10 +40,10 @@ void CanvasWidgetState::render() {
 
     auto widget = (const CanvasWidget *)widgetCursor.widget;
 
-    Value value;
-    DATA_OPERATION_FUNCTION(widget->data, DATA_OPERATION_GET_CANVAS_DRAW_FUNCTION, widgetCursor, value);
-    auto drawFunction = (void (*)(const WidgetCursor &widgetCursor))value.getVoidPointer();
-    drawFunction(widgetCursor);
+    auto drawFunction = getCanvasDrawFunction(widgetCursor, widget->data);
+    if (drawFunction) {
+        drawFunction(widgetCursor);
+    }
 }
 
 } // namespace gui

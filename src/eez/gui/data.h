@@ -580,7 +580,7 @@ enum DataOperationEnum {
     DATA_OPERATION_YT_DATA_GET_CURSOR_OFFSET,
     DATA_OPERATION_YT_DATA_GET_CURSOR_X_VALUE,
     DATA_OPERATION_YT_DATA_TOUCH_DRAG,
-    DATA_OPERATION_GET_CANVAS_DRAW_FUNCTION,
+    DATA_OPERATION_GET_CANVAS_REFRESH_STATE,
     DATA_OPERATION_GET_TEXT_CURSOR_POSITION,
     DATA_OPERATION_GET_X_SCROLL,
 	DATA_OPERATION_GET_SLOT_AND_SUBCHANNEL_INDEX,
@@ -676,6 +676,10 @@ void getSlotAndSubchannelIndex(const WidgetCursor &widgetCursor, int16_t id, int
 
 bool isMicroAmperAllowed(const WidgetCursor &widgetCursor, int16_t id);
 bool isAmperAllowed(const WidgetCursor &widgetCursor, int16_t id);
+
+typedef void (*CanvasDrawFunction)(const WidgetCursor &widgetCursor);
+CanvasDrawFunction getCanvasDrawFunction(const WidgetCursor &widgetCursor, int16_t id);
+Value getCanvasRefreshState(const WidgetCursor &widgetCursor, int16_t id);
 
 typedef void(*DataOperationsFunction)(DataOperationEnum operation, const WidgetCursor &widgetCursor, Value &value);
 extern DataOperationsFunction g_dataOperationsFunctions[];

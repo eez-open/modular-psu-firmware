@@ -293,7 +293,6 @@ void sync() {
 
         clearDirty();
     }
-
 }
 
 void finishAnimation() {

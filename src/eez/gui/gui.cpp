@@ -41,7 +41,11 @@ namespace gui {
 bool g_isBlinkTime;
 static bool g_wasBlinkTime;
 
-uint32_t g_fps;
+#ifdef EEZ_CONF_GUI_CALC_FPS
+uint32_t g_fpsValues[NUM_FPS_VALUES];
+uint32_t g_fpsAvg;
+static uint32_t g_fpsTotal;
+#endif
 
 ////////////////////////////////////////////////////////////////////////////////
 
@@ -52,21 +56,33 @@ void guiInit() {
 }
 
 void guiTick() {
+	display::sync();
+
+#ifdef EEZ_CONF_GUI_CALC_FPS
     // calculate last FPS value
+	g_fpsTotal -= g_fpsValues[0];
+
+	for (size_t i = 1; i < NUM_FPS_VALUES; i++) {
+		g_fpsValues[i - 1] = g_fpsValues[i];
+	}
+
 	static uint32_t g_lastTimeFPS;
 	uint32_t time = millis();
 	auto diff = time - g_lastTimeFPS;
 	g_lastTimeFPS = time;
-	g_fps = diff > 0 ? 1000 / diff : 0;
 
-	display::sync();
+	g_fpsValues[NUM_FPS_VALUES - 1] = 1000 / diff;
+
+	g_fpsTotal += g_fpsValues[NUM_FPS_VALUES - 1];
+	g_fpsAvg = g_fpsTotal / NUM_FPS_VALUES;
+#endif
+
+	g_wasBlinkTime = g_isBlinkTime;
+	g_isBlinkTime = (millis() % (2 * CONF_GUI_BLINK_TIME)) > CONF_GUI_BLINK_TIME;
 
     if (g_mainAssets->flowDefinition) {
         flow::tick();
     }
-
-	g_wasBlinkTime = g_isBlinkTime;
-	g_isBlinkTime = (millis() % (2 * CONF_GUI_BLINK_TIME)) > CONF_GUI_BLINK_TIME;
 
 	eventHandling();
 	stateManagmentHook();

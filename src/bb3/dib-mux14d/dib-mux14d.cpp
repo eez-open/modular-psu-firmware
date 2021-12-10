@@ -201,7 +201,7 @@ public:
 	uint32_t p2RelayCycles[NUM_RELAYS];
 	uint32_t lastWrittenP2RelayCycles[NUM_RELAYS];
 
-	Interval relayCyclesWriteInterval = WRITE_ONTIME_INTERVAL * MIN_TO_MS;
+	psu::Interval relayCyclesWriteInterval = WRITE_ONTIME_INTERVAL * MIN_TO_MS;
 
     float cjTemp = 0.0f;
 

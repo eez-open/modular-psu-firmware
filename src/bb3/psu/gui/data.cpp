@@ -6086,9 +6086,9 @@ void data_ramp_and_delay_list(DataOperationEnum operation, const WidgetCursor &w
     } else if (operation == DATA_OPERATION_DESELECT) {
         selectChannel((Channel * )value.getVoidPointer());
     } else if (operation == DATA_OPERATION_GET) {
-        value = page->getRefreshState();
-    } else if (operation == DATA_OPERATION_GET_CANVAS_DRAW_FUNCTION) {
         value = Value((void *)SysSettingsRampAndDelayPage::draw, VALUE_TYPE_POINTER);
+    } else if (operation == DATA_OPERATION_GET_CANVAS_REFRESH_STATE) {
+        value = page->getRefreshState();
     }
 }
 

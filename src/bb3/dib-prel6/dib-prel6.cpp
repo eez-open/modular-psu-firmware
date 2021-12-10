@@ -177,7 +177,7 @@ public:
     // relay cycles counting    
     uint32_t relayCycles[NUM_RELAYS];
     uint32_t lastWrittenRelayCycles[NUM_RELAYS];
-    Interval relayCyclesWriteInterval = WRITE_ONTIME_INTERVAL * MIN_TO_MS;
+    psu::Interval relayCyclesWriteInterval = WRITE_ONTIME_INTERVAL * MIN_TO_MS;
 
     Prel6Module() {
         assert(sizeof(Request) <= BUFFER_SIZE);

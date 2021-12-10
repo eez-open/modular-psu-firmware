@@ -1270,61 +1270,61 @@ bool getAllowZero(const WidgetCursor &widgetCursor, int16_t id) {
     return value.getInt() != 0;
 }
 
-Value getMin(const WidgetCursor &widgetCursor,  int16_t id) {
+Value getMin(const WidgetCursor &widgetCursor, int16_t id) {
     Value value;
     DATA_OPERATION_FUNCTION(id, DATA_OPERATION_GET_MIN, widgetCursor, value);
     return value;
 }
 
-Value getMax(const WidgetCursor &widgetCursor,  int16_t id) {
+Value getMax(const WidgetCursor &widgetCursor, int16_t id) {
     Value value;
     DATA_OPERATION_FUNCTION(id, DATA_OPERATION_GET_MAX, widgetCursor, value);
     return value;
 }
 
-Value getDef(const WidgetCursor &widgetCursor,  int16_t id) {
+Value getDef(const WidgetCursor &widgetCursor, int16_t id) {
     Value value;
     DATA_OPERATION_FUNCTION(id, DATA_OPERATION_GET_DEF, widgetCursor, value);
     return value;
 }
 
-Value getPrecision(const WidgetCursor &widgetCursor,  int16_t id) {
+Value getPrecision(const WidgetCursor &widgetCursor, int16_t id) {
     Value value;
     DATA_OPERATION_FUNCTION(id, DATA_OPERATION_GET_PRECISION, widgetCursor, value);
     return value;
 }
 
-Value getLimit(const WidgetCursor &widgetCursor,  int16_t id) {
+Value getLimit(const WidgetCursor &widgetCursor, int16_t id) {
     Value value;
     DATA_OPERATION_FUNCTION(id, DATA_OPERATION_GET_LIMIT, widgetCursor, value);
     return value;
 }
 
-const char *getName(const WidgetCursor &widgetCursor,  int16_t id) {
+const char *getName(const WidgetCursor &widgetCursor, int16_t id) {
     Value value;
     DATA_OPERATION_FUNCTION(id, DATA_OPERATION_GET_NAME, widgetCursor, value);
     return value.getString();
 }
 
-Unit getUnit(const WidgetCursor &widgetCursor,  int16_t id) {
+Unit getUnit(const WidgetCursor &widgetCursor, int16_t id) {
     Value value;
     DATA_OPERATION_FUNCTION(id, DATA_OPERATION_GET_UNIT, widgetCursor, value);
     return (Unit)value.getInt();
 }
 
-bool isChannelData(const WidgetCursor &widgetCursor,  int16_t id) {
+bool isChannelData(const WidgetCursor &widgetCursor, int16_t id) {
     Value value;
     DATA_OPERATION_FUNCTION(id, DATA_OPERATION_GET_IS_CHANNEL_DATA, widgetCursor, value);
     return value.getInt() != 0;
 }
 
-void getLabel(const WidgetCursor &widgetCursor,  int16_t id, char *text, int count) {
+void getLabel(const WidgetCursor &widgetCursor, int16_t id, char *text, int count) {
     Value value;
     DATA_OPERATION_FUNCTION(id, DATA_OPERATION_GET_LABEL, widgetCursor, value);
     value.toText(text, count);
 }
 
-void getEncoderStepValues(const WidgetCursor &widgetCursor,  int16_t id, StepValues &stepValues) {
+void getEncoderStepValues(const WidgetCursor &widgetCursor, int16_t id, StepValues &stepValues) {
     Value value(&stepValues, VALUE_TYPE_POINTER);
     DATA_OPERATION_FUNCTION(id, DATA_OPERATION_GET_ENCODER_STEP_VALUES, widgetCursor, value);
     if (value.getType() == VALUE_TYPE_INT32 && value.getInt()) {
@@ -1341,35 +1341,35 @@ void getEncoderStepValues(const WidgetCursor &widgetCursor,  int16_t id, StepVal
     }
 }
 
-void setEncoderMode(const WidgetCursor &widgetCursor,  int16_t id, EncoderMode encoderMode) {
+void setEncoderMode(const WidgetCursor &widgetCursor, int16_t id, EncoderMode encoderMode) {
 	Value value(encoderMode, VALUE_TYPE_INT32);
 	DATA_OPERATION_FUNCTION(id, DATA_OPERATION_SET_ENCODER_MODE, widgetCursor, value);
 }
 
-Value get(const WidgetCursor &widgetCursor,  int16_t id) {
+Value get(const WidgetCursor &widgetCursor, int16_t id) {
     Value value;
     DATA_OPERATION_FUNCTION(id, DATA_OPERATION_GET, widgetCursor, value);
     return value;
 }
 
-const char *isValidValue(const WidgetCursor &widgetCursor,  int16_t id, Value value) {
+const char *isValidValue(const WidgetCursor &widgetCursor, int16_t id, Value value) {
     Value savedValue = value;
     DATA_OPERATION_FUNCTION(id, DATA_OPERATION_IS_VALID_VALUE, widgetCursor, value);
     return value != savedValue ? value.getString() : nullptr;
 }
 
-Value set(const WidgetCursor &widgetCursor,  int16_t id, Value value) {
+Value set(const WidgetCursor &widgetCursor, int16_t id, Value value) {
     DATA_OPERATION_FUNCTION(id, DATA_OPERATION_SET, widgetCursor, value);
     return value;
 }
 
-Value getDisplayValueRange(const WidgetCursor &widgetCursor,  int16_t id) {
+Value getDisplayValueRange(const WidgetCursor &widgetCursor, int16_t id) {
     Value value;
     DATA_OPERATION_FUNCTION(id, DATA_OPERATION_GET_DISPLAY_VALUE_RANGE, widgetCursor, value);
     return value;
 }
 
-uint32_t getTextRefreshRate(const WidgetCursor &widgetCursor,  int16_t id) {
+uint32_t getTextRefreshRate(const WidgetCursor &widgetCursor, int16_t id) {
     Value value;
     DATA_OPERATION_FUNCTION(id, DATA_OPERATION_GET_TEXT_REFRESH_RATE, widgetCursor, value);
     if (value.getType() == VALUE_TYPE_UINT32) {
@@ -1378,7 +1378,7 @@ uint32_t getTextRefreshRate(const WidgetCursor &widgetCursor,  int16_t id) {
     return 0;
 }
 
-uint16_t getColor(const WidgetCursor &widgetCursor,  int16_t id, const Style *style) {
+uint16_t getColor(const WidgetCursor &widgetCursor, int16_t id, const Style *style) {
     Value value((void *)style, VALUE_TYPE_POINTER);
     DATA_OPERATION_FUNCTION(id, DATA_OPERATION_GET_COLOR, widgetCursor, value);
     if (value.getType() == VALUE_TYPE_UINT16) {
@@ -1387,7 +1387,7 @@ uint16_t getColor(const WidgetCursor &widgetCursor,  int16_t id, const Style *st
     return style->color;
 }
 
-uint16_t getBackgroundColor(const WidgetCursor &widgetCursor,  int16_t id, const Style *style) {
+uint16_t getBackgroundColor(const WidgetCursor &widgetCursor, int16_t id, const Style *style) {
     Value value((void *)style, VALUE_TYPE_POINTER);
     DATA_OPERATION_FUNCTION(id, DATA_OPERATION_GET_BACKGROUND_COLOR, widgetCursor, value);
     if (value.getType() == VALUE_TYPE_UINT16) {
@@ -1396,7 +1396,7 @@ uint16_t getBackgroundColor(const WidgetCursor &widgetCursor,  int16_t id, const
     return style->backgroundColor;
 }
 
-uint16_t getActiveColor(const WidgetCursor &widgetCursor,  int16_t id, const Style *style) {
+uint16_t getActiveColor(const WidgetCursor &widgetCursor, int16_t id, const Style *style) {
     Value value((void *)style, VALUE_TYPE_POINTER);
     DATA_OPERATION_FUNCTION(id, DATA_OPERATION_GET_ACTIVE_COLOR, widgetCursor, value);
     if (value.getType() == VALUE_TYPE_UINT16) {
@@ -1405,7 +1405,7 @@ uint16_t getActiveColor(const WidgetCursor &widgetCursor,  int16_t id, const Sty
     return style->activeColor;
 }
 
-uint16_t getActiveBackgroundColor(const WidgetCursor &widgetCursor,  int16_t id, const Style *style) {
+uint16_t getActiveBackgroundColor(const WidgetCursor &widgetCursor, int16_t id, const Style *style) {
     Value value((void *)style, VALUE_TYPE_POINTER);
     DATA_OPERATION_FUNCTION(id, DATA_OPERATION_GET_ACTIVE_BACKGROUND_COLOR, widgetCursor, value);
     if (value.getType() == VALUE_TYPE_UINT16) {
@@ -1428,44 +1428,44 @@ bool isBlinking(const WidgetCursor &widgetCursor, int16_t id) {
     return value.getInt() ? true : false;
 }
 
-Value getEditValue(const WidgetCursor &widgetCursor,  int16_t id) {
+Value getEditValue(const WidgetCursor &widgetCursor, int16_t id) {
     Value value;
     DATA_OPERATION_FUNCTION(id, DATA_OPERATION_GET, widgetCursor, value);
     DATA_OPERATION_FUNCTION(id, DATA_OPERATION_GET_EDIT_VALUE, widgetCursor, value);
     return value;
 }
 
-Value getBitmapImage(const WidgetCursor &widgetCursor,  int16_t id) {
+Value getBitmapImage(const WidgetCursor &widgetCursor, int16_t id) {
     Value value;
     DATA_OPERATION_FUNCTION(id, DATA_OPERATION_GET_BITMAP_IMAGE, widgetCursor, value);
     return value;
 }
 
-uint32_t ytDataGetRefreshCounter(const WidgetCursor &widgetCursor,  int16_t id) {
+uint32_t ytDataGetRefreshCounter(const WidgetCursor &widgetCursor, int16_t id) {
     Value value;
     DATA_OPERATION_FUNCTION(id, DATA_OPERATION_YT_DATA_GET_REFRESH_COUNTER, widgetCursor, value);
     return value.getUInt32();
 }
 
-uint32_t ytDataGetSize(const WidgetCursor &widgetCursor,  int16_t id) {
+uint32_t ytDataGetSize(const WidgetCursor &widgetCursor, int16_t id) {
     Value value;
     DATA_OPERATION_FUNCTION(id, DATA_OPERATION_YT_DATA_GET_SIZE, widgetCursor, value);
     return value.getUInt32();
 
 }
 
-uint32_t ytDataGetPosition(const WidgetCursor &widgetCursor,  int16_t id) {
+uint32_t ytDataGetPosition(const WidgetCursor &widgetCursor, int16_t id) {
     Value value;
     DATA_OPERATION_FUNCTION(id, DATA_OPERATION_YT_DATA_GET_POSITION, widgetCursor, value);
     return value.getUInt32();
 }
 
-void ytDataSetPosition(const WidgetCursor &widgetCursor,  int16_t id, uint32_t newPosition) {
+void ytDataSetPosition(const WidgetCursor &widgetCursor, int16_t id, uint32_t newPosition) {
 	Value value(newPosition, VALUE_TYPE_UINT32);
     DATA_OPERATION_FUNCTION(id, DATA_OPERATION_YT_DATA_SET_POSITION, widgetCursor, value);
 }
 
-uint32_t ytDataGetPositionIncrement(const WidgetCursor &widgetCursor,  int16_t id) {
+uint32_t ytDataGetPositionIncrement(const WidgetCursor &widgetCursor, int16_t id) {
     Value value;
     DATA_OPERATION_FUNCTION(id, DATA_OPERATION_YT_DATA_GET_POSITION_INCREMENT, widgetCursor, value);
     if (value.getType() == VALUE_TYPE_UINT32) {
@@ -1474,73 +1474,73 @@ uint32_t ytDataGetPositionIncrement(const WidgetCursor &widgetCursor,  int16_t i
     return 1;
 }
 
-uint32_t ytDataGetPageSize(const WidgetCursor &widgetCursor,  int16_t id) {
+uint32_t ytDataGetPageSize(const WidgetCursor &widgetCursor, int16_t id) {
     Value value;
     DATA_OPERATION_FUNCTION(id, DATA_OPERATION_YT_DATA_GET_PAGE_SIZE, widgetCursor, value);
     return value.getUInt32();
 }
 
-const Style *ytDataGetStyle(const WidgetCursor &widgetCursor,  int16_t id, uint8_t valueIndex) {
+const Style *ytDataGetStyle(const WidgetCursor &widgetCursor, int16_t id, uint8_t valueIndex) {
     Value value(valueIndex, VALUE_TYPE_UINT8);
     DATA_OPERATION_FUNCTION(id, DATA_OPERATION_YT_DATA_GET_STYLE, widgetCursor, value);
     return getStyle(value.getUInt16());
 }
 
-Value ytDataGetMin(const WidgetCursor &widgetCursor,  int16_t id, uint8_t valueIndex) {
+Value ytDataGetMin(const WidgetCursor &widgetCursor, int16_t id, uint8_t valueIndex) {
     Value value(valueIndex, VALUE_TYPE_UINT8);
     DATA_OPERATION_FUNCTION(id, DATA_OPERATION_YT_DATA_GET_MIN, widgetCursor, value);
     return value;
 }
 
-Value ytDataGetMax(const WidgetCursor &widgetCursor,  int16_t id, uint8_t valueIndex) {
+Value ytDataGetMax(const WidgetCursor &widgetCursor, int16_t id, uint8_t valueIndex) {
     Value value(valueIndex, VALUE_TYPE_UINT8);
     DATA_OPERATION_FUNCTION(id, DATA_OPERATION_YT_DATA_GET_MAX, widgetCursor, value);
     return value;
 }
 
-int ytDataGetVertDivisions(const WidgetCursor &widgetCursor,  int16_t id) {
+int ytDataGetVertDivisions(const WidgetCursor &widgetCursor, int16_t id) {
     Value value;
     DATA_OPERATION_FUNCTION(id, DATA_OPERATION_YT_DATA_GET_VERT_DIVISIONS, widgetCursor, value);
     return value.getInt();
 }
 
-int ytDataGetHorzDivisions(const WidgetCursor &widgetCursor,  int16_t id) {
+int ytDataGetHorzDivisions(const WidgetCursor &widgetCursor, int16_t id) {
     Value value;
     DATA_OPERATION_FUNCTION(id, DATA_OPERATION_YT_DATA_GET_HORZ_DIVISIONS, widgetCursor, value);
     return value.getInt();
 }
 
-float ytDataGetDiv(const WidgetCursor &widgetCursor,  int16_t id, uint8_t valueIndex) {
+float ytDataGetDiv(const WidgetCursor &widgetCursor, int16_t id, uint8_t valueIndex) {
     Value value(valueIndex, VALUE_TYPE_UINT8);
     DATA_OPERATION_FUNCTION(id, DATA_OPERATION_YT_DATA_GET_DIV, widgetCursor, value);
     return value.getFloat();
 }
 
-float ytDataGetOffset(const WidgetCursor &widgetCursor,  int16_t id, uint8_t valueIndex) {
+float ytDataGetOffset(const WidgetCursor &widgetCursor, int16_t id, uint8_t valueIndex) {
     Value value(valueIndex, VALUE_TYPE_UINT8);
     DATA_OPERATION_FUNCTION(id, DATA_OPERATION_YT_DATA_GET_OFFSET, widgetCursor, value);
     return value.getFloat();
 }
 
-bool ytDataDataValueIsVisible(const WidgetCursor &widgetCursor,  int16_t id, uint8_t valueIndex) {
+bool ytDataDataValueIsVisible(const WidgetCursor &widgetCursor, int16_t id, uint8_t valueIndex) {
     Value value(valueIndex, VALUE_TYPE_UINT8);
     DATA_OPERATION_FUNCTION(id, (DataOperationEnum)(DATA_OPERATION_YT_DATA_VALUE_IS_VISIBLE), widgetCursor, value);
     return value.getInt();
 }
 
-bool ytDataGetShowLabels(const WidgetCursor &widgetCursor,  int16_t id) {
+bool ytDataGetShowLabels(const WidgetCursor &widgetCursor, int16_t id) {
     Value value;
     DATA_OPERATION_FUNCTION(id, (DataOperationEnum)(DATA_OPERATION_YT_DATA_GET_SHOW_LABELS), widgetCursor, value);
     return value.getInt();
 }
 
-int8_t ytDataGetSelectedValueIndex(const WidgetCursor &widgetCursor,  int16_t id) {
+int8_t ytDataGetSelectedValueIndex(const WidgetCursor &widgetCursor, int16_t id) {
     Value value;
     DATA_OPERATION_FUNCTION(id, (DataOperationEnum)(DATA_OPERATION_YT_DATA_GET_SELECTED_VALUE_INDEX), widgetCursor, value);
     return (int8_t)value.getInt();
 }
 
-void ytDataGetLabel(const WidgetCursor &widgetCursor,  int16_t id, uint8_t valueIndex, char *text, int count) {
+void ytDataGetLabel(const WidgetCursor &widgetCursor, int16_t id, uint8_t valueIndex, char *text, int count) {
     text[0] = 0;
     YtDataGetLabelParams params = {
         valueIndex,
@@ -1551,25 +1551,25 @@ void ytDataGetLabel(const WidgetCursor &widgetCursor,  int16_t id, uint8_t value
     DATA_OPERATION_FUNCTION(id, (DataOperationEnum)(DATA_OPERATION_YT_DATA_GET_LABEL), widgetCursor, value);
 }
 
-Value::YtDataGetValueFunctionPointer ytDataGetGetValueFunc(const WidgetCursor &widgetCursor,  int16_t id) {
+Value::YtDataGetValueFunctionPointer ytDataGetGetValueFunc(const WidgetCursor &widgetCursor, int16_t id) {
     Value value;
     DATA_OPERATION_FUNCTION(id, DATA_OPERATION_YT_DATA_GET_GET_VALUE_FUNC, widgetCursor, value);
     return value.getYtDataGetValueFunctionPointer();
 }
 
-uint8_t ytDataGetGraphUpdateMethod(const WidgetCursor &widgetCursor,  int16_t id) {
+uint8_t ytDataGetGraphUpdateMethod(const WidgetCursor &widgetCursor, int16_t id) {
     Value value;
     DATA_OPERATION_FUNCTION(id, DATA_OPERATION_YT_DATA_GET_GRAPH_UPDATE_METHOD, widgetCursor, value);
     return value.getUInt8();
 }
 
-float ytDataGetPeriod(const WidgetCursor &widgetCursor,  int16_t id) {
+float ytDataGetPeriod(const WidgetCursor &widgetCursor, int16_t id) {
     Value value;
     DATA_OPERATION_FUNCTION(id, DATA_OPERATION_YT_DATA_GET_PERIOD, widgetCursor, value);
     return value.getFloat();
 }
 
-uint8_t *ytDataGetBookmarks(const WidgetCursor &widgetCursor,  int16_t id) {
+uint8_t *ytDataGetBookmarks(const WidgetCursor &widgetCursor, int16_t id) {
 	Value value;
 	DATA_OPERATION_FUNCTION(id, DATA_OPERATION_YT_DATA_GET_BOOKMARKS, widgetCursor, value);
     if (value.getType() == VALUE_TYPE_POINTER) {
@@ -1578,30 +1578,30 @@ uint8_t *ytDataGetBookmarks(const WidgetCursor &widgetCursor,  int16_t id) {
     return nullptr;
 }
 
-bool ytDataIsCursorVisible(const WidgetCursor &widgetCursor,  int16_t id) {
+bool ytDataIsCursorVisible(const WidgetCursor &widgetCursor, int16_t id) {
     Value value;
     DATA_OPERATION_FUNCTION(id, DATA_OPERATION_YT_DATA_IS_CURSOR_VISIBLE, widgetCursor, value);
     return value.getInt() == 1;
 }
 
-uint32_t ytDataGetCursorOffset(const WidgetCursor &widgetCursor,  int16_t id) {
+uint32_t ytDataGetCursorOffset(const WidgetCursor &widgetCursor, int16_t id) {
     Value value;
     DATA_OPERATION_FUNCTION(id, DATA_OPERATION_YT_DATA_GET_CURSOR_OFFSET, widgetCursor, value);
     return value.getUInt32();
 }
 
-Value ytDataGetCursorXValue(const WidgetCursor &widgetCursor,  int16_t id) {
+Value ytDataGetCursorXValue(const WidgetCursor &widgetCursor, int16_t id) {
     Value value;
     DATA_OPERATION_FUNCTION(id, DATA_OPERATION_YT_DATA_GET_CURSOR_X_VALUE, widgetCursor, value);
     return value;
 }
 
-void ytDataTouchDrag(const WidgetCursor &widgetCursor,  int16_t id, TouchDrag *touchDrag) {
+void ytDataTouchDrag(const WidgetCursor &widgetCursor, int16_t id, TouchDrag *touchDrag) {
     Value value = Value(touchDrag, VALUE_TYPE_POINTER);
     DATA_OPERATION_FUNCTION(id, DATA_OPERATION_YT_DATA_TOUCH_DRAG, widgetCursor, value);
 }
 
-int getTextCursorPosition(const WidgetCursor &widgetCursor,  int16_t id) {
+int getTextCursorPosition(const WidgetCursor &widgetCursor, int16_t id) {
     Value value;
     DATA_OPERATION_FUNCTION(id, DATA_OPERATION_GET_TEXT_CURSOR_POSITION, widgetCursor, value);
     return value.getType() == VALUE_TYPE_INT32 ? value.getInt() : -1;
@@ -1614,7 +1614,7 @@ int getXScroll(const WidgetCursor &widgetCursor) {
     return value.getType() == VALUE_TYPE_INT32 ? value.getInt() : 0;
 }
 
-void getSlotAndSubchannelIndex(const WidgetCursor &widgetCursor,  int16_t id, int &slotIndex, int &subchannelIndex) {
+void getSlotAndSubchannelIndex(const WidgetCursor &widgetCursor, int16_t id, int &slotIndex, int &subchannelIndex) {
 	Value value;
 	DATA_OPERATION_FUNCTION(id, DATA_OPERATION_GET_SLOT_AND_SUBCHANNEL_INDEX, widgetCursor, value);
 	if (value.getType() == VALUE_TYPE_UINT32) {
@@ -1623,16 +1623,31 @@ void getSlotAndSubchannelIndex(const WidgetCursor &widgetCursor,  int16_t id, in
 	}
 }
 
-bool isMicroAmperAllowed(const WidgetCursor &widgetCursor,  int16_t id) {
+bool isMicroAmperAllowed(const WidgetCursor &widgetCursor, int16_t id) {
 	Value value;
 	DATA_OPERATION_FUNCTION(id, DATA_OPERATION_IS_MICRO_AMPER_ALLOWED, widgetCursor, value);
 	return value.getInt() == 1;
 }
 
-bool isAmperAllowed(const WidgetCursor &widgetCursor,  int16_t id) {
+bool isAmperAllowed(const WidgetCursor &widgetCursor, int16_t id) {
 	Value value;
 	DATA_OPERATION_FUNCTION(id, DATA_OPERATION_IS_AMPER_ALLOWED, widgetCursor, value);
 	return value.getInt() == 1;
+}
+
+CanvasDrawFunction getCanvasDrawFunction(const WidgetCursor &widgetCursor, int16_t id) {
+    Value value;
+    DATA_OPERATION_FUNCTION(id, DATA_OPERATION_GET, widgetCursor, value);
+    if (value.getType() == VALUE_TYPE_POINTER) {
+        return (CanvasDrawFunction)value.getVoidPointer();
+    }
+    return nullptr;
+}
+
+Value getCanvasRefreshState(const WidgetCursor &widgetCursor, int16_t id) {
+    Value value;
+    DATA_OPERATION_FUNCTION(id, DATA_OPERATION_GET_CANVAS_REFRESH_STATE, widgetCursor, value);
+    return value;
 }
 
 } // namespace gui

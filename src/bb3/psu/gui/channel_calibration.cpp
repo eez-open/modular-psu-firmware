@@ -1284,17 +1284,17 @@ void data_channel_calibration_chart(DataOperationEnum operation, const WidgetCur
     if (operation == DATA_OPERATION_GET) {
         auto editPage = (ChSettingsCalibrationEditPage *)getPage(PAGE_ID_CH_SETTINGS_CALIBRATION_EDIT);
         if (editPage) {
+            value = Value((void *)drawEditorCalibrationChart, VALUE_TYPE_POINTER);
+        } else {
+            value = Value((void *)drawViewerCalibrationChart, VALUE_TYPE_POINTER);
+        }
+    } else if (operation == DATA_OPERATION_GET_CANVAS_REFRESH_STATE) {
+        auto editPage = (ChSettingsCalibrationEditPage *)getPage(PAGE_ID_CH_SETTINGS_CALIBRATION_EDIT);
+        if (editPage) {
             value = editPage->getChartVersion();
         } else {
             auto viewPage = (ChSettingsCalibrationViewPage *)getPage(PAGE_ID_CH_SETTINGS_CALIBRATION_VIEW);
             value = viewPage->getChartVersion();
-        }
-    } else if (operation == DATA_OPERATION_GET_CANVAS_DRAW_FUNCTION) {
-        auto editPage = (ChSettingsCalibrationEditPage *)getPage(PAGE_ID_CH_SETTINGS_CALIBRATION_EDIT);
-        if (editPage) {
-            value = Value((void *)drawEditorCalibrationChart, VALUE_TYPE_POINTER);
-        } else {
-            value = Value((void *)drawViewerCalibrationChart, VALUE_TYPE_POINTER);
         }
     }
 }

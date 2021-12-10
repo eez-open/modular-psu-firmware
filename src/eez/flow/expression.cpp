@@ -55,7 +55,7 @@ bool evalExpression(FlowState *flowState, int componentIndex, const uint8_t *ins
 				}
 			} else {
 				// native variable
-				if (!stack.push(get(g_widgetCursor, instructionArg + 1))) {
+				if (!stack.push(get(g_widgetCursor, instructionArg - flowDefinition->globalVariables.count + 1))) {
 					return false;
 				}
 			}

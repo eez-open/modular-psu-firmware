@@ -223,7 +223,7 @@ public:
     uint32_t powerRelayCycles;
     uint32_t lastWrittenSignalRelayCycles[NUM_ROWS][NUM_COLUMNS];
     uint32_t lastWrittenPowerRelayCycles;
-    Interval relayCyclesWriteInterval = WRITE_ONTIME_INTERVAL * MIN_TO_MS;
+    psu::Interval relayCyclesWriteInterval = WRITE_ONTIME_INTERVAL * MIN_TO_MS;
 
     Smx46Module() {
         moduleType = MODULE_TYPE_DIB_SMX46;
