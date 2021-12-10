@@ -90,7 +90,7 @@ namespace eez {
 
 void highPriorityThreadMainLoop(void *);
 
-EEZ_THREAD_DECLARE(highPriority, AboveNormal, 4096);
+EEZ_THREAD_DECLARE(highPriority, AboveNormal, 4 * 1024);
 
 #if defined(EEZ_PLATFORM_STM32)
 #define HIGH_PRIORITY_QUEUE_SIZE 50
@@ -110,7 +110,7 @@ EEZ_MESSAGE_QUEUE_DECLARE(highPriority, {
 
 void lowPriorityThreadMainLoop(void *);
 
-EEZ_THREAD_DECLARE(lowPriority, Normal, 12288);
+EEZ_THREAD_DECLARE(lowPriority, Normal, 12 * 1024);
 
 EEZ_MESSAGE_QUEUE_DECLARE(lowPriority, {
 	LowPriorityThreadMessage type;

@@ -54452,6 +54452,15 @@
       "activeColor": "labels_and_colors_page_channel_color",
       "activeBackgroundColor": "labels_and_colors_page_channel_color_text",
       "padding": "0 5"
+    },
+    {
+      "name": "fps_graph",
+      "inheritFrom": "default",
+      "alwaysBuild": true,
+      "color": "#00ff1e",
+      "backgroundColor": "#000000",
+      "borderSize": "1",
+      "borderColor": "backdrop"
     }
   ],
   "fonts": [

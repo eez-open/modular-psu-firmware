@@ -562,6 +562,12 @@ void endRendering() {
     }
 #endif
 
+#ifdef EEZ_CONF_GUI_CALC_FPS
+#ifdef EEZ_CONF_GUI_DRAW_FPS_GRAPH
+	setDirty();
+#endif
+#endif
+
     if (isDirty()) {
         for (int bufferIndex = 0; bufferIndex < g_numBuffersToDraw; bufferIndex++) {
             Buffer &buffer = g_buffers[bufferIndex];
@@ -589,6 +595,12 @@ void endRendering() {
             bitBlt(g_buffers[bufferIndex].bufferPointer, nullptr, sx, sy, x2 - x1 + 1, y2 - y1 + 1, x1, y1, buffer.opacity);
         }
 
+#ifdef EEZ_CONF_GUI_CALC_FPS
+#ifdef EEZ_CONF_GUI_DRAW_FPS_GRAPH
+        drawFpsGraph(getDisplayWidth() - 64 - 4, 4, 64, 32, getStyle(EEZ_CONF_STYLE_ID_FPS_GRAPH));
+#endif
+#endif
+
 #if OPTION_KEYBOARD
         keyboard::updateDisplay();
 #endif
@@ -598,6 +610,65 @@ void endRendering() {
 #endif
     }
 }
+
+#ifdef EEZ_CONF_GUI_CALC_FPS
+uint32_t g_fpsValues[NUM_FPS_VALUES];
+uint32_t g_fpsAvg;
+static uint32_t g_fpsTotal;
+static uint32_t g_lastTimeFPS;
+
+void startCalcFPS() {
+    // calculate last FPS value
+	g_fpsTotal -= g_fpsValues[0];
+
+	for (size_t i = 1; i < NUM_FPS_VALUES; i++) {
+		g_fpsValues[i - 1] = g_fpsValues[i];
+	}
+
+	uint32_t time = millis();
+	auto diff = time - g_lastTimeFPS;
+
+	auto fps = 1000 / diff;
+    if (fps > 60) {
+        fps = 60;
+    }
+    g_fpsValues[NUM_FPS_VALUES - 1] = fps;
+
+	g_fpsTotal += g_fpsValues[NUM_FPS_VALUES - 1];
+	g_fpsAvg = g_fpsTotal / NUM_FPS_VALUES;
+}
+
+void endCalcFPS() {
+	g_lastTimeFPS = millis();
+}
+
+void drawFpsGraph(int x, int y, int w, int h, const Style *style) {
+	int x1 = x;
+	int y1 = y;
+	int x2 = x + w - 1;
+	int y2 = y + h - 1;
+	drawBorderAndBackground(x1, y1, x2, y2, style, style->backgroundColor);
+
+	x1++;
+	y1++;
+	x2--;
+	y2--;
+
+	x = x1;
+	for (size_t i = 0; i < NUM_FPS_VALUES && x <= x2; i++, x++) {
+		int y = y2 - g_fpsValues[i] * (y2 - y1) / 60;
+		if (y < y1) {
+			y = y1;
+		}
+		if (g_fpsValues[i] < 40) {
+			display::setColor16(COLOR_RED);
+		} else {
+			display::setColor(style->color);
+		}
+		display::drawVLine(x, y, y2 - y);
+	}
+}
+#endif
 
 } // namespace display
 } // namespace gui

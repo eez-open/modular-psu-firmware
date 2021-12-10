@@ -20,6 +20,7 @@
 
 #include <stdint.h>
 
+#include <eez/gui_conf.h>
 #include <eez/gui/font.h>
 #include <eez/gui/geometry.h>
 
@@ -115,6 +116,11 @@ void endRendering();
 void *getBufferPointer();
 
 const uint8_t * takeScreenshot();
+
+#ifdef EEZ_CONF_GUI_CALC_FPS
+extern uint32_t g_fpsAvg;
+void drawFpsGraph(int x, int y, int w, int h, const Style *style);
+#endif
 
 } // namespace display
 } // namespace gui

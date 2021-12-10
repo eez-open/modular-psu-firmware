@@ -54,12 +54,6 @@ namespace gui {
 extern WidgetCursor g_activeWidget;
 extern bool g_isBlinkTime;
 
-#ifdef EEZ_CONF_GUI_CALC_FPS
-static const size_t NUM_FPS_VALUES = 60;
-extern uint32_t g_fpsValues[NUM_FPS_VALUES];
-extern uint32_t g_fpsAvg;
-#endif
-
 ////////////////////////////////////////////////////////////////////////////////
 
 void guiInit();

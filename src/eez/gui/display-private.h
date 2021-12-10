@@ -58,6 +58,13 @@ inline void clearDirty() { g_dirty = false; }
 inline void setDirty() { g_dirty = true; }
 inline bool isDirty() { return g_dirty; }
 
+#ifdef EEZ_CONF_GUI_CALC_FPS
+static const size_t NUM_FPS_VALUES = 60;
+extern uint32_t g_fpsValues[NUM_FPS_VALUES];
+void startCalcFPS();
+void endCalcFPS();
+#endif
+
 } // namespace display
 } // namespace gui
 } // namespace eez

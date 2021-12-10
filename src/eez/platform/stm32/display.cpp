@@ -370,6 +370,10 @@ bool isOn() {
 
 ////////////////////////////////////////////////////////////////////////////////
 
+static uint32_t g_lastSyncTime;
+
+#define WAIT_FOR_VSYNC while (!(LTDC->CDSR & LTDC_CDSR_VSYNCS)) { /*osDelay(0);*/ } g_lastSyncTime = millis()
+
 void animate() {
     float t = (millis() - g_animationState.startTime) / (1000.0f * g_animationState.duration);
     if (t < 1.0f) {
@@ -381,11 +385,7 @@ void animate() {
 
         DMA2D_WAIT;
 
-        // wait for VSYNC
-        while (!(LTDC->CDSR & LTDC_CDSR_VSYNCS)) {
-            //osDelay(0);
-        }
-
+        WAIT_FOR_VSYNC;
         setAddress(g_animationBuffer);
     } else {
         g_animationState.enabled = false;
@@ -395,11 +395,7 @@ void animate() {
 void swapBuffers() {
     DMA2D_WAIT;
 
-    // wait for VSYNC
-    while (!(LTDC->CDSR & LTDC_CDSR_VSYNCS)) {
-        //osDelay(0);
-    }
-
+    WAIT_FOR_VSYNC;
     setAddress(g_buffer);
 
     auto temp = g_bufferNew;
@@ -419,6 +415,10 @@ void sync() {
         return;
     }
 
+#ifdef EEZ_CONF_GUI_CALC_FPS
+    startCalcFPS();
+#endif
+
     if (g_displayState == TURNING_ON) {
         turnOnTickHook();
     }
@@ -429,21 +429,33 @@ void sync() {
             finishAnimation();
         }
         clearDirty();
-        // clearDirty();
+#ifdef EEZ_CONF_GUI_CALC_FPS
+        endCalcFPS();
+#endif
         return;
+    }
+
+    static const uint32_t VSYNC_PERIOD = 12;
+    uint32_t time = millis();
+    if (time - g_lastSyncTime < VSYNC_PERIOD) {
+        osDelay(VSYNC_PERIOD - (time - g_lastSyncTime));
     }
 
     if (isDirty()) {
         clearDirty();
-
         swapBuffers();
+    } else {
+        WAIT_FOR_VSYNC;
     }
-
     if (g_takeScreenshot) {
         bitBltRGB888(g_bufferOld, SCREENSHOOT_BUFFER_START_ADDRESS, 0, 0, DISPLAY_WIDTH, DISPLAY_HEIGHT);
         DMA2D_WAIT;
         g_takeScreenshot = false;
     }
+
+#ifdef EEZ_CONF_GUI_CALC_FPS
+    endCalcFPS();
+#endif
 }
 
 void finishAnimation() {

@@ -275,6 +275,9 @@ void sync() {
             finishAnimation();
         }
         clearDirty();
+#ifdef EEZ_CONF_GUI_CALC_FPS
+        calcFPS();
+#endif
         return;
     }
 
@@ -293,6 +296,11 @@ void sync() {
 
         clearDirty();
     }
+
+#ifdef EEZ_CONF_GUI_CALC_FPS
+    calcFPS();
+#endif
+
 }
 
 void finishAnimation() {
