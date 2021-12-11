@@ -48,14 +48,14 @@ int g_serialInputCharPosition = 0;
 #if defined(EEZ_PLATFORM_STM32)
 extern "C" void notifySerialLineStateChanged(uint8_t serialLineState) {
 	using namespace eez;
-    sendMessageToLowPriorityThread(SERIAL_LINE_STATE_CHANGED, serialLineState);
+    sendMessageToLowPriorityThread(SERIAL_LINE_STATE_CHANGED, serialLineState, 0);
 }
 
 extern "C" void notifySerialInput(uint8_t *buffer, uint32_t length) {
 	g_buffer = buffer;
 	g_length = length;
 	using namespace eez;
-	sendMessageToLowPriorityThread(SERIAL_INPUT_AVAILABLE);
+	sendMessageToLowPriorityThread(SERIAL_INPUT_AVAILABLE, 0, 0);
 	return;
 }
 #endif
