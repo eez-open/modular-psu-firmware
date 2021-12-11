@@ -110,7 +110,7 @@ EEZ_MESSAGE_QUEUE_DECLARE(highPriority, {
 
 void lowPriorityThreadMainLoop(void *);
 
-EEZ_THREAD_DECLARE(lowPriority, Normal, 12 * 1024);
+EEZ_THREAD_DECLARE(lowPriority, Normal, 24 * 1024);
 
 EEZ_MESSAGE_QUEUE_DECLARE(lowPriority, {
 	LowPriorityThreadMessage type;

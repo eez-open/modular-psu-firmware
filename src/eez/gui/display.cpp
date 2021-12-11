@@ -562,10 +562,10 @@ void endRendering() {
     }
 #endif
 
-#ifdef EEZ_CONF_GUI_CALC_FPS
-#ifdef EEZ_CONF_GUI_DRAW_FPS_GRAPH
-	setDirty();
-#endif
+#if defined(EEZ_CONF_GUI_CALC_FPS) && defined(EEZ_CONF_STYLE_ID_FPS_GRAPH)
+    if (g_drawFpsGraphEnabled) {
+	    setDirty();
+    }
 #endif
 
     if (isDirty()) {
@@ -595,10 +595,10 @@ void endRendering() {
             bitBlt(g_buffers[bufferIndex].bufferPointer, nullptr, sx, sy, x2 - x1 + 1, y2 - y1 + 1, x1, y1, buffer.opacity);
         }
 
-#ifdef EEZ_CONF_GUI_CALC_FPS
-#ifdef EEZ_CONF_GUI_DRAW_FPS_GRAPH
-        drawFpsGraph(getDisplayWidth() - 64 - 4, 4, 64, 32, getStyle(EEZ_CONF_STYLE_ID_FPS_GRAPH));
-#endif
+#if defined(EEZ_CONF_GUI_CALC_FPS) && defined(EEZ_CONF_STYLE_ID_FPS_GRAPH)
+        if (g_drawFpsGraphEnabled) {
+            drawFpsGraph(getDisplayWidth() - 64 - 4, 4, 64, 32, getStyle(EEZ_CONF_STYLE_ID_FPS_GRAPH));
+        }
 #endif
 
 #if OPTION_KEYBOARD
@@ -612,12 +612,20 @@ void endRendering() {
 }
 
 #ifdef EEZ_CONF_GUI_CALC_FPS
+bool g_calcFpsEnabled;
+#if defined(EEZ_CONF_STYLE_ID_FPS_GRAPH)
+bool g_drawFpsGraphEnabled;
+#endif
 uint32_t g_fpsValues[NUM_FPS_VALUES];
 uint32_t g_fpsAvg;
 static uint32_t g_fpsTotal;
 static uint32_t g_lastTimeFPS;
 
 void startCalcFPS() {
+    if (!g_calcFpsEnabled) {
+        return;
+    }
+
     // calculate last FPS value
 	g_fpsTotal -= g_fpsValues[0];
 
@@ -639,6 +647,10 @@ void startCalcFPS() {
 }
 
 void endCalcFPS() {
+    if (!g_calcFpsEnabled) {
+        return;
+    }
+
 	g_lastTimeFPS = millis();
 }
 

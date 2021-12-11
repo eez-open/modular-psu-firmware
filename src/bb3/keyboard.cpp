@@ -23,7 +23,6 @@
 #include <bb3/keyboard.h>
 #include <bb3/mouse.h>
 #include <eez/gui/gui.h>
-#include <eez/gui/display.h>
 #include <bb3/psu/psu.h>
 #include <bb3/psu/gui/psu.h>
 

@@ -23,6 +23,8 @@
 #include <main.h>
 #endif
 
+#include <eez/gui/gui.h>
+
 #include <bb3/firmware.h>
 #include <bb3/system.h>
 #include <eez/alloc.h>
@@ -37,9 +39,7 @@
 #include <bb3/psu/ontime.h>
 #include <bb3/psu/scpi/psu.h>
 #include <bb3/psu/event_queue.h>
-#if OPTION_DISPLAY
 #include <bb3/psu/gui/psu.h>
-#endif
 
 #include <bb3/mcu/eeprom.h>
 
@@ -142,8 +142,19 @@ scpi_result_t scpi_cmd_debug(scpi_t *context) {
         }
 		else if (cmd == 34) {
 			g_startTime = millis();
-		} else {
-            SCPI_ErrorPush(context, SCPI_ERROR_HARDWARE_MISSING);
+		} 
+#if defined(EEZ_CONF_GUI_CALC_FPS) && defined(EEZ_CONF_STYLE_ID_FPS_GRAPH)
+        else if (cmd == 35) {
+			using namespace eez::gui;
+			using namespace eez::gui::display;
+			g_drawFpsGraphEnabled = !g_drawFpsGraphEnabled;
+            g_calcFpsEnabled = g_drawFpsGraphEnabled;
+			refreshScreen();
+			return SCPI_RES_OK;
+		} 
+#endif
+        else {
+            SCPI_ErrorPush(context, SCPI_ERROR_PARAMETER_NOT_ALLOWED);
             return SCPI_RES_ERR;
         }
     } else {

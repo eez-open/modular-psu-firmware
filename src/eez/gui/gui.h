@@ -18,11 +18,10 @@
 
 #pragma once
 
+#include <eez/gui_conf.h>
 #include <eez/gui/assets.h>
 #include <eez/gui/page.h>
-
 #include <eez/gui/display.h>
-#include <eez/gui_conf.h>
 
 enum {
 	PAGE_ID_NONE = 0,

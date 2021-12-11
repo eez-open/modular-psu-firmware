@@ -17,7 +17,6 @@
 */
 
 #include <eez/gui/gui.h>
-#include <eez/gui/display.h>
 
 #include <bb3/keyboard.h>
 #include <bb3/mouse.h>

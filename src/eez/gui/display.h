@@ -118,6 +118,10 @@ void *getBufferPointer();
 const uint8_t * takeScreenshot();
 
 #ifdef EEZ_CONF_GUI_CALC_FPS
+extern bool g_calcFpsEnabled;
+#if defined(EEZ_CONF_STYLE_ID_FPS_GRAPH)
+extern bool g_drawFpsGraphEnabled;
+#endif
 extern uint32_t g_fpsAvg;
 void drawFpsGraph(int x, int y, int w, int h, const Style *style);
 #endif

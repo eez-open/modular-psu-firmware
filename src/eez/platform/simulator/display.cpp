@@ -37,7 +37,6 @@
 #include <eez/mouse.h>
 #endif
 
-#include <eez/gui/display.h>
 #include <eez/gui/display-private.h>
 
 using namespace eez::gui;
@@ -265,6 +264,10 @@ void sync() {
         return;
     }
 
+#ifdef EEZ_CONF_GUI_CALC_FPS
+	startCalcFPS();
+#endif
+
     if (g_mainWindow == nullptr) {
         init();
     }
@@ -276,9 +279,9 @@ void sync() {
         }
         clearDirty();
 #ifdef EEZ_CONF_GUI_CALC_FPS
-        calcFPS();
+		endCalcFPS();
 #endif
-        return;
+		return;
     }
 
     if (g_takeScreenshot) {
@@ -298,9 +301,8 @@ void sync() {
     }
 
 #ifdef EEZ_CONF_GUI_CALC_FPS
-    calcFPS();
+	endCalcFPS();
 #endif
-
 }
 
 void finishAnimation() {

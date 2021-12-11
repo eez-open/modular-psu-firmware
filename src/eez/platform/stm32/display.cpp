@@ -33,7 +33,6 @@
 #include <eez/os.h>
 
 #include <eez/gui/gui.h>
-#include <eez/gui/display.h>
 #include <eez/gui/display-private.h>
 
 #include <eez/platform/stm32/display.h>
@@ -435,11 +434,11 @@ void sync() {
         return;
     }
 
-    static const uint32_t VSYNC_PERIOD = 12;
-    uint32_t time = millis();
-    if (time - g_lastSyncTime < VSYNC_PERIOD) {
-        osDelay(VSYNC_PERIOD - (time - g_lastSyncTime));
-    }
+    // static const uint32_t VSYNC_PERIOD = 12;
+    // uint32_t time = millis();
+    // if (time - g_lastSyncTime < VSYNC_PERIOD) {
+    //     osDelay(VSYNC_PERIOD - (time - g_lastSyncTime));
+    // }
 
     if (isDirty()) {
         clearDirty();
