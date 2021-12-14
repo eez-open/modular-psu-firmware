@@ -41,6 +41,7 @@
 #include <bb3/psu/event_queue.h>
 #include <bb3/psu/gui/psu.h>
 
+#include <eez/eeprom.h>
 #include <bb3/mcu/eeprom.h>
 
 #include <bb3/bp3c/flash_slave.h>
@@ -73,7 +74,7 @@ scpi_result_t scpi_cmd_debug(scpi_t *context) {
             taskENTER_CRITICAL();
 #endif
 
-            mcu::eeprom::resetAllExceptOnTimeCounters();
+            eeprom::resetAllExceptOnTimeCounters();
 
 #if defined(EEZ_PLATFORM_STM32)
             taskEXIT_CRITICAL();

@@ -46,10 +46,12 @@ void read(bool &isPressed, int &x, int &y) {
         y = 0;
     } 
     else {
-        isPressed = g_mouseButton1IsPressed;
+#endif
+		isPressed = g_mouseButton1IsPressed;
         x = g_mouseX;
         y = g_mouseY;
-    }
+#if OPTION_MOUSE
+	}
 #endif
 }
 

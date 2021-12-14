@@ -42,7 +42,7 @@
 #include <eez/gui/gui.h>
 #include <eez/gui/widgets/containers/container.h>
 
-#include <bb3/fs/fs.h>
+#include <eez/fs/fs.h>
 
 #include <eez/memory.h>
 
@@ -1616,7 +1616,7 @@ public:
         }
 
         if (n >= MAX_PATH_LENGTH + 1) {
-            psu::gui::errorMessage("File name too big!");
+            psu::gui::g_psuAppContext.errorMessage("File name too big!");
             return;
         }
 
@@ -1692,7 +1692,7 @@ public:
 		g_parameters.period = value;
 		int numUnchecked = g_parameters.setPeriod(value);
 		if (numUnchecked > 0) {
-			psu::gui::infoMessage("Some resources unchecked.");
+			psu::gui::g_psuAppContext.infoMessage("Some resources unchecked.");
 		}
 	}
 

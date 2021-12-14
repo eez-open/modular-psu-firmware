@@ -115,7 +115,8 @@ void endRendering();
 
 void *getBufferPointer();
 
-const uint8_t * takeScreenshot();
+const uint8_t *takeScreenshot();
+void releaseScreenshot();
 
 #ifdef EEZ_CONF_GUI_CALC_FPS
 extern bool g_calcFpsEnabled;

@@ -79,7 +79,26 @@ void drawBorderAndBackground(int &x1, int &y1, int &x2, int &y2, const Style *st
 	}
 
 	if (isTransparent && !widgetCursor.refreshed) {
-		for (size_t i = 0; i < widgetCursor.backgroundStyleStackPointer; i++) {
+        size_t startStackPointer;
+		for (startStackPointer = widgetCursor.backgroundStyleStackPointer - 1; startStackPointer > 0; startStackPointer--) {
+			auto &backgroundStyle = widgetCursor.backgroundStyleStack[startStackPointer];
+
+            auto color = backgroundStyle.active ? backgroundStyle.style->activeBackgroundColor : backgroundStyle.style->backgroundColor;
+            if (color != TRANSPARENT_COLOR_INDEX) {
+                // non-transparent color
+                break;
+            } else if (backgroundStyle.style->backgroundImage) {
+                auto bitmap = getBitmap(backgroundStyle.style->backgroundImage);
+                if (bitmap) {
+                    if (bitmap->bpp != 32) {
+                        // non-transparent bitmap
+                        break;
+                    }
+                }
+            }
+        }
+
+		for (size_t i = startStackPointer; i < widgetCursor.backgroundStyleStackPointer; i++) {
 			auto &backgroundStyle = widgetCursor.backgroundStyleStack[i];
 
 			auto color = backgroundStyle.active ? backgroundStyle.style->activeBackgroundColor : backgroundStyle.style->backgroundColor;

@@ -64,6 +64,8 @@ Buffer g_buffers[NUM_BUFFERS];
 static void *g_mainBufferPointer;
 static int g_numBuffersToDraw;
 
+bool g_screenshotAllocated;
+
 ////////////////////////////////////////////////////////////////////////////////
 
 uint32_t color16to32(uint16_t color, uint8_t opacity) {
@@ -611,6 +613,10 @@ void endRendering() {
     }
 }
 
+void releaseScreenshot() {
+    g_screenshotAllocated = false;
+}
+
 #ifdef EEZ_CONF_GUI_CALC_FPS
 bool g_calcFpsEnabled;
 #if defined(EEZ_CONF_STYLE_ID_FPS_GRAPH)
@@ -621,11 +627,7 @@ uint32_t g_fpsAvg;
 static uint32_t g_fpsTotal;
 static uint32_t g_lastTimeFPS;
 
-void startCalcFPS() {
-    if (!g_calcFpsEnabled) {
-        return;
-    }
-
+void calcFPS() {
     // calculate last FPS value
 	g_fpsTotal -= g_fpsValues[0];
 
@@ -644,14 +646,8 @@ void startCalcFPS() {
 
 	g_fpsTotal += g_fpsValues[NUM_FPS_VALUES - 1];
 	g_fpsAvg = g_fpsTotal / NUM_FPS_VALUES;
-}
 
-void endCalcFPS() {
-    if (!g_calcFpsEnabled) {
-        return;
-    }
-
-	g_lastTimeFPS = millis();
+	g_lastTimeFPS = time;
 }
 
 void drawFpsGraph(int x, int y, int w, int h, const Style *style) {

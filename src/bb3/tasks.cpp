@@ -59,7 +59,7 @@
 
 #include <bb3/mcu/battery.h>
 
-#include <bb3/fs/fs.h>
+#include <eez/fs/fs.h>
 #include <bb3/libs/image/jpeg.h>
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -310,7 +310,7 @@ void lowPriorityThreadOneIter() {
 
                 if (dlog_record::isExecuting() && dlog_record::g_recordingParameters.period < 1.0f) {
                     g_screenshotGenerating = false;
-                    psu::gui::infoMessage("Taking a screenshot is not possible during DLOG recording.");
+                    psu::gui::g_psuAppContext.infoMessage("Taking a screenshot is not possible during DLOG recording.");
                     return;
                 }
 
@@ -323,6 +323,7 @@ void lowPriorityThreadOneIter() {
 
                 if (jpegEncode(screenshotPixels, &imageData, &imageDataSize)) {
                     event_queue::pushEvent(SCPI_ERROR_OUT_OF_MEMORY_FOR_REQ_OP);
+                    display::releaseScreenshot();
                     g_screenshotGenerating = false;
                     return;
                 }
@@ -364,9 +365,10 @@ void lowPriorityThreadOneIter() {
                         if (written == imageDataSize) {
                             if (file.close()) {
                                 // success!
-                                psu::gui::infoMessage("Screenshot saved");
+                                psu::gui::g_psuAppContext.infoMessage("Screenshot saved");
                                 event_queue::pushEvent(event_queue::EVENT_INFO_SCREENSHOT_SAVED);
                                 onSdCardFileChangeHook(filePath);
+                                display::releaseScreenshot();
                                 g_screenshotGenerating = false;
                                 return;
                             }
@@ -377,8 +379,8 @@ void lowPriorityThreadOneIter() {
                 }
 
                 // timeout
+                display::releaseScreenshot();
                 event_queue::pushEvent(SCPI_ERROR_MASS_STORAGE_ERROR);
-                g_screenshotGenerating = false;
             } else if (type == THREAD_MESSAGE_FILE_MANAGER_LOAD_DIRECTORY) {
                 file_manager::doLoadDirectory();
             } else if (type == THREAD_MESSAGE_FILE_MANAGER_UPLOAD_FILE) {

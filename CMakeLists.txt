@@ -96,6 +96,7 @@ set(header_files)
 set(src_eez
     src/eez/alloc.cpp
     src/eez/debug.cpp
+    src/eez/eeprom.cpp
     src/eez/memory.cpp
     src/eez/os.cpp
     src/eez/unit.cpp
@@ -105,6 +106,7 @@ list (APPEND src_files ${src_eez})
 set(header_eez
     src/eez/alloc.h
     src/eez/debug.h
+    src/eez/eeprom.h
     src/eez/encoder.h
     src/eez/hmi.h
     src/eez/keyboard.h
@@ -252,14 +254,12 @@ set(src_bb3_psu_gui
     src/bb3/psu/gui/file_manager.cpp
     src/bb3/psu/gui/keypad.cpp
     src/bb3/psu/gui/labels_and_colors.cpp
-    src/bb3/psu/gui/page.cpp
     src/bb3/psu/gui/page_ch_settings.cpp
     src/bb3/psu/gui/page_event_queue.cpp
     src/bb3/psu/gui/page_sys_settings.cpp
     src/bb3/psu/gui/page_user_profiles.cpp
     src/bb3/psu/gui/password.cpp
     src/bb3/psu/gui/psu.cpp
-    src/bb3/psu/gui/touch_calibration.cpp
 )
 list (APPEND src_files ${src_bb3_psu_gui})
 set(header_bb3_psu_gui
@@ -270,14 +270,12 @@ set(header_bb3_psu_gui
     src/bb3/psu/gui/file_manager.h
     src/bb3/psu/gui/keypad.h
     src/bb3/psu/gui/labels_and_colors.h
-    src/bb3/psu/gui/page.h
     src/bb3/psu/gui/page_ch_settings.h
     src/bb3/psu/gui/page_event_queue.h
     src/bb3/psu/gui/page_sys_settings.h
     src/bb3/psu/gui/page_user_profiles.h
     src/bb3/psu/gui/password.h
     src/bb3/psu/gui/psu.h
-    src/bb3/psu/gui/touch_calibration.h
 )
 list (APPEND header_files ${header_bb3_psu_gui})
 source_group("bb3\\psu\\gui" FILES ${src_bb3_psu_gui} ${header_bb3_psu_gui})
@@ -326,6 +324,7 @@ set(src_eez_gui
     src/eez/gui/overlay.cpp
     src/eez/gui/page.cpp
     src/eez/gui/touch.cpp
+    src/eez/gui/touch_calibration.h
     src/eez/gui/touch_filter.cpp
     src/eez/gui/update.cpp
     src/eez/gui/widget.cpp
@@ -346,6 +345,7 @@ set(header_eez_gui
     src/eez/gui/overlay.h
     src/eez/gui/page.h
     src/eez/gui/touch.h
+    src/eez/gui/touch_calibration.cpp
     src/eez/gui/touch_filter.h
     src/eez/gui/update.h
     src/eez/gui/widget.h
@@ -443,15 +443,15 @@ set(header_eez_libs_lz4
 list (APPEND header_files ${header_eez_libs_lz4})
 source_group("eez\\libs\\lz4" FILES ${src_eez_libs_lz4} ${header_eez_libs_lz4})
 
-set(src_bb3_fs
-    src/bb3/fs/simulator/fs.cpp
+set(src_eez_fs
+    src/eez/fs/simulator/fs.cpp
 )
-list (APPEND src_files ${src_bb3_fs})
-set(header_bb3_fs
-    src/bb3/fs/fs.h
+list (APPEND src_files ${src_eez_fs})
+set(header_eez_fs
+    src/eez/fs/fs.h
 )
-list (APPEND header_files ${header_bb3_fs})
-source_group("bb3\\fs" FILES ${src_v} ${header_bb3_fs})
+list (APPEND header_files ${header_eez_fs})
+source_group("eez\\fs" FILES ${src_eez_fs} ${header_eez_fs})
 
 set(src_bb3_libs_image
     src/bb3/libs/image/bitmap.cpp

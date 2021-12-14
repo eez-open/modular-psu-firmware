@@ -22,7 +22,6 @@
 #include <eez/gui/widget.h>
 
 namespace eez {
-
 namespace gui {
 
 #if defined(EEZ_PLATFORM_STM32)

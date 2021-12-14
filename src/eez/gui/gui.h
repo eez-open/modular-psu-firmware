@@ -20,14 +20,7 @@
 
 #include <eez/gui_conf.h>
 #include <eez/gui/assets.h>
-#include <eez/gui/page.h>
 #include <eez/gui/display.h>
-
-enum {
-	PAGE_ID_NONE = 0,
-	DATA_ID_NONE = 0,
-	ACTION_ID_NONE = 0
-};
 
 enum {
     FIRST_INTERNAL_PAGE_ID = 32000,
@@ -143,6 +136,7 @@ void externalDataHook(int16_t id, DataOperationEnum operation, const WidgetCurso
 
 OnTouchFunctionType getWidgetTouchFunctionHook(const WidgetCursor &widgetCursor);
 
+class Page;
 Page *getPageFromIdHook(int pageId);
 
 void setFocusCursor(const WidgetCursor& cursor, int16_t dataId);
@@ -175,5 +169,6 @@ uint16_t transformColorHook(uint16_t color);
 #include <eez/gui/font.h>
 #include <eez/gui/draw.h>
 #include <eez/gui/touch.h>
+#include <eez/gui/page.h>
 
 #define DATA_OPERATION_FUNCTION(id, operation, widgetCursor, value) (id >= 0 ? g_dataOperationsFunctions[id](operation, widgetCursor, value) : externalDataHook(id, operation, widgetCursor, value))

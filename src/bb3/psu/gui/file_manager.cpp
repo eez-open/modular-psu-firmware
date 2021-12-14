@@ -48,7 +48,7 @@
 #include <bb3/psu/gui/file_manager.h>
 #include <bb3/psu/gui/keypad.h>
 
-#include <bb3/fs/fs.h>
+#include <eez/fs/fs.h>
 
 #include <eez/gui/image.h>
 #include <bb3/fpga/prog.h>
@@ -767,13 +767,13 @@ void selectFile(uint32_t fileIndex) {
                             if (makeAbsolutePath(fileName, filePath)) {
                                 scripting::startScript(filePath);
                             } else {
-                                errorMessage(Value(SCPI_ERROR_FILE_NAME_ERROR, VALUE_TYPE_SCPI_ERROR));
+								g_psuAppContext.errorMessage(Value(SCPI_ERROR_FILE_NAME_ERROR, VALUE_TYPE_SCPI_ERROR));
                             }
                         } else {
-                            errorMessage(Value(SCPI_ERROR_FILE_NAME_ERROR, VALUE_TYPE_SCPI_ERROR));
+							g_psuAppContext.errorMessage(Value(SCPI_ERROR_FILE_NAME_ERROR, VALUE_TYPE_SCPI_ERROR));
                         }
                     } else {
-                        infoMessage("Script is already running!");
+						g_psuAppContext.infoMessage("Script is already running!");
                     }
                 } else {
                     pushPage(PAGE_ID_FILE_MENU);
@@ -820,7 +820,7 @@ void openFile() {
 
     char filePath[MAX_PATH_LENGTH + 1];
     if (!makeAbsolutePath(fileItem->name, filePath)) {
-        errorMessage(Value(SCPI_ERROR_FILE_NAME_ERROR, VALUE_TYPE_SCPI_ERROR));
+		g_psuAppContext.errorMessage(Value(SCPI_ERROR_FILE_NAME_ERROR, VALUE_TYPE_SCPI_ERROR));
         return;
     }
 
@@ -915,13 +915,13 @@ void uploadFile() {
 
     char filePath[MAX_PATH_LENGTH + 1];
     if (!makeAbsolutePath(fileItem->name, filePath)) {
-        errorMessage(Value(SCPI_ERROR_FILE_NAME_ERROR, VALUE_TYPE_SCPI_ERROR));
+		g_psuAppContext.errorMessage(Value(SCPI_ERROR_FILE_NAME_ERROR, VALUE_TYPE_SCPI_ERROR));
         return;
     }
 
     int err;
     if (!psu::scpi::mmemUpload(filePath, context, &err)) {
-        errorMessage(Value(err, VALUE_TYPE_SCPI_ERROR));
+		g_psuAppContext.errorMessage(Value(err, VALUE_TYPE_SCPI_ERROR));
     }
 }
 
@@ -952,7 +952,7 @@ void doRenameFile() {
     // source file path
     char srcFilePath[MAX_PATH_LENGTH + 1];
     if (!makeAbsolutePath(fileItem->name, srcFilePath)) {
-        errorMessage(Value(SCPI_ERROR_FILE_NAME_ERROR, VALUE_TYPE_SCPI_ERROR));
+		g_psuAppContext.errorMessage(Value(SCPI_ERROR_FILE_NAME_ERROR, VALUE_TYPE_SCPI_ERROR));
         return;
     }
 
@@ -962,7 +962,7 @@ void doRenameFile() {
     char dstFileName[MAX_PATH_LENGTH + 1];
     
     if (strlen(g_fileNameWithoutExtension) + (extension ? strlen(extension) : 0) > MAX_PATH_LENGTH) {
-        errorMessage(Value(SCPI_ERROR_FILE_NAME_ERROR, VALUE_TYPE_SCPI_ERROR));
+		g_psuAppContext.errorMessage(Value(SCPI_ERROR_FILE_NAME_ERROR, VALUE_TYPE_SCPI_ERROR));
         return;
     }
     
@@ -973,13 +973,13 @@ void doRenameFile() {
     
     char dstFilePath[MAX_PATH_LENGTH + 1];
     if (!makeAbsolutePath(dstFileName, dstFilePath)) {
-        errorMessage(Value(SCPI_ERROR_FILE_NAME_ERROR, VALUE_TYPE_SCPI_ERROR));
+		g_psuAppContext.errorMessage(Value(SCPI_ERROR_FILE_NAME_ERROR, VALUE_TYPE_SCPI_ERROR));
         return;
     }
 
     int err;
     if (!psu::sd_card::moveFile(srcFilePath, dstFilePath, &err)) {
-        errorMessage(Value(err, VALUE_TYPE_SCPI_ERROR));
+		g_psuAppContext.errorMessage(Value(err, VALUE_TYPE_SCPI_ERROR));
     }
 }
 
@@ -1024,13 +1024,13 @@ void deleteFile() {
 
     char filePath[MAX_PATH_LENGTH + 1];
     if (!makeAbsolutePath(fileItem->name, filePath)) {
-        errorMessage(Value(SCPI_ERROR_FILE_NAME_ERROR, VALUE_TYPE_SCPI_ERROR));
+		g_psuAppContext.errorMessage(Value(SCPI_ERROR_FILE_NAME_ERROR, VALUE_TYPE_SCPI_ERROR));
         return;
     }
 
     int err;
     if (!psu::sd_card::deleteFile(filePath, &err)) {
-        errorMessage(Value(err, VALUE_TYPE_SCPI_ERROR));
+		g_psuAppContext.errorMessage(Value(err, VALUE_TYPE_SCPI_ERROR));
     }
 }
 
@@ -1070,7 +1070,7 @@ void FileBrowserPage::set() {
 
     char filePath[MAX_PATH_LENGTH + 1];
     if (!makeAbsolutePath(fileItem->name, filePath)) {
-        errorMessage(Value(SCPI_ERROR_FILE_NAME_ERROR, VALUE_TYPE_SCPI_ERROR));
+		g_psuAppContext.errorMessage(Value(SCPI_ERROR_FILE_NAME_ERROR, VALUE_TYPE_SCPI_ERROR));
         return;
     }
 
@@ -1108,7 +1108,7 @@ void onNewFileOk(char *fileNameWithoutExtension) {
 
     char fileName[MAX_PATH_LENGTH + 1];
     if (strlen(fileNameWithoutExtension) + strlen(extension) > MAX_PATH_LENGTH) {
-        errorMessage(Value(SCPI_ERROR_FILE_NAME_ERROR, VALUE_TYPE_SCPI_ERROR));
+		g_psuAppContext.errorMessage(Value(SCPI_ERROR_FILE_NAME_ERROR, VALUE_TYPE_SCPI_ERROR));
         return;
     }
 
@@ -1117,7 +1117,7 @@ void onNewFileOk(char *fileNameWithoutExtension) {
 
     char filePath[MAX_PATH_LENGTH + 1];
     if (!makeAbsolutePath(fileName, filePath)) {
-        errorMessage(Value(SCPI_ERROR_FILE_NAME_ERROR, VALUE_TYPE_SCPI_ERROR));
+		g_psuAppContext.errorMessage(Value(SCPI_ERROR_FILE_NAME_ERROR, VALUE_TYPE_SCPI_ERROR));
         return;
     }
 

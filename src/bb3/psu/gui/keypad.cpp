@@ -1089,7 +1089,7 @@ void NumericKeypad::ok() {
                 m_keypadText[0] = 0;
                 m_cursorPosition = 0;
             } else {
-                errorMessage("Invalid IP address format!");
+				g_psuAppContext.errorMessage("Invalid IP address format!");
             }
 
             return;

@@ -268,7 +268,7 @@ void SysSettingsDateTimePage::checkTestNtpServerStatus() {
             SysSettingsDateTimePage *page = (SysSettingsDateTimePage *)getActivePage();
             page->doSet();
         } else {
-            errorMessage("Unable to connect to NTP server!");
+			g_psuAppContext.errorMessage("Unable to connect to NTP server!");
         }
     }
 }
@@ -294,12 +294,12 @@ void SysSettingsDateTimePage::set() {
 void SysSettingsDateTimePage::doSet() {
     if (!ntpEnabled) {
         if (!datetime::isValidDate(uint8_t(dateTime.year - 2000), dateTime.month, dateTime.day)) {
-            errorMessage("Invalid date!");
+			g_psuAppContext.errorMessage("Invalid date!");
             return;
         }
 
         if (!datetime::isValidTime(dateTime.hour, dateTime.minute, dateTime.second)) {
-            errorMessage("Invalid time!");
+			g_psuAppContext.errorMessage("Invalid time!");
             popPage();
             return;
         }
@@ -378,7 +378,7 @@ void SysSettingsEthernetPage::editStaticAddress() {
 void SysSettingsEthernetPage::onSetScpiPort(float value) {
     auto port = (uint16_t)value;
     if (port == DEBUGGER_TCP_PORT) {
-		errorMessage("Port " QUOTE(DEBUGGER_TCP_PORT) " is reserved!");
+		g_psuAppContext.errorMessage("Port " QUOTE(DEBUGGER_TCP_PORT) " is reserved!");
         return;
     }
 
@@ -402,7 +402,7 @@ void SysSettingsEthernetPage::editScpiPort() {
 void SysSettingsEthernetPage::onSetMacAddress(char *value) {
     uint8_t macAddress[6];
     if (!parseMacAddress(value, strlen(value), macAddress)) {
-        errorMessage("Invalid MAC address!");
+		g_psuAppContext.errorMessage("Invalid MAC address!");
         return;
     }
 
@@ -451,7 +451,7 @@ void SysSettingsEthernetPage::applyAndRestart() {
 
 void SysSettingsEthernetPage::set() {
     if (getDirty()) {
-        yesNoDialog(PAGE_ID_INFO_RESTART, "", applyAndRestart, popPage, popPage);
+        g_psuAppContext.yesNoDialog(PAGE_ID_INFO_RESTART, "", applyAndRestart, popPage, popPage);
     }
 }
 
@@ -718,12 +718,12 @@ void SysSettingsTemperaturePage::setParams() {
     persist_conf::setFanSettings(fanMode, (uint8_t)roundf(fanSpeedPercentage.getFloat()), fanSpeedPWM);
 
     popPage();
-    infoMessage("Aux temp. protection changed!");
+	g_psuAppContext.infoMessage("Aux temp. protection changed!");
 }
 
 void SysSettingsTemperaturePage::clear() {
     temperature::sensors[temp_sensor::AUX].clearProtection();
-    infoMessage("Cleared!");
+	g_psuAppContext.infoMessage("Cleared!");
 }
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -766,7 +766,7 @@ void SysSettingsEncoderPage::set() {
     if (getDirty()) {
         persist_conf::setEncoderSettings(confirmationMode, movingSpeedDown, movingSpeedUp);
         popPage();
-        infoMessage("Encoder settings changed!");
+		g_psuAppContext.infoMessage("Encoder settings changed!");
     }
 }
 
@@ -1090,15 +1090,15 @@ void SysSettingsTrackingPage::set() {
             showPage(PAGE_ID_MAIN);
 
             if (m_couplingType == channel_dispatcher::COUPLING_TYPE_NONE) {
-                infoMessage("Uncoupled!");
+				g_psuAppContext.infoMessage("Uncoupled!");
             } else if (m_couplingType == channel_dispatcher::COUPLING_TYPE_PARALLEL) {
-                infoMessage("Coupled in parallel!");
+				g_psuAppContext.infoMessage("Coupled in parallel!");
             } else if (m_couplingType == channel_dispatcher::COUPLING_TYPE_SERIES) {
-                infoMessage("Coupled in series!");
+				g_psuAppContext.infoMessage("Coupled in series!");
             } else if (m_couplingType == channel_dispatcher::COUPLING_TYPE_SPLIT_RAILS) {
-                infoMessage("Coupled in split rails!");
+				g_psuAppContext.infoMessage("Coupled in split rails!");
             } else {
-                infoMessage("Coupled in common GND!");
+				g_psuAppContext.infoMessage("Coupled in common GND!");
             }
         } else {
             event_queue::pushEvent(err);
@@ -1120,9 +1120,9 @@ void SysSettingsTrackingPage::set() {
             showPage(PAGE_ID_MAIN);
 
             if (getNumTrackingChannels() >= 2) {
-                infoMessage("Tracking enabled!");
+				g_psuAppContext.infoMessage("Tracking enabled!");
             } else {
-                infoMessage("Tracking disabled!");
+				g_psuAppContext.infoMessage("Tracking disabled!");
             }
         }
     }

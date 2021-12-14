@@ -20,15 +20,6 @@
 
 namespace eez {
 
-enum TestResult {
-    TEST_NONE,
-    TEST_FAILED,
-    TEST_OK,
-    TEST_CONNECTING,
-    TEST_SKIPPED,
-    TEST_WARNING
-};
-
 extern bool g_isBooted;
 extern bool g_bootTestSuccess;
 extern bool g_shutdownInProgress;

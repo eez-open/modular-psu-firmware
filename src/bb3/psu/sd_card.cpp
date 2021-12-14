@@ -45,7 +45,7 @@
 #include <bb3/psu/gui/file_manager.h>
 #endif
 
-#include <bb3/fs/fs.h>
+#include <eez/fs/fs.h>
 
 #if defined(EEZ_PLATFORM_STM32)
 extern "C" int g_sdCardIsPresent;

@@ -35,7 +35,7 @@
 #include <bb3/bp3c/io_exp.h>
 #include <bb3/bp3c/eeprom.h>
 
-#include <bb3/fs/fs.h>
+#include <eez/fs/fs.h>
 
 #ifdef EEZ_PLATFORM_STM32
 
@@ -260,7 +260,7 @@ Exit:
 			success = true;
 		} else {
 #if OPTION_DISPLAY
-			psu::gui::errorMessage("Downloading failed!");
+			psu::gui::g_psuAppContext.errorMessage("Downloading failed!");
 #endif
 		}
 	} else {
@@ -270,7 +270,7 @@ Exit:
 		osDelay(100);
 		psu::gui::hideAsyncOperationInProgress();
 		osDelay(100);
-		psu::gui::errorMessage("Failed to start update!");
+		psu::gui::g_psuAppContext.errorMessage("Failed to start update!");
 #endif
 	}
 

@@ -25,7 +25,7 @@
 #include <bb3/psu/scpi/psu.h>
 #include <bb3/psu/gui/psu.h>
 
-#include <bb3/fs/fs.h>
+#include <eez/fs/fs.h>
 
 #include <bb3/fpga/prog.h>
 

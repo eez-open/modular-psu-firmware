@@ -31,7 +31,7 @@ static unsigned g_queueHead;
 static unsigned g_queueTail;
 static bool g_queueIsFull = false;
 
-void queueInit() {
+void queueReset() {
 	g_queueHead = 0;
 	g_queueTail = 0;
 	g_queueIsFull = false;

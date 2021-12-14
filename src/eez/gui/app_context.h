@@ -33,6 +33,8 @@ struct PageOnStack {
     int displayBufferIndex = -1;
 };
 
+class ToastMessagePage;
+
 class AppContext {
     friend struct AppViewWidgetState;
 
@@ -95,8 +97,25 @@ public:
     virtual int getLongTouchActionHook(const WidgetCursor &widgetCursor);
     virtual int getExtraLongTouchActionHook(const WidgetCursor &widgetCursor);
 
+    void infoMessage(const char *message);
+    void infoMessage(Value value);
+    void infoMessage(const char *message, void (*action)(), const char *actionLabel);
+    void errorMessage(const char *message, bool autoDismiss = false);
+    void errorMessage(Value value);
+    void errorMessageWithAction(Value value, void (*action)(int param), const char *actionLabel, int actionParam);
+    void errorMessageWithAction(const char *message, void (*action)(), const char *actionLabel);
+
+    void yesNoDialog(int yesNoPageId, const char *message, void (*yes_callback)(), void (*no_callback)(), void (*cancel_callback)());
+    void yesNoDialog(int yesNoPageId, Value value, void(*yes_callback)(), void(*no_callback)(), void(*cancel_callback)());
+
     int m_pageIdToSetOnNextIter;
     Page *m_pageToSetOnNextIter;
+
+	// TODO these should be private
+	void(*m_dialogYesCallback)();
+	void(*m_dialogNoCallback)();
+	void(*m_dialogCancelCallback)();
+	void(*m_dialogLaterCallback)();
 
 protected:
     PageOnStack m_pageNavigationStack[CONF_GUI_PAGE_NAVIGATION_STACK_SIZE];
@@ -117,6 +136,8 @@ protected:
     bool isPageFullyCovered(int pageNavigationStackIndex);
     
     virtual bool canExecuteActionWhenTouchedOutsideOfActivePage(int pageId, int action);
+
+    void pushToastMessage(ToastMessagePage *toastMessage);
 };
 
 AppContext &getRootAppContext();

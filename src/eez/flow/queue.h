@@ -23,7 +23,7 @@
 namespace eez {
 namespace flow {
 
-void queueInit();
+void queueReset();
 size_t getQueueSize();
 bool addToQueue(FlowState *flowState, unsigned componentIndex, int sourceComponentIndex = -1, int sourceOutputIndex = -1, int targetInputIndex = -1);
 bool peekNextTaskFromQueue(FlowState *&flowState, unsigned &componentIndex);

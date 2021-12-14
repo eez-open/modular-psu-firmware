@@ -181,6 +181,7 @@ scpi_result_t scpi_cmd_displayDataQ(scpi_t *context) {
 
     if (jpegEncode(screenshotPixels, &imageData, &imageDataSize)) {
     	SCPI_ErrorPush(context, SCPI_ERROR_OUT_OF_MEMORY_FOR_REQ_OP);
+        display::releaseScreenshot();
     	return SCPI_RES_ERR;
     }
 
@@ -196,6 +197,8 @@ scpi_result_t scpi_cmd_displayDataQ(scpi_t *context) {
         imageData += n;
         imageDataSize -= n;
     }
+
+    display::releaseScreenshot();
 
     return SCPI_RES_OK;
 #else
@@ -263,7 +266,7 @@ static scpi_choice_def_t inputTypeChoice[] = {
 };
 
 static scpi_choice_def_t menuTypeChoice[] = {
-    { "BUTTon", psu::gui::MENU_TYPE_BUTTON },
+    { "BUTTon", eez::gui::MENU_TYPE_BUTTON },
     SCPI_CHOICE_LIST_END /* termination of option list */
 };
 
@@ -723,7 +726,7 @@ scpi_result_t scpi_cmd_displayWindowError(scpi_t *context) {
     memcpy(message, valueText, valueTextLen);
     message[valueTextLen] = 0;
     
-    psu::gui::errorMessage(message);
+    psu::gui::g_psuAppContext.errorMessage(message);
 
     return SCPI_RES_OK;
 #else

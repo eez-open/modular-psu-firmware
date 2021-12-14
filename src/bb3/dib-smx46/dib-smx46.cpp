@@ -1775,7 +1775,7 @@ static void onSetTriggerMode(uint16_t value) {
 
 	int err;
 	if (!g_slots[g_aoutConfigurationPage.g_slotIndex]->setFunctionGeneratorResourceTriggerMode(g_aoutConfigurationPage.g_subchannelIndex, 0, (TriggerMode)value, &err)) {
-		errorMessage("Too many function generator resources");
+		g_psuAppContext.errorMessage("Too many function generator resources");
 	}
 }
 

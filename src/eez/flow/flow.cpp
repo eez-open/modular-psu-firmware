@@ -40,7 +40,7 @@ static const uint32_t FLOW_TICK_MAX_DURATION_MS = 20;
 
 FlowState *g_mainPageFlowState;
 
-static const uint32_t MAX_PAGES = 10;
+static const uint32_t MAX_PAGES = 100;
 FlowState *g_pagesFlowState[MAX_PAGES];
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -53,29 +53,23 @@ unsigned start(Assets *assets) {
 
 	g_lastFlowStateIndex = 0;
 
-	queueInit();
+	queueReset();
 
 	scpiComponentInit();
 
 	fixAssetValues(assets);
 
-	onStarted(assets);
-
-	for (uint32_t i = 0; i < assets->pages.count; i++) {
-		auto page = assets->pages.item(assets, i);
-		if (!(page->flags & PAGE_IS_USED_AS_CUSTOM_WIDGET)) {
-			g_pagesFlowState[i] = initPageFlowState(assets, i, nullptr, 0);
-		} else {
-			g_pagesFlowState[i] = nullptr;
-		}
+	for (uint32_t i = 0; i < MAX_PAGES; i++) {
+		g_pagesFlowState[i] = nullptr;
 	}
-	g_mainPageFlowState = g_pagesFlowState[0];
+
+	onStarted(assets);
 
 	return 1;
 }
 
 void tick() {
-	if (!g_mainPageFlowState) {
+	if (!isFlowRunningHook()) {
 		return;
 	}
 
@@ -135,12 +129,15 @@ void stop() {
 		}
 		g_mainPageFlowState = nullptr;
 	}
+	queueReset();
 }
 
 FlowState *getFlowState(int16_t pageId, const WidgetCursor &widgetCursor) {
-	if (!g_mainPageFlowState) {
+	if (!isFlowRunningHook()) {
 		return nullptr;
 	}
+
+	auto assets = widgetCursor.assets;
 
 	if (widgetCursor.widget && widgetCursor.widget->type == WIDGET_TYPE_LAYOUT_VIEW) {
 		if (widgetCursor.flowState) {
@@ -170,9 +167,21 @@ FlowState *getFlowState(int16_t pageId, const WidgetCursor &widgetCursor) {
 
 			return layoutViewWidgetExecutionState->flowState;
 		}
+	} else {
+		auto pageIndex = pageId;
+		auto page = assets->pages.item(assets, pageIndex);
+		if (!(page->flags & PAGE_IS_USED_AS_CUSTOM_WIDGET)) {
+			if (!g_pagesFlowState[pageIndex]) {
+				g_pagesFlowState[pageIndex] = initPageFlowState(assets, pageIndex, nullptr, 0);
+				if (pageIndex == 0) {
+					g_mainPageFlowState = g_pagesFlowState[0];
+				}
+			}
+			return g_pagesFlowState[pageIndex];
+		}
 	}
 
-	return g_pagesFlowState[pageId];
+	return nullptr;
 }
 
 void executeFlowAction(const gui::WidgetCursor &widgetCursor, int16_t actionId) {
@@ -199,6 +208,10 @@ void executeFlowAction(const gui::WidgetCursor &widgetCursor, int16_t actionId) 
 }
 
 void dataOperation(int16_t dataId, DataOperationEnum operation, const gui::WidgetCursor &widgetCursor, Value &value) {
+	if (!isFlowRunningHook()) {
+		return;
+	}
+
 	auto flowState = widgetCursor.flowState;
 
 	auto flowDataId = -dataId - 1;

@@ -20,21 +20,18 @@
 
 #include <eez/os.h>
 
+#if defined(EEZ_PLATFORM_STM32)
+extern volatile uint64_t g_tickCount;
+#endif
+
 #define WATCHDOG_LONG_OPERATION 1
 #define WATCHDOG_HIGH_PRIORITY_THREAD 2
 #define WATCHDOG_GUI_THREAD 3
-
 #if defined(EEZ_PLATFORM_STM32)
-
 void watchdogReset(int fromTask);
 #define WATCHDOG_RESET(fromTask) watchdogReset(fromTask)
-
-extern volatile uint64_t g_tickCount;
-
 #else
-
 #define WATCHDOG_RESET(...) (void)0
-
 #endif
 
 namespace eez {

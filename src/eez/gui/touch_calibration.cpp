@@ -1,4 +1,4 @@
-/* / mcu / sound.h
+/*
  * EEZ Modular Firmware
  * Copyright (C) 2015-present, Envox d.o.o.
  *
@@ -16,30 +16,23 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#if OPTION_DISPLAY
-
-#include <bb3/system.h>
+#include <eez/os.h>
 #include <eez/sound.h>
 
 #include <eez/gui/gui.h>
 #include <eez/gui/touch_filter.h>
 
-#include <bb3/psu/psu.h>
-
-#include <bb3/psu/gui/psu.h>
-#include <bb3/psu/gui/touch_calibration.h>
+#include <eez/gui/touch_calibration.h>
 
 #define CONF_GUI_TOUCH_CALIBRATION_M 17
 #define TOUCH_POINT_ACTIVATION_THRESHOLD 200
 
 ////////////////////////////////////////////////////////////////////////////////
 
-using namespace eez::gui::touch;
-using namespace eez::display;
-
 namespace eez {
-namespace psu {
 namespace gui {
+
+static AppContext *g_appContext;
 
 static uint32_t g_pointStartTime;
 
@@ -51,11 +44,25 @@ static int g_currentPoint;
 
 bool isTouchCalibrated() {
     bool success;
+
+	int16_t touchScreenCalTlx;
+	int16_t touchScreenCalTly;
+	int16_t touchScreenCalBrx;
+	int16_t touchScreenCalBry;
+	int16_t touchScreenCalTrx;
+	int16_t touchScreenCalTry;
+
+	getTouchScreenCalibrationParamsHook(
+		touchScreenCalTlx, touchScreenCalTly,
+		touchScreenCalBrx, touchScreenCalBry,
+		touchScreenCalTrx, touchScreenCalTry
+	);
+
     success = touch::calibrateTransform(
-        persist_conf::devConf.touchScreenCalTlx, persist_conf::devConf.touchScreenCalTly,
-        persist_conf::devConf.touchScreenCalBrx, persist_conf::devConf.touchScreenCalBry,
-        persist_conf::devConf.touchScreenCalTrx, persist_conf::devConf.touchScreenCalTry,
-        CONF_GUI_TOUCH_CALIBRATION_M, getDisplayWidth(), getDisplayHeight());
+        touchScreenCalTlx, touchScreenCalTly,
+        touchScreenCalBrx, touchScreenCalBry,
+        touchScreenCalTrx, touchScreenCalTry,
+        CONF_GUI_TOUCH_CALIBRATION_M, display::getDisplayWidth(), display::getDisplayHeight());
     return success;
 }
 
@@ -65,44 +72,28 @@ void startCalibration() {
     g_pointStartTime = millis();
 }
 
-void enterTouchCalibration() {
-    replacePage(PAGE_ID_TOUCH_CALIBRATION);
-    Channel::saveAndDisableOE();
+void enterTouchCalibration(AppContext *appContext) {
+    g_appContext = appContext;
+	onEnterTouchCalibrationHook();
     startCalibration();
 }
 
-static void touchCalibrationDialogYes() {
-    persist_conf::setTouchscreenCalParams(g_points[0].x, g_points[0].y, g_points[1].x, g_points[1].y, g_points[2].x, g_points[2].y);
-
-    if (isPageOnStack(PAGE_ID_SYS_SETTINGS_DISPLAY)) {
-        popPage();
-        infoMessage("Touch screen is calibrated.");
-    } else if (g_askMcuRevisionInProgress) {
-		showPage(PAGE_ID_SELECT_MCU_REVISION);
-    } else {
-        showPage(PAGE_ID_MAIN);
-    }
-
-    Channel::restoreOE();
+void touchCalibrationDialogYes() {
+	setTouchScreenCalibrationParamsHook(g_points[0].x, g_points[0].y, g_points[1].x, g_points[1].y, g_points[2].x, g_points[2].y);
+	onTouchCalibrationOkHook();
 }
 
-static void touchCalibrationDialogNo() {
+void touchCalibrationDialogNo() {
     startCalibration();
 }
 
-static void touchCalibrationDialogCancel() {
-    if (isPageOnStack(PAGE_ID_SYS_SETTINGS_DISPLAY)) {
-        popPage();
-    } else {
-        showPage(PAGE_ID_MAIN);
-    }
-
-    Channel::restoreOE();
+void touchCalibrationDialogCancel() {
+	onTouchCalibrationCancelHook();
 }
 
 void selectTouchCalibrationPoint() {
-    g_points[g_currentPoint].x = getX();
-    g_points[g_currentPoint].y = getY();
+    g_points[g_currentPoint].x = touch::getX();
+    g_points[g_currentPoint].y = touch::getY();
 
     g_currentPoint++;
     g_pointStartTime = millis();
@@ -112,16 +103,13 @@ void selectTouchCalibrationPoint() {
 
         bool success = touch::calibrateTransform(
             g_points[0].x, g_points[0].y, g_points[1].x, g_points[1].y, g_points[2].x,
-            g_points[2].y, CONF_GUI_TOUCH_CALIBRATION_M, getDisplayWidth(), getDisplayHeight());
+            g_points[2].y, CONF_GUI_TOUCH_CALIBRATION_M, display::getDisplayWidth(), display::getDisplayHeight());
 
         if (success) {
-            yesNoDialog(
-                isPageOnStack(PAGE_ID_SYS_SETTINGS_DISPLAY) ? PAGE_ID_TOUCH_CALIBRATION_YES_NO_CANCEL : PAGE_ID_TOUCH_CALIBRATION_YES_NO,
-                "Save changes?", touchCalibrationDialogYes, touchCalibrationDialogNo, touchCalibrationDialogCancel
-            );
+			onTouchCalibrationConfirmHook();
         } else {
             startCalibration();
-            errorMessage("Received data is invalid due to\nimprecise pointing or\ncommunication problem!", true);
+			g_appContext->errorMessage("Received data is invalid due to\nimprecise pointing or\ncommunication problem!", true);
         }
     }
 }
@@ -159,20 +147,11 @@ void onTouchCalibrationPageTouch(const WidgetCursor &foundWidget, Event &touchEv
     }
 }
 
-} // namespace gui
-} // namespace psu
-} // namespace eez
-
-namespace eez {
-namespace gui {
-
 void data_touch_calibration_point(DataOperationEnum operation, const WidgetCursor& widgetCursor, Value &value) {
     if (operation == DATA_OPERATION_GET) {
-        value = Value(psu::gui::g_currentPoint);
+        value = Value(g_currentPoint);
     }
 }
 
 } // namespace gui
 } // namespace eez
-
-#endif

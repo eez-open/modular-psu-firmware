@@ -243,7 +243,7 @@ void UserProfilesPage::onAsyncOperationFinished(int16_t err) {
     if (err == SCPI_RES_OK) {
         // infoMessage("Done!");
     } else {
-        errorMessage(Value(err, VALUE_TYPE_SCPI_ERROR));
+		g_psuAppContext.errorMessage(Value(err, VALUE_TYPE_SCPI_ERROR));
     }
 }
 

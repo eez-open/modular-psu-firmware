@@ -26,7 +26,7 @@
 #include <eez/debug.h>
 #include <eez/memory.h>
 #include <eez/util.h>
-#include <bb3/fs/fs.h>
+#include <eez/fs/fs.h>
 
 #define CHECK_ERROR(desc, err) (void)(desc); (void)(err);
 //#define CHECK_ERROR(desc, err) if (err != FR_OK) DebugTrace("%s: %d\n", desc, (int)err)

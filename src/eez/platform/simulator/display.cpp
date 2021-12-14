@@ -248,7 +248,7 @@ void doTakeScreenshot() {
     }
 
     g_takeScreenshot = false;
-
+    g_screenshotAllocated = true;
 }
 
 void sync() {
@@ -265,22 +265,21 @@ void sync() {
     }
 
 #ifdef EEZ_CONF_GUI_CALC_FPS
-	startCalcFPS();
+    if (g_calcFpsEnabled) {
+	    calcFPS();
+    }
 #endif
 
     if (g_mainWindow == nullptr) {
         init();
     }
 
-    if (g_animationState.enabled) {
+    if (!g_screenshotAllocated && g_animationState.enabled) {
         animate();
         if (!g_animationState.enabled) {
             finishAnimation();
         }
         clearDirty();
-#ifdef EEZ_CONF_GUI_CALC_FPS
-		endCalcFPS();
-#endif
 		return;
     }
 
@@ -299,10 +298,6 @@ void sync() {
 
         clearDirty();
     }
-
-#ifdef EEZ_CONF_GUI_CALC_FPS
-	endCalcFPS();
-#endif
 }
 
 void finishAnimation() {
@@ -332,6 +327,9 @@ int getDisplayHeight() {
 ////////////////////////////////////////////////////////////////////////////////
 
 const uint8_t *takeScreenshot() {
+    while (g_screenshotAllocated) {
+    }
+
 	g_takeScreenshot = true;
 
 #ifdef __EMSCRIPTEN__

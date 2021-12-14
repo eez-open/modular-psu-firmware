@@ -36,7 +36,7 @@
 
 #include <eez/gui/widgets/yt_graph.h>
 
-#include <bb3/fs/fs.h>
+#include <eez/fs/fs.h>
 
 #include <eez/memory.h>
 

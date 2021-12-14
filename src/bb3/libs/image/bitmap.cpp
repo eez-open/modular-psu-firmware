@@ -19,7 +19,7 @@
 #include <stdint.h>
 
 #include <eez/memory.h>
-#include <bb3/fs/fs.h>
+#include <eez/fs/fs.h>
 #include <bb3/libs/image/bitmap.h>
 
     // const uint8_t buffer[] = {

@@ -45,7 +45,7 @@ static void checkPasswordOkCallback(char *text) {
     } else {
         // entered password doesn't match,
         popPage();
-        errorMessage("Invalid password!");
+		g_psuAppContext.errorMessage("Invalid password!");
     }
 }
 
@@ -61,7 +61,7 @@ static void onRetypeNewPasswordOk(char *text) {
     if (strlen(g_newPassword) != textLen || strncmp(g_newPassword, text, textLen) != 0) {
         // retyped new password doesn't match
         popPage();
-        errorMessage("Password doesn't match!");
+		g_psuAppContext.errorMessage("Password doesn't match!");
         return;
     }
 
@@ -88,9 +88,9 @@ static void onNewPasswordOk(char *text) {
     if (!isOk) {
         // invalid password, return to keypad
         if (err == SCPI_ERROR_PASSWORD_TOO_SHORT || err == SCPI_ERROR_PASSWORD_TOO_SHORT) {
-            errorMessage("Password too short!");
+			g_psuAppContext.errorMessage("Password too short!");
         } else {
-            errorMessage("Password too long!");
+			g_psuAppContext.errorMessage("Password too long!");
         }
         return;
     }

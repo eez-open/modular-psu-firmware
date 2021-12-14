@@ -493,9 +493,9 @@ void switchToNextEncoderMode() {
 		}
 
 		if (encoderMode == ENCODER_MODE_AUTO) {
-			infoMessage("Auto");
+			g_psuAppContext.infoMessage("Auto");
 		} else {
-			infoMessage(getCurrentEncoderStepValue());
+			g_psuAppContext.infoMessage(getCurrentEncoderStepValue());
 		}
 	}
 }

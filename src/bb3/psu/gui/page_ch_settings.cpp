@@ -247,7 +247,7 @@ int ChSettingsProtectionSetPage::getDirty() {
 void ChSettingsProtectionSetPage::onSetFinish(bool showInfo) {
     popPage();
     if (showInfo) {
-        infoMessage("Protection params changed!");
+		g_psuAppContext.infoMessage("Protection params changed!");
     }
 }
 
@@ -664,7 +664,7 @@ void ChSettingsListsPage::doValueSet(float value) {
             if (iRow == 0 && m_voltageListLength <= 1) {
                 for (int i = 0; i < m_currentListLength; ++i) {
                     if (value * m_currentList[i] > channel_dispatcher::getPowerMaxLimit(*g_channel)) {
-                        errorMessage("Power limit exceeded");
+						g_psuAppContext.errorMessage("Power limit exceeded");
                         return;
                     }
                 }
@@ -679,7 +679,7 @@ void ChSettingsListsPage::doValueSet(float value) {
             if (iRow == 0 && m_currentListLength <= 1) {
                 for (int i = 0; i < m_voltageListLength; ++i) {
                     if (value * m_voltageList[i] > channel_dispatcher::getPowerMaxLimit(*g_channel)) {
-                        errorMessage("Power limit exceeded");
+						g_psuAppContext.errorMessage("Power limit exceeded");
                         return;
                     }
                 }
@@ -693,7 +693,7 @@ void ChSettingsListsPage::doValueSet(float value) {
         }
 
         if (power > channel_dispatcher::getPowerMaxLimit(*g_channel)) {
-            errorMessage("Power limit exceeded");
+			g_psuAppContext.errorMessage("Power limit exceeded");
             return;
         }
     }
@@ -890,7 +890,7 @@ void ChSettingsListsPage::set() {
                 channel_dispatcher::setTriggerOutputState(*g_channel, true);
             }
         } else {
-            errorMessage("List lengths are not equivalent!");
+			g_psuAppContext.errorMessage("List lengths are not equivalent!");
         }
     }
 }
@@ -1061,7 +1061,7 @@ void ChSettingsListsPage::doClearColumn() {
 }
 
 void ChSettingsListsPage::clearColumn() {
-    yesNoDialog(PAGE_ID_YES_NO, "Are you sure?", onClearColumn, 0, 0);
+	g_psuAppContext.yesNoDialog(PAGE_ID_YES_NO, "Are you sure?", onClearColumn, 0, 0);
 }
 
 void ChSettingsListsPage::onDeleteRows() {
@@ -1080,7 +1080,7 @@ void ChSettingsListsPage::doDeleteRows() {
 }
 
 void ChSettingsListsPage::deleteRows() {
-    yesNoDialog(PAGE_ID_YES_NO, "Are you sure?", onDeleteRows, 0, 0);
+	g_psuAppContext.yesNoDialog(PAGE_ID_YES_NO, "Are you sure?", onDeleteRows, 0, 0);
 }
 
 void ChSettingsListsPage::onDeleteAll() {
@@ -1096,7 +1096,7 @@ void ChSettingsListsPage::doDeleteAll() {
 }
 
 void ChSettingsListsPage::deleteAll() {
-    yesNoDialog(PAGE_ID_YES_NO, "Are you sure?", onDeleteAll, 0, 0);
+	g_psuAppContext.yesNoDialog(PAGE_ID_YES_NO, "Are you sure?", onDeleteAll, 0, 0);
 }
 
 void ChSettingsListsPage::showFileMenu() {
@@ -1145,7 +1145,7 @@ void ChSettingsListsPage::onImportListFinished(int16_t err) {
 
         m_iCursor = 0;
     } else {
-        errorMessage(Value(err, VALUE_TYPE_SCPI_ERROR));
+		g_psuAppContext.errorMessage(Value(err, VALUE_TYPE_SCPI_ERROR));
     }
 }
 
@@ -1182,7 +1182,7 @@ void ChSettingsListsPage::onExportListFinished(int16_t err) {
     hideProgressPage();
 
     if (err != SCPI_RES_OK) {
-        errorMessage(Value(err, VALUE_TYPE_SCPI_ERROR));
+		g_psuAppContext.errorMessage(Value(err, VALUE_TYPE_SCPI_ERROR));
     }
 }
 

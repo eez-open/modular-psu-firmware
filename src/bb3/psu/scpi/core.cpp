@@ -16,12 +16,9 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
+#include <eez/eeprom.h>
 #include <bb3/firmware.h>
-
 #include <bb3/psu/psu.h>
-
-#include <bb3/mcu/eeprom.h>
-
 #include <bb3/psu/profile.h>
 #include <bb3/psu/scpi/psu.h>
 

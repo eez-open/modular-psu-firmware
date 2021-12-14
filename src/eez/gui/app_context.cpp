@@ -34,6 +34,7 @@
 #endif
 
 #include <eez/gui/gui.h>
+#include <eez/gui/touch_calibration.h>
 #include <eez/gui/widgets/button.h>
 
 #include <eez/hmi.h>
@@ -48,9 +49,6 @@ AppContext::AppContext() {
 }
 
 void AppContext::stateManagment() {
-    if (getActivePageId() == PAGE_ID_NONE) {
-        showPage(getMainPageId());
-    }
 }
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -266,6 +264,11 @@ bool AppContext::canExecuteActionWhenTouchedOutsideOfActivePage(int pageId, int 
 
 void AppContext::onPageTouch(const WidgetCursor &foundWidget, Event &touchEvent) {
     int activePageId = getActivePageId();
+    if (activePageId == PAGE_ID_TOUCH_CALIBRATION) {
+        onTouchCalibrationPageTouch(foundWidget, touchEvent);
+        return;
+    }
+
     if (activePageId != PAGE_ID_NONE && !isPageInternal(activePageId)) {
         auto page = getPageAsset(activePageId);
         if ((page->flags & CLOSE_PAGE_IF_TOUCHED_OUTSIDE_FLAG) != 0) {
@@ -386,6 +389,62 @@ int AppContext::getLongTouchActionHook(const WidgetCursor &widgetCursor) {
 
 int AppContext::getExtraLongTouchActionHook(const WidgetCursor &widgetCursor) {
     return ACTION_ID_NONE;
+}
+
+void AppContext::yesNoDialog(int yesNoPageId, const char *message, void (*yes_callback)(), void (*no_callback)(), void (*cancel_callback)()) {
+    set(WidgetCursor(), DATA_ID_ALERT_MESSAGE, Value(message));
+
+    m_dialogYesCallback = yes_callback;
+    m_dialogNoCallback = no_callback;
+    m_dialogCancelCallback = cancel_callback;
+
+    pushPage(yesNoPageId);
+}
+
+void AppContext::yesNoDialog(int yesNoPageId, Value value, void(*yes_callback)(), void(*no_callback)(), void(*cancel_callback)()) {
+	set(WidgetCursor(), DATA_ID_ALERT_MESSAGE, value);
+
+	m_dialogYesCallback = yes_callback;
+	m_dialogNoCallback = no_callback;
+	m_dialogCancelCallback = cancel_callback;
+
+	pushPage(yesNoPageId);
+}
+
+void AppContext::infoMessage(const char *message) {
+    pushToastMessage(ToastMessagePage::create(this, INFO_TOAST, message));
+}
+
+void AppContext::infoMessage(Value value) {
+    pushToastMessage(ToastMessagePage::create(this, INFO_TOAST, value));
+}
+
+void AppContext::infoMessage(const char *message, void (*action)(), const char *actionLabel) {
+    pushToastMessage(ToastMessagePage::create(this, INFO_TOAST, message, action, actionLabel));
+}
+
+void AppContext::errorMessage(const char *message, bool autoDismiss) {
+    AppContext::pushToastMessage(ToastMessagePage::create(this, ERROR_TOAST, message, autoDismiss));
+    sound::playBeep();
+}
+
+void AppContext::errorMessage(Value value) {
+    AppContext::pushToastMessage(ToastMessagePage::create(this, ERROR_TOAST, value));
+    sound::playBeep();
+}
+
+void AppContext::errorMessageWithAction(Value value, void (*action)(int param), const char *actionLabel, int actionParam) {
+    AppContext::pushToastMessage(ToastMessagePage::create(this, ERROR_TOAST, value, action, actionLabel, actionParam));
+    sound::playBeep();
+}
+
+void AppContext::errorMessageWithAction(const char *message, void (*action)(), const char *actionLabel) {
+    AppContext::pushToastMessage(ToastMessagePage::create(this, ERROR_TOAST, message, action, actionLabel));
+    sound::playBeep();
+}
+
+void AppContext::pushToastMessage(ToastMessagePage *toastMessage) {
+    pushPage(INTERNAL_PAGE_ID_TOAST_MESSAGE, toastMessage);
 }
 
 } // namespace gui

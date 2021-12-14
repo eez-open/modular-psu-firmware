@@ -18,16 +18,32 @@
 
 #pragma once
 
-using namespace eez::gui;
+#include <stdint.h>
+
+#include <eez/os.h>
 
 namespace eez {
-namespace psu {
-namespace gui {
+namespace eeprom {
 
-bool isTouchCalibrated();
-void enterTouchCalibration();
-void onTouchCalibrationPageTouch(const WidgetCursor &foundWidget, Event &touchEvent);
+// opcodes
+static const uint8_t WREN = 6;
+static const uint8_t WRDI = 4;
+static const uint8_t RDSR = 5;
+static const uint8_t WRSR = 1;
+static const uint8_t READ = 3;
+static const uint8_t WRITE = 2;
 
-} // namespace gui
-} // namespace psu
+static const uint16_t EEPROM_ONTIME_START_ADDRESS = 64;
+
+static const uint16_t EEPROM_SIZE = 32768;
+
+void init();
+bool test();
+
+extern TestResult g_testResult;
+
+bool read(uint8_t *buffer, uint16_t buffer_size, uint16_t address);
+bool write(const uint8_t *buffer, uint16_t buffer_size, uint16_t address);
+
+} // namespace eeprom
 } // namespace eez

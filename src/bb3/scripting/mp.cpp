@@ -18,7 +18,7 @@
 
 #include <stdio.h>
 
-#include <bb3/fs/fs.h>
+#include <eez/fs/fs.h>
 
 #include <bb3/psu/gui/psu.h>
 

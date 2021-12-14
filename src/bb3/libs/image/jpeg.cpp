@@ -37,7 +37,7 @@ extern "C" {
 #include <eez/debug.h>
 #include <eez/memory.h>
 #include <eez/util.h>
-#include <bb3/fs/fs.h>
+#include <eez/fs/fs.h>
 #include <bb3/libs/image/jpeg.h>
 
 static size_t g_imageDataSize;

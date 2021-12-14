@@ -26,7 +26,6 @@ using namespace eez::gui;
 
 #include <bb3/psu/gui/data.h>
 #include <bb3/psu/gui/keypad.h>
-#include <bb3/psu/gui/page.h>
 
 namespace eez {
 namespace psu {
@@ -75,20 +74,9 @@ void showEnteringStandbyPage();
 void showSavingPage();
 void showShutdownPage();
 
-extern Value g_alertMessage;
 extern Value g_alertMessage2;
 extern Value g_alertMessage3;
 
-void infoMessage(const char *message);
-void infoMessage(Value value);
-void infoMessage(const char *message, void (*action)(), const char *actionLabel);
-void errorMessage(const char *message, bool autoDismiss = false);
-void errorMessage(Value value);
-void errorMessageWithAction(Value value, void (*action)(int param), const char *actionLabel, int actionParam);
-void errorMessageWithAction(const char *message, void (*action)(), const char *actionLabel);
-
-void yesNoDialog(int yesNoPageId, const char *message, void (*yes_callback)(), void (*no_callback)(), void (*cancel_callback)());
-void yesNoDialog(int yesNoPageId, Value value, void(*yes_callback)(), void(*no_callback)(), void(*cancel_callback)());
 void yesNoLater(const char *message, void (*yes_callback)(), void (*no_callback)(), void (*later_callback)() = 0);
 void areYouSure(void (*yes_callback)());
 void areYouSureWithMessage(const char *message, void (*yes_callback)(), void (*no_callback)() = 0, void (*cancel_callback)() = 0);
@@ -232,12 +220,6 @@ public:
     void dialogSetDataItemValue(int16_t dataId, Value& value);
     void dialogSetDataItemValue(int16_t dataId, const char *str);
     void dialogClose();
-
-    // TODO these should be private
-    void (*m_dialogYesCallback)();
-    void (*m_dialogNoCallback)();
-    void (*m_dialogCancelCallback)();
-    void (*m_dialogLaterCallback)();
 
     int getLongTouchActionHook(const WidgetCursor &widgetCursor) override;
     int getExtraLongTouchActionHook(const WidgetCursor &widgetCursor) override;

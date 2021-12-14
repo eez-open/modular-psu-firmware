@@ -49,8 +49,9 @@
 #include <bb3/psu/gui/page_sys_settings.h>
 #include <bb3/psu/gui/page_user_profiles.h>
 #include <bb3/psu/gui/password.h>
-#include <bb3/psu/gui/touch_calibration.h>
 #include <bb3/psu/gui/file_manager.h>
+
+#include <eez/gui/touch_calibration.h>
 
 #include <bb3/psu/sd_card.h>
 
@@ -177,7 +178,7 @@ void action_keypad_option3() {
 }
 
 void action_enter_touch_calibration() {
-    psu::gui::enterTouchCalibration();
+    enterTouchCalibration(&g_psuAppContext);
 }
 
 void action_show_touch_calibration_intro() {
@@ -395,7 +396,7 @@ void onChannelCopyDestinationSelected(uint16_t value) {
             stringCopy(message, sizeof(message), "Copying is not possible!");
             stringAppendString(message, sizeof(message), "\n");
             stringAppendString(message, sizeof(message), err);
-            errorMessage(message);
+			g_psuAppContext.errorMessage(message);
         }
     } else {
         g_slots[hmi::g_selectedSlotIndex]->copyTo(value);
@@ -456,27 +457,27 @@ void action_ch_settings_calibration_toggle_enable() {
 
 void action_ch_settings_prot_clear() {
     channel_dispatcher::clearProtection(*g_channel);
-    infoMessage("Cleared!");
+	g_psuAppContext.infoMessage("Cleared!");
 }
 
 void action_ch_settings_ovp_prot_clear() {
     channel_dispatcher::clearOvpProtection(*g_channel);
-    infoMessage("Cleared!");
+	g_psuAppContext.infoMessage("Cleared!");
 }
 
 void action_ch_settings_ocp_prot_clear() {
     channel_dispatcher::clearOcpProtection(*g_channel);
-    infoMessage("Cleared!");
+	g_psuAppContext.infoMessage("Cleared!");
 }
 
 void action_ch_settings_opp_prot_clear() {
     channel_dispatcher::clearOppProtection(*g_channel);
-    infoMessage("Cleared!");
+	g_psuAppContext.infoMessage("Cleared!");
 }
 
 void action_ch_settings_otp_prot_clear() {
     channel_dispatcher::clearOtpProtection(*g_channel);
-    infoMessage("Cleared!");
+	g_psuAppContext.infoMessage("Cleared!");
 }
 
 void action_ch_settings_prot_toggle_state() {
@@ -596,32 +597,32 @@ void action_toggle_channels_view_mode() {
 
     if (persist_conf::isMaxView()) {
         if (persist_conf::devConf.channelsViewModeInMax == CHANNELS_VIEW_MODE_IN_MAX_NUMERIC) {
-            infoMessage("Numeric");
+			g_psuAppContext.infoMessage("Numeric");
         } else if (persist_conf::devConf.channelsViewModeInMax == CHANNELS_VIEW_MODE_IN_MAX_HORZ_BAR) {
-            infoMessage("Horizontal Bar");
+			g_psuAppContext.infoMessage("Horizontal Bar");
         } else {
             if (persist_conf::devConf.ytGraphUpdateMethod == YT_GRAPH_UPDATE_METHOD_SCROLL) {
-                infoMessage("YT Scroll");
+				g_psuAppContext.infoMessage("YT Scroll");
             } else {
-                infoMessage("YT Scan");
+				g_psuAppContext.infoMessage("YT Scan");
             }
         }
     } else {
         if (persist_conf::devConf.channelsViewMode == CHANNELS_VIEW_MODE_NUMERIC) {
-            infoMessage(CH_NUM > 0 ? "Numeric" : "Vertical");
+			g_psuAppContext.infoMessage(CH_NUM > 0 ? "Numeric" : "Vertical");
         } else if (persist_conf::devConf.channelsViewMode == CHANNELS_VIEW_MODE_HORZ_BAR) {
-            infoMessage(CH_NUM > 0 ? "Horizontal Bar": "Horizontal");
+			g_psuAppContext.infoMessage(CH_NUM > 0 ? "Horizontal Bar": "Horizontal");
         } else if (persist_conf::devConf.channelsViewMode == CHANNELS_VIEW_MODE_VERT_BAR) {
-            infoMessage(CH_NUM > 0 ? "Vertical Bar": "Vertical");
+			g_psuAppContext.infoMessage(CH_NUM > 0 ? "Vertical Bar": "Vertical");
         } else {
             if (CH_NUM > 0) {
                 if (persist_conf::devConf.ytGraphUpdateMethod == YT_GRAPH_UPDATE_METHOD_SCROLL) {
-                    infoMessage("YT Scroll");
+					g_psuAppContext.infoMessage("YT Scroll");
                 } else {
-                    infoMessage("YT Scan");
+					g_psuAppContext.infoMessage("YT Scan");
                 }
             } else {
-                infoMessage("Horizontal");
+				g_psuAppContext.infoMessage("Horizontal");
             }
         }
     }
@@ -945,12 +946,12 @@ void action_stand_by() {
 
 void action_restart() {
     popPage();
-    yesNoDialog(PAGE_ID_YES_NO, "Do you want to restart?", eez::restart, nullptr, nullptr);
+    g_psuAppContext.yesNoDialog(PAGE_ID_YES_NO, "Do you want to restart?", eez::restart, nullptr, nullptr);
 }
 
 void action_shutdown() {
     popPage();
-    yesNoDialog(PAGE_ID_YES_NO, "Do you want to shutdown?", eez::shutdown, nullptr, nullptr);
+	g_psuAppContext.yesNoDialog(PAGE_ID_YES_NO, "Do you want to shutdown?", eez::shutdown, nullptr, nullptr);
 }
 
 void action_turn_display_off() {
@@ -1115,7 +1116,7 @@ void action_user_switch_clicked() {
     }
 
     if (isFrontPanelLocked()) {
-        errorMessage("Front panel is locked!");
+		g_psuAppContext.errorMessage("Front panel is locked!");
         return;
     }
 
@@ -1159,7 +1160,7 @@ void action_user_switch_clicked() {
                 return;
             }
         }
-        infoMessage("Tracking is not enabled.");
+		g_psuAppContext.infoMessage("Tracking is not enabled.");
         break;
 
     case persist_conf::USER_SWITCH_ACTION_HOME:
@@ -1217,7 +1218,7 @@ void onSetModuleType(uint16_t moduleType) {
 #ifdef __EMSCRIPTEN__
     infoMessage("Reload page to apply change!");
 #else
-    infoMessage("Restart program to apply change!");
+	g_psuAppContext.infoMessage("Restart program to apply change!");
 #endif
 }
 
@@ -1299,7 +1300,7 @@ void action_channel_update_firmware() {
     if (getActivePageId() == PAGE_ID_MAIN) {
         hmi::selectSlot(getFoundWidgetAtDown().cursor);
     }
-    yesNoDialog(PAGE_ID_YES_NO_FLASH_SLAVE, nullptr, onSelectFirmware, nullptr, nullptr);
+	g_psuAppContext.yesNoDialog(PAGE_ID_YES_NO_FLASH_SLAVE, nullptr, onSelectFirmware, nullptr, nullptr);
 }
 
 void action_show_sys_settings_ramp_and_delay() {
@@ -1381,7 +1382,7 @@ void action_select_mass_storage_device() {
 
 void action_show_display_test_page() {
     pushPage(PAGE_ID_SYS_SETTINGS_DISPLAY_TEST);
-    infoMessage("Switch colors by screen tap or encoder.\nTo exit push encoder or user switch.", nullptr, "Close");
+	g_psuAppContext.infoMessage("Switch colors by screen tap or encoder.\nTo exit push encoder or user switch.", nullptr, "Close");
 }
 
 void action_toggle_display_test_color_index() {

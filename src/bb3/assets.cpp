@@ -18,7 +18,7 @@
 
 #include <eez/gui/gui.h>
 
-#include <bb3/fs/fs.h>
+#include <eez/fs/fs.h>
 
 #include <scpi/scpi.h>
 

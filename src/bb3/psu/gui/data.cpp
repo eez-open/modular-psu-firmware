@@ -1555,7 +1555,7 @@ void onSetStringValue(char *value) {
         popPage();
         set(widgetCursor, g_editValueDataId, value);
     } else {
-        errorMessage(errMessage);
+		g_psuAppContext.errorMessage(errMessage);
     }
 }
 
@@ -6025,14 +6025,6 @@ void data_async_progress(DataOperationEnum operation, const WidgetCursor &widget
 void data_alert_message_is_set(DataOperationEnum operation, const WidgetCursor &widgetCursor, Value &value) {
     if (operation == DATA_OPERATION_GET) {
         value = g_alertMessage.getString() != nullptr;
-    }
-}
-
-void data_alert_message(DataOperationEnum operation, const WidgetCursor &widgetCursor, Value &value) {
-    if (operation == DATA_OPERATION_GET) {
-        value = psu::gui::g_alertMessage;
-    } else if (operation == DATA_OPERATION_SET) {
-        g_alertMessage = value;
     }
 }
 

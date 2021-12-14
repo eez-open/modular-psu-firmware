@@ -58,7 +58,7 @@
 #include <bb3/psu/gui/page_user_profiles.h>
 #include <bb3/psu/gui/password.h>
 #include <bb3/psu/gui/file_manager.h>
-#include <bb3/psu/gui/touch_calibration.h>
+#include <eez/gui/touch_calibration.h>
 #include <bb3/psu/gui/labels_and_colors.h>
 
 #include <bb3/function_generator.h>
@@ -212,7 +212,7 @@ void PsuAppContext::stateManagment() {
     if (!g_powerIsUp) {
     	if (g_isBooted && !g_shutdownInProgress && getActivePageId() != PAGE_ID_NONE) {
     		showPage(PAGE_ID_NONE);
-    		eez::display::turnOff();
+    		eez::gui::display::turnOff();
     	}
         return;
     }
@@ -225,7 +225,7 @@ void PsuAppContext::stateManagment() {
         showPage(PAGE_ID_DISPLAY_OFF);
         return;
     } else if (psu::persist_conf::devConf.displayState == 1 && activePageId == PAGE_ID_DISPLAY_OFF) {
-        eez::display::turnOn();
+		eez::gui::display::turnOn();
         showPage(getMainPageId());
         return;
     }
@@ -248,7 +248,7 @@ void PsuAppContext::stateManagment() {
     // start touch screen calibration automatically after period of time
     if (activePageId == PAGE_ID_TOUCH_CALIBRATION_INTRO) {
         if (inactivityPeriod >= 20 * 1000UL) {
-            enterTouchCalibration();
+            enterTouchCalibration(this);
             return;
         }
     }
@@ -262,9 +262,9 @@ void PsuAppContext::stateManagment() {
 
     // handling of display off page
     if (activePageId == PAGE_ID_DISPLAY_OFF) {
-        if (eez::display::isOn()) {
+        if (eez::gui::display::isOn()) {
             if (int32_t(tickCount - m_showPageTime) >= CONF_GUI_DISPLAY_OFF_PAGE_TIMEOUT_MS) {
-                eez::display::turnOff();
+				eez::gui::display::turnOff();
                 m_showPageTime = tickCount;
             }
         }
@@ -610,11 +610,6 @@ void PsuAppContext::onPageTouch(const WidgetCursor &foundWidget, Event &touchEve
 
     int activePageId = getActivePageId();
 
-    if (activePageId == PAGE_ID_TOUCH_CALIBRATION) {
-        onTouchCalibrationPageTouch(foundWidget, touchEvent);
-        return;
-    }
-
     if (touchEvent.type == EVENT_TYPE_TOUCH_DOWN) {
         if (activePageId == PAGE_ID_EDIT_MODE_SLIDER) {
             edit_mode_slider::onTouchDown();
@@ -633,7 +628,7 @@ void PsuAppContext::onPageTouch(const WidgetCursor &foundWidget, Event &touchEve
         } else if (activePageId == PAGE_ID_EDIT_MODE_STEP) {
             edit_mode_step::onTouchUp();
         } else if (activePageId == PAGE_ID_TOUCH_CALIBRATION_INTRO) {
-            enterTouchCalibration();
+            enterTouchCalibration(this);
         }
     } else if (touchEvent.type == EVENT_TYPE_LONG_TOUCH) {
         if (activePageId == PAGE_ID_NONE || activePageId == PAGE_ID_STANDBY) {
@@ -957,9 +952,17 @@ bool PsuAppContext::dialogOpen(int *err) {
         }
     } else {
         sendMessageToGuiThread(GUI_QUEUE_MESSAGE_TYPE_DIALOG_OPEN);
-        do {
-            osDelay(1);
-        } while (!isExternalPageOnStack());
+        if (err) {
+            static const int DIALOG_OPEN_TIMEOUT = 100;
+            for (int i = 0; i < DIALOG_OPEN_TIMEOUT; i++) {
+                if (isExternalPageOnStack()) {
+                    return true;
+                }
+                osDelay(1);
+            }
+            *err = SCPI_ERROR_TIME_OUT;
+            return false;
+        }
     }
     return true;
 }
@@ -1145,25 +1148,25 @@ void PsuAppContext::pageRenderCustom(int i, WidgetCursor &widgetCursor) {
     if (getActivePageId() == PAGE_ID_TOUCH_CALIBRATION_YES_NO || getActivePageId() == PAGE_ID_TOUCH_CALIBRATION_YES_NO_CANCEL) {
         auto eventType = touch::getEventType();
         if (eventType == EVENT_TYPE_TOUCH_DOWN || eventType == EVENT_TYPE_TOUCH_MOVE) {
-            int x = MIN(MAX(touch::getX(), 1), eez::display::getDisplayWidth() - 2);
-            int y = MIN(MAX(touch::getY(), 1), eez::display::getDisplayHeight() - 2);
-            eez::display::setColor(255, 255, 255);
-            eez::display::fillRect(x - 1, y - 1, x + 1, y + 1);
+            int x = MIN(MAX(touch::getX(), 1), display::getDisplayWidth() - 2);
+            int y = MIN(MAX(touch::getY(), 1), display::getDisplayHeight() - 2);
+            display::setColor(255, 255, 255);
+            display::fillRect(x - 1, y - 1, x + 1, y + 1);
         }
     } else if (getActivePageId() == PAGE_ID_TOUCH_TEST) {
 		if (g_findCallback == nullptr) {
 			if (get(widgetCursor, DATA_ID_TOUCH_CALIBRATED_PRESSED).getInt()) {
-				int x = MIN(MAX(get(widgetCursor, DATA_ID_TOUCH_CALIBRATED_X).getInt(), 1), eez::display::getDisplayWidth() - 2);
-				int y = MIN(MAX(get(widgetCursor, DATA_ID_TOUCH_CALIBRATED_Y).getInt(), 1), eez::display::getDisplayHeight() - 2);
-				eez::display::setColor(0, 0, 255);
-				eez::display::fillRect(x - 1, y - 1, x + 1, y + 1);
+				int x = MIN(MAX(get(widgetCursor, DATA_ID_TOUCH_CALIBRATED_X).getInt(), 1), display::getDisplayWidth() - 2);
+				int y = MIN(MAX(get(widgetCursor, DATA_ID_TOUCH_CALIBRATED_Y).getInt(), 1), display::getDisplayHeight() - 2);
+				display::setColor(0, 0, 255);
+				display::fillRect(x - 1, y - 1, x + 1, y + 1);
 			}
 
 			if (get(widgetCursor, DATA_ID_TOUCH_FILTERED_PRESSED).getInt()) {
-				int x = MIN(MAX(get(widgetCursor, DATA_ID_TOUCH_FILTERED_X).getInt(), 1), eez::display::getDisplayWidth() - 2);
-				int y = MIN(MAX(get(widgetCursor, DATA_ID_TOUCH_FILTERED_Y).getInt(), 1), eez::display::getDisplayHeight() - 2);
-				eez::display::setColor(0, 255, 0);
-				eez::display::fillRect(x - 1, y - 1, x + 1, y + 1);
+				int x = MIN(MAX(get(widgetCursor, DATA_ID_TOUCH_FILTERED_X).getInt(), 1), display::getDisplayWidth() - 2);
+				int y = MIN(MAX(get(widgetCursor, DATA_ID_TOUCH_FILTERED_Y).getInt(), 1), display::getDisplayHeight() - 2);
+				display::setColor(0, 255, 0);
+				display::fillRect(x - 1, y - 1, x + 1, y + 1);
 			}
 		}
     }
@@ -1258,7 +1261,7 @@ void onSetVoltageLimit(float limit) {
     Channel &channel = Channel::get(g_iChannelSetValue);
     channel_dispatcher::setVoltageLimit(channel, limit);
     popPage();
-    infoMessage("Voltage limit changed!");
+    g_psuAppContext.infoMessage("Voltage limit changed!");
 }
 
 void changeVoltageLimit(int iChannel) {
@@ -1276,7 +1279,7 @@ void onSetCurrentLimit(float limit) {
     Channel &channel = Channel::get(g_iChannelSetValue);
     channel_dispatcher::setCurrentLimit(channel, limit);
     popPage();
-    infoMessage("Current limit changed!");
+	g_psuAppContext.infoMessage("Current limit changed!");
 }
 
 void changeCurrentLimit(int iChannel) {
@@ -1294,7 +1297,7 @@ void onSetPowerLimit(float limit) {
     Channel &channel = Channel::get(g_iChannelSetValue);
     channel_dispatcher::setPowerLimit(channel, limit);
     popPage();
-    infoMessage("Power limit changed!");
+	g_psuAppContext.infoMessage("Power limit changed!");
 }
 
 void changePowerLimit(int iChannel) {
@@ -1312,7 +1315,7 @@ void onSetPowerTripLevel(float level) {
     Channel &channel = Channel::get(g_iChannelSetValue);
     channel_dispatcher::setOppParameters(channel, channel.prot_conf.flags.p_state ? 1 : 0, level, channel.prot_conf.p_delay);
     popPage();
-    infoMessage("Power protection level changed!");
+	g_psuAppContext.infoMessage("Power protection level changed!");
 }
 
 void changePowerTripLevel(int iChannel) {
@@ -1330,7 +1333,7 @@ void onSetPowerTripDelay(float delay) {
     Channel &channel = Channel::get(g_iChannelSetValue);
     channel_dispatcher::setOppParameters(channel, channel.prot_conf.flags.p_state ? 1 : 0, channel_dispatcher::getPowerProtectionLevel(channel), delay);
     popPage();
-    infoMessage("Power protection delay changed!");
+	g_psuAppContext.infoMessage("Power protection delay changed!");
 }
 
 void changePowerTripDelay(int iChannel) {
@@ -1348,7 +1351,7 @@ void onSetTemperatureTripLevel(float level) {
     Channel &channel = Channel::get(g_iChannelSetValue);
     channel_dispatcher::setOtpParameters(channel, temperature::getChannelSensorState(&channel) ? 1 : 0, level, temperature::getChannelSensorDelay(&channel));
     popPage();
-    infoMessage("Temperature protection level changed!");
+	g_psuAppContext.infoMessage("Temperature protection level changed!");
 }
 
 void changeTemperatureTripLevel(int iChannel) {
@@ -1366,7 +1369,7 @@ void onSetTemperatureTripDelay(float delay) {
     Channel &channel = Channel::get(g_iChannelSetValue);
     channel_dispatcher::setOtpParameters(channel, temperature::getChannelSensorState(&channel) ? 1 : 0, temperature::getChannelSensorLevel(&channel), delay);
     popPage();
-    infoMessage("Temperature protection delay changed!");
+	g_psuAppContext.infoMessage("Temperature protection delay changed!");
 }
 
 void changeTemperatureTripDelay(int iChannel) {
@@ -1409,7 +1412,7 @@ void psuErrorMessage(const Cursor cursor, Value value, void (*ok_callback)()) {
                 if (ok_callback) {
                     ok_callback();
                 }
-                errorMessageWithAction(value, changeVoltageLimit, "Change voltage limit", iChannel);
+				g_psuAppContext.errorMessageWithAction(value, changeVoltageLimit, "Change voltage limit", iChannel);
                 return;
             }
         } else if (value.getScpiError() == SCPI_ERROR_CURRENT_LIMIT_EXCEEDED) {
@@ -1417,7 +1420,7 @@ void psuErrorMessage(const Cursor cursor, Value value, void (*ok_callback)()) {
                 if (ok_callback) {
                     ok_callback();
                 }
-                errorMessageWithAction(value, changeCurrentLimit, "Change current limit", iChannel);
+				g_psuAppContext.errorMessageWithAction(value, changeCurrentLimit, "Change current limit", iChannel);
                 return;
             }
         } else if (value.getScpiError() == SCPI_ERROR_POWER_LIMIT_EXCEEDED || value.getScpiError() == SCPI_ERROR_MODULE_TOTAL_POWER_LIMIT_EXCEEDED) {
@@ -1425,7 +1428,7 @@ void psuErrorMessage(const Cursor cursor, Value value, void (*ok_callback)()) {
                 if (ok_callback) {
                     ok_callback();
                 }
-                errorMessageWithAction(value, changePowerLimit, "Change power limit", iChannel);
+				g_psuAppContext.errorMessageWithAction(value, changePowerLimit, "Change power limit", iChannel);
                 return;
             }
         }
@@ -1434,28 +1437,28 @@ void psuErrorMessage(const Cursor cursor, Value value, void (*ok_callback)()) {
 			if (ok_callback) {
 				ok_callback();
 			}
-			errorMessageWithAction(value, show_ovp_settings, "OVP Settings", value.getSecondInt16());
+			g_psuAppContext.errorMessageWithAction(value, show_ovp_settings, "OVP Settings", value.getSecondInt16());
 			return;
 
 		} else if (value.getFirstInt16() == event_queue::EVENT_ERROR_CH_OCP_TRIPPED) {
 			if (ok_callback) {
 				ok_callback();
 			}
-			errorMessageWithAction(value, show_ocp_settings, "OCP Settings", value.getSecondInt16());
+			g_psuAppContext.errorMessageWithAction(value, show_ocp_settings, "OCP Settings", value.getSecondInt16());
 			return;
 
 		} else if (value.getFirstInt16() == event_queue::EVENT_ERROR_CH_OPP_TRIPPED) {
 			if (ok_callback) {
 				ok_callback();
 			}
-			errorMessageWithAction(value, show_opp_settings, "OPP Settings", value.getSecondInt16());
+			g_psuAppContext.errorMessageWithAction(value, show_opp_settings, "OPP Settings", value.getSecondInt16());
 			return;
 
 		} else if (value.getFirstInt16() == event_queue::EVENT_ERROR_CH_OTP_TRIPPED) {
 			if (ok_callback) {
 				ok_callback();
 			}
-			errorMessageWithAction(value, show_otp_settings, "OTP Settings", value.getSecondInt16());
+			g_psuAppContext.errorMessageWithAction(value, show_otp_settings, "OTP Settings", value.getSecondInt16());
 			return;
 		}
 	}
@@ -1464,7 +1467,7 @@ void psuErrorMessage(const Cursor cursor, Value value, void (*ok_callback)()) {
         ok_callback();
     }
 
-    errorMessage(value);
+	g_psuAppContext.errorMessage(value);
 }
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -1556,7 +1559,7 @@ static void doUnlockFrontPanel() {
     popPage();
 
     psu::persist_conf::lockFrontPanel(false);
-    infoMessage("Front panel is unlocked!");
+	g_psuAppContext.infoMessage("Front panel is unlocked!");
 }
 
 static void checkPasswordToUnlockFrontPanel() {
@@ -1565,7 +1568,7 @@ static void checkPasswordToUnlockFrontPanel() {
 
 void lockFrontPanel() {
     psu::persist_conf::lockFrontPanel(true);
-    infoMessage("Front panel is locked!");
+	g_psuAppContext.infoMessage("Front panel is locked!");
 }
 
 void unlockFrontPanel() {
@@ -1573,7 +1576,7 @@ void unlockFrontPanel() {
         checkPasswordToUnlockFrontPanel();
     } else {
         psu::persist_conf::lockFrontPanel(false);
-        infoMessage("Front panel is unlocked!");
+		g_psuAppContext.infoMessage("Front panel is unlocked!");
     }
 }
 
@@ -1642,69 +1645,10 @@ void showShutdownPage() {
 
 ////////////////////////////////////////////////////////////////////////////////
 
-Value g_alertMessage;
 Value g_alertMessage2;
 Value g_alertMessage3;
 
 ////////////////////////////////////////////////////////////////////////////////
-
-void pushToastMessage(ToastMessagePage *toastMessage) {
-    pushPage(INTERNAL_PAGE_ID_TOAST_MESSAGE, toastMessage);
-}
-
-void infoMessage(const char *message) {
-    pushToastMessage(ToastMessagePage::create(INFO_TOAST, message));
-}
-
-void infoMessage(Value value) {
-    pushToastMessage(ToastMessagePage::create(INFO_TOAST, value));
-}
-
-void infoMessage(const char *message, void (*action)(), const char *actionLabel) {
-    pushToastMessage(ToastMessagePage::create(INFO_TOAST, message, action, actionLabel));
-}
-
-void errorMessage(const char *message, bool autoDismiss) {
-    pushToastMessage(ToastMessagePage::create(ERROR_TOAST, message, autoDismiss));
-    sound::playBeep();
-}
-
-void errorMessage(Value value) {
-    pushToastMessage(ToastMessagePage::create(ERROR_TOAST, value));
-    sound::playBeep();
-}
-
-void errorMessageWithAction(Value value, void (*action)(int param), const char *actionLabel, int actionParam) {
-    pushToastMessage(ToastMessagePage::create(ERROR_TOAST, value, action, actionLabel, actionParam));
-    sound::playBeep();
-}
-
-void errorMessageWithAction(const char *message, void (*action)(), const char *actionLabel) {
-    pushToastMessage(ToastMessagePage::create(ERROR_TOAST, message, action, actionLabel));
-    sound::playBeep();
-}
-
-////////////////////////////////////////////////////////////////////////////////
-
-void yesNoDialog(int yesNoPageId, const char *message, void (*yes_callback)(), void (*no_callback)(), void (*cancel_callback)()) {
-    set(WidgetCursor(), DATA_ID_ALERT_MESSAGE, Value(message));
-
-    g_psuAppContext.m_dialogYesCallback = yes_callback;
-    g_psuAppContext.m_dialogNoCallback = no_callback;
-    g_psuAppContext.m_dialogCancelCallback = cancel_callback;
-
-    pushPage(yesNoPageId);
-}
-
-void yesNoDialog(int yesNoPageId, Value value, void(*yes_callback)(), void(*no_callback)(), void(*cancel_callback)()) {
-	set(WidgetCursor(), DATA_ID_ALERT_MESSAGE, value);
-
-	g_psuAppContext.m_dialogYesCallback = yes_callback;
-	g_psuAppContext.m_dialogNoCallback = no_callback;
-	g_psuAppContext.m_dialogCancelCallback = cancel_callback;
-
-	pushPage(yesNoPageId);
-}
 
 void yesNoLater(const char *message, void (*yes_callback)(), void (*no_callback)(), void (*later_callback)()) {
     set(WidgetCursor(), DATA_ID_ALERT_MESSAGE, Value(message));
@@ -1717,11 +1661,11 @@ void yesNoLater(const char *message, void (*yes_callback)(), void (*no_callback)
 }
 
 void areYouSure(void (*yes_callback)()) {
-    yesNoDialog(PAGE_ID_YES_NO, "Are you sure?", yes_callback, 0, 0);
+	g_psuAppContext.yesNoDialog(PAGE_ID_YES_NO, "Are you sure?", yes_callback, 0, 0);
 }
 
 void areYouSureWithMessage(const char *message, void (*yes_callback)(), void (*no_callback)(), void (*cancel_callback)()) {
-    yesNoDialog(PAGE_ID_ARE_YOU_SURE_WITH_MESSAGE, message, yes_callback, no_callback, cancel_callback);
+	g_psuAppContext.yesNoDialog(PAGE_ID_ARE_YOU_SURE_WITH_MESSAGE, message, yes_callback, no_callback, cancel_callback);
 }
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -2063,7 +2007,7 @@ void doChannelToggleOutput() {
             } else if (trigger::isInitiated()) {
                 trigger::abort();
             } else {
-                yesNoDialog(PAGE_ID_YES_NO_L, "Trigger is active. Re-initiate trigger?", channelReinitiateTrigger, 0, 0);
+				g_psuAppContext.yesNoDialog(PAGE_ID_YES_NO_L, "Trigger is active. Re-initiate trigger?", channelReinitiateTrigger, 0, 0);
             }
         } else {
             channel_dispatcher::outputEnable(channel, true);
@@ -2103,10 +2047,10 @@ void channelToggleOutput() {
         // };
         if (temperature::sensors[temp_sensor::AUX].isTripped()) {
             // errorMessageWithAction("AUX temp. sensor is tripped!", clearTrip, "Clear", channelIndex);
-            errorMessage("AUX temp. sensor is tripped!");
+			g_psuAppContext.errorMessage("AUX temp. sensor is tripped!");
         } else {
             // errorMessageWithAction("Channel is tripped!", clearTrip, "Clear", channelIndex);
-            errorMessage("Channel is tripped!");
+			g_psuAppContext.errorMessage("Channel is tripped!");
         }
     } else {
         if (!channel.isOutputEnabled() && !channel.isCalibrationExists()) {
@@ -2661,6 +2605,84 @@ namespace gui {
 
 using namespace psu::gui;
 
+void getTouchScreenCalibrationParamsHook(
+	int16_t &touchScreenCalTlx, int16_t &touchScreenCalTly,
+	int16_t &touchScreenCalBrx, int16_t &touchScreenCalBry,
+	int16_t &touchScreenCalTrx, int16_t &touchScreenCalTry
+) {
+	touchScreenCalTlx = psu::persist_conf::devConf.touchScreenCalTlx;
+	touchScreenCalTly = psu::persist_conf::devConf.touchScreenCalTly;
+	touchScreenCalBrx = psu::persist_conf::devConf.touchScreenCalBrx;
+	touchScreenCalBry = psu::persist_conf::devConf.touchScreenCalBry;
+	touchScreenCalTrx = psu::persist_conf::devConf.touchScreenCalTrx;
+	touchScreenCalTry = psu::persist_conf::devConf.touchScreenCalTry;
+}
+
+void setTouchScreenCalibrationParamsHook(
+	int16_t touchScreenCalTlx, int16_t touchScreenCalTly,
+	int16_t touchScreenCalBrx, int16_t touchScreenCalBry,
+	int16_t touchScreenCalTrx, int16_t touchScreenCalTry
+) {
+	psu::persist_conf::setTouchscreenCalParams(
+		touchScreenCalTlx, touchScreenCalTly,
+		touchScreenCalBrx, touchScreenCalBry,
+		touchScreenCalTrx, touchScreenCalTry
+	);
+}
+
+void onEnterTouchCalibrationHook() {
+	replacePage(PAGE_ID_TOUCH_CALIBRATION);
+	psu::Channel::saveAndDisableOE();
+}
+
+void onTouchCalibrationOkHook() {
+	if (isPageOnStack(PAGE_ID_SYS_SETTINGS_DISPLAY)) {
+		popPage();
+		g_psuAppContext.infoMessage("Touch screen is calibrated.");
+	} else if (g_askMcuRevisionInProgress) {
+		showPage(PAGE_ID_SELECT_MCU_REVISION);
+	} else {
+		showPage(PAGE_ID_MAIN);
+	}
+
+	psu::Channel::restoreOE();
+}
+
+void onTouchCalibrationCancelHook() {
+	if (isPageOnStack(PAGE_ID_SYS_SETTINGS_DISPLAY)) {
+		popPage();
+	} else {
+		showPage(PAGE_ID_MAIN);
+	}
+
+	psu::Channel::restoreOE();
+}
+
+void onTouchCalibrationConfirmHook() {
+	g_psuAppContext.yesNoDialog(
+		g_psuAppContext.isPageOnStack(PAGE_ID_SYS_SETTINGS_DISPLAY) ? PAGE_ID_TOUCH_CALIBRATION_YES_NO_CANCEL : PAGE_ID_TOUCH_CALIBRATION_YES_NO,
+		"Save changes?", touchCalibrationDialogYes, touchCalibrationDialogNo, touchCalibrationDialogCancel
+	);
+}
+
+void toastMessagePageOnEncoderHook(ToastMessagePage *toast, int counter) {
+    if (toast->hasAction()) {
+        if (counter < 0) {
+            if (toast->messageValue.getType() == VALUE_TYPE_SCPI_ERROR) {
+                if (
+					toast->messageValue.getFirstInt16() == SCPI_ERROR_VOLTAGE_LIMIT_EXCEEDED ||
+					toast->messageValue.getFirstInt16() == SCPI_ERROR_CURRENT_LIMIT_EXCEEDED ||
+					toast->messageValue.getFirstInt16() == SCPI_ERROR_POWER_LIMIT_EXCEEDED
+                ) {
+					toast->appContext->popPage();
+                }
+            }
+        }
+    } else {
+		toast->appContext->popPage();
+    }
+}
+
 static int g_selectedMcuRevision; // 0 - None, 1 - R2B4, 2 - R3B3
 
 void data_selected_mcu_revision(DataOperationEnum operation, const WidgetCursor &widgetCursor, Value &value) {
@@ -2687,9 +2709,9 @@ void doSwitchToR2B4() {
 
 void action_show_select_mcu_revision_page() {
 	if (g_mcuRevision == MCU_REVISION_R2B4) {
-		yesNoDialog(PAGE_ID_YES_NO, "Switch to R3B3?", doSwitchToR3B3, nullptr, nullptr);
+		g_psuAppContext.yesNoDialog(PAGE_ID_YES_NO, "Switch to R3B3?", doSwitchToR3B3, nullptr, nullptr);
 	} else {
-		yesNoDialog(PAGE_ID_YES_NO, "Switch to R2B4?", doSwitchToR2B4, nullptr, nullptr);
+		g_psuAppContext.yesNoDialog(PAGE_ID_YES_NO, "Switch to R2B4?", doSwitchToR2B4, nullptr, nullptr);
 	}
 }
 

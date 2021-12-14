@@ -24,30 +24,27 @@
 #endif
 
 #include <eez/conf.h>
+#include <eez/eeprom.h>
 
 #include <bb3/system.h>
 #include <bb3/usb.h>
 #include <bb3/tasks.h>
-
 #include <bb3/psu/psu.h>
-
-#include <bb3/mcu/eeprom.h>
 #include <bb3/mcu/encoder.h>
 #include <bb3/bp3c/eeprom.h>
-
 #include <bb3/psu/dlog_record.h>
 #include <bb3/psu/event_queue.h>
 #include <bb3/psu/serial_psu.h>
 #include <bb3/psu/calibration.h>
 #include <bb3/psu/ntp.h>
-
 #if OPTION_ENCODER
 #include <bb3/mcu/encoder.h>
 #endif
-
 #if OPTION_DISPLAY
-#include <bb3/psu/gui/psu.h>
-using namespace eez::display;
+#include <eez/gui/gui.h>
+#include <bb3/gui/document.h>
+using namespace eez::gui;
+using namespace eez::gui::display;
 #endif
 
 #if OPTION_ETHERNET
@@ -252,7 +249,7 @@ static bool confRead(uint8_t *buffer, uint16_t bufferSize, uint16_t address, int
     }
 
     for (int i = 0; i < NUM_RETRIES; i++) {
-        bool result = mcu::eeprom::read(buffer, bufferSize, address);
+        bool result = eeprom::read(buffer, bufferSize, address);
 
         if (!result) {
         	pushEvent(event_queue::EVENT_ERROR_EEPROM_MCU_READ_ERROR);
@@ -279,7 +276,7 @@ static bool confWrite(const uint8_t *buffer, uint16_t bufferSize, uint16_t addre
     }
 
     for (int i = 0; i < NUM_RETRIES; i++) {
-        bool result = mcu::eeprom::write(buffer, bufferSize, address);
+        bool result = eeprom::write(buffer, bufferSize, address);
 
         if (!result) {
         	pushEvent(event_queue::EVENT_ERROR_EEPROM_MCU_WRITE_ERROR);
@@ -807,7 +804,7 @@ uint32_t readTotalOnTime(int type) {
 
     for (int i = 0; i < NUM_RETRIES; i++) {
         if (type == ontime::ON_TIME_COUNTER_MCU) {
-            result = confRead((uint8_t *)buffer, sizeof(buffer), mcu::eeprom::EEPROM_ONTIME_START_ADDRESS, -1);
+            result = confRead((uint8_t *)buffer, sizeof(buffer), eeprom::EEPROM_ONTIME_START_ADDRESS, -1);
         } else {
             result = moduleConfRead(
                 type - ontime::ON_TIME_COUNTER_SLOT1,
@@ -860,7 +857,7 @@ bool writeTotalOnTime(int type, uint32_t time) {
         // }
         // lastTime = time;
 
-        return confWrite((uint8_t *)buffer, sizeof(buffer), mcu::eeprom::EEPROM_ONTIME_START_ADDRESS);
+        return confWrite((uint8_t *)buffer, sizeof(buffer), eeprom::EEPROM_ONTIME_START_ADDRESS);
     } else {
         return moduleConfWrite(
             type - ontime::ON_TIME_COUNTER_SLOT1,

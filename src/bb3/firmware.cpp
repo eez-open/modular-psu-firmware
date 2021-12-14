@@ -25,19 +25,20 @@
 #include <usb_device.h>
 #endif
 
-#include <bb3/firmware.h>
 #include <eez/alloc.h>
-#include <bb3/system.h>
-#include <bb3/tasks.h>
-#include <bb3/scripting/scripting.h>
+#include <eez/eeprom.h>
 #include <eez/sound.h>
 #include <eez/memory.h>
-#include <bb3/uart.h>
-#include <bb3/usb.h>
-#include <bb3/aux_ps/fan.h>
 
 #include <eez/gui/gui.h>
 
+#include <bb3/firmware.h>
+#include <bb3/system.h>
+#include <bb3/tasks.h>
+#include <bb3/scripting/scripting.h>
+#include <bb3/uart.h>
+#include <bb3/usb.h>
+#include <bb3/aux_ps/fan.h>
 #include <bb3/psu/psu.h>
 #include <bb3/psu/channel_dispatcher.h>
 #include <bb3/psu/sd_card.h>
@@ -58,19 +59,15 @@
 #include <bb3/psu/ntp.h>
 #endif
 #include <bb3/psu/gui/psu.h>
-
 #if OPTION_FAN
 #include <bb3/aux_ps/fan.h>
 #endif
-
 #include <bb3/mcu/battery.h>
-#include <bb3/mcu/eeprom.h>
 #include <bb3/mcu/sdram.h>
 #include <bb3/mcu/ethernet.h>
 #if OPTION_ENCODER
 #include <bb3/mcu/encoder.h>
 #endif
-
 #include <bb3/bp3c/eeprom.h>
 #include <bb3/bp3c/io_exp.h>
 
@@ -133,8 +130,8 @@ void boot() {
     psu::sd_card::init();
 #endif
 
-    mcu::eeprom::init();
-    mcu::eeprom::test();
+    eeprom::init();
+    eeprom::test();
 
     bp3c::eeprom::init();
     bp3c::eeprom::test();
@@ -386,7 +383,7 @@ bool testMaster() {
         stringAppendString(g_masterErrorMessage, MASTER_ERROR_MESSAGE_SIZE, g_masterErrorMessage[0] ? ", DateTime" : "DateTime");
     }
 
-    if (!mcu::eeprom::test()) {
+    if (!eeprom::test()) {
         g_numMasterErrors++;
         stringAppendString(g_masterErrorMessage, MASTER_ERROR_MESSAGE_SIZE, g_masterErrorMessage[0] ? ", EEPROM" : "EEPROM");
     }

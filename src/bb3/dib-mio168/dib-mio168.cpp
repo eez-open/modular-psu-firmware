@@ -7659,9 +7659,9 @@ void onSetSimulatorAfeVersion(uint16_t value) {
 	persist_conf::setAfeVersion(g_slotIndex, afeVersion);
 
 #ifdef __EMSCRIPTEN__
-	infoMessage("Reload page to apply change!");
+	g_psuAppContext.infoMessage("Reload page to apply change!");
 #else
-	infoMessage("Restart program to apply change!");
+	g_psuAppContext.infoMessage("Restart program to apply change!");
 #endif
 }
 

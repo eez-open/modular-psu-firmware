@@ -38,7 +38,7 @@
 
 #include <bb3/function_generator.h>
 
-#include <bb3/fs/fs.h>
+#include <eez/fs/fs.h>
 
 #define CONF_AUTO_SAVE_TIMEOUT_MS 60 * 1000
 #define CONF_AUTO_NAME_PREFIX "Saved at "

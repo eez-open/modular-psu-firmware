@@ -67,7 +67,7 @@
 #endif
 
 #include <bb3/mcu/battery.h>
-#include <bb3/mcu/eeprom.h>
+#include <eez/eeprom.h>
 
 #include <bb3/dib-dcp405/dib-dcp405.h>
 #include <bb3/dib-dcp405/ioexp.h>

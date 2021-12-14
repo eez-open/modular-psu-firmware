@@ -34,7 +34,7 @@
 
 #include <bb3/psu/gui/psu.h>
 
-#include <bb3/fs/fs.h>
+#include <eez/fs/fs.h>
 
 #define CONF_COUNTER_THRESHOLD_IN_SECONDS 5
 #define CONF_SAVE_LIST_TIMEOUT_MS 2000

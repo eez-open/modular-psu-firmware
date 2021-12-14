@@ -16,6 +16,86 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
+ /*! \page eeprom_map MCU EEPROM map
+
+ # Overview
+
+ |Address|Size|Description                               |
+ |-------|----|------------------------------------------|
+ |0      |  64|Not used                                  |
+ |64     |  24|[Total ON-time counter](#ontime-counter)  |
+ |1024   |  64|[Device configuration](#device)           |
+ |1536   | 128|[Device configuration 2](#device2)        |
+
+ ## <a name="ontime-counter">ON-time counter</a>
+
+ |Offset|Size|Type                     |Description                  |
+ |------|----|-------------------------|-----------------------------|
+ |0     |4   |int                      |1st magic number             |
+ |4     |4   |int                      |1st counter                  |
+ |8     |4   |int                      |1st counter (copy)           |
+ |12    |4   |int                      |2nd magic number             |
+ |16    |4   |int                      |2nd counter                  |
+ |20    |4   |int                      |2bd counter (copy)           |
+
+ ## <a name="device">Device configuration</a>
+
+ |Offset|Size|Type                     |Description                  |
+ |------|----|-------------------------|-----------------------------|
+ |0     |6   |[struct](#block-header)  |[Block header](#block-header)|
+ |8     |8   |string                   |Serial number                |
+ |16    |17  |string                   |Calibration password         |
+ |36    |4   |[bitarray](#device-flags)|[Device Flags](#device-flags)|
+ |40    |1   |int                      |Year                         |
+ |41    |1   |int                      |Month                        |
+ |42    |1   |int                      |Day                          |
+ |43    |1   |int                      |Hour                         |
+ |44    |1   |int                      |Minute                       |
+ |45    |1   |int                      |Second                       |
+ |46    |2   |int                      |Time zone                    |
+ |48    |1   |int                      |Auto profile location        |
+ |49    |1   |int                      |Touch screen cal. orientation|
+ |50    |2   |int                      |Touch screen cal. TLX        |
+ |52    |2   |int                      |Touch screen cal. TLY        |
+ |54    |2   |int                      |Touch screen cal. BRX        |
+ |56    |2   |int                      |Touch screen cal. BRY        |
+ |58    |2   |int                      |Touch screen cal. TRX        |
+ |60    |2   |int                      |Touch screen cal. TRY        |
+
+ ## <a name="device">Device configuration 2</a>
+
+ |Offset|Size|Type                     |Description                  |
+ |------|----|-------------------------|-----------------------------|
+ |0     |6   |[struct](#block-header)  |[Block header](#block-header)|
+ |8     |17  |string                   |System password              |
+
+ #### <a name="device-flags">Device flags</a>
+
+ |Bit|Description         |
+ |---|--------------------|
+ |0  |Sound enabled       |
+ |1  |Date set            |
+ |2  |Time set            |
+ |3  |Auto recall profile |
+ |4  |DST                 |
+ |5  |Channel display mode|
+ |6  |Channel display mode|
+ |7  |Channel display mode|
+ |8  |Ethernet enabled    |
+ |9  |Switch off all outputs when protection tripped |
+ |10 |Shutdown when protection tripped               |
+ |11 |Force disabling of all outputs on power up     |
+ |12 |Click sound enabled |
+
+ ## <a name="block-header">Block header</a>
+
+ |Offset|Size|Type|Description|
+ |------|----|----|-----------|
+ |0     |4   |int |Checksum   |
+ |4     |2   |int |Version    |
+
+ */
+
 #pragma once
 
 #define NUM_CHANNELS_VIEW_MODES 4

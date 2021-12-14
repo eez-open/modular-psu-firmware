@@ -64,6 +64,15 @@
 
 namespace eez {
 
+enum TestResult {
+	TEST_NONE,
+	TEST_FAILED,
+	TEST_OK,
+	TEST_CONNECTING,
+	TEST_SKIPPED,
+	TEST_WARNING
+};
+
 uint32_t millis();
 
 extern bool g_shutdown;

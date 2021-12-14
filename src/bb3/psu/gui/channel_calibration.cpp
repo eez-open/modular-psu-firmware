@@ -346,9 +346,9 @@ void ChSettingsCalibrationEditPage::onSetRemarkOk(char *remark) {
 
     if (calibration::g_editor.save()) {
         popPage();
-        infoMessage("Calibration data saved!");
+		g_psuAppContext.infoMessage("Calibration data saved!");
     } else {
-        errorMessage("Save failed!");
+		g_psuAppContext.errorMessage("Save failed!");
     }
 }
 

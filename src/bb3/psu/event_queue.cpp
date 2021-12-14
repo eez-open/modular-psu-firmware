@@ -18,7 +18,9 @@
 
 #include <limits.h>
 
+#include <eez/eeprom.h>
 #include <eez/os.h>
+#include <eez/sound.h>
 
 #include <bb3/psu/psu.h>
 
@@ -26,15 +28,12 @@
 
 #include <bb3/firmware.h>
 #include <bb3/system.h>
-#include <eez/sound.h>
-
-#include <bb3/mcu/eeprom.h>
 
 #include <bb3/psu/datetime.h>
 #include <bb3/psu/event_queue.h>
 #include <bb3/psu/sd_card.h>
 
-#include <bb3/fs/fs.h>
+#include <eez/fs/fs.h>
 
 #if OPTION_ETHERNET
 #include <bb3/mcu/ethernet.h>
@@ -323,7 +322,7 @@ void pushTraceMessage(int16_t traceMessageType, const char *message, size_t mess
 #if !CONF_SURVIVE_MODE
     if (startsWith(message, "wrong thread")) {
         sound::playBeep();
-        errorMessage(message);
+		g_psuAppContext.errorMessage(message);
     }
 #endif
 }

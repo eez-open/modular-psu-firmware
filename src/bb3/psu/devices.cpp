@@ -19,20 +19,17 @@
 #include <string.h>
 #include <stdio.h>
 
+#include <eez/eeprom.h>
+
 #include <bb3/psu/psu.h>
 #include <bb3/psu/devices.h>
 #include <bb3/psu/sd_card.h>
-
-#include <bb3/mcu/eeprom.h>
-
 #if OPTION_ETHERNET
 #include <bb3/psu/ethernet_scpi.h>
 #endif
-
 #include <bb3/psu/datetime.h>
 #include <bb3/psu/rtc.h>
 #include <bb3/psu/temp_sensor.h>
-
 #if OPTION_FAN
 #include <bb3/aux_ps/fan.h>
 #endif
@@ -75,7 +72,7 @@ bool getDevice(int deviceIndex, Device &device) {
         stringCopy(device.name, sizeof(device.name), "EEPROM");
 #if OPTION_EXT_EEPROM        
         device.installed = true;
-        device.testResult = mcu::eeprom::g_testResult;
+        device.testResult = eeprom::g_testResult;
 #else
         device.installed = false;
         device.testResult = TEST_SKIPPED;

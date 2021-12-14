@@ -37,7 +37,7 @@ bool loadFlowScript(int *err) {
 		err = &localErr;
 	}
 
-	if (!eez::gui::loadExternalAssets(g_scriptPath, err) || !psu::gui::g_psuAppContext.dialogOpen(err)) {
+	if (!eez::gui::loadExternalAssets(g_scriptPath, err)) {
 		char scriptName[64];
 		getFileName(g_scriptPath, scriptName, sizeof(scriptName));
 		ErrorTrace("App error: %s\n", scriptName);
@@ -53,8 +53,8 @@ bool loadFlowScript(int *err) {
 	}
 
 	startFlowScript();
-	return true;
 
+	return true;
 }
 
 void startFlowScript() {
@@ -71,6 +71,9 @@ void startFlowScript() {
 
 	flow::start(g_externalAssets);
 	g_flowIsRunning = true;
+
+	printf("g_flowIsRunning\n");
+	psu::gui::g_psuAppContext.dialogOpen(nullptr);
 }
 
 void flowTick() {
