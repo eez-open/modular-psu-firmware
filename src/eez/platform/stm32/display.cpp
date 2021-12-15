@@ -462,16 +462,15 @@ const uint8_t *takeScreenshot() {
 
 ////////////////////////////////////////////////////////////////////////////////
 
-void drawPixel(int x, int y) {
+void startPixelsDraw() {
     DMA2D_WAIT;
-    *(g_bufferDraw + y * DISPLAY_WIDTH + x) = g_fc;
+}
 
-    setDirty();
+void drawPixel(int x, int y) {
+    *(g_bufferDraw + y * DISPLAY_WIDTH + x) = g_fc;
 }
 
 void drawPixel(int x, int y, uint8_t opacity) {
-    DMA2D_WAIT;
-
     auto dest = g_bufferDraw + y * DISPLAY_WIDTH + x;
     *dest = color32to16(
         blendColor(
@@ -479,16 +478,14 @@ void drawPixel(int x, int y, uint8_t opacity) {
             color16to32(*dest, 255 - opacity)
         )
     );
+}
 
+void endPixelsDraw() {
     setDirty();
 }
 
-void fillRect(int x1, int y1, int x2, int y2, int r) {
-    if (r == 0) {
-        fillRect(g_bufferDraw, x1, y1, x2 - x1 + 1, y2 - y1 + 1, g_fc);
-    } else {
-        fillRoundedRect(x1, y1, x2, y2, r);
-    }
+void fillRect(int x1, int y1, int x2, int y2) {
+    fillRect(g_bufferDraw, x1, y1, x2 - x1 + 1, y2 - y1 + 1, g_fc);
 
     setDirty();
 }

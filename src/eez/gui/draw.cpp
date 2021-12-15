@@ -48,25 +48,13 @@ bool styleIsVertAlignBottom(const Style *style) {
 ////////////////////////////////////////////////////////////////////////////////
 
 void drawBorderAndBackground(int &x1, int &y1, int &x2, int &y2, const Style *style, uint16_t color, bool ignoreLuminocity) {
-    int borderRadius = style->borderRadius;
-    if (style->borderSizeTop > 0 || style->borderSizeRight > 0 || style->borderSizeBottom > 0 || style->borderSizeLeft > 0) {
-        display::setColor(style->borderColor);
-        if ((style->borderSizeTop == 1 && style->borderSizeRight == 1 && style->borderSizeBottom == 1 && style->borderSizeLeft == 1) && borderRadius == 0) {
-            display::drawRect(x1, y1, x2, y2);
-        } else {
-            display::fillRect(x1, y1, x2, y2, style->borderRadius);
-			borderRadius = MAX(borderRadius - MAX(style->borderSizeTop, MAX(style->borderSizeRight, MAX(style->borderSizeBottom, style->borderSizeLeft))), 0);
-        }
-        x1 += style->borderSizeLeft;
-        y1 += style->borderSizeTop;
-        x2 -= style->borderSizeRight;
-        y2 -= style->borderSizeBottom;
-    }
-
     const WidgetCursor& widgetCursor = g_widgetCursor;
 
+	bool hasBorder = style->borderSizeTop > 0 || style->borderSizeRight > 0 || style->borderSizeBottom > 0 || style->borderSizeLeft > 0;
+    int borderRadius = style->borderRadius;
+
 	bool isTransparent = true;
-	if (color != TRANSPARENT_COLOR_INDEX) {
+	if (color != TRANSPARENT_COLOR_INDEX && style->opacity == 255 && !(hasBorder && borderRadius > 0)) {
 		// non-transparent color
 		isTransparent = false;
 	}
@@ -84,7 +72,7 @@ void drawBorderAndBackground(int &x1, int &y1, int &x2, int &y2, const Style *st
 			auto &backgroundStyle = widgetCursor.backgroundStyleStack[startStackPointer];
 
             auto color = backgroundStyle.active ? backgroundStyle.style->activeBackgroundColor : backgroundStyle.style->backgroundColor;
-            if (color != TRANSPARENT_COLOR_INDEX) {
+            if (color != TRANSPARENT_COLOR_INDEX && backgroundStyle.style->opacity == 255) {
                 // non-transparent color
                 break;
             } else if (backgroundStyle.style->backgroundImage) {
@@ -104,7 +92,9 @@ void drawBorderAndBackground(int &x1, int &y1, int &x2, int &y2, const Style *st
 			auto color = backgroundStyle.active ? backgroundStyle.style->activeBackgroundColor : backgroundStyle.style->backgroundColor;
 			if (color != TRANSPARENT_COLOR_INDEX) {
 				display::setColor(color, ignoreLuminocity);
-				display::fillRect(x1, y1, x2, y2, borderRadius);
+				auto savedOpacity = display::setOpacity(backgroundStyle.style->opacity);
+				display::fillRect(x1, y1, x2, y2);
+				display::setOpacity(savedOpacity);
 			}
 
 			if (backgroundStyle.style->backgroundImage) {
@@ -143,9 +133,58 @@ void drawBorderAndBackground(int &x1, int &y1, int &x2, int &y2, const Style *st
 		}
 	}
 
+    if (hasBorder) {
+        display::setColor(style->borderColor, ignoreLuminocity);
+        if (borderRadius > 0) {
+            display::setBackColor(color, ignoreLuminocity);
+
+            int lineWidth = style->borderSizeTop;
+            if (lineWidth < style->borderSizeRight) {
+                lineWidth = style->borderSizeRight;
+            }
+            if (lineWidth < style->borderSizeBottom) {
+                lineWidth = style->borderSizeBottom;
+            }
+            if (lineWidth < style->borderSizeLeft) {
+                lineWidth = style->borderSizeLeft;
+            }
+
+            display::fillRoundedRect(x1, y1, x2, y2, lineWidth, style->borderRadius);
+
+            lineWidth++;
+
+            x1 += lineWidth;
+            y1 += lineWidth;
+            x2 -= lineWidth;
+            y2 -= lineWidth;
+
+            return;
+        }
+
+        if (style->borderSizeLeft > 0) {
+            display::fillRect(x1, y1, x1 + style->borderSizeLeft - 1, y2);
+        }
+        if (style->borderSizeTop > 0) {
+            display::fillRect(x1, y1, x2, y1 + style->borderSizeTop - 1);
+        }
+        if (style->borderSizeRight > 0) {
+            display::fillRect(x2 - (style->borderSizeRight - 1), y1, x2, y2);
+        }
+        if (style->borderSizeBottom > 0) {
+            display::fillRect(x1, y2 - (style->borderSizeBottom - 1), x2, y2);
+        }
+
+        x1 += style->borderSizeLeft;
+        y1 += style->borderSizeTop;
+        x2 -= style->borderSizeRight;
+        y2 -= style->borderSizeBottom;
+    }
+
 	if (color != TRANSPARENT_COLOR_INDEX) {
 		display::setColor(color, ignoreLuminocity);
-		display::fillRect(x1, y1, x2, y2, borderRadius);
+		auto savedOpacity = display::setOpacity(style->opacity);
+		display::fillRect(x1, y1, x2, y2);
+		display::setOpacity(savedOpacity);
 	}
 
     if (style->backgroundImage) {
@@ -153,10 +192,13 @@ void drawBorderAndBackground(int &x1, int &y1, int &x2, int &y2, const Style *st
 		if (bitmap) {
             Image image;
 
-            image.width = bitmap->w;
-            image.height = bitmap->h;
+			int w = MIN(x2 - x1 + 1, bitmap->w);
+			int h = MIN(y2 - y1 + 1, bitmap->h);
+
+            image.width = w;
+            image.height = h;
             image.bpp = bitmap->bpp;
-            image.lineOffset = 0;
+			image.lineOffset = bitmap->w - w;
             image.pixels = (uint8_t *)bitmap->pixels;
 
             display::drawBitmap(&image, x1, y1);
@@ -692,29 +734,35 @@ void expandRectWithShadow(int &x1, int &y1, int &x2, int &y2) {
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
 void drawLine(int x1, int y1, int x2, int y2) {
-   int dx = x2 - x1;
-   int dy = y2 - y1;
-   
-   int length;
-   if (abs(dx) > abs(dy)) {
-       length = abs(dx);
-   } else {
-       length = abs(dy);
-   }
-   
-   float xinc = (float)dx / length;
-   float yinc = (float)dy / length;
-   float x = (float)x1;
-   float y = (float)y1;
-   for (int i = 0; i < length; i++) {
-       display::drawPixel((int)roundf(x), (int)roundf(y));
-       x += xinc;
-       y += yinc;
-   }
+    display::startPixelsDraw();
+
+    int dx = x2 - x1;
+    int dy = y2 - y1;
+
+    int length;
+    if (abs(dx) > abs(dy)) {
+        length = abs(dx);
+    } else {
+        length = abs(dy);
+    }
+
+    float xinc = (float)dx / length;
+    float yinc = (float)dy / length;
+    float x = (float)x1;
+    float y = (float)y1;
+    for (int i = 0; i < length; i++) {
+        display::drawPixel((int)roundf(x), (int)roundf(y));
+        x += xinc;
+        y += yinc;
+    }
+
+    display::endPixelsDraw();
 }
 
 // http://members.chello.at/~easyfilter/bresenham.html
 void drawAntialiasedLine(int x0, int y0, int x1, int y1) {
+    display::startPixelsDraw();
+
     int dx = abs(x1 - x0), sx = x0 < x1 ? 1 : -1;
     int dy = abs(y1 - y0), sy = y0 < y1 ? 1 : -1;
     int err = dx - dy, e2, x2;                       /* error value e_xy */
@@ -734,6 +782,8 @@ void drawAntialiasedLine(int x0, int y0, int x1, int y1) {
             err += dx; y0 += sy;
         }
     }
+
+    display::endPixelsDraw();
 }
 
 } // namespace gui

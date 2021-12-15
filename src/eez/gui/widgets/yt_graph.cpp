@@ -109,10 +109,19 @@ struct YTGraphDrawHelper {
         if (yPrevValue == INT_MIN || abs(yPrevValue - yValue) <= 1) {
             display::drawPixel(x, widgetCursor.y + yValue);
         } else {
+            int y1;
+            int y2;
             if (yPrevValue < yValue) {
-                display::drawVLine(x, widgetCursor.y + yPrevValue + 1, yValue - yPrevValue - 1);
+                //display::drawVLine(x, widgetCursor.y + yPrevValue + 1, yValue - yPrevValue - 1);
+                y1 = widgetCursor.y + yPrevValue + 1;
+                y2 = y1 + yValue - yPrevValue;
             } else {
-                display::drawVLine(x, widgetCursor.y + yValue, yPrevValue - yValue - 1);
+                //display::drawVLine(x, widgetCursor.y + yValue, yPrevValue - yValue - 1);
+                y1 = widgetCursor.y + yValue;
+                y2 = y1 + yPrevValue - yValue;
+            }
+            for (int y = y1; y < y2; y++) {
+                display::drawPixel(x, y);
             }
         }
     }
@@ -142,6 +151,7 @@ struct YTGraphDrawHelper {
             display::fillRect(widgetCursor.x, widgetCursor.y, x2, widgetCursor.y + widget->h - 1);
         }
 
+        display::startPixelsDraw();
         for (position = startPosition; position < endPosition; ++position) {
             x = widgetCursor.x + position % graphWidth;
 
@@ -153,6 +163,7 @@ struct YTGraphDrawHelper {
 
             drawStep();
         }
+        display::endPixelsDraw();
     }
 
     void drawScrolling(uint32_t previousHistoryValuePosition, uint32_t currentHistoryValuePosition, uint32_t numPositions_, uint16_t graphWidth) {
@@ -184,6 +195,7 @@ struct YTGraphDrawHelper {
         display::setColor16(color16);
         display::fillRect(startX, widgetCursor.y, endX - 1, widgetCursor.y + widget->h - 1);
 
+        display::startPixelsDraw();
         for (x = startX; x < endX; x++, position++) {
             y[0] = getYValue(0, position);
             y[1] = getYValue(1, position);
@@ -193,6 +205,7 @@ struct YTGraphDrawHelper {
             yPrev[0] = y[0];
             yPrev[1] = y[1];
         }
+        display::endPixelsDraw();
     }
 };
 
@@ -297,7 +310,12 @@ struct YTGraphStaticDrawHelper {
         if (yFrom == yTo) {
             display::drawPixel(x, widgetCursor.y + yFrom);
         } else {
-            display::drawVLine(x, widgetCursor.y + yFrom, yTo - yFrom);
+            // display::drawVLine(x, widgetCursor.y + yFrom, yTo - yFrom);
+            int y1 = widgetCursor.y + yFrom;
+            int y2 = y1 + yTo - yFrom + 1;
+            for (int y = y1; y < y2; y++) {
+                display::drawPixel(x, y);
+            }
         }
     }
 
@@ -374,11 +392,11 @@ struct YTGraphStaticDrawHelper {
             }
 
             if (!transparent) {
-                display::setColor(labelStyle->backgroundColor, false);
+                display::setColor(labelStyle->backgroundColor);
                 display::fillRect(xLabel, yLabels[m_valueIndex], xLabel + labelWidth - 1, yLabels[m_valueIndex] + font.getHeight() - 1);
             }
 
-            display::setColor(labelStyle->color, false);
+            display::setColor(labelStyle->color);
             display::drawStr(labelText, -1, xLabel, yLabels[m_valueIndex], widgetCursor.x, widgetCursor.y, widgetCursor.x + widgetCursor.widget->w - 1, widgetCursor.y + widgetCursor.widget->h - 1, font, -1);
         }
     }
@@ -417,6 +435,7 @@ struct YTGraphStaticDrawHelper {
 		}
 
         // draw graphs
+        display::startPixelsDraw();
         for (m_valueIndex = 0; m_valueIndex < MAX_NUM_OF_Y_VALUES; m_valueIndex++) {
             if (m_valueIndex != selectedValueIndex) {
                 drawGraph(currentHistoryValuePosition, startX, endX, vertDivisions);
@@ -426,6 +445,7 @@ struct YTGraphStaticDrawHelper {
             m_valueIndex = selectedValueIndex;
             drawGraph(currentHistoryValuePosition, startX, endX, vertDivisions);
         }
+        display::endPixelsDraw();
 
 		// draw cursor
 		if (ytDataIsCursorVisible(widgetCursor, widgetCursor.widget->data)) {

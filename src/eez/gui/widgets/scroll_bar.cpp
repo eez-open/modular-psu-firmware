@@ -117,7 +117,7 @@ void ScrollBarWidgetState::render() {
 
         const Style *trackStyle = getStyle(widget->style);
         display::setColor(trackStyle->color);
-        display::fillRect(xTrack, yTrack, xTrack + wTrack - 1, yTrack + hTrack - 1, 0);
+        display::fillRect(xTrack, yTrack, xTrack + wTrack - 1, yTrack + hTrack - 1);
 
         // draw thumb
         const Style *thumbStyle = getStyle(widget->thumbStyle);
@@ -154,7 +154,7 @@ void ScrollBarWidgetState::render() {
         // scroll bar is hidden
         const Style *trackStyle = getStyle(widget->style);
         display::setColor(trackStyle->color);
-        display::fillRect(widgetCursor.x, widgetCursor.y, widgetCursor.x + widget->w - 1, widgetCursor.y + widget->h - 1, 0);
+        display::fillRect(widgetCursor.x, widgetCursor.y, widgetCursor.x + widget->w - 1, widgetCursor.y + widget->h - 1);
     }
 }
 

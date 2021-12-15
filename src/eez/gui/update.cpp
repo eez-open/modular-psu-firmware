@@ -88,6 +88,11 @@ void updateScreen() {
 
 	g_widgetStateEnd = g_widgetCursor.currentState;
 	g_widgetStateStructureChanged = !g_widgetCursor.hasPreviousState;
+
+	if (g_foundWidgetAtDownInvalid) {
+		WidgetCursor widgetCursor;
+		setFoundWidgetAtDown(widgetCursor);
+	}
 }
 
 void enumRootWidget() {

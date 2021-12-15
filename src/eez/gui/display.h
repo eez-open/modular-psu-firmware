@@ -83,9 +83,11 @@ uint8_t setOpacity(uint8_t opacity);
 uint8_t getOpacity();
 
 // these are the basic drawing operations
+void startPixelsDraw();
 void drawPixel(int x, int y);
 void drawPixel(int x, int y, uint8_t opacity);
-void fillRect(int x1, int y1, int x2, int y2, int radius = 0);
+void endPixelsDraw();
+void fillRect(int x1, int y1, int x2, int y2);
 void bitBlt(int x1, int y1, int x2, int y2, int x, int y);
 void drawBitmap(Image *image, int x, int y);
 
@@ -100,7 +102,7 @@ void drawHLine(int x, int y, int l);
 void drawVLine(int x, int y, int l);
 void drawRect(int x1, int y1, int x2, int y2);
 void drawFocusFrame(int x, int y, int w, int h);
-void fillRoundedRect(int x1, int y1, int x2, int y2, int r);
+void fillRoundedRect(int x1, int y1, int x2, int y2, int lineWidth, int r);
 
 void drawStr(const char *text, int textLength, int x, int y, int clip_x1, int clip_y1, int clip_x2,int clip_y2, gui::font::Font &font, int cursorPosition);
 int getCharIndexAtPosition(int xPos, const char *text, int textLength, int x, int y, int clip_x1, int clip_y1, int clip_x2,int clip_y2, gui::font::Font &font);

@@ -345,10 +345,11 @@ const uint8_t *takeScreenshot() {
 
 ////////////////////////////////////////////////////////////////////////////////
 
+void startPixelsDraw() {
+}
+
 void drawPixel(int x, int y) {
     *(g_buffer + y * DISPLAY_WIDTH + x) = color16to32(g_fc);
-
-    setDirty();
 }
 
 void drawPixel(int x, int y, uint8_t opacity) {
@@ -357,32 +358,30 @@ void drawPixel(int x, int y, uint8_t opacity) {
     *dest = blendColor(
         color16to32(g_fc, opacity), 
         color16to32(RGB_TO_COLOR(destUint8[0], destUint8[1], destUint8[2]), 255 - opacity));
+}
 
+void endPixelsDraw() {
     setDirty();
 }
 
-void fillRect(int x1, int y1, int x2, int y2, int r) {
-    if (r == 0) {
-        uint32_t color32 = color16to32(g_fc, g_opacity);
-        uint32_t *dst = g_buffer + y1 * DISPLAY_WIDTH + x1;
-        int width = x2 - x1 + 1;
-        int height = y2 - y1 + 1;
-        int nl = DISPLAY_WIDTH - width;
-        if (g_opacity == 255) {
-            for (uint32_t *dstEnd = dst + height * DISPLAY_WIDTH; dst != dstEnd; dst += nl) {
-                for (uint32_t *lineEnd = dst + width; dst != lineEnd; dst++) {
-                    *dst = color32;
-                }
-            }
-        } else {
-            for (uint32_t *dstEnd = dst + height * DISPLAY_WIDTH; dst != dstEnd; dst += nl) {
-                for (uint32_t *lineEnd = dst + width; dst != lineEnd; dst++) {
-                    *dst = blendColor(color32, *dst);
-                }
+void fillRect(int x1, int y1, int x2, int y2) {
+    uint32_t color32 = color16to32(g_fc, g_opacity);
+    uint32_t *dst = g_buffer + y1 * DISPLAY_WIDTH + x1;
+    int width = x2 - x1 + 1;
+    int height = y2 - y1 + 1;
+    int nl = DISPLAY_WIDTH - width;
+    if (g_opacity == 255) {
+        for (uint32_t *dstEnd = dst + height * DISPLAY_WIDTH; dst != dstEnd; dst += nl) {
+            for (uint32_t *lineEnd = dst + width; dst != lineEnd; dst++) {
+                *dst = color32;
             }
         }
     } else {
-        fillRoundedRect(x1, y1, x2, y2, r);
+        for (uint32_t *dstEnd = dst + height * DISPLAY_WIDTH; dst != dstEnd; dst += nl) {
+            for (uint32_t *lineEnd = dst + width; dst != lineEnd; dst++) {
+                *dst = blendColor(color32, *dst);
+            }
+        }
     }
 
     setDirty();

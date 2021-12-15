@@ -307,8 +307,8 @@ void ToastMessagePage::updateInternalPage() {
                 actionWidget.x,
                 actionWidget.y - textHeight / 4,
                 actionWidget.x + actionWidget.w - 1,
-                actionWidget.y + actionWidget.h - 1 + textHeight / 4,
-                0);
+                actionWidget.y + actionWidget.h - 1 + textHeight / 4
+			);
 
             display::setBackColor(actionStyle->color);
             display::setColor(actionStyle->backgroundColor);

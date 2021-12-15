@@ -62,10 +62,10 @@ void LayoutViewWidgetState::render() {
     auto widget = (const LayoutViewWidget *)widgetCursor.widget;
     const Style* style = getStyle(widget->style);
     drawRectangle(widgetCursor.x, widgetCursor.y, (int)widget->w, (int)widget->h, style, flags.active);
-    if (layout) {
-        const Style* styleLayout = getStyle(layout->style);
-        drawRectangle(widgetCursor.x, widgetCursor.y, (int)layout->w, (int)layout->h, styleLayout, flags.active);
-    }
+    // if (layout) {
+    //     const Style* styleLayout = getStyle(layout->style);
+    //     drawRectangle(widgetCursor.x, widgetCursor.y, (int)layout->w, (int)layout->h, styleLayout, flags.active);
+    // }
 	repainted = true;
 }
 
@@ -85,10 +85,10 @@ void LayoutViewWidgetState::enumChildren() {
 	} else {
 		const Style* style = getStyle(widget->style);
 		widgetCursor.pushBackground(widgetCursor.x, widgetCursor.y, style, flags.active);
-        if (layout) {
-            const Style* styleLayout = getStyle(layout->style);
-		    widgetCursor.pushBackground(widgetCursor.x, widgetCursor.y, styleLayout, flags.active);
-        }
+        // if (layout) {
+        //     const Style* styleLayout = getStyle(layout->style);
+		//     widgetCursor.pushBackground(widgetCursor.x, widgetCursor.y, styleLayout, flags.active);
+        // }
 	}
 
     auto savedForceRefresh = widgetCursor.forceRefresh;
@@ -120,9 +120,9 @@ void LayoutViewWidgetState::enumChildren() {
     widgetCursor.forceRefresh = savedForceRefresh;
 
     if (g_findCallback == nullptr) {
-        if (layout) {
-            widgetCursor.popBackground();
-        }
+        // if (layout) {
+        //     widgetCursor.popBackground();
+        // }
         widgetCursor.popBackground();
     }
 }

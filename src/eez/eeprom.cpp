@@ -19,6 +19,7 @@
 #include <memory.h>
 
 #include <eez/eeprom.h>
+#include <eez/os.h>
 #include <eez/util.h>
 
 //#include <bb3/system.h>
@@ -105,7 +106,7 @@ bool writeToEEPROM(const uint8_t *buffer, uint16_t bufferSize, uint16_t address)
             return false;
         }
 
-        delay(5);
+        osDelay(5);
 
         // verify
         uint8_t verify[MAX_WRITE_CHUNK_SIZE];
@@ -177,23 +178,6 @@ bool write(const uint8_t *buffer, uint16_t bufferSize, uint16_t address) {
 }
 
 void init() {
-#if !USE_EEPROM
-    File file;
-    if (!file.open(EEPROM_FILE_PATH, FILE_READ)) {
-        if (file.open(EEPROM_FILE_PATH, FILE_CREATE_ALWAYS | FILE_WRITE)) {
-#if defined(EEZ_PLATFORM_STM32)
-			uint8_t bufferTemp[MAX_WRITE_CHUNK_SIZE];
-			for (size_t address = 0; address < EEPROM_SIZE; address += MAX_WRITE_CHUNK_SIZE) {
-				readFromEEPROM(bufferTemp, MAX_WRITE_CHUNK_SIZE, address);
-				file.write(bufferTemp, MAX_WRITE_CHUNK_SIZE);
-				watchdogReset();
-			}
-#endif
-        	file.close();
-        }
-    }
-#endif
-
 	g_testResult = TEST_OK;
 }
 

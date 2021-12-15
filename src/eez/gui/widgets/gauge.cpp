@@ -140,7 +140,7 @@ void GaugeWidgetState::render() {
 
 	// clear background
 	setColor(isActive ? style->activeBackgroundColor : style->backgroundColor);
-	fillRect(widgetCursor.x, widgetCursor.y, widgetCursor.x + widget->w - 1, widgetCursor.y + widget->h - 1, 0);
+	fillRect(widgetCursor.x, widgetCursor.y, widgetCursor.x + widget->w - 1, widgetCursor.y + widget->h - 1);
 
 	// init AGG
 	agg::rendering_buffer rbuf;

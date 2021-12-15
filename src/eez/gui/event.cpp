@@ -166,8 +166,10 @@ OnTouchFunctionType getWidgetTouchFunction(const WidgetCursor &widgetCursor) {
 }
 
 static void onPageTouch(const WidgetCursor &foundWidget, Event &touchEvent) {
-	if (foundWidget) {
+	if (foundWidget.appContext) {
 		foundWidget.appContext->onPageTouch(foundWidget, touchEvent);
+	} else {
+		getRootAppContext().onPageTouch(foundWidget, touchEvent);
 	}
 }
 

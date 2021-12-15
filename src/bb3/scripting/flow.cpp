@@ -72,7 +72,6 @@ void startFlowScript() {
 	flow::start(g_externalAssets);
 	g_flowIsRunning = true;
 
-	printf("g_flowIsRunning\n");
 	psu::gui::g_psuAppContext.dialogOpen(nullptr);
 }
 

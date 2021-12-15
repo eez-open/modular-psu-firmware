@@ -41,7 +41,7 @@ bool ButtonWidgetState::updateState() {
     WIDGET_STATE(flags.blinking, g_isBlinkTime && (isBlinking(widgetCursor, widget->data) || styleIsBlink(style)));
 
     WIDGET_STATE(data, widget->data ? get(widgetCursor, widget->data) : 0);
-    
+
     return !hasPreviousState;
 }
 

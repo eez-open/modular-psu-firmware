@@ -106,7 +106,9 @@ public:
     // Use srgba8 as the "user" color type, even though the underlying color type 
     // might be something else, such as rgba32. This allows code based on 
     // 8-bit sRGB values to carry on working as before.
-    typedef agg::srgba8       Color;
+    //typedef agg::srgba8       Color;
+    typedef agg::rgba8       Color;
+
     typedef agg::rect_i       Rect;
     typedef agg::rect_d       RectD;
     typedef agg::trans_affine Affine;

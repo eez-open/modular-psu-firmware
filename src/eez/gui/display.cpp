@@ -20,6 +20,9 @@
 #include <string.h>
 #include <memory.h>
 
+#include <agg2d.h>
+#include <agg_rendering_buffer.h>
+
 #include <eez/conf.h>
 #include <eez/util.h>
 
@@ -267,7 +270,9 @@ void setColor16(uint16_t color) {
 
 void setColor(uint16_t color, bool ignoreLuminocity) {
     g_fc = getColor16FromIndex(color);
-    adjustColor(g_fc);
+    if (!ignoreLuminocity) {
+        adjustColor(g_fc);
+    }
 }
 
 uint16_t getColor() {
@@ -281,7 +286,9 @@ void setBackColor(uint8_t r, uint8_t g, uint8_t b) {
 
 void setBackColor(uint16_t color, bool ignoreLuminocity) {
 	g_bc = getColor16FromIndex(color);
-	adjustColor(g_bc);
+    if (!ignoreLuminocity) {
+	    adjustColor(g_bc);
+    }
 }
 
 uint16_t getBackColor() {
@@ -313,8 +320,6 @@ void drawRect(int x1, int y1, int x2, int y2) {
     drawHLine(x1, y2, x2 - x1);
     drawVLine(x1, y1, y2 - y1);
     drawVLine(x2, y1, y2 - y1);
-
-    setDirty();
 }
 
 void drawFocusFrame(int x, int y, int w, int h) {
@@ -335,20 +340,20 @@ void drawFocusFrame(int x, int y, int w, int h) {
     fillRect(x, y + h - lineWidth, x + w - 1, y + h - 1);
 }
 
-void fillRoundedRect(int x1, int y1, int x2, int y2, int r) {
-    fillRect(x1 + r, y1, x2 - r, y1 + r - 1);
-    fillRect(x1, y1 + r, x1 + r - 1, y2 - r);
-    fillRect(x2 + 1 - r, y1 + r, x2, y2 - r);
-    fillRect(x1 + r, y2 - r + 1, x2 - r, y2);
-    fillRect(x1 + r, y1 + r, x2 - r, y2 - r);
-
-    for (int ry = 0; ry <= r; ry++) {
-        int rx = (int)round(sqrt(r * r - ry * ry));
-        drawHLine(x2 - r, y2 - r + ry, rx);
-        drawHLine(x1 + r - rx, y2 - r + ry, rx);
-        drawHLine(x2 - r, y1 + r - ry, rx);
-        drawHLine(x1 + r - rx, y1 + r - ry, rx);
-    }
+void fillRoundedRect(int x1, int y1, int x2, int y2, int lineWidth, int r) {
+	// init AGG
+	agg::rendering_buffer rbuf;
+	rbuf.attach((uint8_t *)getBufferPointer(), getDisplayWidth(), getDisplayHeight(), getDisplayWidth() * DISPLAY_BPP / 8);
+	Agg2D graphics;
+	graphics.attach(rbuf.buf(), rbuf.width(), rbuf.height(), rbuf.stride());
+    auto w = x2 - x1 + 1;
+    auto h = y2 - y1 + 1;
+	graphics.clipBox(x1, y1, x1 + w, y1 + h);
+	graphics.translate(x1, y1);
+    graphics.lineWidth(lineWidth);
+	graphics.lineColor(COLOR_TO_R(g_fc), COLOR_TO_G(g_fc), COLOR_TO_B(g_fc));
+    graphics.fillColor(COLOR_TO_R(g_bc), COLOR_TO_G(g_bc), COLOR_TO_B(g_bc));
+    graphics.roundedRect(lineWidth / 2.0, lineWidth / 2.0, w - lineWidth, h - lineWidth, r);
 }
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -662,17 +667,28 @@ void drawFpsGraph(int x, int y, int w, int h, const Style *style) {
 	x2--;
 	y2--;
 
+	bool isRed = false;
+	display::setColor(style->color);
+
 	x = x1;
 	for (size_t i = 0; i < NUM_FPS_VALUES && x <= x2; i++, x++) {
 		int y = y2 - g_fpsValues[i] * (y2 - y1) / 60;
 		if (y < y1) {
 			y = y1;
 		}
+
 		if (g_fpsValues[i] < 40) {
-			display::setColor16(COLOR_RED);
+			if (!isRed) {
+				display::setColor16(COLOR_RED);
+				isRed = true;
+			}
 		} else {
-			display::setColor(style->color);
+			if (isRed) {
+				display::setColor(style->color);
+				isRed = false;
+			}
 		}
+
 		display::drawVLine(x, y, y2 - y);
 	}
 }
