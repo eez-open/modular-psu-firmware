@@ -59,7 +59,7 @@ void ButtonWidgetState::render() {
             data.toText(text, sizeof(text));
             drawText(text, -1, widgetCursor.x, widgetCursor.y, (int)widget->w, (int)widget->h, style, flags.active, flags.blinking);
         }
-    } else {
+    } else if (widget->text) {
         drawText(widget->text.ptr(widgetCursor.assets), -1, widgetCursor.x, widgetCursor.y, (int)widget->w, (int)widget->h, style, flags.active, flags.blinking);
     }
 }

@@ -149,8 +149,6 @@ void stateManagmentHook();
 
 bool activePageHasBackdropHook();
 
-bool pushPageThreadHook(AppContext *appContext, int pageId, Page *page);
-bool showPageThreadHook(AppContext *appContext, int pageId);
 void executeActionThreadHook();
 
 bool isEventHandlingDisabledHook();

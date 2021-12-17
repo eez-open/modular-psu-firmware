@@ -50,7 +50,12 @@ enum {
 
 };
 
+class AppContext;
+class Page;
+
 void sendMessageToGuiThread(uint8_t messageType, uint32_t messageParam = 0, uint32_t timeoutMillisec = osWaitForever);
+bool pushPageInGuiThread(AppContext *appContext, int pageId, Page *page);
+bool showPageInGuiThread(AppContext *appContext, int pageId);
 
 void onGuiQueueMessageHook(uint8_t type, int16_t param);
 

@@ -20,6 +20,8 @@
 
 #include <eez/debug.h>
 
+#include <eez/gui/gui.h>
+
 #include <eez/flow/flow.h>
 #include <eez/flow/operations.h>
 #include <eez/flow/queue.h>
@@ -258,7 +260,7 @@ void propagateValueThroughSeqout(FlowState *flowState, unsigned componentIndex) 
 
 ////////////////////////////////////////////////////////////////////////////////
 
-void getValue(uint16_t dataId, const WidgetCursor &widgetCursor, Value &value) {
+void getValue(uint16_t dataId, DataOperationEnum operation, const WidgetCursor &widgetCursor, Value &value) {
 	if (isFlowRunningHook()) {
 		FlowState *flowState = widgetCursor.flowState;
 		auto assets = flowState->assets;
@@ -269,7 +271,7 @@ void getValue(uint16_t dataId, const WidgetCursor &widgetCursor, Value &value) {
 			auto component = flow->components.item(assets, widgetDataItem->componentIndex);
 			auto propertyValue = component->propertyValues.item(assets, widgetDataItem->propertyValueIndex);
 
-			if (!evalExpression(flowState, widgetDataItem->componentIndex, propertyValue->evalInstructions, value, nullptr, widgetCursor.iterators)) {
+			if (!evalExpression(flowState, widgetDataItem->componentIndex, propertyValue->evalInstructions, value, nullptr, widgetCursor.iterators, operation)) {
 				throwError(flowState, widgetDataItem->componentIndex, "doGetFlowValue failed\n");
 			}
 		}
@@ -302,6 +304,8 @@ void setValue(uint16_t dataId, const WidgetCursor &widgetCursor, const Value& va
 void assignValue(FlowState *flowState, int componentIndex, Value &dstValue, const Value &srcValue) {
 	if (dstValue.getType() == VALUE_TYPE_FLOW_OUTPUT) {
 		propagateValue(flowState, componentIndex, dstValue.getUInt16(), srcValue);
+	} else if (dstValue.getType() == VALUE_TYPE_NATIVE_VARIABLE) {
+		set(g_widgetCursor, dstValue.getInt(), srcValue);
 	} else {
 		Value *pDstValue = dstValue.pValueValue;
 		

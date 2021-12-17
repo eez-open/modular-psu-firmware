@@ -123,7 +123,7 @@ void ChSettingsAdvViewPage::edit() {
             options.flags.signButtonEnabled = false;
             options.flags.dotButtonEnabled = true;
 
-            NumericKeypad::start(0, MakeValue(displayValues[displayValueIndex].range, options.editValueUnit), options, onDisplayValueRangeSet, 0, 0);
+            startNumericKeypad(0, MakeValue(displayValues[displayValueIndex].range, options.editValueUnit), options, onDisplayValueRangeSet, 0, 0);
         }
     } else if (dataId == DATA_ID_CHANNEL_DISPLAY_VIEW_SETTINGS_YT_VIEW_RATE) {
         NumericKeypadOptions options;
@@ -138,7 +138,7 @@ void ChSettingsAdvViewPage::edit() {
         options.flags.signButtonEnabled = false;
         options.flags.dotButtonEnabled = true;
 
-        NumericKeypad::start(0, MakeValue(ytViewRate, UNIT_SECOND), options, onYTViewRateSet, 0, 0);
+        startNumericKeypad(0, MakeValue(ytViewRate, UNIT_SECOND), options, onYTViewRateSet, 0, 0);
     }
 }
 
@@ -294,7 +294,7 @@ void ChSettingsProtectionSetPage::editLimit() {
     options.flags.signButtonEnabled = true;
     options.flags.dotButtonEnabled = true;
 
-    NumericKeypad::start(0, limit, options, onLimitSet, 0, 0);
+    startNumericKeypad(0, limit, options, onLimitSet, 0, 0);
 }
 
 void ChSettingsProtectionSetPage::onLevelSet(float value) {
@@ -324,7 +324,7 @@ void ChSettingsProtectionSetPage::editLevel() {
     options.flags.signButtonEnabled = true;
     options.flags.dotButtonEnabled = true;
 
-    NumericKeypad::start(0, level, options, onLevelSet, 0, 0);
+    startNumericKeypad(0, level, options, onLevelSet, 0, 0);
 }
 
 void ChSettingsProtectionSetPage::onDelaySet(float value) {
@@ -347,7 +347,7 @@ void ChSettingsProtectionSetPage::editDelay() {
     options.flags.signButtonEnabled = true;
     options.flags.dotButtonEnabled = true;
 
-    NumericKeypad::start(0, delay, options, onDelaySet, 0, 0);
+    startNumericKeypad(0, delay, options, onDelaySet, 0, 0);
 }
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -758,7 +758,7 @@ void ChSettingsListsPage::edit() {
         }
         stringAppendString(label, sizeof(label), "]: ");
 
-        NumericKeypad::start(label, value, options, onValueSet, 0, 0);
+        startNumericKeypad(label, value, options, onValueSet, 0, 0);
     } else {
         m_iCursor = getCursorIndex(getFoundWidgetAtDown().cursor, widget->data);
 
@@ -1197,11 +1197,10 @@ void ChSettingsListsPage::editListCount() {
     options.max = MAX_LIST_COUNT;
     options.def = 0;
 
-    options.flags.option1ButtonEnabled = true;
-    options.option1ButtonText = INFINITY_SYMBOL;
-    options.option1 = onListCountSetToInfinity;
+	options.option1Action = NUMERIC_KEYPAD_OPTION_ACTION_LIST_COUNT_SET_TO_INFINITY;
+	options.option1ButtonText = INFINITY_SYMBOL;
 
-    NumericKeypad::start(0, Value((uint16_t)m_listCount), options, onListCountSet, 0, 0);
+    startNumericKeypad(0, Value((uint16_t)m_listCount), options, onListCountSet, 0, 0);
 }
 
 void ChSettingsListsPage::onListCountSet(float value) {

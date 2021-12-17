@@ -19,8 +19,9 @@
 #pragma once
 
 #include <eez/gui/gui.h>
+#include <eez/gui/thread.h>
+
 #include <bb3/gui/document.h>
-#include <bb3/gui/thread.h>
 
 using namespace eez::gui;
 

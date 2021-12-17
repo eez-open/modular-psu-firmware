@@ -594,6 +594,22 @@ const char *FLOW_OUTPUT_value_type_name(const Value &value) {
     return "internal";
 }
 
+bool compare_NATIVE_VARIABLE_value(const Value &a, const Value &b) {
+    auto aValue = get(g_widgetCursor, a.getInt());
+    auto bValue = get(g_widgetCursor, b.getInt());
+	return aValue == bValue;
+}
+
+void NATIVE_VARIABLE_value_to_text(const Value &value, char *text, int count) {
+    auto aValue = get(g_widgetCursor, value.getInt());
+    aValue.toText(text, count);
+}
+
+const char *NATIVE_VARIABLE_value_type_name(const Value &value) {
+    auto aValue = get(g_widgetCursor, value.getInt());
+    return g_valueTypeNames[aValue.type](aValue);
+}
+
 bool compare_RANGE_value(const Value &a, const Value &b) {
     return a.getUInt32() == b.getUInt32();
 }
@@ -643,6 +659,30 @@ const char *ENUM_value_type_name(const Value &value) {
 
 bool compare_YT_DATA_GET_VALUE_FUNCTION_POINTER_value(const Value &a, const Value &b) {
     return a.getUInt32() == b.getUInt32();
+}
+
+bool compare_IP_ADDRESS_value(const Value &a, const Value &b) {
+    return a.getUInt32() == b.getUInt32();
+}
+
+void IP_ADDRESS_value_to_text(const Value &value, char *text, int count) {
+    ipAddressToString(value.getUInt32(), text, count);
+}
+
+const char *IP_ADDRESS_value_type_name(const Value &value) {
+    return "internal";
+}
+
+bool compare_TIME_ZONE_value(const Value &a, const Value &b) {
+    return a.getInt16() == b.getInt16();
+}
+
+void TIME_ZONE_value_to_text(const Value &value, char *text, int count) {
+    formatTimeZone(value.getInt16(), text, count);
+}
+
+const char *TIME_ZONE_value_type_name(const Value &value) {
+    return "internal";
 }
 
 void YT_DATA_GET_VALUE_FUNCTION_POINTER_value_to_text(const Value &value, char *text, int count) {
@@ -822,6 +862,10 @@ double Value::toDouble(int *err) const {
 	if (type == VALUE_TYPE_VALUE_PTR) {
 		return pValueValue->toDouble(err);
 	}
+    
+    if (type == VALUE_TYPE_NATIVE_VARIABLE) {
+		return get(g_widgetCursor, getInt()).toDouble(err);
+	}
 
 	if (err) {
 		*err = 0;
@@ -880,6 +924,10 @@ double Value::toDouble(int *err) const {
 float Value::toFloat(int *err) const {
 	if (type == VALUE_TYPE_VALUE_PTR) {
 		return pValueValue->toFloat(err);
+	}
+    
+    if (type == VALUE_TYPE_NATIVE_VARIABLE) {
+		return get(g_widgetCursor, getInt()).toFloat(err);
 	}
 
 	if (err) {
@@ -975,6 +1023,10 @@ int32_t Value::toInt32(int *err) const {
 		return pValueValue->toInt32(err);
 	}
 
+    if (type == VALUE_TYPE_NATIVE_VARIABLE) {
+		return get(g_widgetCursor, getInt()).toInt32(err);
+	}
+
 	if (type == VALUE_TYPE_DOUBLE) {
 		return (int32_t)doubleValue;
 	}
@@ -1000,6 +1052,10 @@ int32_t Value::toInt32(int *err) const {
 int64_t Value::toInt64(int *err) const {
 	if (type == VALUE_TYPE_VALUE_PTR) {
 		return pValueValue->toInt64(err);
+	} 
+    
+    if (type == VALUE_TYPE_NATIVE_VARIABLE) {
+		return get(g_widgetCursor, getInt()).toInt64(err);
 	}
 
 	if (err) {
@@ -1060,7 +1116,11 @@ bool Value::toBool(int *err) const {
 		return pValueValue->toBool(err);
 	}
 
-	if (err) {
+    if (type == VALUE_TYPE_NATIVE_VARIABLE) {
+		return get(g_widgetCursor, getInt()).toBool(err);
+	}
+	
+    if (err) {
 		*err = 0;
 	}
 
@@ -1123,6 +1183,10 @@ bool Value::toBool(int *err) const {
 Value Value::toString(uint32_t id) const {
 	if (type == VALUE_TYPE_VALUE_PTR) {
 		return pValueValue->toString(id);
+	}
+
+    if (type == VALUE_TYPE_NATIVE_VARIABLE) {
+		return get(g_widgetCursor, getInt()).toString(id);
 	}
 
 	if (type == VALUE_TYPE_STRING || type == VALUE_TYPE_STRING_REF) {
@@ -1210,6 +1274,12 @@ Value Value::concatenateString(const Value &str1, const Value &str2) {
     value.refValue = stringRef;
 
 	return value;
+}
+
+////////////////////////////////////////////////////////////////////////////////
+
+void data_none(DataOperationEnum operation, const WidgetCursor &widgetCursor, Value &value) {
+    value = Value();
 }
 
 ////////////////////////////////////////////////////////////////////////////////

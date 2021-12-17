@@ -98,7 +98,7 @@ bool LabelsAndColorsPage::isSlotColorModified(int slotIndex) {
 void LabelsAndColorsPage::editChannelLabel(int slotIndex, int subchannelIndex) {
     g_editSlotIndex = slotIndex;
     g_editSubchannelIndex = subchannelIndex;
-    Keypad::startPush(0, 
+    startTextKeypad(0, 
         LabelsAndColorsPage::getChannelLabelOrDefault(slotIndex, subchannelIndex), 
         1, g_slots[slotIndex]->getChannelLabelMaxLength(subchannelIndex),
         false, 
@@ -324,7 +324,7 @@ void onSetSlotDefaultLabel() {
 
 void action_change_slot_label() {
     hmi::selectSlot(getFoundWidgetAtDown().cursor);
-    Keypad::startPush(0,
+    startTextKeypad(0,
         LabelsAndColorsPage::getSlotLabelOrDefault(hmi::g_selectedSlotIndex), 1, SLOT_LABEL_MAX_LENGTH, false,
         onSetSlotLabel, popPage,
         LabelsAndColorsPage::isSlotLabelModified(hmi::g_selectedSlotIndex) ? onSetSlotDefaultLabel : nullptr);

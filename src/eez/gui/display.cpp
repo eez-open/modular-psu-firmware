@@ -340,7 +340,7 @@ void drawFocusFrame(int x, int y, int w, int h) {
     fillRect(x, y + h - lineWidth, x + w - 1, y + h - 1);
 }
 
-void fillRoundedRect(int x1, int y1, int x2, int y2, int lineWidth, int r) {
+void fillRoundedRect(int x1, int y1, int x2, int y2, int lineWidth, int r, bool drawLine, bool fill) {
 	// init AGG
 	agg::rendering_buffer rbuf;
 	rbuf.attach((uint8_t *)getBufferPointer(), getDisplayWidth(), getDisplayHeight(), getDisplayWidth() * DISPLAY_BPP / 8);
@@ -351,8 +351,16 @@ void fillRoundedRect(int x1, int y1, int x2, int y2, int lineWidth, int r) {
 	graphics.clipBox(x1, y1, x1 + w, y1 + h);
 	graphics.translate(x1, y1);
     graphics.lineWidth(lineWidth);
-	graphics.lineColor(COLOR_TO_R(g_fc), COLOR_TO_G(g_fc), COLOR_TO_B(g_fc));
-    graphics.fillColor(COLOR_TO_R(g_bc), COLOR_TO_G(g_bc), COLOR_TO_B(g_bc));
+    if (drawLine) {
+	    graphics.lineColor(COLOR_TO_R(g_fc), COLOR_TO_G(g_fc), COLOR_TO_B(g_fc));
+    } else {
+        graphics.noLine();
+    }	
+    if (fill) {
+        graphics.fillColor(COLOR_TO_R(g_bc), COLOR_TO_G(g_bc), COLOR_TO_B(g_bc));
+    } else {
+        graphics.noFill();
+    }
     graphics.roundedRect(lineWidth / 2.0, lineWidth / 2.0, w - lineWidth, h - lineWidth, r);
 }
 

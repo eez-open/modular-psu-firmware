@@ -88,8 +88,7 @@ bool init() {
     }
 
     // Create renderer
-    g_renderer =
-        SDL_CreateRenderer(g_mainWindow, -1, SDL_RENDERER_ACCELERATED | SDL_RENDERER_PRESENTVSYNC);
+    g_renderer = SDL_CreateRenderer(g_mainWindow, -1, SDL_RENDERER_ACCELERATED | SDL_RENDERER_PRESENTVSYNC);
     if (g_renderer == NULL) {
         printf("Renderer could not be created! SDL Error: %s\n", SDL_GetError());
         return false;
@@ -252,7 +251,11 @@ void doTakeScreenshot() {
 }
 
 void sync() {
-    static uint32_t g_lastTickCount;
+	if (g_mainWindow == nullptr) {
+		init();
+	}
+
+	static uint32_t g_lastTickCount;
     uint32_t tickCount = millis();
     int32_t diff = 1000 / 60 - (tickCount - g_lastTickCount);
     g_lastTickCount = tickCount;
@@ -269,10 +272,6 @@ void sync() {
 	    calcFPS();
     }
 #endif
-
-    if (g_mainWindow == nullptr) {
-        init();
-    }
 
     if (!g_screenshotAllocated && g_animationState.enabled) {
         animate();

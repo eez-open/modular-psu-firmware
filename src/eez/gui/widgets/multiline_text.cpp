@@ -56,7 +56,7 @@ void MultilineTextWidgetState::render() {
                 flags.active,
                 widget->firstLineIndent, widget->hangingIndent);
         }
-    } else {
+    } else if (widget->text) {
         drawMultilineText(
             widget->text.ptr(widgetCursor.assets), 
             widgetCursor.x, widgetCursor.y, (int)widget->w, (int)widget->h,

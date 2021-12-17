@@ -36,6 +36,7 @@
 #include <bb3/system.h>
 #include <bb3/tasks.h>
 #include <bb3/scripting/scripting.h>
+#include <bb3/mouse.h>
 #include <bb3/uart.h>
 #include <bb3/usb.h>
 #include <bb3/aux_ps/fan.h>
@@ -145,6 +146,8 @@ void boot() {
     psu::persist_conf::init();
 
     gui::startThread();
+
+    mouse::init();
 
 #if !CONF_SURVIVE_MODE
     if (psu::persist_conf::devConf.mcuRevisionTag == MCU_REVISION_TAG && psu::persist_conf::devConf.mcuRevision != 0) {

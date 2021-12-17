@@ -34,6 +34,7 @@
 #endif
 
 #include <eez/gui/gui.h>
+#include <eez/gui/thread.h>
 #include <eez/gui/touch_calibration.h>
 #include <eez/gui/widgets/button.h>
 
@@ -148,7 +149,7 @@ void AppContext::replacePage(int pageId, Page *page) {
 }
 
 void AppContext::pushPage(int pageId, Page *page) {
-    if (pushPageThreadHook(this, pageId, page)) {
+    if (pushPageInGuiThread(this, pageId, page)) {
         return;
     }
 
@@ -161,11 +162,6 @@ void AppContext::pushPage(int pageId, Page *page) {
     }
 
     doShowPage(pageId, page, previousPageId);
-}
-
-void AppContext::doShowPage() {
-    setPage(m_pageIdToSetOnNextIter);
-    m_pageIdToSetOnNextIter = PAGE_ID_NONE;
 }
 
 void AppContext::popPage() {
@@ -234,18 +230,13 @@ bool AppContext::isExternalPageOnStack() {
 }
 
 void AppContext::showPage(int pageId) {
-    if (showPageThreadHook(this, pageId)) {
+    if (showPageInGuiThread(this, pageId)) {
         return;
     }
 
     if (pageId != getActivePageId()) {
         setPage(pageId);
     }
-}
-
-void AppContext::doPushPage() {
-    pushPage(m_pageIdToSetOnNextIter, m_pageToSetOnNextIter);
-    m_pageIdToSetOnNextIter = PAGE_ID_NONE;
 }
 
 ////////////////////////////////////////////////////////////////////////////////

@@ -18,6 +18,8 @@
 
 #pragma once
 
+#include <eez/gui/keypad.h>
+
 namespace eez {
 namespace psu {
 
@@ -52,8 +54,6 @@ void nonInteractiveDiscard();
 } // namespace edit_mode
 
 ////////////////////////////////////////////////////////////////////////////////
-
-class NumericKeypad;
 
 namespace edit_mode_keypad {
 

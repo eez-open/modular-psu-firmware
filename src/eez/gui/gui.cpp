@@ -50,6 +50,12 @@ void guiInit() {
 }
 
 void guiTick() {
+	if (display::isOn()) {
+		display::beginRendering();
+		updateScreen();
+		display::endRendering();
+	}
+
 	display::sync();
 
 	g_wasBlinkTime = g_isBlinkTime;
@@ -61,12 +67,6 @@ void guiTick() {
 
 	eventHandling();
 	stateManagmentHook();
-
-	if (display::isOn()) {
-		display::beginRendering();
-		updateScreen();
-		display::endRendering();
-	}
 }
 
 ////////////////////////////////////////////////////////////////////////////////

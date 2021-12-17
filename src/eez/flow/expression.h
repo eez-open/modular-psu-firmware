@@ -23,8 +23,6 @@
 namespace eez {
 namespace flow {
 
-using eez::gui::MAX_ITERATORS;
-
 static const size_t STACK_SIZE = 20;
 
 struct EvalStack {
@@ -58,8 +56,7 @@ struct EvalStack {
 
 };
 
-bool evalExpression(FlowState *flowState, int componentIndex, const uint8_t *instructions, EvalStack &stack, int *numInstructionBytes = nullptr);
-bool evalExpression(FlowState *flowState, int componentIndex, const uint8_t *instructions, Value &result, int *numInstructionBytes = nullptr, const int32_t *iterators = nullptr);
+bool evalExpression(FlowState *flowState, int componentIndex, const uint8_t *instructions, Value &result, int *numInstructionBytes = nullptr, const int32_t *iterators = nullptr, eez::gui::DataOperationEnum operation = eez::gui::DATA_OPERATION_GET);
 bool evalAssignableExpression(FlowState *flowState, int componentIndex, const uint8_t *instructions, Value &result, int *numInstructionBytes = nullptr, const int32_t *iterators = nullptr);
 
 } // flow

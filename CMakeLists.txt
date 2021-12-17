@@ -172,14 +172,12 @@ source_group("bb3\\conf\\eez" FILES ${header_bb3_conf_eez})
 set(src_bb3_gui
     src/bb3/gui/display.cpp
     src/bb3/gui/document.cpp
-    src/bb3/gui/thread.cpp
 )
 list (APPEND src_files ${src_bb3_gui})
 set(header_bb3_gui
     src/bb3/gui/document.h
     src/bb3/gui/document_simulator.h
     src/bb3/gui/document_stm32.h
-    src/bb3/gui/thread.h
 )
 list (APPEND header_files ${header_bb3_gui})
 source_group("bb3\\gui" FILES ${src_bb3_gui} ${header_bb3_gui})
@@ -321,8 +319,10 @@ set(src_eez_gui
     src/eez/gui/font.cpp
     src/eez/gui/geometry.cpp
     src/eez/gui/gui.cpp
+    src/eez/gui/keypad.cpp
     src/eez/gui/overlay.cpp
     src/eez/gui/page.cpp
+    src/eez/gui/thread.cpp
     src/eez/gui/touch.cpp
     src/eez/gui/touch_calibration.h
     src/eez/gui/touch_filter.cpp
@@ -342,8 +342,10 @@ set(header_eez_gui
     src/eez/gui/geometry.h
     src/eez/gui/gui.h
     src/eez/gui/image.h
+    src/eez/gui/keypad.h
     src/eez/gui/overlay.h
     src/eez/gui/page.h
+    src/eez/gui/thread.h
     src/eez/gui/touch.h
     src/eez/gui/touch_calibration.cpp
     src/eez/gui/touch_filter.h

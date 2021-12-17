@@ -76,7 +76,7 @@ void SysSettingsDateTimePage::toggleNtp() {
 
 void SysSettingsDateTimePage::editNtpServer() {
 #if OPTION_ETHERNET
-    Keypad::startPush(0, ntpServer, 0, 32, false, onSetNtpServer, popPage);
+    startTextKeypad(0, ntpServer, 0, 32, false, onSetNtpServer, popPage);
 #endif
 }
 
@@ -160,7 +160,7 @@ void SysSettingsDateTimePage::edit() {
 
     if (label) {
         editDataId = id;
-        NumericKeypad::start(label, value, options, onSetValue, 0, 0);
+        startNumericKeypad(label, value, options, onSetValue, 0, 0);
     }
 }
 
@@ -396,7 +396,7 @@ void SysSettingsEthernetPage::editScpiPort() {
 
     options.enableDefButton();
 
-    NumericKeypad::start(0, Value((int)m_scpiPort, VALUE_TYPE_PORT), options, onSetScpiPort, 0, 0);
+    startNumericKeypad(0, Value((int)m_scpiPort, VALUE_TYPE_PORT), options, onSetScpiPort, 0, 0);
 }
 
 void SysSettingsEthernetPage::onSetMacAddress(char *value) {
@@ -415,7 +415,7 @@ void SysSettingsEthernetPage::onSetMacAddress(char *value) {
 void SysSettingsEthernetPage::editMacAddress() {
     char macAddressStr[18];
     macAddressToString(m_macAddress, macAddressStr);
-    Keypad::startPush(0, macAddressStr, 0, 32, false, onSetMacAddress, popPage);
+    startTextKeypad(0, macAddressStr, 0, 32, false, onSetMacAddress, popPage);
 }
 
 int SysSettingsEthernetPage::getDirty() {
@@ -475,7 +475,7 @@ void SysSettingsEthernetStaticPage::onAddressSet(uint32_t address) {
 void SysSettingsEthernetStaticPage::editAddress(uint32_t &address) {
     m_editAddress = &address;
     NumericKeypadOptions options;
-    NumericKeypad::start(0, Value((uint32_t)address, VALUE_TYPE_IP_ADDRESS), options, 0, onAddressSet, 0);
+    startNumericKeypad(0, Value((uint32_t)address, VALUE_TYPE_IP_ADDRESS), options, 0, onAddressSet, 0);
 }
 
 void SysSettingsEthernetStaticPage::editIpAddress() {
@@ -637,7 +637,7 @@ void SysSettingsTemperaturePage::editLevel() {
     options.flags.signButtonEnabled = true;
     options.flags.dotButtonEnabled = true;
 
-    NumericKeypad::start(0, level, options, onLevelSet, 0, 0);
+    startNumericKeypad(0, level, options, onLevelSet, 0, 0);
 }
 
 void SysSettingsTemperaturePage::onDelaySet(float value) {
@@ -660,7 +660,7 @@ void SysSettingsTemperaturePage::editDelay() {
     options.flags.signButtonEnabled = true;
     options.flags.dotButtonEnabled = true;
 
-    NumericKeypad::start(0, delay, options, onDelaySet, 0, 0);
+    startNumericKeypad(0, delay, options, onDelaySet, 0, 0);
 }
 
 void SysSettingsTemperaturePage::toggleFanMode() {
@@ -707,7 +707,7 @@ void SysSettingsTemperaturePage::editFanSpeed() {
 
     options.encoderPrecision = 1.0f;
 
-    NumericKeypad::start(0, fanSpeedPercentage, options, onFanSpeedSet, 0, 0);
+    startNumericKeypad(0, fanSpeedPercentage, options, onFanSpeedSet, 0, 0);
 }
 
 void SysSettingsTemperaturePage::setParams() {
@@ -809,7 +809,7 @@ void SysSettingsTriggerPage::editDelay() {
     options.flags.signButtonEnabled = true;
     options.flags.dotButtonEnabled = true;
 
-    NumericKeypad::start(0, MakeValue(trigger::g_triggerDelay, UNIT_SECOND), options, onDelaySet, 0, 0);
+    startNumericKeypad(0, MakeValue(trigger::g_triggerDelay, UNIT_SECOND), options, onDelaySet, 0, 0);
 }
 
 void SysSettingsTriggerPage::toggleInitiateContinuously() {

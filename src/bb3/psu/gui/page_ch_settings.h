@@ -255,6 +255,8 @@ public:
 
     int16_t getDataIdAtCursor();
 
+    static void onListCountSetToInfinity();
+
 private:
     char m_listFilePath[MAX_PATH_LENGTH + 1];
     float m_voltageListLoad[MAX_LIST_LENGTH];
@@ -292,7 +294,6 @@ private:
     static void onExportListFileSelected(const char *listFilePath);
 
     static void onListCountSet(float value);
-    static void onListCountSetToInfinity();
 
     static void onTriggerOnListStopSet(uint16_t value);
 };

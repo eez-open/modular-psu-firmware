@@ -324,7 +324,7 @@
         "defaultMaxValue": 50
       },
       {
-        "name": "edit_unit",
+        "name": "keypad_edit_unit",
         "type": "string",
         "defaultValue": "mV"
       },
@@ -10363,7 +10363,7 @@
               "wireID": "3b5a6921-b951-4ad1-f080-3810e0d1a6e0",
               "customInputs": [],
               "customOutputs": [],
-              "data": "edit_unit",
+              "data": "keypad_edit_unit",
               "action": "keypad_unit",
               "style": {
                 "inheritFrom": "key"
@@ -15341,7 +15341,7 @@
                   "wireID": "a081cfa1-1c98-4a1a-e3a0-f0f0fe58c727",
                   "customInputs": [],
                   "customOutputs": [],
-                  "data": "edit_unit",
+                  "data": "keypad_edit_unit",
                   "action": "keypad_unit",
                   "style": {
                     "inheritFrom": "key"

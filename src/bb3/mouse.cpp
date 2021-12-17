@@ -17,6 +17,7 @@
 */
 
 #include <eez/gui/gui.h>
+#include <eez/gui/thread.h>
 
 #include <bb3/keyboard.h>
 #include <bb3/mouse.h>
@@ -24,7 +25,6 @@
 #include <bb3/usb.h>
 
 #include <bb3/gui/document.h>
-#include <bb3/gui/thread.h>
 
 using namespace eez::gui;
 using namespace eez::gui::display;

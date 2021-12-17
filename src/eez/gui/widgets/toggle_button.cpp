@@ -41,15 +41,17 @@ void ToggleButtonWidgetState::render() {
 
     auto widget = (const ToggleButtonWidget *)widgetCursor.widget;
     const Style* style = getStyle(widget->style);
-    drawText(
-        flags.enabled ? 
-            widget->text2.ptr(widgetCursor.assets): 
-            widget->text1.ptr(widgetCursor.assets),
-        -1,
-        widgetCursor.x, widgetCursor.y, (int)widget->w, (int)widget->h,
-        style,
-        flags.active
-    );
+
+    auto text = flags.enabled ? widget->text2 : widget->text1;
+    if (text) {
+        drawText(
+            text.ptr(widgetCursor.assets),
+            -1,
+            widgetCursor.x, widgetCursor.y, (int)widget->w, (int)widget->h,
+            style,
+            flags.active
+        );
+    }
 }
 
 } // namespace gui

@@ -118,65 +118,6 @@ void action_non_interactive_discard() {
     edit_mode::nonInteractiveDiscard();
 }
 
-void action_keypad_key() {
-    getActiveKeypad()->key();
-}
-
-void action_keypad_space() {
-    getActiveKeypad()->space();
-}
-
-void action_keypad_back() {
-    getActiveKeypad()->back();
-}
-
-void action_keypad_clear() {
-    getActiveKeypad()->clear();
-}
-
-void action_toggle_keypad_mode() {
-    auto keypad = getActiveKeypad();
-    if (keypad->m_keypadMode == KEYPAD_MODE_LOWERCASE) {
-        getActiveKeypad()->m_keypadMode = KEYPAD_MODE_UPPERCASE;
-    } else if (keypad->m_keypadMode == KEYPAD_MODE_UPPERCASE) {
-        getActiveKeypad()->m_keypadMode = KEYPAD_MODE_SYMBOL;
-    } else {
-        getActiveKeypad()->m_keypadMode = KEYPAD_MODE_LOWERCASE;
-    }
-}
-
-void action_keypad_ok() {
-    getActiveKeypad()->ok();
-}
-
-void action_keypad_cancel() {
-    getActiveKeypad()->cancel();
-}
-
-void action_keypad_set_default() {
-    getActiveKeypad()->setDefault();
-}
-
-void action_keypad_sign() {
-    getActiveKeypad()->sign();
-}
-
-void action_keypad_unit() {
-    getActiveKeypad()->unit();
-}
-
-void action_keypad_option1() {
-    getActiveKeypad()->option1();
-}
-
-void action_keypad_option2() {
-    getActiveKeypad()->option2();
-}
-
-void action_keypad_option3() {
-    getActiveKeypad()->option3();
-}
-
 void action_enter_touch_calibration() {
     enterTouchCalibration(&g_psuAppContext);
 }
@@ -1028,11 +969,6 @@ void onSimulatorLoadSet(float value) {
 	channel_dispatcher::setLoad(*g_channel, value);
 }
 
-void onSimulatorDisconnectLoad() {
-    g_frontPanelAppContext.popPage();
-	channel_dispatcher::setLoadEnabled(*g_channel, false);
-}
-
 void selectSimulatorLoad() {
     NumericKeypadOptions options;
 
@@ -1044,11 +980,11 @@ void selectSimulatorLoad() {
 
     options.flags.signButtonEnabled = false;
     options.flags.dotButtonEnabled = true;
-    options.flags.option1ButtonEnabled = true;
-    options.option1ButtonText = "Off";
-    options.option1 = onSimulatorDisconnectLoad;
 
-    NumericKeypad::start(&g_frontPanelAppContext, 0, MakeValue(g_channel->simulator.getLoad(), UNIT_OHM), options, onSimulatorLoadSet, 0, 0);
+	options.option1Action = NUMERIC_KEYPAD_OPTION_ACTION_SIMULATOR_DISCONNECT_LOAD;
+	options.option1ButtonText = "Off";
+
+    startNumericKeypad(&g_frontPanelAppContext, 0, MakeValue(g_channel->simulator.getLoad(), UNIT_OHM), options, onSimulatorLoadSet, 0, 0);
 }
 
 void action_simulator_load() {
@@ -1102,7 +1038,7 @@ void action_edit_animations_duration() {
     options.flags.signButtonEnabled = false;
     options.flags.dotButtonEnabled = true;
 
-    NumericKeypad::start(0, Value(psu::persist_conf::devConf.animationsDuration, UNIT_SECOND), options, onSetAnimationsDuration, 0, 0);
+    startNumericKeypad(0, Value(psu::persist_conf::devConf.animationsDuration, UNIT_SECOND), options, onSetAnimationsDuration, 0, 0);
 }
 
 void action_user_switch_clicked() {
@@ -1407,7 +1343,7 @@ void action_edit_ntp_refresh_frequency() {
     options.enableMinButton();
 
     SysSettingsDateTimePage *page = (SysSettingsDateTimePage *)getPage(PAGE_ID_SYS_SETTINGS_DATE_TIME);
-    NumericKeypad::start(0, Value(page->ntpRefreshFrequency, VALUE_TYPE_UINT32), options, onSetNtpRefreshFrequency, 0, 0);
+    startNumericKeypad(0, Value(page->ntpRefreshFrequency, VALUE_TYPE_UINT32), options, onSetNtpRefreshFrequency, 0, 0);
 }
 
 void action_module_resync() {

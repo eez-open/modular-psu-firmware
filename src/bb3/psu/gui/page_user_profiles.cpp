@@ -90,7 +90,7 @@ void UserProfilesPage::onSaveYes() {
         char remark[PROFILE_NAME_MAX_LENGTH + 1];
         profile::getSaveName(g_selectedProfileLocation, remark, sizeof(remark));
 
-        Keypad::startPush(0, remark, 0, PROFILE_NAME_MAX_LENGTH, false, onSaveEditRemarkOk, 0);
+        startTextKeypad(0, remark, 0, PROFILE_NAME_MAX_LENGTH, false, onSaveEditRemarkOk, 0);
     } else {
         onSaveFinish();
     }
@@ -215,7 +215,7 @@ void UserProfilesPage::editRemark() {
     if (g_selectedProfileLocation > 0 && profile::isValid(g_selectedProfileLocation)) {
         char remark[PROFILE_NAME_MAX_LENGTH + 1];
         profile::getName(g_selectedProfileLocation, remark, sizeof(remark));
-        Keypad::startPush(0, remark, 0, PROFILE_NAME_MAX_LENGTH, false, onEditRemarkOk, 0);
+        startTextKeypad(0, remark, 0, PROFILE_NAME_MAX_LENGTH, false, onEditRemarkOk, 0);
     }
 }
 

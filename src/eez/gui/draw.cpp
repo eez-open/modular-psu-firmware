@@ -134,9 +134,14 @@ void drawBorderAndBackground(int &x1, int &y1, int &x2, int &y2, const Style *st
 	}
 
     if (hasBorder) {
-        display::setColor(style->borderColor, ignoreLuminocity);
+		if (style->borderColor != TRANSPARENT_COLOR_INDEX) {
+			display::setColor(style->borderColor, ignoreLuminocity);
+		}
+
         if (borderRadius > 0) {
-            display::setBackColor(color, ignoreLuminocity);
+			if (color != TRANSPARENT_COLOR_INDEX) {
+				display::setBackColor(color, ignoreLuminocity);
+			}
 
             int lineWidth = style->borderSizeTop;
             if (lineWidth < style->borderSizeRight) {
@@ -149,7 +154,7 @@ void drawBorderAndBackground(int &x1, int &y1, int &x2, int &y2, const Style *st
                 lineWidth = style->borderSizeLeft;
             }
 
-            display::fillRoundedRect(x1, y1, x2, y2, lineWidth, style->borderRadius);
+            display::fillRoundedRect(x1, y1, x2, y2, lineWidth, style->borderRadius, style->borderColor != TRANSPARENT_COLOR_INDEX, color != TRANSPARENT_COLOR_INDEX);
 
             lineWidth++;
 
@@ -161,18 +166,20 @@ void drawBorderAndBackground(int &x1, int &y1, int &x2, int &y2, const Style *st
             return;
         }
 
-        if (style->borderSizeLeft > 0) {
-            display::fillRect(x1, y1, x1 + style->borderSizeLeft - 1, y2);
-        }
-        if (style->borderSizeTop > 0) {
-            display::fillRect(x1, y1, x2, y1 + style->borderSizeTop - 1);
-        }
-        if (style->borderSizeRight > 0) {
-            display::fillRect(x2 - (style->borderSizeRight - 1), y1, x2, y2);
-        }
-        if (style->borderSizeBottom > 0) {
-            display::fillRect(x1, y2 - (style->borderSizeBottom - 1), x2, y2);
-        }
+		if (style->borderColor != TRANSPARENT_COLOR_INDEX) {
+			if (style->borderSizeLeft > 0) {
+				display::fillRect(x1, y1, x1 + style->borderSizeLeft - 1, y2);
+			}
+			if (style->borderSizeTop > 0) {
+				display::fillRect(x1, y1, x2, y1 + style->borderSizeTop - 1);
+			}
+			if (style->borderSizeRight > 0) {
+				display::fillRect(x2 - (style->borderSizeRight - 1), y1, x2, y2);
+			}
+			if (style->borderSizeBottom > 0) {
+				display::fillRect(x1, y2 - (style->borderSizeBottom - 1), x2, y2);
+			}
+		}
 
         x1 += style->borderSizeLeft;
         y1 += style->borderSizeTop;

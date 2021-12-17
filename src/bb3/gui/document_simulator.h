@@ -39,7 +39,7 @@ enum DataEnum {
     DATA_ID_ALERT_MESSAGE_2 = 37,
     DATA_ID_ALERT_MESSAGE_3 = 38,
     DATA_ID_EDIT_VALUE = 39,
-    DATA_ID_EDIT_UNIT = 40,
+    DATA_ID_KEYPAD_EDIT_UNIT = 40,
     DATA_ID_EDIT_INFO = 41,
     DATA_ID_EDIT_MODE_INTERACTIVE_MODE_SELECTOR = 42,
     DATA_ID_EDIT_STEPS = 43,
@@ -686,7 +686,7 @@ void data_alert_message(DataOperationEnum operation, const WidgetCursor &cursor,
 void data_alert_message_2(DataOperationEnum operation, const WidgetCursor &cursor, Value &value);
 void data_alert_message_3(DataOperationEnum operation, const WidgetCursor &cursor, Value &value);
 void data_edit_value(DataOperationEnum operation, const WidgetCursor &cursor, Value &value);
-void data_edit_unit(DataOperationEnum operation, const WidgetCursor &cursor, Value &value);
+void data_keypad_edit_unit(DataOperationEnum operation, const WidgetCursor &cursor, Value &value);
 void data_edit_info(DataOperationEnum operation, const WidgetCursor &cursor, Value &value);
 void data_edit_mode_interactive_mode_selector(DataOperationEnum operation, const WidgetCursor &cursor, Value &value);
 void data_edit_steps(DataOperationEnum operation, const WidgetCursor &cursor, Value &value);
@@ -2862,4 +2862,4 @@ enum PagesEnum {
     PAGE_ID_DIB_MUX14D_RELAY_CYCLES = 243
 };
 
-extern const uint8_t assets[489808];
+extern const uint8_t assets[489742];

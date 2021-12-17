@@ -1876,7 +1876,7 @@ void action_dib_smx46_edit_x_label() {
 	g_labelDefault[1] = '1' + i;
 	g_labelDefault[2] = 0;
 
-    Keypad::startPush("Label: ", g_labelPointer, 1, Module::MAX_SWITCH_MATRIX_LABEL_LENGTH, false, onSetLabel, popPage, onSetLabelDefault);
+    startTextKeypad("Label: ", g_labelPointer, 1, Module::MAX_SWITCH_MATRIX_LABEL_LENGTH, false, onSetLabel, popPage, onSetLabelDefault);
 }
 
 void action_dib_smx46_edit_y_label() {
@@ -1895,7 +1895,7 @@ void action_dib_smx46_edit_y_label() {
 	g_labelDefault[1] = '1' + i;
 	g_labelDefault[2] = 0;
 	
-	Keypad::startPush("Label: ", g_labelPointer, 1, Module::MAX_SWITCH_MATRIX_LABEL_LENGTH, false, onSetLabel, popPage, onSetLabelDefault);
+	startTextKeypad("Label: ", g_labelPointer, 1, Module::MAX_SWITCH_MATRIX_LABEL_LENGTH, false, onSetLabel, popPage, onSetLabelDefault);
 }
 
 void action_dib_smx46_clear_all_routes() {

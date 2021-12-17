@@ -18,7 +18,7 @@
 
 #include <eez/os.h>
 
-#include <bb3/gui/thread.h>
+#include <eez/gui/thread.h>
 
 #include <eez/flow/private.h>
 #include <eez/flow/debugger.h>

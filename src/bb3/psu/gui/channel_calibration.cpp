@@ -357,7 +357,7 @@ void ChSettingsCalibrationEditPage::set() {
     int16_t uiErr;
     bool result = calibration::g_editor.canSave(scpiErr, &uiErr);
     if (result || uiErr == SCPI_ERROR_CALIBRATION_REMARK_NOT_SET) {
-        Keypad::startPush("Remark: ", calibration::g_editor.getRemark(), 0, CALIBRATION_REMARK_MAX_LENGTH, false, onSetRemarkOk, popPage);
+        startTextKeypad("Remark: ", calibration::g_editor.getRemark(), 0, CALIBRATION_REMARK_MAX_LENGTH, false, onSetRemarkOk, popPage);
     } else {
         generateError(uiErr);
     }

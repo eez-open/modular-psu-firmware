@@ -73,7 +73,7 @@ void propagateValue(FlowState *flowState, unsigned componentIndex, unsigned outp
 void propagateValue(FlowState *flowState, unsigned componentIndex, unsigned outputIndex); // propagates null value
 void propagateValueThroughSeqout(FlowState *flowState, unsigned componentIndex); // propagates null value through @seqout (0-th output)
 
-void getValue(uint16_t dataId, const WidgetCursor &widgetCursor, Value &value);
+void getValue(uint16_t dataId, eez::gui::DataOperationEnum operation, const WidgetCursor &widgetCursor, Value &value);
 void setValue(uint16_t dataId, const WidgetCursor &widgetCursor, const Value& value);
 
 void assignValue(FlowState *flowState, int componentIndex, Value &dstValue, const Value &srcValue);

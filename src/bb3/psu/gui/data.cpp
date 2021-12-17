@@ -714,18 +714,6 @@ const char *COUNTDOWN_value_type_name(const Value &value) {
     return "internal";
 }
 
-bool compare_TIME_ZONE_value(const Value &a, const Value &b) {
-    return a.getInt16() == b.getInt16();
-}
-
-void TIME_ZONE_value_to_text(const Value &value, char *text, int count) {
-    formatTimeZone(value.getInt16(), text, count);
-}
-
-const char *TIME_ZONE_value_type_name(const Value &value) {
-    return "internal";
-}
-
 bool compare_DATE_DMY_value(const Value &a, const Value &b) {
     return a.getUInt32() == b.getUInt32();
 }
@@ -901,18 +889,6 @@ void MAC_ADDRESS_value_to_text(const Value &value, char *text, int count) {
 }
 
 const char *MAC_ADDRESS_value_type_name(const Value &value) {
-    return "internal";
-}
-
-bool compare_IP_ADDRESS_value(const Value &a, const Value &b) {
-    return a.getUInt32() == b.getUInt32();
-}
-
-void IP_ADDRESS_value_to_text(const Value &value, char *text, int count) {
-    ipAddressToString(value.getUInt32(), text, count);
-}
-
-const char *IP_ADDRESS_value_type_name(const Value &value) {
     return "internal";
 }
 
@@ -1576,9 +1552,8 @@ void editValue(int16_t dataId) {
         auto max = getMax(widgetCursor, g_editValueDataId);
         if (max.getType() != VALUE_TYPE_UNDEFINED) {
             if (isinf(max.getFloat())) {
-                options.flags.option1ButtonEnabled = true;
-                options.option1ButtonText = INFINITY_SYMBOL;
-                options.option1 = onSetInfinityValue;
+				options.option1Action = NUMERIC_KEYPAD_OPTION_ACTION_SET_TO_INFINITY_VALUE;
+				options.option1ButtonText = INFINITY_SYMBOL;
             } else {
                 options.max = max.getFloat();
                 options.enableMaxButton();
@@ -1593,9 +1568,8 @@ void editValue(int16_t dataId) {
 
         options.flags.signButtonEnabled = options.min < 0;
         options.flags.dotButtonEnabled = true;
-        options.flags.option1ButtonEnabled = true;
 
-        NumericKeypad::start(0, value, options, onSetFloatValue, 0, 0);
+        startNumericKeypad(0, value, options, onSetFloatValue, 0, 0);
     } else if (value.getType() == VALUE_TYPE_UINT16) {
         NumericKeypadOptions options;
 
@@ -1605,9 +1579,9 @@ void editValue(int16_t dataId) {
 
         options.enableDefButton();
 
-        NumericKeypad::start(0, (int)value.getUInt16(), options, onSetUInt16Value, 0, 0);
+        startNumericKeypad(0, (int)value.getUInt16(), options, onSetUInt16Value, 0, 0);
     } else {
-        Keypad::startPush(0, value.getString(), 0, getMax(widgetCursor, g_editValueDataId).getUInt32(), value.getType() == VALUE_TYPE_PASSWORD, onSetStringValue, 0);
+        startTextKeypad(0, value.getString(), 0, getMax(widgetCursor, g_editValueDataId).getUInt32(), value.getType() == VALUE_TYPE_PASSWORD, onSetStringValue, 0);
     }
 }
 
@@ -1633,10 +1607,6 @@ int getSlotView(SlotViewType slotViewType, int slotIndex, Cursor cursor) {
 
 
 ////////////////////////////////////////////////////////////////////////////////
-
-void data_none(DataOperationEnum operation, const WidgetCursor &widgetCursor, Value &value) {
-    value = Value();
-}
 
 void data_channels(DataOperationEnum operation, const WidgetCursor &widgetCursor, Value &value) {
     auto cursor = widgetCursor.cursor;
@@ -2339,15 +2309,6 @@ void data_edit_value(DataOperationEnum operation, const WidgetCursor &widgetCurs
     }
 }
 
-void data_edit_unit(DataOperationEnum operation, const WidgetCursor &widgetCursor, Value &value) {
-    if (operation == DATA_OPERATION_GET) {
-        Keypad *keypad = getActiveKeypad();
-        if (keypad) {
-            value = getUnitName(keypad->getSwitchToUnit());
-        }
-    }
-}
-
 void data_edit_info(DataOperationEnum operation, const WidgetCursor &widgetCursor, Value &value) {
     if (operation == DATA_OPERATION_GET) {
         value = Value(0, VALUE_TYPE_EDIT_INFO);
@@ -2388,153 +2349,6 @@ void data_firmware_info(DataOperationEnum operation, const WidgetCursor &widgetC
         }
 
         value = firmware_info;
-    }
-}
-
-void data_keypad_text(DataOperationEnum operation, const WidgetCursor &widgetCursor, Value &value) {
-    if (operation == DATA_OPERATION_GET) {
-        Keypad *keypad = getActiveKeypad();
-        if (keypad) {
-            value = keypad->getKeypadTextValue();
-        }
-    } else if (operation == DATA_OPERATION_GET_TEXT_CURSOR_POSITION) {
-        Keypad *keypad = getActiveKeypad();
-        if (keypad) {
-            value = keypad->getCursorPostion();
-        }
-    } else if (operation == DATA_OPERATION_GET_X_SCROLL) {
-        Keypad *keypad = getActiveKeypad();
-        if (keypad) {
-            value = keypad->getXScroll(*(WidgetCursor *)value.getVoidPointer());
-        }
-    }
-}
-
-void data_keypad_mode(DataOperationEnum operation, const WidgetCursor &widgetCursor, Value &value) {
-    if (operation == DATA_OPERATION_GET) {
-        Keypad *keypad = getActiveKeypad();
-        if (keypad) {
-            value = keypad->m_keypadMode;
-        }
-    }
-}
-
-void data_keypad_option1_text(DataOperationEnum operation, const WidgetCursor &widgetCursor, Value &value) {
-    if (operation == DATA_OPERATION_GET) {
-        NumericKeypad *keypad = getActiveNumericKeypad();
-        if (keypad) {
-            value = Value(keypad->m_options.flags.option1ButtonEnabled ? keypad->m_options.option1ButtonText : "");
-        }
-    }
-}
-
-void data_keypad_option1_enabled(DataOperationEnum operation, const WidgetCursor &widgetCursor, Value &value) {
-    if (operation == DATA_OPERATION_GET) {
-        NumericKeypad *keypad = getActiveNumericKeypad();
-        if (keypad) {
-            value = (int)keypad->m_options.flags.option1ButtonEnabled;
-        }
-    }
-}
-
-void data_keypad_option2_text(DataOperationEnum operation, const WidgetCursor &widgetCursor, Value &value) {
-    if (operation == DATA_OPERATION_GET) {
-        NumericKeypad *keypad = getActiveNumericKeypad();
-        if (keypad) {
-            value = Value(keypad->m_options.flags.option2ButtonEnabled ? keypad->m_options.option2ButtonText : "");
-        }
-    }
-}
-
-void data_keypad_option2_enabled(DataOperationEnum operation, const WidgetCursor &widgetCursor, Value &value) {
-    if (operation == DATA_OPERATION_GET) {
-        NumericKeypad *keypad = getActiveNumericKeypad();
-        if (keypad) {
-            value = (int)keypad->m_options.flags.option2ButtonEnabled;
-        }
-    }
-}
-
-void data_keypad_option3_text(DataOperationEnum operation, const WidgetCursor &widgetCursor, Value &value) {
-    if (operation == DATA_OPERATION_GET) {
-        NumericKeypad *keypad = getActiveNumericKeypad();
-        if (keypad) {
-            value = Value(keypad->m_options.flags.option3ButtonEnabled ? keypad->m_options.option3ButtonText : "");
-        }
-    }
-}
-
-void data_keypad_option3_enabled(DataOperationEnum operation, const WidgetCursor &widgetCursor, Value &value) {
-    if (operation == DATA_OPERATION_GET) {
-        NumericKeypad *keypad = getActiveNumericKeypad();
-        if (keypad) {
-            value = (int)keypad->m_options.flags.option3ButtonEnabled;
-        }
-    }
-}
-
-void data_keypad_sign_enabled(DataOperationEnum operation, const WidgetCursor &widgetCursor, Value &value) {
-    if (operation == DATA_OPERATION_GET) {
-        NumericKeypad *keypad = getActiveNumericKeypad();
-        if (keypad) {
-            value = (int)keypad->m_options.flags.signButtonEnabled;
-        }
-    }
-}
-
-void data_keypad_dot_enabled(DataOperationEnum operation, const WidgetCursor &widgetCursor, Value &value) {
-    if (operation == DATA_OPERATION_GET) {
-        NumericKeypad *keypad = getActiveNumericKeypad();
-        if (keypad) {
-            value = (int)keypad->m_options.flags.dotButtonEnabled;
-        }
-    }
-}
-
-void data_keypad_unit_enabled(DataOperationEnum operation, const WidgetCursor &widgetCursor, Value &value) {
-    if (operation == DATA_OPERATION_GET) {
-        NumericKeypad *keypad = getActiveNumericKeypad();
-        if (keypad) {
-            value = keypad->m_options.editValueUnit == UNIT_VOLT ||
-                    keypad->m_options.editValueUnit == UNIT_MILLI_VOLT ||
-                    keypad->m_options.editValueUnit == UNIT_AMPER ||
-                    keypad->m_options.editValueUnit == UNIT_MILLI_AMPER ||
-                    keypad->m_options.editValueUnit == UNIT_MICRO_AMPER ||
-                    keypad->m_options.editValueUnit == UNIT_WATT ||
-                    keypad->m_options.editValueUnit == UNIT_MILLI_WATT ||
-                    keypad->m_options.editValueUnit == UNIT_SECOND ||
-                    keypad->m_options.editValueUnit == UNIT_MILLI_SECOND ||
-                    keypad->m_options.editValueUnit == UNIT_OHM ||
-                    keypad->m_options.editValueUnit == UNIT_KOHM ||
-                    keypad->m_options.editValueUnit == UNIT_MOHM ||
-                    keypad->m_options.editValueUnit == UNIT_HERTZ ||
-                    keypad->m_options.editValueUnit == UNIT_MILLI_HERTZ ||
-                    keypad->m_options.editValueUnit == UNIT_KHERTZ ||
-                    keypad->m_options.editValueUnit == UNIT_MHERTZ ||
-                    keypad->m_options.editValueUnit == UNIT_FARAD ||
-                    keypad->m_options.editValueUnit == UNIT_MILLI_FARAD ||
-                    keypad->m_options.editValueUnit == UNIT_MICRO_FARAD ||
-                    keypad->m_options.editValueUnit == UNIT_NANO_FARAD ||
-                    keypad->m_options.editValueUnit == UNIT_PICO_FARAD;
-        }
-    }
-}
-
-void data_keypad_ok_enabled(DataOperationEnum operation, const WidgetCursor &widgetCursor, Value &value) {
-    if (operation == DATA_OPERATION_GET) {
-        Keypad *keypad = getActiveKeypad();
-        if (keypad) {
-            value = keypad->isOkEnabled() ? 1 : 0;
-        }
-    }
-}
-
-void data_keypad_can_set_default(DataOperationEnum operation, const WidgetCursor &widgetCursor, Value &value) {
-    if (operation == DATA_OPERATION_GET) {
-        Keypad *keypad = getActiveKeypad();
-        if (keypad) {
-            value = keypad->canSetDefault();
-        }
     }
 }
 

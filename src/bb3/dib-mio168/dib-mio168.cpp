@@ -6090,7 +6090,7 @@ void editPinLabel(int subchannelIndex) {
         pinLabelOrDefault = g_slots[g_editLabelSlotIndex]->getDefaultChannelLabel(g_editSubchannelIndex) + g_editLabelPinIndex * (CHANNEL_LABEL_MAX_LENGTH + 1);
     }
 
-    Keypad::startPush(0, 
+    startTextKeypad(0, 
         pinLabelOrDefault,
         1, CHANNEL_LABEL_MAX_LENGTH,
         false, 

@@ -28,7 +28,7 @@
 #include <bb3/usb.h>
 
 #include <eez/gui/gui.h>
-#include <bb3/gui/thread.h>
+#include <eez/gui/thread.h>
 
 #include <bb3/psu/psu.h>
 #include <bb3/psu/persist_conf.h>

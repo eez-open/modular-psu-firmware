@@ -77,7 +77,7 @@ extern ip4_addr_t gw;
 using namespace eez::psu::ethernet;
 using namespace eez::scpi;
 
-#include <bb3/gui/thread.h>
+#include <eez/gui/thread.h>
 using namespace eez::gui;
 
 #define CONF_CONNECT_TIMEOUT 30000

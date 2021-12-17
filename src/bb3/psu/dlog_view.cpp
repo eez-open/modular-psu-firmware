@@ -1697,7 +1697,7 @@ public:
 	}
 
     static void editFileName() {
-        psu::gui::Keypad::startPush(0, DlogParamsPage::g_parameters.filePath, 0, MAX_PATH_LENGTH, false, onSetFileName, 0);
+        psu::gui::startTextKeypad(0, DlogParamsPage::g_parameters.filePath, 0, MAX_PATH_LENGTH, false, onSetFileName, 0);
     }
 
     static void selectTriggerSource() {

@@ -21,8 +21,8 @@
 #define CONF_GUI_PAGE_NAVIGATION_STACK_SIZE 10
 #define CONF_MAX_STATE_SIZE (GUI_STATE_BUFFER_SIZE / 2)
 
-#define APP_CONTEXT_ID_DEVICE 1
-#define APP_CONTEXT_ID_SIMULATOR_FRONT_PANEL 2
+#define APP_CONTEXT_ID_DEVICE 0
+#define APP_CONTEXT_ID_SIMULATOR_FRONT_PANEL 1
 
 namespace eez {
 namespace gui {
@@ -46,11 +46,7 @@ public:
     virtual void stateManagment();
 
     void showPage(int pageId);
-    void doShowPage();
-    
     void pushPage(int pageId, Page *page = nullptr);
-    void doPushPage();
-    
     void popPage();
     void removePageFromStack(int pageId);
 
@@ -107,9 +103,6 @@ public:
 
     void yesNoDialog(int yesNoPageId, const char *message, void (*yes_callback)(), void (*no_callback)(), void (*cancel_callback)());
     void yesNoDialog(int yesNoPageId, Value value, void(*yes_callback)(), void(*no_callback)(), void(*cancel_callback)());
-
-    int m_pageIdToSetOnNextIter;
-    Page *m_pageToSetOnNextIter;
 
 	// TODO these should be private
 	void(*m_dialogYesCallback)();

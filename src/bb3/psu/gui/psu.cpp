@@ -29,7 +29,9 @@
 #include <bb3/system.h>
 #include <bb3/hmi.h>
 #include <bb3/keyboard.h>
+#include <bb3/mouse.h>
 #include <bb3/scripting/scripting.h>
+#include <bb3/scripting/flow.h>
 #if OPTION_ENCODER
 #include <bb3/mcu/encoder.h>
 #endif
@@ -144,7 +146,7 @@ PsuAppContext::PsuAppContext() {
 }
 
 void PsuAppContext::stateManagment() {
-    if (m_pageIdToSetOnNextIter == PAGE_ID_WELCOME) {
+    if (getActivePageId() == PAGE_ID_WELCOME) {
         playPowerUp(sound::PLAY_POWER_UP_CONDITION_WELCOME_PAGE_IS_ACTIVE);
     } 
 
@@ -849,7 +851,7 @@ const char *PsuAppContext::textInput(const char *label, size_t minChars, size_t 
 }
 
 void PsuAppContext::doShowTextInput() {
-    Keypad::startPush(m_inputLabel, m_textInputParams.m_input, m_textInputParams.m_minChars, m_textInputParams.m_maxChars, false, m_textInputParams.onSet, m_textInputParams.onCancel);
+    startTextKeypad(m_inputLabel, m_textInputParams.m_input, m_textInputParams.m_minChars, m_textInputParams.m_maxChars, false, m_textInputParams.onSet, m_textInputParams.onCancel);
 }
 
 void NumberInputParams::onSet(float value) {
@@ -892,7 +894,7 @@ float PsuAppContext::numberInput(const char *label, Unit unit, float min, float 
 }
 
 void PsuAppContext::doShowNumberInput() {
-    NumericKeypad::start(this, m_inputLabel, Value(m_numberInputParams.m_input, m_numberInputParams.m_options.editValueUnit), m_numberInputParams.m_options, m_numberInputParams.onSet, nullptr, m_numberInputParams.onCancel);
+    startNumericKeypad(this, m_inputLabel, Value(m_numberInputParams.m_input, m_numberInputParams.m_options.editValueUnit), m_numberInputParams.m_options, m_numberInputParams.onSet, nullptr, m_numberInputParams.onCancel);
 }
 
 void IntegerInputParams::onSet(float value) {
@@ -941,7 +943,7 @@ bool PsuAppContext::integerInput(const char *label, int32_t min, int32_t max, in
 }
 
 void PsuAppContext::doShowIntegerInput() {
-    NumericKeypad::start(this, m_inputLabel, Value((float)m_integerInputParams.m_input, UNIT_UNKNOWN), m_integerInputParams.m_options, m_integerInputParams.onSet, nullptr, m_integerInputParams.onCancel);
+    startNumericKeypad(this, m_inputLabel, Value((float)m_integerInputParams.m_input, UNIT_UNKNOWN), m_integerInputParams.m_options, m_integerInputParams.onSet, nullptr, m_integerInputParams.onCancel);
 }
 
 bool PsuAppContext::dialogOpen(int *err) {
@@ -1254,7 +1256,7 @@ void changeValue(Channel &channel, const Value &value, float minValue, float max
     options.flags.signButtonEnabled = true;
     options.flags.dotButtonEnabled = true;
 
-    NumericKeypad::start(0, value, options, onSetValue, 0, 0);
+    startNumericKeypad(0, value, options, onSetValue, 0, 0);
 }
 
 void onSetVoltageLimit(float limit) {
@@ -1914,11 +1916,11 @@ void onEncoder(int counter, bool clicked) {
         }
 
         if (activePageId == PAGE_ID_EDIT_MODE_KEYPAD || activePageId == PAGE_ID_NUMERIC_KEYPAD) {
-            ((NumericKeypad *)getActiveKeypad())->onEncoder(counter);
+            ((eez::psu::gui::NumericKeypad *)getActiveKeypad())->onEncoder(counter);
         }
 #if defined(EEZ_PLATFORM_SIMULATOR)
         else if (activePageId == PAGE_ID_FRONT_PANEL_NUMERIC_KEYPAD) {
-            ((NumericKeypad *)getActiveKeypad())->onEncoder(counter);
+            ((eez::psu::gui::NumericKeypad *)getActiveKeypad())->onEncoder(counter);
         }
 #endif
         else if (activePageId == PAGE_ID_EDIT_MODE_STEP) {
@@ -2107,6 +2109,10 @@ void stateManagmentHook() {
 #endif
 
     g_psuAppContext.stateManagment();
+
+	scripting::flowTick();
+
+	WATCHDOG_RESET(WATCHDOG_GUI_THREAD);
 }
 
 bool styleGetSmallerFontHook(font::Font &font) {
@@ -2455,25 +2461,49 @@ uint16_t transformColorHook(uint16_t color) {
 }
 
 int16_t getAppContextId(AppContext *pAppContext) {
+    if (pAppContext == &g_psuAppContext) {
+        return APP_CONTEXT_ID_DEVICE;
+    }
+    
 #if defined(EEZ_PLATFORM_SIMULATOR)
     if (pAppContext == &g_frontPanelAppContext) {
         return APP_CONTEXT_ID_SIMULATOR_FRONT_PANEL;
     }
 #endif
-    return APP_CONTEXT_ID_DEVICE;
+    
+    return -1;
 }
 
 AppContext *getAppContextFromId(int16_t id) {
+    if (id == APP_CONTEXT_ID_DEVICE) {
+        return &g_psuAppContext;
+    }
+
 #if defined(EEZ_PLATFORM_SIMULATOR)
     if (id == APP_CONTEXT_ID_SIMULATOR_FRONT_PANEL) {
         return &g_frontPanelAppContext;
     }
 #endif
-    return &g_psuAppContext;
+
+    return nullptr;
 }
 
 void onGuiQueueMessageHook(uint8_t type, int16_t param) {
-    if (type == GUI_QUEUE_MESSAGE_TYPE_LISTS_PAGE_IMPORT_LIST_FINISHED) {
+	if (type == GUI_QUEUE_MESSAGE_MOUSE_X_MOVE) {
+		mouse::onMouseXMove(param);
+	} else if (type == GUI_QUEUE_MESSAGE_MOUSE_Y_MOVE) {
+		mouse::onMouseYMove(param);
+	} else if (type == GUI_QUEUE_MESSAGE_MOUSE_BUTTON_DOWN) {
+		mouse::onMouseButtonDown(param);
+	} else if (type == GUI_QUEUE_MESSAGE_MOUSE_BUTTON_UP) {
+		mouse::onMouseButtonUp(param);
+	} else if (type == GUI_QUEUE_MESSAGE_MOUSE_DISCONNECTED) {
+		mouse::onMouseDisconnected();
+	} else if (type == GUI_QUEUE_MESSAGE_FLOW_START) {
+		scripting::startFlowScript();
+	} else if (type == GUI_QUEUE_MESSAGE_FLOW_STOP) {
+		scripting::stopFlowScript();
+	} else if (type == GUI_QUEUE_MESSAGE_TYPE_LISTS_PAGE_IMPORT_LIST_FINISHED) {
         g_ChSettingsListsPage.onImportListFinished(param);
     } else if (type == GUI_QUEUE_MESSAGE_TYPE_LISTS_PAGE_EXPORT_LIST_FINISHED) {
         g_ChSettingsListsPage.onExportListFinished(param);

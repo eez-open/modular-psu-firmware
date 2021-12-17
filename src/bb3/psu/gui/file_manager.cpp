@@ -1002,7 +1002,7 @@ void renameFile() {
         stringCopy(fileNameWithoutExtension, MAX_PATH_LENGTH, fileItem->name);
     }
 
-    Keypad::startPush(0, fileNameWithoutExtension, 1, MAX_PATH_LENGTH, false, onRenameFileOk, popPage);
+    startTextKeypad(0, fileNameWithoutExtension, 1, MAX_PATH_LENGTH, false, onRenameFileOk, popPage);
 }
 
 bool isDeleteFileEnabled() {
@@ -1127,7 +1127,7 @@ void onNewFileOk(char *fileNameWithoutExtension) {
 void newFile() {
     if (isSaveDialog()) {
         popPage();
-        Keypad::startPush(0, 0, 1, MAX_PATH_LENGTH, false, onNewFileOk, popPage);
+        startTextKeypad(0, 0, 1, MAX_PATH_LENGTH, false, onNewFileOk, popPage);
     }
 }
 

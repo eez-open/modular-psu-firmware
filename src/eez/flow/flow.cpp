@@ -184,6 +184,15 @@ FlowState *getFlowState(int16_t pageId, const WidgetCursor &widgetCursor) {
 	return nullptr;
 }
 
+int getPageIndex(FlowState *flowState) {
+	for (uint32_t pageIndex = 0; pageIndex < MAX_PAGES; pageIndex++) {
+		if (g_pagesFlowState[pageIndex] == flowState) {
+			return (int)pageIndex;
+		}
+	}
+	return -1;
+}
+
 void executeFlowAction(const gui::WidgetCursor &widgetCursor, int16_t actionId) {
 	if (!isFlowRunningHook()) {
 		return;
@@ -224,18 +233,20 @@ void dataOperation(int16_t dataId, DataOperationEnum operation, const gui::Widge
 		auto component = flow->components.item(assets, widgetDataItem->componentIndex);
 
 		if (operation == DATA_OPERATION_GET) {
-			getValue(flowDataId, widgetCursor, value);
+			getValue(flowDataId, operation, widgetCursor, value);
 			if (component->type == WIDGET_TYPE_INPUT && dataId == widgetCursor.widget->data) {
 				value = getInputWidgetData(widgetCursor, value);
 			}
 		} else if (operation == DATA_OPERATION_COUNT) {
 			Value arrayValue;
-			getValue(flowDataId, widgetCursor, arrayValue);
+			getValue(flowDataId, operation, widgetCursor, arrayValue);
 			if (arrayValue.getType() == VALUE_TYPE_ARRAY) {
 				value = arrayValue.arrayValue->arraySize;
 			} else {
 				value = 0;
 			}
+		}  else if (operation == DATA_OPERATION_GET_TEXT_CURSOR_POSITION) {
+			getValue(flowDataId, operation, widgetCursor, value);
 		} else if (operation == DATA_OPERATION_GET_MIN) {
 			if (component->type == WIDGET_TYPE_INPUT) {
 				value = getInputWidgetMin(widgetCursor);

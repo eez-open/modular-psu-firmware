@@ -24,6 +24,8 @@
 
 #include <eez/sound.h>
 
+#include <eez/gui/keypad.h>
+
 #if OPTION_ENCODER
 #include <bb3/mcu/encoder.h>
 #endif

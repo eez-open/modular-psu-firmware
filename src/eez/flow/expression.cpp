@@ -26,7 +26,7 @@ using namespace eez::gui;
 namespace eez {
 namespace flow {
 
-bool evalExpression(FlowState *flowState, int componentIndex, const uint8_t *instructions, EvalStack &stack, int *numInstructionBytes) {
+static bool evalExpression(FlowState *flowState, int componentIndex, const uint8_t *instructions, EvalStack &stack, int *numInstructionBytes) {
 	auto assets = flowState->assets;
 	auto flowDefinition = flowState->flowDefinition;
 	auto flow = flowState->flow;
@@ -55,7 +55,7 @@ bool evalExpression(FlowState *flowState, int componentIndex, const uint8_t *ins
 				}
 			} else {
 				// native variable
-				if (!stack.push(get(g_widgetCursor, instructionArg - flowDefinition->globalVariables.count + 1))) {
+				if (!stack.push(Value((int)(instructionArg - flowDefinition->globalVariables.count + 1), VALUE_TYPE_NATIVE_VARIABLE))) {
 					return false;
 				}
 			}
@@ -69,10 +69,14 @@ bool evalExpression(FlowState *flowState, int componentIndex, const uint8_t *ins
 
 			if (arrayValue.getType() == VALUE_TYPE_VALUE_PTR) {
 				arrayValue = *arrayValue.pValueValue;
+			} else if (arrayValue.getType() == VALUE_TYPE_NATIVE_VARIABLE) {
+				arrayValue = get(g_widgetCursor, arrayValue.getInt());
 			}
 
 			if (elementIndexValue.getType() == VALUE_TYPE_VALUE_PTR) {
 				elementIndexValue = *elementIndexValue.pValueValue;
+			} else if (arrayValue.getType() == VALUE_TYPE_NATIVE_VARIABLE) {
+				elementIndexValue = get(g_widgetCursor, elementIndexValue.getInt());
 			}
 
 			if (arrayValue.type != VALUE_TYPE_ARRAY) {
@@ -116,7 +120,7 @@ bool evalExpression(FlowState *flowState, int componentIndex, const uint8_t *ins
 	return true;
 }
 
-bool evalExpression(FlowState *flowState, int componentIndex, const uint8_t *instructions, Value &result, int *numInstructionBytes, const int32_t *iterators) {
+bool evalExpression(FlowState *flowState, int componentIndex, const uint8_t *instructions, Value &result, int *numInstructionBytes, const int32_t *iterators, DataOperationEnum operation) {
 	EvalStack stack;
 
 	stack.flowState = flowState;
@@ -129,6 +133,8 @@ bool evalExpression(FlowState *flowState, int componentIndex, const uint8_t *ins
 
 			if (finalResult.getType() == VALUE_TYPE_VALUE_PTR) {
 				result = *finalResult.pValueValue;
+			} else if (finalResult.getType() == VALUE_TYPE_NATIVE_VARIABLE) {
+				DATA_OPERATION_FUNCTION(finalResult.getInt(), operation, g_widgetCursor, result);
 			} else {
 				result = finalResult;
 			}
@@ -151,7 +157,7 @@ bool evalAssignableExpression(FlowState *flowState, int componentIndex, const ui
 	if (evalExpression(flowState, componentIndex, instructions, stack, numInstructionBytes)) {
 		if (stack.sp == 1) {
 			auto finalResult = stack.pop();
-			if (finalResult.getType() == VALUE_TYPE_VALUE_PTR || finalResult.getType() == VALUE_TYPE_FLOW_OUTPUT) {
+			if (finalResult.getType() == VALUE_TYPE_VALUE_PTR || finalResult.getType() == VALUE_TYPE_NATIVE_VARIABLE || finalResult.getType() == VALUE_TYPE_FLOW_OUTPUT) {
 				result = finalResult;
 				return true;
 			}

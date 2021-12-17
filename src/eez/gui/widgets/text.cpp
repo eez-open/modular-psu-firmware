@@ -50,7 +50,7 @@ bool TextWidgetState::updateState() {
 
     WIDGET_STATE(flags.blinking, g_isBlinkTime && styleIsBlink(style));
     
-    const char *text = widget->text.ptr(widgetCursor.assets);
+    const char *text = widget->text ? widget->text.ptr(widgetCursor.assets) : nullptr;
 	WIDGET_STATE(data, !(text && text[0]) && widget->data ? get(widgetCursor, widget->data) : 0);
 
     return !hasPreviousState;
@@ -61,7 +61,7 @@ void TextWidgetState::render() {
 
     auto widget = (const TextWidget *)widgetCursor.widget;
     const Style *style = getStyle(overrideStyleHook(widgetCursor, widget->style));
-    const char *text = widget->text.ptr(widgetCursor.assets);
+    const char *text = widget->text ? widget->text.ptr(widgetCursor.assets) : nullptr;
 
     uint16_t overrideColor                 = flags.focused ? style->focusColor           : overrideStyleColorHook(widgetCursor, style);
     uint16_t overrideBackgroundColor       = flags.focused ? style->focusBackgroundColor : style->backgroundColor;
