@@ -30,15 +30,13 @@
 namespace eez {
 namespace gui {
 
-WidgetCursor UpDownWidgetState::g_selectedWidget;
-
 bool UpDownWidgetState::updateState() {
     const WidgetCursor &widgetCursor = g_widgetCursor;
 
     bool hasPreviousState = widgetCursor.hasPreviousState;
     auto widget = (const UpDownWidget *)widgetCursor.widget;
 
-    WIDGET_STATE(flags.active, g_selectedWidget == widgetCursor);
+    WIDGET_STATE(flags.active, g_isActiveWidget);
     WIDGET_STATE(data, get(widgetCursor, widget->data));
 
     return !hasPreviousState;
@@ -119,10 +117,6 @@ void UpDownWidgetState::onTouch(const WidgetCursor &widgetCursor, Event &touchEv
     const Widget *widget = widgetCursor.widget;
 
     if (touchEvent.type == EVENT_TYPE_TOUCH_DOWN || touchEvent.type == EVENT_TYPE_AUTO_REPEAT) {
-        if (touchEvent.type == EVENT_TYPE_TOUCH_DOWN) {
-            g_selectedWidget = widgetCursor;
-        }
-
         if (touchEvent.x < widgetCursor.x + widget->w / 2) {
             upDown(widgetCursor, UP_DOWN_WIDGET_SEGMENT_DOWN_BUTTON);
         } else {
@@ -130,8 +124,6 @@ void UpDownWidgetState::onTouch(const WidgetCursor &widgetCursor, Event &touchEv
         }
 
         sound::playClick();
-    } else if (touchEvent.type == EVENT_TYPE_TOUCH_UP) {
-        g_selectedWidget = 0;
     }
 }
 

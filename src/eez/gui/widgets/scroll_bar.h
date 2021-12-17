@@ -29,6 +29,7 @@ struct ScrollBarWidget : public Widget {
 };
 
 enum ScrollBarWidgetSegment {
+    SCROLL_BAR_WIDGET_SEGMENT_UNINITIALIZED,
     SCROLL_BAR_WIDGET_SEGMENT_NONE,
     SCROLL_BAR_WIDGET_SEGMENT_TRACK_LEFT,
     SCROLL_BAR_WIDGET_SEGMENT_TRACK_RIGHT,
@@ -42,11 +43,6 @@ struct ScrollBarWidgetState : public WidgetState {
     int size;
     int position;
     int pageSize;
-    ScrollBarWidgetSegment segment;
-
-    ScrollBarWidgetSegment dragSegment;
-    int dragStartX;
-    int dragStartPosition;
 
     static WidgetCursor g_selectedWidget;
 

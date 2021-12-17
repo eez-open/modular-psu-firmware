@@ -32,6 +32,10 @@
 namespace eez {
 namespace gui {
 
+ScrollBarWidgetSegment dragSegment;
+int dragStartX;
+int dragStartPosition;
+
 int getSize(const WidgetCursor &widgetCursor) {
     return ytDataGetSize(widgetCursor, widgetCursor.widget->data);
 }
@@ -60,19 +64,16 @@ void getThumbGeometry(int size, int position, int pageSize, int xTrack, int wTra
     xThumb = xTrack + (int)round(remap(position, 0, 0, size - pageSize, wTrack - widthThumb));
 }
 
-WidgetCursor ScrollBarWidgetState::g_selectedWidget;
-
 bool ScrollBarWidgetState::updateState() {
     const WidgetCursor &widgetCursor = g_widgetCursor;
 
     bool hasPreviousState = widgetCursor.hasPreviousState;
 
-    WIDGET_STATE(flags.active, g_selectedWidget == widgetCursor);
+    WIDGET_STATE(flags.active, g_isActiveWidget);
     WIDGET_STATE(flags.focused, isFocusWidget(widgetCursor));
     WIDGET_STATE(size, getSize(widgetCursor));
     WIDGET_STATE(position, getPosition(widgetCursor));
     WIDGET_STATE(pageSize, getPageSize(widgetCursor));
-    WIDGET_STATE(segment, dragSegment);
 
     return !hasPreviousState;
 }
@@ -95,7 +96,7 @@ void ScrollBarWidgetState::render() {
                 widgetCursor.y, 
                 isHorizontal ? buttonSize : (int)widget->w, 
                 isHorizontal ? (int)widget->h : buttonSize, buttonsStyle, 
-                segment == SCROLL_BAR_WIDGET_SEGMENT_LEFT_BUTTON
+                flags.active && dragSegment == SCROLL_BAR_WIDGET_SEGMENT_LEFT_BUTTON
             );
         }
 
@@ -143,7 +144,7 @@ void ScrollBarWidgetState::render() {
                 isHorizontal ? buttonSize : (int)widget->w, 
                 isHorizontal ? (int)widget->h : buttonSize,
                 buttonsStyle, 
-                segment == SCROLL_BAR_WIDGET_SEGMENT_RIGHT_BUTTON
+                flags.active && dragSegment == SCROLL_BAR_WIDGET_SEGMENT_RIGHT_BUTTON
             );
         }
 
@@ -190,9 +191,8 @@ void ScrollBarWidgetState::onTouch(const WidgetCursor &widgetCursor, Event &touc
             wTrack = widget->h - 2 * buttonSize;
         }
 
-        if (touchEvent.type == EVENT_TYPE_TOUCH_DOWN || touchEvent.type == EVENT_TYPE_AUTO_REPEAT) {
+        if (touchEvent.type == EVENT_TYPE_TOUCH_DOWN || touchEvent.type == EVENT_TYPE_AUTO_REPEAT || dragSegment == SCROLL_BAR_WIDGET_SEGMENT_UNINITIALIZED) {
             if (touchEvent.type == EVENT_TYPE_TOUCH_DOWN) {
-                g_selectedWidget = widgetCursor;
                 dragSegment = SCROLL_BAR_WIDGET_SEGMENT_NONE;
             }
 
@@ -237,13 +237,14 @@ void ScrollBarWidgetState::onTouch(const WidgetCursor &widgetCursor, Event &touc
                     dragStartPosition = getPosition(widgetCursor);
                 }
             }
-        } else if (touchEvent.type == EVENT_TYPE_TOUCH_MOVE) {
+        } 
+        
+        if (touchEvent.type == EVENT_TYPE_TOUCH_MOVE) {
             if (dragSegment == SCROLL_BAR_WIDGET_SEGMENT_THUMB) {
                 int size = getSize(widgetCursor);
                 setPosition(widgetCursor, dragStartPosition + (int)round(1.0 * (x - dragStartX) * size / wTrack));
             }
         } else if (touchEvent.type == EVENT_TYPE_TOUCH_UP) {
-            g_selectedWidget = 0;
             dragSegment = SCROLL_BAR_WIDGET_SEGMENT_NONE;
         }
 

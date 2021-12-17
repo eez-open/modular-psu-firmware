@@ -458,5 +458,9 @@ void animateRects(AppContext *appContext, Buffer startBuffer, int numRects, floa
     }
 }
 
+bool isFocusWidget(const WidgetCursor &widgetCursor) {
+    return widgetCursor.appContext->isFocusWidget(widgetCursor);
+}
+
 } // namespace gui
 } // namespace eez

@@ -38,19 +38,29 @@
 namespace eez {
 namespace gui {
 
-static WidgetCursor m_foundWidgetAtDown;
-WidgetCursor g_activeWidget;
-static bool m_touchActionExecuted;
-static bool m_touchActionExecutedAtDown;
-static OnTouchFunctionType m_onTouchFunction;
-static bool m_longTouchGenerated;
-static bool m_extraLongTouchGenerated;
+////////////////////////////////////////////////////////////////////////////////
 
+WidgetCursor g_activeWidget;
 bool g_isLongTouch;
+
+static WidgetCursor g_foundWidgetAtDown;
+
+static bool g_touchActionExecuted;
+static bool g_touchActionExecutedAtDown;
+
+static OnTouchFunctionType g_onTouchFunction;
+
+static bool g_longTouchGenerated;
+static bool g_extraLongTouchGenerated;
+
+////////////////////////////////////////////////////////////////////////////////
 
 static void processTouchEvent(EventType type, int x, int y);
 static void onPageTouch(const WidgetCursor &foundWidget, Event &touchEvent);
 static void onWidgetDefaultTouch(const WidgetCursor &widgetCursor, Event &touchEvent);
+static void onWidgetTouch(const WidgetCursor &widgetCursor, Event &touchEvent);
+
+////////////////////////////////////////////////////////////////////////////////
 
 void eventHandling() {
 	if (isEventHandlingDisabledHook()) {
@@ -91,19 +101,19 @@ void eventHandling() {
         if (eventType == EVENT_TYPE_TOUCH_DOWN) {
             m_touchDownTimeMs = tickCountMs;
             m_lastAutoRepeatEventTimeMs = tickCountMs;
-            m_longTouchGenerated = false;
-            m_extraLongTouchGenerated = false;
+            g_longTouchGenerated = false;
+            g_extraLongTouchGenerated = false;
             processTouchEvent(EVENT_TYPE_TOUCH_DOWN, eventX, eventY);
         } else if (eventType == EVENT_TYPE_TOUCH_MOVE) {
             processTouchEvent(EVENT_TYPE_TOUCH_MOVE, eventX, eventY);
 
-            if (!m_longTouchGenerated && int32_t(tickCountMs - m_touchDownTimeMs) >= CONF_GUI_LONG_TOUCH_TIMEOUT_MS) {
-                m_longTouchGenerated = true;
+            if (!g_longTouchGenerated && int32_t(tickCountMs - m_touchDownTimeMs) >= CONF_GUI_LONG_TOUCH_TIMEOUT_MS) {
+                g_longTouchGenerated = true;
                 processTouchEvent(EVENT_TYPE_LONG_TOUCH, eventX, eventY);
             }
 
-            if (m_longTouchGenerated && !m_extraLongTouchGenerated && int32_t(tickCountMs - m_touchDownTimeMs) >= CONF_GUI_EXTRA_LONG_TOUCH_TIMEOUT_MS) {
-                m_extraLongTouchGenerated = true;
+            if (g_longTouchGenerated && !g_extraLongTouchGenerated && int32_t(tickCountMs - m_touchDownTimeMs) >= CONF_GUI_EXTRA_LONG_TOUCH_TIMEOUT_MS) {
+                g_extraLongTouchGenerated = true;
                 processTouchEvent(EVENT_TYPE_EXTRA_LONG_TOUCH, eventX, eventY);
             }
 
@@ -119,29 +129,23 @@ void eventHandling() {
 
 static void processTouchEvent(EventType type, int x, int y) {
     if (type == EVENT_TYPE_TOUCH_DOWN) {
-        m_foundWidgetAtDown = findWidget(x, y);
-        m_onTouchFunction = getWidgetTouchFunction(m_foundWidgetAtDown);
-        if (!m_onTouchFunction) {
-            m_onTouchFunction = onPageTouch;
+        g_foundWidgetAtDown = findWidget(x, y);
+        g_onTouchFunction = getWidgetTouchFunction(g_foundWidgetAtDown);
+        if (!g_onTouchFunction) {
+            g_onTouchFunction = onPageTouch;
         }
     } else if (type == EVENT_TYPE_TOUCH_UP) {
         g_activeWidget = 0;
     }
 
-    if (m_onTouchFunction) {
+    if (g_onTouchFunction) {
         Event event;
         event.type = type;
         event.x = x;
         event.y = y;
 
-        m_onTouchFunction(m_foundWidgetAtDown, event);
+        g_onTouchFunction(g_foundWidgetAtDown, event);
     }
-}
-
-static void onWidgetTouch(const WidgetCursor &widgetCursor, Event &touchEvent) {
-	if (widgetCursor) {
-		widgetCursor.currentState->onTouch(widgetCursor, touchEvent);
-	}
 }
 
 OnTouchFunctionType getWidgetTouchFunction(const WidgetCursor &widgetCursor) {
@@ -181,15 +185,15 @@ static void onWidgetDefaultTouch(const WidgetCursor &widgetCursor, Event &touchE
     auto action = getWidgetAction(widgetCursor);        
 
     if (touchEvent.type == EVENT_TYPE_TOUCH_DOWN) {
-        m_touchActionExecuted = false;
-        m_touchActionExecutedAtDown = false;
+        g_touchActionExecuted = false;
+        g_touchActionExecutedAtDown = false;
 
         if (action == EEZ_CONF_ACTION_ID_DRAG_OVERLAY) {
             dragOverlay(touchEvent);
             g_activeWidget = widgetCursor;
         } else if (widgetCursor.appContext->testExecuteActionOnTouchDown(action)) {
             executeAction(widgetCursor, action);
-            m_touchActionExecutedAtDown = true;
+            g_touchActionExecutedAtDown = true;
             if (widgetCursor.appContext->isAutoRepeatAction(action)) {
                 g_activeWidget = widgetCursor;
             }
@@ -202,11 +206,11 @@ static void onWidgetDefaultTouch(const WidgetCursor &widgetCursor, Event &touchE
         }
     } else if (touchEvent.type == EVENT_TYPE_AUTO_REPEAT) {
         if (widgetCursor.appContext->isWidgetActionEnabled(widgetCursor) && widgetCursor.appContext->isAutoRepeatAction(action)) {
-            m_touchActionExecuted = true;
+            g_touchActionExecuted = true;
             executeAction(widgetCursor, action);
         }
     } else if (touchEvent.type == EVENT_TYPE_LONG_TOUCH) {
-        m_touchActionExecuted = true;
+        g_touchActionExecuted = true;
         int action = widgetCursor.appContext->getLongTouchActionHook(widgetCursor);
         if (action != ACTION_ID_NONE) {
             g_isLongTouch = true;
@@ -214,15 +218,14 @@ static void onWidgetDefaultTouch(const WidgetCursor &widgetCursor, Event &touchE
             g_isLongTouch = false;
         }
     } else if (touchEvent.type == EVENT_TYPE_EXTRA_LONG_TOUCH) {
-        m_touchActionExecuted = true;
+        g_touchActionExecuted = true;
         int action = widgetCursor.appContext->getExtraLongTouchActionHook(widgetCursor);
         if (action != ACTION_ID_NONE) {
             executeAction(widgetCursor, action);
         }
     } else if (touchEvent.type == EVENT_TYPE_TOUCH_UP) {
-        if (!m_touchActionExecutedAtDown) {
-            g_activeWidget = 0;
-            if (!m_touchActionExecuted) {
+        if (!g_touchActionExecutedAtDown) {
+            if (!g_touchActionExecuted) {
                 if (action == EEZ_CONF_ACTION_ID_DRAG_OVERLAY) {
                     dragOverlay(touchEvent);
                 } else {
@@ -233,22 +236,28 @@ static void onWidgetDefaultTouch(const WidgetCursor &widgetCursor, Event &touchE
     }
 }
 
+static void onWidgetTouch(const WidgetCursor &widgetCursor, Event &touchEvent) {
+	if (widgetCursor) {
+        if (touchEvent.type == EVENT_TYPE_TOUCH_DOWN) {
+			g_activeWidget = g_foundWidgetAtDown;
+        }
+		widgetCursor.currentState->onTouch(widgetCursor, touchEvent);
+	}
+}
+
+
 ////////////////////////////////////////////////////////////////////////////////
 
 WidgetCursor &getFoundWidgetAtDown() {
-    return m_foundWidgetAtDown;
+    return g_foundWidgetAtDown;
 }
 
 void setFoundWidgetAtDown(WidgetCursor &widgetCursor) {
-    m_foundWidgetAtDown = widgetCursor;
+    g_foundWidgetAtDown = widgetCursor;
 }
 
 void clearFoundWidgetAtDown() {
-    m_foundWidgetAtDown = 0;
-}
-
-bool isFocusWidget(const WidgetCursor &widgetCursor) {
-    return widgetCursor.appContext->isFocusWidget(widgetCursor);
+    g_foundWidgetAtDown = 0;
 }
 
 } // namespace gui
