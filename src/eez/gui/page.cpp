@@ -106,52 +106,36 @@ void ToastMessagePage::pageFree() {
 ToastMessagePage *ToastMessagePage::create(AppContext *appContext, ToastType type, const char *message, bool autoDismiss) {
     ToastMessagePage *page = ToastMessagePage::findFreePage();
     
-    page->type = type;
-    stringCopy(page->messageBuffer, sizeof(page->messageBuffer), message);
-    page->message = page->messageBuffer;
-    page->messageValue = Value();
     page->actionLabel = type == ERROR_TOAST && !autoDismiss ? "Close" : nullptr;
-    page->actionWidgetIsActive = false;
-    page->actionWidget.action = type == ERROR_TOAST ? ACTION_ID_INTERNAL_TOAST_ACTION_WITHOUT_PARAM : 0;
+    page->actionWidget.action = type == ERROR_TOAST && !autoDismiss ? ACTION_ID_INTERNAL_TOAST_ACTION_WITHOUT_PARAM : 0;
     page->actionWithoutParam = nullptr;
-    page->appContext = appContext;
 
-	page->dirty = true;
+    page->init(appContext, type, Value(message));
 
     return page;
 }
 
-ToastMessagePage *ToastMessagePage::create(AppContext *appContext, ToastType type, Value messageValue)  {
+ToastMessagePage *ToastMessagePage::create(AppContext *appContext, ToastType type, Value message)  {
     ToastMessagePage *page = ToastMessagePage::findFreePage();
 
-    page->type = type;
-    page->message = nullptr;
-    page->messageValue = messageValue;
     page->actionLabel = type == ERROR_TOAST ? "Close" : nullptr;
-    page->actionWidgetIsActive = false;
     page->actionWidget.action = type == ERROR_TOAST ? ACTION_ID_INTERNAL_TOAST_ACTION_WITHOUT_PARAM : 0;
     page->actionWithoutParam = nullptr;
-    page->appContext = appContext;
 
-	page->dirty = true;
+    page->init(appContext, type, message);
 
     return page;
 }
 
-ToastMessagePage *ToastMessagePage::create(AppContext *appContext, ToastType type, Value messageValue, void (*action)(int param), const char *actionLabel, int actionParam) {
+ToastMessagePage *ToastMessagePage::create(AppContext *appContext, ToastType type, Value message, void (*action)(int param), const char *actionLabel, int actionParam) {
     ToastMessagePage *page = ToastMessagePage::findFreePage();
 
-    page->type = type;
-    page->message = nullptr;
-    page->messageValue = messageValue;
     page->actionLabel = actionLabel;
-    page->actionWidgetIsActive = false;
     page->actionWidget.action = ACTION_ID_INTERNAL_TOAST_ACTION;
     page->action = action;
     page->actionParam = actionParam;
-    page->appContext = appContext;
 
-	page->dirty = true;
+    page->init(appContext, type, message);
 
     return page;
 }
@@ -159,88 +143,55 @@ ToastMessagePage *ToastMessagePage::create(AppContext *appContext, ToastType typ
 ToastMessagePage *ToastMessagePage::create(AppContext *appContext, ToastType type, const char *message, void (*action)(), const char *actionLabel) {
     ToastMessagePage *page = ToastMessagePage::findFreePage();
 
-    page->type = type;
-    page->message = message;
-    page->messageValue = Value();
     page->actionLabel = actionLabel;
-    page->actionWidgetIsActive = false;
     page->actionWidget.action = ACTION_ID_INTERNAL_TOAST_ACTION_WITHOUT_PARAM;
     page->actionWithoutParam = action;
-    page->appContext = appContext;
 
-	page->dirty = true;
+    page->init(appContext, type, Value(message));
 
     return page;
 }
 
 ////////////////////////////////////////
 
-void ToastMessagePage::onEncoder(int counter) {
-	toastMessagePageOnEncoderHook(this, counter);
-}
+void ToastMessagePage::init(AppContext *appContext, ToastType type, const Value& message) {
+    this->appContext = appContext;
+    this->type = type;
+    this->messageValue = message;
 
-void ToastMessagePage::onEncoderClicked() {
-    if (hasAction()) {
-        eez::gui::executeAction((int)(int16_t)actionWidget.action);
-    } else {
-		appContext->popPage();
-    }
-}
+    lastActiveWidget = WidgetCursor();
 
-void ToastMessagePage::updateInternalPage() {
-    const WidgetCursor &widgetCursor = g_widgetCursor;
-
-	WidgetCursor toastPageWidgetCursor(widgetCursor.assets, appContext, &actionWidget, actionWidget.x, actionWidget.y, widgetCursor.currentState, widgetCursor.refreshed, widgetCursor.hasPreviousState);
-
-    auto temp = toastPageWidgetCursor == g_activeWidget;
-    if (widgetCursor.hasPreviousState && actionWidgetIsActive == temp && !dirty) {
-        return;
-    }
-
-    actionWidgetIsActive = temp;
-
-    const Style *style = getStyle(type == INFO_TOAST ? STYLE_ID_INFO_ALERT : STYLE_ID_ERROR_ALERT);
-    const Style *actionStyle = getStyle(STYLE_ID_ERROR_ALERT_BUTTON);
+    auto styleId = type == INFO_TOAST ? STYLE_ID_INFO_ALERT : STYLE_ID_ERROR_ALERT;
+    auto style = getStyle(styleId);
+    auto actionStyle = getStyle(STYLE_ID_ERROR_ALERT_BUTTON);
 
     font::Font font = styleGetFont(style);
 
-    const char *message1 = nullptr;
-    size_t message1Len = 0;
-    const char *message2 = nullptr;
-    size_t message2Len = 0;
-    const char *message3 = nullptr;
-    size_t message3Len = 0;
+    char *line1 = nullptr;
+    char *line2 = nullptr;
+    char *line3 = nullptr;
 
-    message1 = this->message;
-    char messageTextBuffer[256];
-    if (message1 == nullptr) {
-        messageValue.toText(messageTextBuffer, sizeof(messageTextBuffer));
-        message1 = messageTextBuffer;
-    }
+    message.toText(messageBuffer, sizeof(messageBuffer));
 
-    message2 = strchr(message1, '\n');
-    if (message2) {
-        message1Len = message2 - message1;
-        message2++;
-        message3 = strchr(message2, '\n');
-        if (message3) {
-            message3++;
-            message2Len = message3 - message2;
-            message3Len = strlen(message3);
-        } else {
-            message2Len = strlen(message2);
+    // split message to up to three lines
+    line1 = messageBuffer;
+    line2 = strchr(line1, '\n');
+    if (line2) {
+        *line2 = 0;
+        line2++;
+        line3 = strchr(line2, '\n');
+        if (line3) {
+            *line3 = 0;
+            line3++;
         }
-    } else {
-        message1Len = strlen(message1);
     }
 
     int minTextWidth = 80;
-    int textWidth1 = display::measureStr(message1, message1Len, font, 0);
-    int textWidth2 = message2 ? display::measureStr(message2, message2Len, font, 0) : 0;
-    int textWidth3 = message3 ? display::measureStr(message3, message3Len, font, 0) : 0;
+    int line1Width = display::measureStr(line1, -1, font, 0);
+    int line2Width = line2 ? display::measureStr(line2, -1, font, 0) : 0;
+    int line3Width = line3 ? display::measureStr(line3, -1, font, 0) : 0;
     int actionLabelWidth = actionLabel ? (actionStyle->paddingLeft + display::measureStr(actionLabel, -1, font, 0) + actionStyle->paddingRight) : 0;
-
-    int textWidth = MAX(MAX(MAX(MAX(minTextWidth, textWidth1), textWidth2), textWidth3), actionLabelWidth);
+    int textWidth = MAX(MAX(MAX(MAX(minTextWidth, line1Width), line2Width), line3Width), actionLabelWidth);
   
     int textHeight = font.getHeight();
 
@@ -248,102 +199,190 @@ void ToastMessagePage::updateInternalPage() {
         textWidth +
         style->paddingRight + style->borderSizeRight;
 
-    int numLines = (message3 ? 3 : message2 ? 2 : 1);
+    int numLines = (line3 ? 3 : line2 ? 2 : 1);
+
+	auto actionLabelHeight = actionStyle->paddingTop + textHeight + actionStyle->paddingBottom;
 
     height = style->borderSizeTop + style->paddingTop +
-        numLines * textHeight + (actionLabel ? (style->paddingTop + textHeight) : 0) +
+        numLines * textHeight + (actionLabel ? (style->paddingTop + actionLabelHeight) : 0) +
         style->paddingBottom + style->borderSizeBottom;
 
-	x = appContext->rect.x + (appContext->rect.w - width) / 2;
-	y = appContext->rect.y + (appContext->rect.h - height) / 2;
+    containerRectangleWidget.type = WIDGET_TYPE_RECTANGLE;
+    containerRectangleWidget.data = DATA_ID_NONE;
+    containerRectangleWidget.action = ACTION_ID_NONE;
+    containerRectangleWidget.style = styleId;
+    containerRectangleWidget.flags.ignoreLuminosity = 0;
+	containerRectangleWidget.x = 0;
+	containerRectangleWidget.y = 0;
+	containerRectangleWidget.w = width;
+	containerRectangleWidget.h = height;
 
-    int x1 = x;
-    int y1 = y;
-    int x2 = x + width - 1;
-    int y2 = y + height - 1;
+    int yText = style->paddingTop;
 
-    drawBorderAndBackground(x1, y1, x2, y2, style, style->backgroundColor);
-
-    // draw text message
-    display::setColor(style->color);
-
-    int yText = y1 + style->paddingTop;
-
-    display::drawStr(message1, message1Len, 
-        x1 + style->paddingLeft + (textWidth - textWidth1) / 2, 
-        yText, 
-        x1, y1, x2, y2, font, -1);
+    line2Widget.type = WIDGET_TYPE_TEXT;
+    line1Widget.data = DATA_ID_NONE;
+    line1Widget.action = ACTION_ID_NONE;
+    line1Widget.style = styleId;
+    line1Widget.text = line1;
+    line1Widget.flags = 0;
+    line1Widget.x = style->paddingLeft + (textWidth - line1Width) / 2;
+    line1Widget.y = yText;
+    line1Widget.w = line1Width;
+    line1Widget.h = textHeight;
 
     yText += textHeight;
 
-    if (message2) {
-        display::drawStr(message2, message2Len,
-            x1 + style->paddingLeft + (textWidth - textWidth2) / 2,
-            yText,
-            x1, y1, x2, y2, font, -1);
+    if (line2) {
+        line2Widget.type = WIDGET_TYPE_TEXT;
+        line2Widget.data = DATA_ID_NONE;
+        line2Widget.action = ACTION_ID_NONE;
+        line2Widget.style = styleId;
+        line2Widget.text = line2;
+        line2Widget.flags = 0;
+        line2Widget.x = style->paddingLeft + (textWidth - line2Width) / 2;
+        line2Widget.y = yText;
+        line2Widget.w = line2Width;
+        line2Widget.h = textHeight;
 
         yText += textHeight;
-    }
 
-    if (message3) {
-        display::drawStr(message3, message3Len, 
-            x1 + style->paddingLeft + (textWidth - textWidth2) / 2, 
-            yText, 
-            x1, y1, x2, y2, font, -1);
+        if (line3) {
+            line3Widget.type = WIDGET_TYPE_TEXT;
+            line3Widget.data = DATA_ID_NONE;
+            line3Widget.action = ACTION_ID_NONE;
+            line3Widget.style = styleId;
+            line3Widget.text = line3;
+            line3Widget.flags = 0;
+            line3Widget.x = style->paddingLeft + (textWidth - line3Width) / 2;
+            line3Widget.y = yText;
+            line3Widget.w = line3Width;
+            line3Widget.h = textHeight;
 
-        yText += textHeight;
+            yText += textHeight;
+        } else {
+            line3Widget.type = WIDGET_TYPE_NONE;
+        }
+    } else {
+        line2Widget.type = WIDGET_TYPE_NONE;
     }
 
     if (actionLabel) {
-        actionWidget.x = x1 + style->paddingLeft + (textWidth - actionLabelWidth) / 2;
-        actionWidget.y = yText + style->paddingTop;
+        actionWidget.type = WIDGET_TYPE_BUTTON;
+        actionWidget.data = DATA_ID_NONE;
+        actionWidget.style = STYLE_ID_ERROR_ALERT_BUTTON;
+        actionWidget.text = actionLabel;
+        actionWidget.x = style->paddingLeft + (textWidth - actionLabelWidth) / 2;
+        actionWidget.y = style->paddingTop + yText;
         actionWidget.w = actionLabelWidth;
-        actionWidget.h = textHeight;
-        
-        if (actionWidgetIsActive) {
-            display::setColor(actionStyle->color);
+        actionWidget.h = actionLabelHeight;
 
-            display::fillRect(
-                actionWidget.x,
-                actionWidget.y - textHeight / 4,
-                actionWidget.x + actionWidget.w - 1,
-                actionWidget.y + actionWidget.h - 1 + textHeight / 4
-			);
-
-            display::setBackColor(actionStyle->color);
-            display::setColor(actionStyle->backgroundColor);
-        } else {
-            display::setBackColor(actionStyle->backgroundColor);
-            display::setColor(actionStyle->color);
-        }
-
-        display::drawStr(actionLabel, -1,
-            actionWidget.x + actionStyle->paddingLeft, actionWidget.y,
-            x1, y1, x2, y2, font, -1);
+		yText += textHeight;
     }
+
+	x = appContext->rect.x + (appContext->rect.w - width) / 2;
+	y = appContext->rect.y + (appContext->rect.h - height) / 2;
+}
+
+void ToastMessagePage::updateInternalPage() {
+	WidgetCursor &widgetCursor = g_widgetCursor;
+
+	if (widgetCursor.hasPreviousState && g_activeWidget == lastActiveWidget) {
+		return;
+	}
+
+    lastActiveWidget = g_activeWidget;
+
+    auto savedWidgetCursor = g_widgetCursor;
+    g_widgetCursor = widgetCursor;
+
+    widgetCursor.widget = &containerRectangleWidget;
+    widgetCursor.x = x + containerRectangleWidget.x;
+    widgetCursor.y = y + containerRectangleWidget.y;
+    RectangleWidgetState rectangleWidgetState;
+    rectangleWidgetState.flags.active = 0;
+    rectangleWidgetState.render();
+
+    if (g_findCallback == nullptr && !widgetCursor.refreshed) {
+	    widgetCursor.pushBackground(widgetCursor.x, widgetCursor.y, getStyle(containerRectangleWidget.style), false);
+    }
+
+    TextWidgetState textWidgetState;
+    textWidgetState.flags.active = 0;
+	textWidgetState.flags.blinking = 0;
+	textWidgetState.flags.focused = 0;
+
+    widgetCursor.widget = &line1Widget;
+    widgetCursor.x = x + line1Widget.x;
+    widgetCursor.y = y + line1Widget.y;
+    textWidgetState.render();
+
+    if (line2Widget.type == WIDGET_TYPE_TEXT) {
+        widgetCursor.widget = &line2Widget;
+        widgetCursor.x = x + line2Widget.x;
+        widgetCursor.y = y + line2Widget.y;
+        textWidgetState.render();
+
+        if (line3Widget.type == WIDGET_TYPE_TEXT) {
+            widgetCursor.widget = &line3Widget;
+            widgetCursor.x = x + line3Widget.x;
+            widgetCursor.y = y + line3Widget.y;
+            textWidgetState.render();
+        }
+    }
+
+    if (actionWidget.type == WIDGET_TYPE_BUTTON) {
+        ButtonWidgetState buttonWidgetState;
+
+		buttonWidgetState.flags.active = g_activeWidget.widget == &actionWidget;
+		buttonWidgetState.flags.blinking = 0;
+		buttonWidgetState.flags.focused = 0;
+		buttonWidgetState.flags.enabled = 1;
+		widgetCursor.widget = &actionWidget;
+        widgetCursor.x = x + actionWidget.x;
+        widgetCursor.y = y + actionWidget.y;
+
+        buttonWidgetState.render();
+    }
+
+    if (g_findCallback == nullptr && !widgetCursor.refreshed) {
+	    widgetCursor.popBackground();
+    }
+
+	g_widgetCursor = savedWidgetCursor;
 }
 
 WidgetCursor ToastMessagePage::findWidgetInternalPage(int x, int y, bool clicked) {
-    const WidgetCursor &widgetCursor = g_widgetCursor;
+    if (actionWidget.type == WIDGET_TYPE_BUTTON) {
+        auto xActionWidget = this->x + actionWidget.x;
+        auto yActionWidget = this->y + actionWidget.y;
 
-    if (x >= this->x && x < this->x + width && y >= this->y && y < this->y + height) {
-        const Style *style = getStyle(type == INFO_TOAST ? STYLE_ID_INFO_ALERT : STYLE_ID_ERROR_ALERT);
-        font::Font font = styleGetFont(style);
-        int textHeight = font.getHeight();
         if (
-            actionWidget.action &&
-            x >= actionWidget.x &&
-            x < actionWidget.x + actionWidget.w &&
-            y >= (actionWidget.y - textHeight / 4) &&
-            y < (actionWidget.y + actionWidget.h - 1 + textHeight / 4)
+            x >= xActionWidget && x < xActionWidget + actionWidget.w && 
+            y >= yActionWidget && y < yActionWidget + actionWidget.h
         ) {
-            return WidgetCursor(g_mainAssets, appContext, &actionWidget, actionWidget.x, actionWidget.y, widgetCursor.currentState, widgetCursor.refreshed, widgetCursor.hasPreviousState);
+			WidgetCursor widgetCursor = g_widgetCursor;
+			widgetCursor.appContext = appContext;
+			widgetCursor.widget = &actionWidget;
+            widgetCursor.x = xActionWidget;
+            widgetCursor.y = yActionWidget;
+            return widgetCursor;
         }
-        widget.action = ACTION_ID_INTERNAL_DIALOG_CLOSE;
-        return WidgetCursor(g_mainAssets, appContext, &widget, x, y, widgetCursor.currentState, widgetCursor.refreshed, widgetCursor.hasPreviousState);
     }
-    
+   
     return WidgetCursor();
+}
+
+void ToastMessagePage::onEncoder(int counter) {
+	toastMessagePageOnEncoderHook(this, counter);
+}
+
+void ToastMessagePage::onEncoderClicked() {
+    if (hasAction()) {
+		WidgetCursor widgetCursor;
+        eez::gui::executeAction(widgetCursor, (int)(int16_t)actionWidget.action);
+    } else {
+		appContext->popPage();
+    }
 }
 
 bool ToastMessagePage::canClickPassThrough() {
@@ -727,8 +766,11 @@ void MenuWithButtonsPage::updateInternalPage() {
     widgetCursor.y = y + m_containerRectangleWidget.y;
     RectangleWidgetState rectangleWidgetState;
     rectangleWidgetState.flags.active = 0;
-
     rectangleWidgetState.render();
+
+    if (g_findCallback == nullptr && !widgetCursor.refreshed) {
+	    widgetCursor.pushBackground(widgetCursor.x, widgetCursor.y, getStyle(m_containerRectangleWidget.style), false);
+    }
 
     widgetCursor.widget = &m_messageTextWidget;
     widgetCursor.x = x + m_messageTextWidget.x;
@@ -751,12 +793,15 @@ void MenuWithButtonsPage::updateInternalPage() {
 		textWidgetState.render();
     }
 
+    if (g_findCallback == nullptr && !widgetCursor.refreshed) {
+	    widgetCursor.popBackground();
+    }
+
     g_widgetCursor = savedWidgetCursor;
 }
 
 WidgetCursor MenuWithButtonsPage::findWidgetInternalPage(int x, int y, bool clicked) {
     WidgetCursor widgetCursor = g_widgetCursor;
-
     widgetCursor.appContext = m_appContext;
 
     for (size_t i = 0; i < m_numButtonTextWidgets; i++) {

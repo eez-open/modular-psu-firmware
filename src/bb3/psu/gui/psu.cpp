@@ -76,8 +76,6 @@
 #include <bb3/platform/simulator/front_panel.h>
 #endif
 
-#define CONF_GUI_TOAST_DURATION_MS 1000L
-
 #define CONF_GUI_ENTERING_STANDBY_PAGE_TIMEOUT_MS 2000
 #define CONF_GUI_STANDBY_PAGE_TIMEOUT_MS 4000
 #define CONF_GUI_DISPLAY_OFF_PAGE_TIMEOUT_MS 2000
@@ -146,6 +144,8 @@ PsuAppContext::PsuAppContext() {
 }
 
 void PsuAppContext::stateManagment() {
+    AppContext::stateManagment();
+
     if (getActivePageId() == PAGE_ID_WELCOME) {
         playPowerUp(sound::PLAY_POWER_UP_CONDITION_WELCOME_PAGE_IS_ACTIVE);
     } 
@@ -164,15 +164,6 @@ void PsuAppContext::stateManagment() {
 
     if (isPageOnStack(PAGE_ID_TEXT_MESSAGE) && !m_textMessage[0]) {
     	removePageFromStack(PAGE_ID_TEXT_MESSAGE);
-    }
-
-    // remove alert message after period of time
-    uint32_t inactivityPeriod = eez::hmi::getInactivityPeriodMs();
-    if (getActivePageId() == INTERNAL_PAGE_ID_TOAST_MESSAGE) {
-        ToastMessagePage *page = (ToastMessagePage *)getActivePage();
-        if (!page->hasAction() && inactivityPeriod >= CONF_GUI_TOAST_DURATION_MS) {
-            popPage();
-        }
     }
 
     uint32_t tickCount = millis();
@@ -246,6 +237,8 @@ void PsuAppContext::stateManagment() {
 			return;
         }
     }
+
+	uint32_t inactivityPeriod = eez::hmi::getInactivityPeriodMs();
 
     // start touch screen calibration automatically after period of time
     if (activePageId == PAGE_ID_TOUCH_CALIBRATION_INTRO) {
@@ -1191,7 +1184,8 @@ bool isDateTimeSetupDone() {
 }
 
 void dateTimeYes() {
-    executeAction(ACTION_ID_SHOW_SYS_SETTINGS_DATE_TIME);
+	WidgetCursor widgetCursor;
+    executeAction(widgetCursor, ACTION_ID_SHOW_SYS_SETTINGS_DATE_TIME);
 }
 
 void dateTimeNo() {
@@ -1199,7 +1193,8 @@ void dateTimeNo() {
 }
 
 void ethernetYes() {
-    executeAction(ACTION_ID_SHOW_SYS_SETTINGS_ETHERNET);
+	WidgetCursor widgetCursor;
+	executeAction(widgetCursor, ACTION_ID_SHOW_SYS_SETTINGS_ETHERNET);
 }
 
 void ethernetNo() {
@@ -2026,7 +2021,8 @@ void triggerManually() {
 }
 
 void channelCalibrationsYes() {
-    executeAction(ACTION_ID_SHOW_CH_SETTINGS_CAL);
+	WidgetCursor widgetCursor;
+	executeAction(widgetCursor, ACTION_ID_SHOW_CH_SETTINGS_CAL);
 }
 
 void channelCalibrationsNo() {
@@ -2294,31 +2290,8 @@ Page *getPageFromIdHook(int pageId) {
     return page;
 }
 
-void action_internal_select_enum_item() {
+void selectEnumItemHook() {
     g_selectFromEnumPage.selectEnumItem();
-}
-
-// from InternalActionsEnum
-static ActionExecFunc g_internalActionExecFunctions[] = {
-    0,
-    // ACTION_ID_INTERNAL_SELECT_ENUM_ITEM
-    action_internal_select_enum_item,
-
-    // ACTION_ID_INTERNAL_DIALOG_CLOSE
-    popPage,
-
-    // ACTION_ID_INTERNAL_TOAST_ACTION
-    ToastMessagePage::executeAction,
-
-    // ACTION_ID_INTERNAL_TOAST_ACTION_WITHOUT_PARAM
-    ToastMessagePage::executeActionWithoutParam,
-
-    // ACTION_ID_INTERNAL_MENU_WITH_BUTTONS
-    MenuWithButtonsPage::executeAction
-};
-
-void executeInternalActionHook(int actionId) {
-    g_internalActionExecFunctions[actionId - FIRST_INTERNAL_ACTION_ID]();
 }
 
 int overrideStyleHook(const WidgetCursor &widgetCursor, int styleId) {

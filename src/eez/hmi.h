@@ -18,10 +18,16 @@
 
 #pragma once
 
+#include <stdint.h>
+
 namespace eez {
 namespace hmi {
 
+void tick();
+
 void noteActivity();
+uint32_t getInactivityPeriodMs();
+uint32_t getTimeOfLastActivity();
 
 }
 } // namespace eez::hmi

@@ -26,7 +26,9 @@ using namespace eez::gui;
 namespace eez {
 namespace flow {
 
-static bool evalExpression(FlowState *flowState, int componentIndex, const uint8_t *instructions, EvalStack &stack, int *numInstructionBytes) {
+EvalStack g_stack;
+
+static bool evalExpression(FlowState *flowState, const uint8_t *instructions, int *numInstructionBytes) {
 	auto assets = flowState->assets;
 	auto flowDefinition = flowState->flowDefinition;
 	auto flow = flowState->flow;
@@ -37,35 +39,35 @@ static bool evalExpression(FlowState *flowState, int componentIndex, const uint8
 		auto instructionType = instruction & EXPR_EVAL_INSTRUCTION_TYPE_MASK;
 		auto instructionArg = instruction & EXPR_EVAL_INSTRUCTION_PARAM_MASK;
 		if (instructionType == EXPR_EVAL_INSTRUCTION_TYPE_PUSH_CONSTANT) {
-			if (!stack.push(*flowDefinition->constants.item(assets, instructionArg))) {
+			if (!g_stack.push(*flowDefinition->constants.item(assets, instructionArg))) {
 				return false;
 			}
 		} else if (instructionType == EXPR_EVAL_INSTRUCTION_TYPE_PUSH_INPUT) {
-			if (!stack.push(flowState->values[instructionArg])) {
+			if (!g_stack.push(flowState->values[instructionArg])) {
 				return false;
 			}
 		} else if (instructionType == EXPR_EVAL_INSTRUCTION_TYPE_PUSH_LOCAL_VAR) {
-			if (!stack.push(&flowState->values[flow->componentInputs.count + instructionArg])) {
+			if (!g_stack.push(&flowState->values[flow->componentInputs.count + instructionArg])) {
 				return false;
 			}
 		} else if (instructionType == EXPR_EVAL_INSTRUCTION_TYPE_PUSH_GLOBAL_VAR) {
 			if ((uint32_t)instructionArg < flowDefinition->globalVariables.count) {
-				if (!stack.push(flowDefinition->globalVariables.item(assets, instructionArg))) {
+				if (!g_stack.push(flowDefinition->globalVariables.item(assets, instructionArg))) {
 					return false;
 				}
 			} else {
 				// native variable
-				if (!stack.push(Value((int)(instructionArg - flowDefinition->globalVariables.count + 1), VALUE_TYPE_NATIVE_VARIABLE))) {
+				if (!g_stack.push(Value((int)(instructionArg - flowDefinition->globalVariables.count + 1), VALUE_TYPE_NATIVE_VARIABLE))) {
 					return false;
 				}
 			}
 		} else if (instructionType == EXPR_EVAL_INSTRUCTION_TYPE_PUSH_OUTPUT) {
-			if (!stack.push(Value((uint16_t)instructionArg, VALUE_TYPE_FLOW_OUTPUT))) {
+			if (!g_stack.push(Value((uint16_t)instructionArg, VALUE_TYPE_FLOW_OUTPUT))) {
 				return false;
 			}
 		} else if (instructionType == EXPR_EVAL_INSTRUCTION_ARRAY_ELEMENT) {
-			auto elementIndexValue = stack.pop();
-			auto arrayValue = stack.pop();
+			auto elementIndexValue = g_stack.pop();
+			auto arrayValue = g_stack.pop();
 
 			if (arrayValue.getType() == VALUE_TYPE_VALUE_PTR) {
 				arrayValue = *arrayValue.pValueValue;
@@ -80,7 +82,7 @@ static bool evalExpression(FlowState *flowState, int componentIndex, const uint8
 			}
 
 			if (arrayValue.type != VALUE_TYPE_ARRAY) {
-				throwError(flowState, componentIndex, "Array value expected\n");
+				throwError(flowState, g_stack.componentIndex, "Array value expected\n");
 				return false;
 			}
 
@@ -89,20 +91,20 @@ static bool evalExpression(FlowState *flowState, int componentIndex, const uint8
 			int err;
 			auto elementIndex = elementIndexValue.toInt32(&err);
 			if (err) {
-				throwError(flowState, componentIndex, "Integer value expected for array element index\n");
+				throwError(flowState, g_stack.componentIndex, "Integer value expected for array element index\n");
 				return false;
 			}
 		
 			if (elementIndex < 0 || elementIndex >= (int)array->arraySize) {
-				throwError(flowState, componentIndex, "Array element index out of bounds\n");
+				throwError(flowState, g_stack.componentIndex, "Array element index out of bounds\n");
 				return false;
 			}
 
-			if (!stack.push(&array->values[elementIndex])) {
+			if (!g_stack.push(&array->values[elementIndex])) {
 				return false;
 			}
 		} else if (instructionType == EXPR_EVAL_INSTRUCTION_TYPE_OPERATION) {
-			if (!g_evalOperations[instructionArg](stack)) {
+			if (!g_evalOperations[instructionArg](g_stack)) {
 				return false;
 			}
 		} else {
@@ -121,15 +123,14 @@ static bool evalExpression(FlowState *flowState, int componentIndex, const uint8
 }
 
 bool evalExpression(FlowState *flowState, int componentIndex, const uint8_t *instructions, Value &result, int *numInstructionBytes, const int32_t *iterators, DataOperationEnum operation) {
-	EvalStack stack;
+	g_stack.sp = 0;
+	g_stack.flowState = flowState;
+	g_stack.componentIndex = componentIndex;
+	g_stack.iterators = iterators;
 
-	stack.flowState = flowState;
-	stack.componentIndex = componentIndex;
-	stack.iterators = iterators;
-
-	if (evalExpression(flowState, componentIndex, instructions, stack, numInstructionBytes)) {
-		if (stack.sp == 1) {
-			auto finalResult = stack.pop();
+	if (evalExpression(flowState, instructions, numInstructionBytes)) {
+		if (g_stack.sp == 1) {
+			auto finalResult = g_stack.pop();
 
 			if (finalResult.getType() == VALUE_TYPE_VALUE_PTR) {
 				result = *finalResult.pValueValue;
@@ -148,15 +149,14 @@ bool evalExpression(FlowState *flowState, int componentIndex, const uint8_t *ins
 }
 
 bool evalAssignableExpression(FlowState *flowState, int componentIndex, const uint8_t *instructions, Value &result, int *numInstructionBytes, const int32_t *iterators) {
-	EvalStack stack;
+	g_stack.sp = 0;
+	g_stack.flowState = flowState;
+	g_stack.componentIndex = componentIndex;
+	g_stack.iterators = iterators;
 
-	stack.flowState = flowState;
-	stack.componentIndex = componentIndex;
-	stack.iterators = iterators;
-
-	if (evalExpression(flowState, componentIndex, instructions, stack, numInstructionBytes)) {
-		if (stack.sp == 1) {
-			auto finalResult = stack.pop();
+	if (evalExpression(flowState, instructions, numInstructionBytes)) {
+		if (g_stack.sp == 1) {
+			auto finalResult = g_stack.pop();
 			if (finalResult.getType() == VALUE_TYPE_VALUE_PTR || finalResult.getType() == VALUE_TYPE_NATIVE_VARIABLE || finalResult.getType() == VALUE_TYPE_FLOW_OUTPUT) {
 				result = finalResult;
 				return true;
@@ -165,6 +165,37 @@ bool evalAssignableExpression(FlowState *flowState, int componentIndex, const ui
 	}
 
 	return false;
+}
+
+int16_t getNativeVariableId(const WidgetCursor &widgetCursor) {
+	if (widgetCursor.flowState) {
+		FlowState *flowState = widgetCursor.flowState;
+		auto assets = flowState->assets;
+		auto flow = flowState->flow;
+
+		WidgetDataItem *widgetDataItem = flow->widgetDataItems.item(assets, -(widgetCursor.widget->data + 1));
+		if (widgetDataItem && widgetDataItem->componentIndex != -1 && widgetDataItem->propertyValueIndex != -1) {
+			auto component = flow->components.item(assets, widgetDataItem->componentIndex);
+			auto propertyValue = component->propertyValues.item(assets, widgetDataItem->propertyValueIndex);
+
+			g_stack.sp = 0;
+			g_stack.flowState = flowState;
+			g_stack.componentIndex = widgetDataItem->componentIndex;
+			g_stack.iterators = widgetCursor.iterators;
+
+			if (evalExpression(flowState, propertyValue->evalInstructions, nullptr)) {
+				if (g_stack.sp == 1) {
+					auto finalResult = g_stack.pop();
+
+					if (finalResult.getType() == VALUE_TYPE_NATIVE_VARIABLE) {
+						return finalResult.getInt();
+					}
+				}
+			}
+		}
+	}
+
+	return DATA_ID_NONE;
 }
 
 } // flow

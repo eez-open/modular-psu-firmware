@@ -168,7 +168,7 @@ void enumWidget() {
 		if (widgetCursor.hasPreviousState && widget->type == widgetState->type) {
             // reuse existing widget state
             bool refresh = widgetState->updateState();
-            if (refresh || widgetCursor.forceRefresh) {
+            if (refresh || widgetCursor.refreshed) {
                 widgetState->render();
             }
 		} else {

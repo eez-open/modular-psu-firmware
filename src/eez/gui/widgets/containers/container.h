@@ -29,6 +29,7 @@ struct ContainerWidget : public Widget {
 
 struct ContainerWidgetState : public WidgetState {
 	WidgetStateFlags flags;
+	int styleId;
 	Overlay *overlay;
     int overlayState;
     int displayBufferIndex;

@@ -97,6 +97,7 @@ set(src_eez
     src/eez/alloc.cpp
     src/eez/debug.cpp
     src/eez/eeprom.cpp
+    src/eez/hmi.cpp
     src/eez/memory.cpp
     src/eez/os.cpp
     src/eez/unit.cpp

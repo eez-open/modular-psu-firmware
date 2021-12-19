@@ -18,8 +18,9 @@
 
 #pragma once
 
-#include <eez/gui/widgets/text.h>
+#include <eez/gui/widgets/button.h>
 #include <eez/gui/widgets/rectangle.h>
+#include <eez/gui/widgets/text.h>
 
 namespace eez {
 namespace gui {
@@ -94,9 +95,11 @@ class ToastMessagePage : public InternalPage {
 
 public:
     static ToastMessagePage *create(AppContext *appContext, ToastType type, const char *message, bool autoDismiss = false);
-    static ToastMessagePage *create(AppContext *appContext, ToastType type, Value message1Value);
-    static ToastMessagePage *create(AppContext *appContext, ToastType type, Value message1Value, void (*action)(int param), const char *actionLabel, int actionParam);
+    static ToastMessagePage *create(AppContext *appContext, ToastType type, Value message);
+    static ToastMessagePage *create(AppContext *appContext, ToastType type, Value message, void (*action)(int param), const char *actionLabel, int actionParam);
     static ToastMessagePage *create(AppContext *appContext, ToastType type, const char *message, void (*action)(), const char *actionLabel);
+
+    void init(AppContext *appContext, ToastType type, const Value& message);
 
     void pageFree();
 
@@ -116,23 +119,26 @@ public:
     static void executeActionWithoutParam();
 
 	AppContext *appContext;
-	Value messageValue;
+    Value messageValue;
 
 private:
     ToastType type;
 
     static const size_t MAX_MESSAGE_LENGTH = 200;
-    char messageBuffer[MAX_MESSAGE_LENGTH + 1];
-    const char *message;
-    const char *actionLabel;
+    char messageBuffer[MAX_MESSAGE_LENGTH];
 
-    Widget actionWidget;
-    bool actionWidgetIsActive;
+    const char *actionLabel;
     void (*action)(int param);
     int actionParam;
     void (*actionWithoutParam)();
 
-    bool dirty;
+    RectangleWidget containerRectangleWidget;
+    TextWidget line1Widget;
+    TextWidget line2Widget;
+    TextWidget line3Widget;
+    ButtonWidget actionWidget;
+
+    WidgetCursor lastActiveWidget;
 };
 
 void toastMessagePageOnEncoderHook(ToastMessagePage *toast, int counter);

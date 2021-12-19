@@ -16,11 +16,13 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
+#include <assert.h>
 #include <math.h>
 #include <string.h>
 
 #include <eez/conf.h>
 #include <eez/os.h>
+#include <eez/debug.h>
 
 #if OPTION_MOUSE
 #include <eez/mouse.h>
@@ -50,16 +52,15 @@ void guiInit() {
 }
 
 void guiTick() {
+	g_wasBlinkTime = g_isBlinkTime;
+	g_isBlinkTime = (millis() % (2 * CONF_GUI_BLINK_TIME)) > CONF_GUI_BLINK_TIME;
+
 	if (display::isOn()) {
 		display::beginRendering();
 		updateScreen();
 		display::endRendering();
+        display::sync();
 	}
-
-	display::sync();
-
-	g_wasBlinkTime = g_isBlinkTime;
-	g_isBlinkTime = (millis() % (2 * CONF_GUI_BLINK_TIME)) > CONF_GUI_BLINK_TIME;
 
     if (g_mainAssets->flowDefinition) {
         flow::tick();
@@ -85,7 +86,7 @@ void executeAction(const WidgetCursor &widgetCursor, int actionId) {
     executeActionThreadHook();
 
     if (isInternalAction(actionId)) {
-        executeInternalActionHook(actionId);
+        executeInternalAction(actionId);
     } else {
         if (actionId >= 0) {
             g_actionExecFunctions[actionId]();
@@ -95,10 +96,38 @@ void executeAction(const WidgetCursor &widgetCursor, int actionId) {
     }
 }
 
-void executeAction(int actionId) {
-    WidgetCursor widgetCursor;
-    executeAction(widgetCursor, actionId);
+void executeActionFunction(int actionId) {
+	assert(actionId > 0);
+	g_actionExecFunctions[actionId]();
 }
+
+void popPage() {
+	getAppContextFromId(APP_CONTEXT_ID_DEVICE)->popPage();
+}
+
+// from InternalActionsEnum
+static ActionExecFunc g_internalActionExecFunctions[] = {
+    0,
+    // ACTION_ID_INTERNAL_SELECT_ENUM_ITEM
+    selectEnumItemHook,
+
+    // ACTION_ID_INTERNAL_DIALOG_CLOSE
+    popPage,
+
+    // ACTION_ID_INTERNAL_TOAST_ACTION
+    ToastMessagePage::executeAction,
+
+    // ACTION_ID_INTERNAL_TOAST_ACTION_WITHOUT_PARAM
+    ToastMessagePage::executeActionWithoutParam,
+
+    // ACTION_ID_INTERNAL_MENU_WITH_BUTTONS
+    MenuWithButtonsPage::executeAction
+};
+
+void executeInternalAction(int actionId) {
+    g_internalActionExecFunctions[actionId - FIRST_INTERNAL_ACTION_ID]();
+}
+
 ////////////////////////////////////////////////////////////////////////////////
 
 using namespace display;

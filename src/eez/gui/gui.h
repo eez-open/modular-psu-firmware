@@ -67,7 +67,8 @@ inline int getWidgetAction(const WidgetCursor &widgetCursor) {
 }
 
 void executeAction(const WidgetCursor &widgetCursor, int actionId);
-void executeAction(int actionId);
+void executeActionFunction(int actionId);
+void executeInternalAction(int actionId);
 
 int16_t getAppContextId(AppContext *pAppContext);
 AppContext *getAppContextFromId(int16_t id);
@@ -143,8 +144,6 @@ void setFocusCursor(const WidgetCursor& cursor, int16_t dataId);
 
 extern const char *g_discardMessage;
 
-void executeInternalActionHook(int actionId);
-
 void stateManagmentHook();
 
 bool activePageHasBackdropHook();
@@ -157,6 +156,8 @@ int overrideStyleHook(const WidgetCursor &widgetCursor, int styleId);
 uint16_t overrideStyleColorHook(const WidgetCursor &widgetCursor, const Style *style);
 uint16_t overrideActiveStyleColorHook(const WidgetCursor &widgetCursor, const Style *style);
 uint16_t transformColorHook(uint16_t color);
+
+void selectEnumItemHook();
 
 } // namespace gui
 } // namespace eez

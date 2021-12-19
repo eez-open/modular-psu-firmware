@@ -150,7 +150,7 @@ void DisplayDataWidgetState::render() {
         style,
         flags.active, flags.blinking, false,
         &color, &backgroundColor, &activeColor, &activeBackgroundColor,
-        data.getType() == VALUE_TYPE_FLOAT || widget->data == EEZ_CONF_DATA_ID_KEYPAD_EDIT_UNIT,
+        data.getType() == VALUE_TYPE_FLOAT || widget->data == EEZ_CONF_DATA_ID_KEYPAD_EDIT_UNIT, // useSmallerFontIfDoesNotFit
         cursorPosition,
         xScroll
     );

@@ -192,7 +192,8 @@ void InputWidgetState::render() {
 		widgetCursor.x, widgetCursor.y, (int)widget->w, (int)widget->h,
 		style,
 		flags.active, flags.blinking, false,
-		&overrideColor, &overrideBackgroundColor, &overrideActiveColor, &overrideActiveBackgroundColor
+		&overrideColor, &overrideBackgroundColor, &overrideActiveColor, &overrideActiveBackgroundColor,
+		true // useSmallerFontIfDoesNotFit
 	);
 }
 

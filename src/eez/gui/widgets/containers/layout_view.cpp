@@ -77,24 +77,22 @@ void LayoutViewWidgetState::enumChildren() {
 
 	auto widget = (const LayoutViewWidget *)widgetCursor.widget;
 
+	bool savedRefreshed = false;
+
 	if (g_findCallback != nullptr) {
 		if (widget->context) {
 			Value newContext;
 			setContext((WidgetCursor &)widgetCursor, widget->context, oldContext, newContext);
 		}
 	} else {
-		const Style* style = getStyle(widget->style);
-		widgetCursor.pushBackground(widgetCursor.x, widgetCursor.y, style, flags.active);
-        // if (layout) {
-        //     const Style* styleLayout = getStyle(layout->style);
-		//     widgetCursor.pushBackground(widgetCursor.x, widgetCursor.y, styleLayout, flags.active);
-        // }
-	}
-
-    auto savedForceRefresh = widgetCursor.forceRefresh;
-	if (repainted) {
-		repainted = false;
-		widgetCursor.forceRefresh = true;
+        savedRefreshed = widgetCursor.refreshed;
+        if (repainted) {
+            repainted = false;
+            widgetCursor.refreshed = true;
+        } else if (!widgetCursor.refreshed) {
+		    const Style* style = getStyle(widget->style);
+		    widgetCursor.pushBackground(widgetCursor.x, widgetCursor.y, style, flags.active);
+        }
 	}
 
     if (layout) {
@@ -117,13 +115,12 @@ void LayoutViewWidgetState::enumChildren() {
 
     widgetCursor.flowState = savedFlowState;
 
-    widgetCursor.forceRefresh = savedForceRefresh;
-
     if (g_findCallback == nullptr) {
-        // if (layout) {
-        //     widgetCursor.popBackground();
-        // }
-        widgetCursor.popBackground();
+        widgetCursor.refreshed = savedRefreshed;
+
+        if (!widgetCursor.refreshed) {
+            widgetCursor.popBackground();
+        }
     }
 }
 

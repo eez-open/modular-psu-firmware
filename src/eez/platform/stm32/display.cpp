@@ -353,7 +353,7 @@ static inline void syncBuffer(uint16_t *buffer) {
     DMA2D_WAIT;
     
     // wait for VSYNC
-    while (!(LTDC->CDSR & LTDC_CDSR_VSYNCS)) { /*osDelay(0);*/ }
+    while (!(LTDC->CDSR & LTDC_CDSR_VSYNCS)) { osDelay(0); }
 
     // Configure the color frame buffer start address
     auto layer = (LTDC_Layer_TypeDef *)((uint32_t)hltdc.Instance + 0x84U);

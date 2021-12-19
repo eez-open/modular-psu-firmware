@@ -80,7 +80,6 @@ void updateScreen() {
 	g_widgetCursor.currentState = g_widgetStateStart;
 	g_widgetCursor.refreshed = !hasPreviousState;
 	g_widgetCursor.hasPreviousState = hasPreviousState;
-	g_widgetCursor.forceRefresh = false;
 
 	g_foundWidgetAtDownInvalid = false;
 

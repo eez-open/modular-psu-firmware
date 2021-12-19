@@ -49,12 +49,15 @@ void SelectWidgetState::render() {
 void SelectWidgetState::enumChildren() {
     WidgetCursor &widgetCursor = g_widgetCursor;
 
-    auto savedForceRefresh = widgetCursor.forceRefresh;
-	if (repainted) {
-		repainted = false;
-		widgetCursor.forceRefresh = true;
+	bool savedRefreshed = false;
+	if (g_findCallback == nullptr) {
+		savedRefreshed = widgetCursor.refreshed;
+		if (repainted) {
+			repainted = false;
+			widgetCursor.refreshed = true;
+		}
 	}
-	
+
 	if (widgetIndex != -1) {
 		auto widget = (const SelectWidget *)widgetCursor.widget;
 
@@ -66,7 +69,9 @@ void SelectWidgetState::enumChildren() {
 		widgetCursor.widget = savedWidget;
 	}
 
-	widgetCursor.forceRefresh = savedForceRefresh;
+	if (g_findCallback == nullptr) {
+		widgetCursor.refreshed = savedRefreshed;
+	}
 }
 
 } // namespace gui

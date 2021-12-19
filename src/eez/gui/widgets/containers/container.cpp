@@ -27,14 +27,15 @@ namespace gui {
 
 bool ContainerWidgetState::updateState() {
     const WidgetCursor &widgetCursor = g_widgetCursor;
+	auto widget = (const ContainerWidget *)widgetCursor.widget;
 
 	bool hasPreviousState = widgetCursor.hasPreviousState;
+
+	WIDGET_STATE(styleId, overrideStyleHook(widgetCursor, widget->style));
 	WIDGET_STATE(flags.active, g_isActiveWidget);
 
 	overlay = getOverlay(widgetCursor);
 	if (overlay) {
-		auto widget = (const ContainerWidget *)widgetCursor.widget;
-
 		// update overlay data
 		auto containerWidget = (const ContainerWidget *)widget;
 		Value widgetCursorValue((void *)&widgetCursor, VALUE_TYPE_POINTER);
@@ -47,83 +48,51 @@ bool ContainerWidgetState::updateState() {
 }
 
 void ContainerWidgetState::render() {
+	if (overlay && overlayState == 0) {
+		return;
+	}
+
     const WidgetCursor &widgetCursor = g_widgetCursor;
 
 	auto widget = (const ContainerWidget *)widgetCursor.widget;
 
 	displayBufferIndex = -1;
 	if (overlay) {
-		if (overlayState == 0) {
-			return;
-		}
 		displayBufferIndex = display::beginBufferRendering();
 	}
 
 	drawRectangle(
 		widgetCursor.x, widgetCursor.y, (int)widget->w, (int)widget->h,
-		getStyle(widget->style), flags.active
+		getStyle(styleId), flags.active
 	);
 	
 	repainted = true;
 }
 
 void ContainerWidgetState::enumChildren() {
-    WidgetCursor &widgetCursor = g_widgetCursor;
+    if (overlay && overlayState == 0) {
+        return;
+    }
 
+    WidgetCursor &widgetCursor = g_widgetCursor;
 	auto widget = (const ContainerWidget *)widgetCursor.widget;
 
+	bool savedRefreshed = false;
+
 	if (g_findCallback == nullptr) {
-		const Style* style = getStyle(widget->style);
-		widgetCursor.pushBackground(widgetCursor.x, widgetCursor.y, style, flags.active);
-	}
-
-	auto savedForceRefresh = widgetCursor.forceRefresh;
-	if (repainted) {
-		repainted = false;
-		widgetCursor.forceRefresh = true;
-	}
-	
-	if (overlay) {
-        renderOverlayChildren();
-
-		widgetCursor.forceRefresh = savedForceRefresh;
-
-		if (g_findCallback == nullptr) {
-			widgetCursor.popBackground();
+		if (overlay) {
+			if (displayBufferIndex == -1) {
+				displayBufferIndex = display::beginBufferRendering();
+			}
 		}
-        return;
-    }
 
-	auto savedWidget = widgetCursor.widget;
-	
-	auto &widgets = widget->widgets;
-
-	auto widgetPtr = widgets.itemsPtr(widgetCursor.assets);
-	for (uint32_t index = 0; index < widgets.count; ++index, ++widgetPtr) {
-		widgetCursor.widget = (const Widget *)widgetPtr->ptr(widgetCursor.assets);
-
-        enumWidget();
-    }
-
-	widgetCursor.widget = savedWidget;
-
-	widgetCursor.forceRefresh = savedForceRefresh;
-
-	if (g_findCallback == nullptr) {
-		widgetCursor.popBackground();
-	}
-}
-
-void ContainerWidgetState::renderOverlayChildren() {
-    WidgetCursor &widgetCursor = g_widgetCursor;
-
-    if (overlayState == 0) {
-        return;
-    }
-
-	if (g_findCallback == nullptr) {
-		if (displayBufferIndex == -1) {
-			displayBufferIndex = display::beginBufferRendering();
+		savedRefreshed = widgetCursor.refreshed;
+		if (repainted) {
+			repainted = false;
+			widgetCursor.refreshed = true;
+		} else if (!widgetCursor.refreshed) {
+			const Style* style = getStyle(styleId);
+			widgetCursor.pushBackground(widgetCursor.x, widgetCursor.y, style, flags.active);
 		}
 	}
 
@@ -131,78 +100,100 @@ void ContainerWidgetState::renderOverlayChildren() {
 
 	int xOffset = 0;
 	int yOffset = 0;
-	getOverlayOffset(widgetCursor, xOffset, yOffset);
 
-	g_xOverlayOffset = xOffset;
-	g_yOverlayOffset = yOffset;
+	if (overlay) {
+		WidgetCursor &widgetCursor = g_widgetCursor;
 
-	auto widget = (const ContainerWidget *)widgetCursor.widget;
-	auto &widgets = widget->widgets;
+		getOverlayOffset(widgetCursor, xOffset, yOffset);
 
-    auto widgetOverrides = overlay->widgetOverrides;
-    auto widgetPtr = widgets.itemsPtr(widgetCursor.assets);
-    for (uint32_t index = 0; index < widgets.count; ++index, ++widgetPtr) {
-        if (widgetOverrides) {
-			if (!widgetOverrides->isVisible) {
-				widgetOverrides++;
-				continue;
+		g_xOverlayOffset = xOffset;
+		g_yOverlayOffset = yOffset;
+
+		auto widget = (const ContainerWidget *)widgetCursor.widget;
+		auto &widgets = widget->widgets;
+
+		auto widgetOverrides = overlay->widgetOverrides;
+		auto widgetPtr = widgets.itemsPtr(widgetCursor.assets);
+		for (uint32_t index = 0; index < widgets.count; ++index, ++widgetPtr) {
+			if (widgetOverrides) {
+				if (!widgetOverrides->isVisible) {
+					widgetOverrides++;
+					continue;
+				}
 			}
-        }
 
-		widgetCursor.widget = (const Widget *)widgetPtr->ptr(widgetCursor.assets);
+			widgetCursor.widget = (const Widget *)widgetPtr->ptr(widgetCursor.assets);
 
-        int16_t xSaved = 0;
-		int16_t ySaved = 0;
-		int16_t wSaved = 0;
-		int16_t hSaved = 0;
+			int16_t xSaved = 0;
+			int16_t ySaved = 0;
+			int16_t wSaved = 0;
+			int16_t hSaved = 0;
 
-		if (widgetOverrides) {
-			xSaved = widgetCursor.widget->x;
-			ySaved = widgetCursor.widget->y;
-			wSaved = widgetCursor.widget->w;
-			hSaved = widgetCursor.widget->h;
+			if (widgetOverrides) {
+				xSaved = widgetCursor.widget->x;
+				ySaved = widgetCursor.widget->y;
+				wSaved = widgetCursor.widget->w;
+				hSaved = widgetCursor.widget->h;
 
-			((Widget*)widgetCursor.widget)->x = widgetOverrides->x;
-			((Widget*)widgetCursor.widget)->y = widgetOverrides->y;
-			((Widget*)widgetCursor.widget)->w = widgetOverrides->w;
-			((Widget*)widgetCursor.widget)->h = widgetOverrides->h;
+				((Widget*)widgetCursor.widget)->x = widgetOverrides->x;
+				((Widget*)widgetCursor.widget)->y = widgetOverrides->y;
+				((Widget*)widgetCursor.widget)->w = widgetOverrides->w;
+				((Widget*)widgetCursor.widget)->h = widgetOverrides->h;
+			}
+
+			enumWidget();
+
+			if (widgetOverrides) {
+				((Widget*)widgetCursor.widget)->x = xSaved;
+				((Widget*)widgetCursor.widget)->y = ySaved;
+				((Widget*)widgetCursor.widget)->w = wSaved;
+				((Widget*)widgetCursor.widget)->h = hSaved;
+				
+				widgetOverrides++;
+			}
 		}
 
-        enumWidget();
+		g_xOverlayOffset = 0;
+		g_yOverlayOffset = 0;
+    } else {
+		auto &widgets = widget->widgets;
 
-		if (widgetOverrides) {
-			((Widget*)widgetCursor.widget)->x = xSaved;
-			((Widget*)widgetCursor.widget)->y = ySaved;
-			((Widget*)widgetCursor.widget)->w = wSaved;
-			((Widget*)widgetCursor.widget)->h = hSaved;
-			
-			widgetOverrides++;
+		auto widgetPtr = widgets.itemsPtr(widgetCursor.assets);
+		for (uint32_t index = 0; index < widgets.count; ++index, ++widgetPtr) {
+			widgetCursor.widget = (const Widget *)widgetPtr->ptr(widgetCursor.assets);
+
+			enumWidget();
 		}
-    }
-
-	g_xOverlayOffset = 0;
-	g_yOverlayOffset = 0;
-
-	if (g_findCallback == nullptr) {
-		const Style *style = getStyle(widgetCursor.widget->style);
-
-		display::endBufferRendering(
-			displayBufferIndex,
-			widgetCursor.x,
-			widgetCursor.y,
-			overlay->width,
-			overlay->height,
-			(widget->flags & SHADOW_FLAG) != 0,
-			style->opacity,
-			xOffset,
-			yOffset,
-			nullptr
-		);
-
-		displayBufferIndex = -1;
 	}
 
 	widgetCursor.widget = savedWidget;
+
+	if (g_findCallback == nullptr) {
+		if (overlay) {
+			const Style *style = getStyle(widgetCursor.widget->style);
+
+			display::endBufferRendering(
+				displayBufferIndex,
+				widgetCursor.x,
+				widgetCursor.y,
+				overlay ? overlay->width : widget->w,
+				overlay ? overlay->height : widget->h,
+				(widget->flags & SHADOW_FLAG) != 0,
+				style->opacity,
+				xOffset,
+				yOffset,
+				nullptr
+			);
+
+			displayBufferIndex = -1;
+		}
+		
+		if (!widgetCursor.refreshed) {
+			widgetCursor.popBackground();
+		}
+
+		widgetCursor.refreshed = savedRefreshed;
+	}
 }
 
 } // namespace gui

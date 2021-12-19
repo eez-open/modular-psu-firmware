@@ -36,6 +36,7 @@ int getPageIndex(FlowState *flowState);
 
 void executeFlowAction(const WidgetCursor &widgetCursor, int16_t actionId);
 void dataOperation(int16_t dataId, DataOperationEnum operation, const WidgetCursor &widgetCursor, Value &value);
+int16_t getNativeVariableId(const WidgetCursor &widgetCursor);
 
 void onDebuggerClientConnected();
 void onDebuggerClientDisconnected();

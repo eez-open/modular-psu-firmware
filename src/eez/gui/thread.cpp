@@ -64,10 +64,10 @@ void mainLoop(void *) {
 #endif
 }
 
-void processGuiQueue() {
+void processGuiQueue(uint32_t timeout) {
 	while (true) {
         guiMessageQueueObject obj;
-		if (!EEZ_MESSAGE_QUEUE_GET(gui, obj, 1)) {
+		if (!EEZ_MESSAGE_QUEUE_GET(gui, obj, timeout)) {
             return;
         }
 
@@ -95,7 +95,7 @@ void processGuiQueue() {
 }
 
 void oneIter() {
-	processGuiQueue();
+	processGuiQueue(5);
 	guiTick();
 }
 

@@ -17,13 +17,9 @@
 */
 
 #include <bb3/hmi.h>
-#include <bb3/system.h>
 
 #include <bb3/psu/psu.h>
 #include <bb3/psu/gui/psu.h>
-#include <bb3/psu/event_queue.h>
-#include <bb3/psu/rtc.h>
-#include <bb3/psu/scpi/psu.h>
 
 using namespace eez::psu;
 using namespace eez::psu::gui;
@@ -31,43 +27,8 @@ using namespace eez::psu::gui;
 namespace eez {
 namespace hmi {
 
-#define MAX_GUI_OR_ENCODER_INACTIVITY_TIME_MS 60 * 1000
-
-static uint32_t g_timeOfLastActivity;
-static bool g_inactivityTimeMaxed = true;
-
 int g_selectedSlotIndex;
 int g_selectedSubchannelIndex;
-
-void tick() {
-    if (!g_inactivityTimeMaxed) {
-        uint32_t inactivityPeriod = getInactivityPeriodMs();
-        if (inactivityPeriod >= MAX_GUI_OR_ENCODER_INACTIVITY_TIME_MS) {
-            g_inactivityTimeMaxed = true;
-        }
-    }
-}
-
-void noteActivity() {
-    g_timeOfLastActivity = millis();
-    g_inactivityTimeMaxed = false;
-}
-
-uint32_t getInactivityPeriodMs() {
-    if (g_inactivityTimeMaxed) {
-        return MAX_GUI_OR_ENCODER_INACTIVITY_TIME_MS;
-    } else {
-        return millis() - g_timeOfLastActivity;
-    }
-}
-
-uint32_t getTimeOfLastActivity() {
-    if (g_inactivityTimeMaxed) {
-        return millis() - MAX_GUI_OR_ENCODER_INACTIVITY_TIME_MS;
-    } else {
-        return g_timeOfLastActivity;
-    }
-}
 
 void selectSlot(int slotIndex) {
     g_selectedSlotIndex = slotIndex;

@@ -40,6 +40,8 @@
 
 #include <eez/hmi.h>
 
+#define CONF_GUI_TOAST_DURATION_MS 1000L
+
 namespace eez {
 namespace gui {
 
@@ -50,6 +52,14 @@ AppContext::AppContext() {
 }
 
 void AppContext::stateManagment() {
+    // remove alert message after period of time
+    uint32_t inactivityPeriod = eez::hmi::getInactivityPeriodMs();
+    if (getActivePageId() == INTERNAL_PAGE_ID_TOAST_MESSAGE) {
+        ToastMessagePage *page = (ToastMessagePage *)getActivePage();
+        if (!page->hasAction() && inactivityPeriod >= CONF_GUI_TOAST_DURATION_MS) {
+            popPage();
+        }
+    }
 }
 
 ////////////////////////////////////////////////////////////////////////////////

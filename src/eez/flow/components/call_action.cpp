@@ -18,6 +18,8 @@
 
 #include <stdio.h>
 
+#include <eez/gui/gui.h>
+
 #include <eez/flow/components.h>
 #include <eez/flow/components/call_action.h>
 #include <eez/flow/debugger.h>
@@ -40,8 +42,13 @@ void executeCallActionComponent(FlowState *flowState, unsigned componentIndex) {
 	auto component = (CallActionActionComponent *)flowState->flow->components.item(assets, componentIndex);
 
 	auto flowIndex = component->flowIndex;
-	if (flowIndex < 0 || flowIndex >= (int)flowState->flowDefinition->flows.count) {
+	if (flowIndex < 0) {
 		throwError(flowState, componentIndex, "Invalid action flow index in CallAction\n");
+		return;
+	}
+
+	if (flowIndex >= (int)flowState->flowDefinition->flows.count) {
+		executeActionFunction(flowIndex - flowState->flowDefinition->flows.count);
 		return;
 	}
 

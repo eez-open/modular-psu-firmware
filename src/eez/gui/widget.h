@@ -95,7 +95,6 @@ struct WidgetCursor {
 	WidgetState *currentState;
 	bool refreshed;
 	bool hasPreviousState;
-	bool forceRefresh;
 
 	BackgroundStyle backgroundStyleStack[BACKGROUND_STYLE_STACK_SIZE];
 	size_t backgroundStyleStackPointer;
@@ -111,7 +110,6 @@ struct WidgetCursor {
 		, currentState(nullptr)
 		, refreshed(true)
 		, hasPreviousState(false)
-		, forceRefresh(false)
 		, backgroundStyleStackPointer(0)
 	{
 		iterators[0] = -1; iterators[1] = -1; iterators[2] = -1; iterators[3] = -1;
@@ -137,7 +135,6 @@ struct WidgetCursor {
 		, currentState(currentState_)
 		, refreshed(refreshed_)
 		, hasPreviousState(hasPreviousState_)
-		, forceRefresh(false)
 		, backgroundStyleStackPointer(0)
     {
 		iterators[0] = -1; iterators[1] = -1; iterators[2] = -1; iterators[3] = -1;
@@ -154,7 +151,6 @@ struct WidgetCursor {
 		, currentState(nullptr)
 		, refreshed(true)
 		, hasPreviousState(false)
-		, forceRefresh(false)
 		, backgroundStyleStackPointer(0)
 	{
 		iterators[0] = -1; iterators[1] = -1; iterators[2] = -1; iterators[3] = -1;
@@ -190,7 +186,6 @@ struct WidgetCursor {
 
 	void pushBackground(int x, int y, const Style *style, bool active);
 	void popBackground();
-	void resetBackgrounds() { backgroundStyleStackPointer = 0; }
 };
 
 struct WidgetStateFlags {

@@ -64,7 +64,7 @@ class Keypad : public Page {
 
     KeypadMode m_keypadMode;
 
-    virtual int getCursorPostion();
+    virtual int getCursorPosition();
     void setCursorPosition(int cursorPosition);
 
     int getXScroll(const WidgetCursor &widgetCursor);
@@ -200,7 +200,7 @@ public:
 	virtual void showLessThanMinErrorMessage();
 	virtual void showGreaterThanMaxErrorMessage();
 
-    virtual int getCursorPostion() override;
+    virtual int getCursorPosition() override;
 
     NumericKeypadOptions m_options;
 

@@ -39,6 +39,7 @@ AppContext &getRootAppContext() {
 ////////////////////////////////////////////////////////////////////////////////
 
 void FrontPanelAppContext::stateManagment() {
+    AppContext::stateManagment();
     if (!isPageOnStack(PAGE_ID_FRONT_PANEL)) {
         showPage(PAGE_ID_FRONT_PANEL);
     }

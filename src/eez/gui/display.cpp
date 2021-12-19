@@ -482,7 +482,7 @@ void drawStr(const char *text, int textLength, int x, int y, int clip_x1, int cl
         xCursor = x;
     }
 
-    if (cursorPosition != -1) {
+    if (cursorPosition != -1 && xCursor - CURSOR_WIDTH / 2 >= clip_x1 && xCursor + CURSOR_WIDTH / 2 - 1 <= clip_x2) {
         auto d = MAX(((clip_y2 - clip_y1) - font.getHeight()) / 2, 0);
         fillRect(xCursor - CURSOR_WIDTH / 2, clip_y1 + d, xCursor + CURSOR_WIDTH / 2 - 1, clip_y2 - d);
     }

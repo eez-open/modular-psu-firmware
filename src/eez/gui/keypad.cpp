@@ -227,7 +227,7 @@ void Keypad::setDefault() {
     }
 }
 
-int Keypad::getCursorPostion() {
+int Keypad::getCursorPosition() {
     return m_cursorPosition + strlen(m_label);
 }
 
@@ -245,7 +245,7 @@ void Keypad::setCursorPosition(int cursorPosition) {
 }
 
 int Keypad::getXScroll(const WidgetCursor &widgetCursor) {
-    int x = DISPLAY_DATA_getCursorXPosition(getCursorPostion(), widgetCursor);
+    int x = DISPLAY_DATA_getCursorXPosition(getCursorPosition(), widgetCursor);
     
     x -= widgetCursor.x;
 
@@ -667,12 +667,12 @@ void NumericKeypad::toggleEditUnit() {
     m_options.editValueUnit = getSwitchToUnit();
 }
 
-int NumericKeypad::getCursorPostion() {
+int NumericKeypad::getCursorPosition() {
     if (m_state == START) {
         return -1;
     }
 
-    return Keypad::getCursorPostion();
+    return Keypad::getCursorPosition();
 }
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -1001,7 +1001,7 @@ void data_keypad_text(DataOperationEnum operation, const WidgetCursor &widgetCur
     } else if (operation == DATA_OPERATION_GET_TEXT_CURSOR_POSITION) {
         Keypad *keypad = getActiveKeypad();
         if (keypad) {
-            value = keypad->getCursorPostion();
+            value = keypad->getCursorPosition();
         }
     } else if (operation == DATA_OPERATION_GET_X_SCROLL) {
         Keypad *keypad = getActiveKeypad();

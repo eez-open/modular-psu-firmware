@@ -68,23 +68,27 @@ void drawBorderAndBackground(int &x1, int &y1, int &x2, int &y2, const Style *st
 
 	if (isTransparent && !widgetCursor.refreshed) {
         size_t startStackPointer;
-		for (startStackPointer = widgetCursor.backgroundStyleStackPointer - 1; startStackPointer > 0; startStackPointer--) {
-			auto &backgroundStyle = widgetCursor.backgroundStyleStack[startStackPointer];
+		if (widgetCursor.backgroundStyleStackPointer > 0) {
+			for (startStackPointer = widgetCursor.backgroundStyleStackPointer - 1; startStackPointer > 0; startStackPointer--) {
+				auto &backgroundStyle = widgetCursor.backgroundStyleStack[startStackPointer];
 
-            auto color = backgroundStyle.active ? backgroundStyle.style->activeBackgroundColor : backgroundStyle.style->backgroundColor;
-            if (color != TRANSPARENT_COLOR_INDEX && backgroundStyle.style->opacity == 255) {
-                // non-transparent color
-                break;
-            } else if (backgroundStyle.style->backgroundImage) {
-                auto bitmap = getBitmap(backgroundStyle.style->backgroundImage);
-                if (bitmap) {
-                    if (bitmap->bpp != 32) {
-                        // non-transparent bitmap
-                        break;
-                    }
-                }
-            }
-        }
+				auto color = backgroundStyle.active ? backgroundStyle.style->activeBackgroundColor : backgroundStyle.style->backgroundColor;
+				if (color != TRANSPARENT_COLOR_INDEX && backgroundStyle.style->opacity == 255) {
+					// non-transparent color
+					break;
+				} else if (backgroundStyle.style->backgroundImage) {
+					auto bitmap = getBitmap(backgroundStyle.style->backgroundImage);
+					if (bitmap) {
+						if (bitmap->bpp != 32) {
+							// non-transparent bitmap
+							break;
+						}
+					}
+				}
+			}
+		} else {
+			startStackPointer = 0;
+		}
 
 		for (size_t i = startStackPointer; i < widgetCursor.backgroundStyleStackPointer; i++) {
 			auto &backgroundStyle = widgetCursor.backgroundStyleStack[i];

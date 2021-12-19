@@ -61,7 +61,7 @@ void onGuiQueueMessageHook(uint8_t type, int16_t param);
 
 bool isGuiThread();
 
-void processGuiQueue();
+void processGuiQueue(uint32_t timeoutMillisec);
 
 } // namespace gui
 } // namespace eez

@@ -62,7 +62,7 @@ void dealWithCongestedBufferSituation(const char *buffer, uint32_t length) {
 	
 	do {
 		osDelay(1);
-		eez::gui::processGuiQueue();
+		eez::gui::processGuiQueue(0);
 
 		if (!g_debuggerIsConnected) {
 			return;
