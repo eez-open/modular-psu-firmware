@@ -80,8 +80,7 @@ void touchMeasure() {
 
     taskENTER_CRITICAL();
 
-    uint8_t result[4];
-
+    uint8_t result[4]
     if (HAL_I2C_Master_Transmit(&hi2c1, TOUCH_DEVICE_ADDRESS, (uint8_t *)&Z1_DATA_ID, 1, 5) != HAL_OK) {
         isError = true;
     }

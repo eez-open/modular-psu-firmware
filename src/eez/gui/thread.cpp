@@ -41,11 +41,7 @@ EEZ_MESSAGE_QUEUE_DECLARE(gui, {
             Page *page;
         } changePage;
         
-        struct {
-            EventType eventType;
-            int eventX;
-            int eventY;
-        } pointerEvent;
+        Event touchEvent;
     };
 });
 
@@ -89,8 +85,8 @@ void processGuiQueue(uint32_t timeout) {
 
     if (type == GUI_QUEUE_MESSAGE_TYPE_DISPLAY_VSYNC) {
         display::update();
-    } else if (type == GUI_QUEUE_MESSAGE_TYPE_POINTER_EVENT) {
-        onPointerEvent(obj.pointerEvent.eventType, obj.pointerEvent.eventX, obj.pointerEvent.eventY);
+    } else if (type == GUI_QUEUE_MESSAGE_TYPE_TOUCH_EVENT) {
+        processTouchEvent(obj.touchEvent);
     } else if (type == GUI_QUEUE_MESSAGE_TYPE_SHOW_PAGE) {
         obj.changePage.appContext->showPage(obj.changePage.pageId);
     } else if (type == GUI_QUEUE_MESSAGE_TYPE_PUSH_PAGE) {
@@ -122,13 +118,13 @@ void sendMessageToGuiThread(uint8_t messageType, uint32_t messageParam, uint32_t
 	EEZ_MESSAGE_QUEUE_PUT(gui, obj, timeoutMillisec);
 }
 
-void sendPointerEventToGuiThread(EventType eventType, int eventX, int eventY) {
+void sendTouchEventToGuiThread(Event &touchEvent) {
     guiMessageQueueObject obj;
-    obj.type = GUI_QUEUE_MESSAGE_TYPE_POINTER_EVENT;
-    obj.pointerEvent.eventType = eventType;
-    obj.pointerEvent.eventX = eventX;
-    obj.pointerEvent.eventY = eventY;
+    obj.type = GUI_QUEUE_MESSAGE_TYPE_TOUCH_EVENT;
+    obj.touchEvent = touchEvent;
 	EEZ_MESSAGE_QUEUE_PUT(gui, obj, 0);
+
+	touchEvent.time = millis();
 }
 
 bool pushPageInGuiThread(AppContext *appContext, int pageId, Page *page) {

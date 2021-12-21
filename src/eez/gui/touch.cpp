@@ -30,10 +30,7 @@ namespace eez {
 namespace gui {
 namespace touch {
 
-static uint32_t g_lastEventTime;
-static EventType g_lastEventType = EVENT_TYPE_TOUCH_NONE;
-static int g_lastEventX = -1;
-static int g_lastEventY = -1;
+static Event g_lastEvent;
 
 static int g_calibratedX = -1;
 static int g_calibratedY = -1;
@@ -65,54 +62,12 @@ void tick() {
 	x = g_filteredX;
 	y = g_filteredY;
 #endif
-	
-	auto eventType = g_lastEventType;
-	if (pressed) {
-		if (g_lastEventType == EVENT_TYPE_TOUCH_NONE || g_lastEventType == EVENT_TYPE_TOUCH_UP) {
-			eventType = EVENT_TYPE_TOUCH_DOWN;
-		} else {
-			if (g_lastEventType == EVENT_TYPE_TOUCH_DOWN) {
-				eventType = EVENT_TYPE_TOUCH_MOVE;
-			}
-		}
-	} else {
-		if (g_lastEventType == EVENT_TYPE_TOUCH_DOWN || g_lastEventType == EVENT_TYPE_TOUCH_MOVE) {
-			eventType = EVENT_TYPE_TOUCH_UP;
-		} else if (g_lastEventType == EVENT_TYPE_TOUCH_UP) {
-			eventType = EVENT_TYPE_TOUCH_NONE;
-		}
-	}
 
-	if (eventType != g_lastEventType || x != g_lastEventX || y != g_lastEventY) {
-		g_lastEventType = eventType;
-		g_lastEventX = x;
-		g_lastEventY = y;
-		if (g_lastEventType != EVENT_TYPE_TOUCH_NONE) {
-			g_lastEventTime = millis();
-			sendPointerEventToGuiThread(g_lastEventType, x, y);
-		}
-	} else {
-		static const uint32_t SEND_TOUC_MOVE_EVENT_EVERY_MS = 20;
-		if (g_lastEventType == EVENT_TYPE_TOUCH_MOVE) {
-			auto time = millis();
-			if (time - g_lastEventTime > SEND_TOUC_MOVE_EVENT_EVERY_MS) {
-				g_lastEventTime = time;
-				sendPointerEventToGuiThread(g_lastEventType, g_lastEventX, g_lastEventY);
-			}
-		}
-	}
+	onTouchEvent(pressed, x, y, g_lastEvent);
 }
 
-EventType getLastEventType() {
-    return g_lastEventType;
-}
-
-int getLastX() {
-    return g_lastEventX;
-}
-
-int getLastY() {
-    return g_lastEventY;
+Event &getLastEvent() {
+    return g_lastEvent;
 }
 
 } // namespace touch

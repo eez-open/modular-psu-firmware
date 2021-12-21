@@ -283,7 +283,7 @@ void AppContext::onPageTouch(const WidgetCursor &foundWidget, Event &touchEvent)
                 if (widgetCursor.widget) {
                    auto action = getWidgetAction(widgetCursor);
                    if (action != ACTION_ID_NONE && canExecuteActionWhenTouchedOutsideOfActivePage(activePageId, action)) {
-                       onPointerEvent(touchEvent.type, touchEvent.x, touchEvent.y);
+                       processTouchEvent(touchEvent);
                    }
                 }
             }

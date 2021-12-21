@@ -1141,10 +1141,10 @@ bool PsuAppContext::canExecuteActionWhenTouchedOutsideOfActivePage(int pageId, i
 
 void PsuAppContext::pageRenderCustom(int i, WidgetCursor &widgetCursor) {
     if (getActivePageId() == PAGE_ID_TOUCH_CALIBRATION_YES_NO || getActivePageId() == PAGE_ID_TOUCH_CALIBRATION_YES_NO_CANCEL) {
-        auto eventType = touch::getLastEventType();
-        if (eventType == EVENT_TYPE_TOUCH_DOWN || eventType == EVENT_TYPE_TOUCH_MOVE) {
-            int x = MIN(MAX(touch::getLastX(), 1), display::getDisplayWidth() - 2);
-            int y = MIN(MAX(touch::getLastY(), 1), display::getDisplayHeight() - 2);
+		auto touchEvent = touch::getLastEvent();
+        if (touchEvent.type == EVENT_TYPE_TOUCH_DOWN || touchEvent.type == EVENT_TYPE_TOUCH_MOVE) {
+            int x = MIN(MAX(touchEvent.x, 1), display::getDisplayWidth() - 2);
+            int y = MIN(MAX(touchEvent.y, 1), display::getDisplayHeight() - 2);
             display::setColor(255, 255, 255);
             display::fillRect(x - 1, y - 1, x + 1, y + 1);
         }

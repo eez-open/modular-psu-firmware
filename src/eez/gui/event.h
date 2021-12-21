@@ -33,12 +33,14 @@ enum EventType {
 };
 
 struct Event {
+    uint32_t time;
     EventType type;
     int x;
     int y;
 };
 
-void onPointerEvent(EventType eventType, int eventX, int eventY);
+void onTouchEvent(bool pressed, int x, int y, Event &lastEvent);
+void processTouchEvent(Event &event);
 
 extern bool g_isLongTouch;
 

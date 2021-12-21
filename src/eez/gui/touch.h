@@ -26,9 +26,7 @@ namespace touch {
 
 void tick();
 
-EventType getLastEventType();
-int getLastX();
-int getLastY();
+Event &getLastEvent();
 
 } // namespace touch
 } // namespace gui

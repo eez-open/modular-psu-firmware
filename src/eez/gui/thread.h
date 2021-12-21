@@ -30,7 +30,7 @@ void startThread();
 enum {
     GUI_QUEUE_MESSAGE_TYPE_DISPLAY_VSYNC = 1,
 
-    GUI_QUEUE_MESSAGE_TYPE_POINTER_EVENT,
+    GUI_QUEUE_MESSAGE_TYPE_TOUCH_EVENT,
     
     GUI_QUEUE_MESSAGE_TYPE_SHOW_PAGE,
     GUI_QUEUE_MESSAGE_TYPE_PUSH_PAGE,
@@ -56,7 +56,7 @@ class AppContext;
 class Page;
 
 void sendMessageToGuiThread(uint8_t messageType, uint32_t messageParam = 0, uint32_t timeoutMillisec = osWaitForever);
-void sendPointerEventToGuiThread(EventType eventType, int eventX, int eventY);
+void sendTouchEventToGuiThread(Event &touchEvent);
 bool pushPageInGuiThread(AppContext *appContext, int pageId, Page *page);
 bool showPageInGuiThread(AppContext *appContext, int pageId);
 

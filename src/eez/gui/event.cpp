@@ -29,6 +29,7 @@
 #include <eez/util.h>
 
 #include <eez/gui/gui.h>
+#include <eez/gui/thread.h>
 
 #define CONF_GUI_LONG_TOUCH_TIMEOUT_MS 1000
 #define CONF_GUI_KEYPAD_FIRST_AUTO_REPEAT_DELAY_MS 300
@@ -62,7 +63,43 @@ static void onWidgetTouch(const WidgetCursor &widgetCursor, Event &touchEvent);
 
 ////////////////////////////////////////////////////////////////////////////////
 
-void onPointerEvent(EventType eventType, int eventX, int eventY) {
+void onTouchEvent(bool pressed, int x, int y, Event &lastEvent) {
+	auto eventType = lastEvent.type;
+	if (pressed) {
+		if (lastEvent.type == EVENT_TYPE_TOUCH_NONE || lastEvent.type == EVENT_TYPE_TOUCH_UP) {
+			eventType = EVENT_TYPE_TOUCH_DOWN;
+		} else {
+			if (lastEvent.type == EVENT_TYPE_TOUCH_DOWN) {
+				eventType = EVENT_TYPE_TOUCH_MOVE;
+			}
+		}
+	} else {
+		if (lastEvent.type == EVENT_TYPE_TOUCH_DOWN || lastEvent.type == EVENT_TYPE_TOUCH_MOVE) {
+			eventType = EVENT_TYPE_TOUCH_UP;
+		} else if (lastEvent.type == EVENT_TYPE_TOUCH_UP) {
+			eventType = EVENT_TYPE_TOUCH_NONE;
+		}
+	}
+
+	if (eventType != lastEvent.type || x != lastEvent.x || y != lastEvent.y) {
+		lastEvent.type = eventType;
+		lastEvent.x = x;
+		lastEvent.y = y;
+		if (lastEvent.type != EVENT_TYPE_TOUCH_NONE) {
+			sendTouchEventToGuiThread(lastEvent);
+		}
+	} else {
+		static const uint32_t SEND_TOUC_MOVE_EVENT_EVERY_MS = 20;
+		if (lastEvent.type == EVENT_TYPE_TOUCH_MOVE) {
+			auto time = millis();
+			if (time - lastEvent.time > SEND_TOUC_MOVE_EVENT_EVERY_MS) {
+				sendTouchEventToGuiThread(lastEvent);
+			}
+		}
+	}
+}
+
+void processTouchEvent(Event &touchEvent) {
 	if (isEventHandlingDisabledHook()) {
 		return;
 	}
@@ -70,36 +107,36 @@ void onPointerEvent(EventType eventType, int eventX, int eventY) {
     static uint32_t m_lastAutoRepeatEventTimeMs;
     static uint32_t m_touchDownTimeMs;
 
-    if (eventType != EVENT_TYPE_TOUCH_NONE) {
+    if (touchEvent.type != EVENT_TYPE_TOUCH_NONE) {
         uint32_t tickCountMs = millis();
 
         eez::hmi::noteActivity();
 
-        if (eventType == EVENT_TYPE_TOUCH_DOWN) {
+        if (touchEvent.type == EVENT_TYPE_TOUCH_DOWN) {
             m_touchDownTimeMs = tickCountMs;
             m_lastAutoRepeatEventTimeMs = tickCountMs;
             g_longTouchGenerated = false;
             g_extraLongTouchGenerated = false;
-            processTouchEvent(EVENT_TYPE_TOUCH_DOWN, eventX, eventY);
-        } else if (eventType == EVENT_TYPE_TOUCH_MOVE) {
-            processTouchEvent(EVENT_TYPE_TOUCH_MOVE, eventX, eventY);
+            processTouchEvent(EVENT_TYPE_TOUCH_DOWN, touchEvent.x, touchEvent.y);
+        } else if (touchEvent.type == EVENT_TYPE_TOUCH_MOVE) {
+            processTouchEvent(EVENT_TYPE_TOUCH_MOVE, touchEvent.x, touchEvent.y);
 
             if (!g_longTouchGenerated && int32_t(tickCountMs - m_touchDownTimeMs) >= CONF_GUI_LONG_TOUCH_TIMEOUT_MS) {
                 g_longTouchGenerated = true;
-                processTouchEvent(EVENT_TYPE_LONG_TOUCH, eventX, eventY);
+                processTouchEvent(EVENT_TYPE_LONG_TOUCH, touchEvent.x, touchEvent.y);
             }
 
             if (g_longTouchGenerated && !g_extraLongTouchGenerated && int32_t(tickCountMs - m_touchDownTimeMs) >= CONF_GUI_EXTRA_LONG_TOUCH_TIMEOUT_MS) {
                 g_extraLongTouchGenerated = true;
-                processTouchEvent(EVENT_TYPE_EXTRA_LONG_TOUCH, eventX, eventY);
+                processTouchEvent(EVENT_TYPE_EXTRA_LONG_TOUCH, touchEvent.x, touchEvent.y);
             }
 
             if (int32_t(tickCountMs - m_lastAutoRepeatEventTimeMs) >= (m_lastAutoRepeatEventTimeMs == m_touchDownTimeMs ? CONF_GUI_KEYPAD_FIRST_AUTO_REPEAT_DELAY_MS : CONF_GUI_KEYPAD_NEXT_AUTO_REPEAT_DELAY_MS)) {
-                processTouchEvent(EVENT_TYPE_AUTO_REPEAT, eventX, eventY);
+                processTouchEvent(EVENT_TYPE_AUTO_REPEAT, touchEvent.x, touchEvent.y);
                 m_lastAutoRepeatEventTimeMs = tickCountMs;
             }
-        } else if (eventType == EVENT_TYPE_TOUCH_UP) {
-            processTouchEvent(EVENT_TYPE_TOUCH_UP, eventX, eventY);
+        } else if (touchEvent.type == EVENT_TYPE_TOUCH_UP) {
+            processTouchEvent(EVENT_TYPE_TOUCH_UP, touchEvent.x, touchEvent.y);
         }
     }
 }
