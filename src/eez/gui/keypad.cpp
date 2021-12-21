@@ -159,6 +159,11 @@ void Keypad::key() {
 		if (textWidget->text) {
 			key(textWidget->text.ptr(widgetCursor.assets)[0]);
 		}
+	} else if (widget->type == WIDGET_TYPE_BUTTON) {
+		auto buttonWidget = (ButtonWidget *)widget;
+		if (buttonWidget->text) {
+			key(buttonWidget->text.ptr(widgetCursor.assets)[0]);
+		}
 	}
 
 	Value value = get(widgetCursor, widget->data);

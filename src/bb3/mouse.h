@@ -27,8 +27,6 @@
 namespace eez {
 namespace mouse {
 
-void init();
-
 void onPageChanged();
 
 void onMouseXMove(int x);
@@ -42,8 +40,10 @@ void onMouseEvent(USBH_HandleTypeDef *phost);
 #endif
 
 struct MouseInfo {
-    uint8_t x;
-    uint8_t y;
+    uint8_t dx;
+    uint8_t dy;
+    int x;
+    int y;
     uint8_t button1: 1;
     uint8_t button2: 1;
     uint8_t button3: 1;

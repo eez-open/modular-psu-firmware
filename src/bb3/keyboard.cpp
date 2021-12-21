@@ -349,14 +349,14 @@ void data_usb_keyboard_state(DataOperationEnum operation, const WidgetCursor &wi
                 }
             }
 
-            if (g_mouseInfo.x != 0) {
+            if (g_mouseInfo.dx != 0) {
                 auto n = strlen(str);
-                snprintf(str + n, KEYBOARD_INFO_STRING_SIZE - n, " / X=%d", (int8_t)g_mouseInfo.x);
+                snprintf(str + n, KEYBOARD_INFO_STRING_SIZE - n, " / X=%d", (int8_t)g_mouseInfo.dx);
             }
 
-            if (g_mouseInfo.y != 0) {
+            if (g_mouseInfo.dy != 0) {
                 auto n = strlen(str);
-                snprintf(str + n, KEYBOARD_INFO_STRING_SIZE - n, " Y=%d", (int8_t)g_mouseInfo.y);
+                snprintf(str + n, KEYBOARD_INFO_STRING_SIZE - n, " Y=%d", (int8_t)g_mouseInfo.dy);
             }
 
             if (g_mouseInfo.button1) {

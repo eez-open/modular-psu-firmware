@@ -20,6 +20,7 @@
 
 #include <eez/gui/gui.h>
 #include <eez/gui/touch_filter.h>
+#include <eez/gui/thread.h>
 
 #include <eez/platform/touch.h>
 
@@ -29,11 +30,10 @@ namespace eez {
 namespace gui {
 namespace touch {
 
+static uint32_t g_lastEventTime;
 static EventType g_lastEventType = EVENT_TYPE_TOUCH_NONE;
-
-static int g_x = -1;
-static int g_y = -1;
-static bool g_pressed = false;
+static int g_lastEventX = -1;
+static int g_lastEventY = -1;
 
 static int g_calibratedX = -1;
 static int g_calibratedY = -1;
@@ -45,138 +45,74 @@ static bool g_filteredPressed = false;
 
 ////////////////////////////////////////////////////////////////////////////////
 
-static EventType g_eventType = EVENT_TYPE_TOUCH_NONE;
-static int g_eventX = -1;
-static int g_eventY = -1;
-
-////////////////////////////////////////////////////////////////////////////////
-
-#if defined(EEZ_PLATFORM_STM32)
-static const int EVENT_QUEUE_MAX_SIZE = 50;
-struct Event {
-    EventType type;
-    int x;
-    int y;
-};
-static Event g_eventQueue[EVENT_QUEUE_MAX_SIZE];
-static uint8_t g_eventQueueHead = 0;
-static uint8_t g_eventQueueTail = 0;
-static bool g_eventQueueFull;
-#endif
-
-void tickHighPriority() {
-    bool pressed;
-    int x;
-    int y;
-    mcu::touch::read(pressed, x, y);
-
-    g_calibratedPressed = pressed;
-    g_calibratedX = x;
-    g_calibratedY = y;
-    transform(g_calibratedX, g_calibratedY);
-
-    g_filteredX = g_calibratedX;
-    g_filteredY = g_calibratedY;
-    g_filteredPressed = filter(g_calibratedPressed, g_filteredX, g_filteredY);
-
-    g_x = g_filteredX;
-    g_y = g_filteredY;
-    g_pressed = g_filteredPressed;
-
-#ifdef EEZ_PLATFORM_SIMULATOR
-    g_x = x;
-    g_y = y;
-    g_pressed = pressed;
-#endif
-
-    if (g_pressed) {
-        if (g_lastEventType == EVENT_TYPE_TOUCH_NONE || g_lastEventType == EVENT_TYPE_TOUCH_UP) {
-            g_lastEventType = EVENT_TYPE_TOUCH_DOWN;
-        } else {
-            if (g_lastEventType == EVENT_TYPE_TOUCH_DOWN) {
-                g_lastEventType = EVENT_TYPE_TOUCH_MOVE;
-            }
-        }
-    } else {
-        if (g_lastEventType == EVENT_TYPE_TOUCH_DOWN || g_lastEventType == EVENT_TYPE_TOUCH_MOVE) {
-            g_lastEventType = EVENT_TYPE_TOUCH_UP;
-        } else if (g_lastEventType == EVENT_TYPE_TOUCH_UP) {
-            g_lastEventType = EVENT_TYPE_TOUCH_NONE;
-        }
-    }
-
-#if defined(EEZ_PLATFORM_STM32)
-    if (g_lastEventType != EVENT_TYPE_TOUCH_NONE) {
-        if (g_eventQueueFull || g_eventQueueTail != g_eventQueueHead) {
-            uint32_t previousEventQueueHead = g_eventQueueHead == 0 ? EVENT_QUEUE_MAX_SIZE - 1 : g_eventQueueHead - 1;
-            Event &event = g_eventQueue[previousEventQueueHead];
-            if (event.type == g_lastEventType) {
-                g_eventQueueHead = previousEventQueueHead;
-            }
-        }
-
-        Event &event = g_eventQueue[g_eventQueueHead];
-
-        event.type = g_lastEventType;
-        event.x = g_x;
-        event.y = g_y;
-
-        if (g_eventQueueFull) {
-            g_eventQueueTail = (g_eventQueueTail + 1) % EVENT_QUEUE_MAX_SIZE;
-        }
-
-        g_eventQueueHead = (g_eventQueueHead + 1) % EVENT_QUEUE_MAX_SIZE;
-
-        if (g_eventQueueHead == g_eventQueueTail) {
-            g_eventQueueFull = true;
-        }
-    }
-#endif
-}
-
-////////////////////////////////////////////////////////////////////////////////
-
 void tick() {
-#if defined(EEZ_PLATFORM_STM32)
-    taskENTER_CRITICAL();
+	bool pressed;
+	int x;
+	int y;
+	mcu::touch::read(pressed, x, y);
 
-    if (g_eventQueueFull || g_eventQueueTail != g_eventQueueHead) {
-        Event &event = g_eventQueue[g_eventQueueTail];
+	g_calibratedPressed = pressed;
+	g_calibratedX = x;
+	g_calibratedY = y;
+	transform(g_calibratedX, g_calibratedY);
 
-        g_eventType = event.type;
-        g_eventX = event.x;
-        g_eventY = event.y;
+	g_filteredX = g_calibratedX;
+	g_filteredY = g_calibratedY;
+	g_filteredPressed = filter(g_calibratedPressed, g_filteredX, g_filteredY);
 
-        g_eventQueueTail = (g_eventQueueTail + 1) % EVENT_QUEUE_MAX_SIZE;
-        g_eventQueueFull = false;
-    } else {
-        g_eventType = EVENT_TYPE_TOUCH_NONE;
-        g_eventX = -1;
-        g_eventY = -1;
-    }
-
-    taskEXIT_CRITICAL();
+#ifdef EEZ_PLATFORM_STM32
+	pressed = g_filteredPressed;
+	x = g_filteredX;
+	y = g_filteredY;
 #endif
+	
+	auto eventType = g_lastEventType;
+	if (pressed) {
+		if (g_lastEventType == EVENT_TYPE_TOUCH_NONE || g_lastEventType == EVENT_TYPE_TOUCH_UP) {
+			eventType = EVENT_TYPE_TOUCH_DOWN;
+		} else {
+			if (g_lastEventType == EVENT_TYPE_TOUCH_DOWN) {
+				eventType = EVENT_TYPE_TOUCH_MOVE;
+			}
+		}
+	} else {
+		if (g_lastEventType == EVENT_TYPE_TOUCH_DOWN || g_lastEventType == EVENT_TYPE_TOUCH_MOVE) {
+			eventType = EVENT_TYPE_TOUCH_UP;
+		} else if (g_lastEventType == EVENT_TYPE_TOUCH_UP) {
+			eventType = EVENT_TYPE_TOUCH_NONE;
+		}
+	}
 
-#if defined(EEZ_PLATFORM_SIMULATOR)
-    tickHighPriority();
-
-    g_eventType = g_lastEventType;
-    g_eventX = g_x;
-    g_eventY = g_y;
-#endif
+	if (eventType != g_lastEventType || x != g_lastEventX || y != g_lastEventY) {
+		g_lastEventType = eventType;
+		g_lastEventX = x;
+		g_lastEventY = y;
+		if (g_lastEventType != EVENT_TYPE_TOUCH_NONE) {
+			g_lastEventTime = millis();
+			sendPointerEventToGuiThread(g_lastEventType, x, y);
+		}
+	} else {
+		static const uint32_t SEND_TOUC_MOVE_EVENT_EVERY_MS = 20;
+		if (g_lastEventType == EVENT_TYPE_TOUCH_MOVE) {
+			auto time = millis();
+			if (time - g_lastEventTime > SEND_TOUC_MOVE_EVENT_EVERY_MS) {
+				g_lastEventTime = time;
+				sendPointerEventToGuiThread(g_lastEventType, g_lastEventX, g_lastEventY);
+			}
+		}
+	}
 }
 
-EventType getEventType() {
-    return g_eventType;
+EventType getLastEventType() {
+    return g_lastEventType;
 }
 
-int getX() {
-    return g_eventX;
+int getLastX() {
+    return g_lastEventX;
 }
 
-int getY() {
-    return g_eventY;
+int getLastY() {
+    return g_lastEventY;
 }
 
 } // namespace touch

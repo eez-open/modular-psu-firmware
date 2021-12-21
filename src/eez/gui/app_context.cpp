@@ -53,10 +53,9 @@ AppContext::AppContext() {
 
 void AppContext::stateManagment() {
     // remove alert message after period of time
-    uint32_t inactivityPeriod = eez::hmi::getInactivityPeriodMs();
     if (getActivePageId() == INTERNAL_PAGE_ID_TOAST_MESSAGE) {
         ToastMessagePage *page = (ToastMessagePage *)getActivePage();
-        if (!page->hasAction() && inactivityPeriod >= CONF_GUI_TOAST_DURATION_MS) {
+        if (!page->hasAction() && eez::hmi::getInactivityPeriodMs() >= CONF_GUI_TOAST_DURATION_MS) {
             popPage();
         }
     }
@@ -284,7 +283,7 @@ void AppContext::onPageTouch(const WidgetCursor &foundWidget, Event &touchEvent)
                 if (widgetCursor.widget) {
                    auto action = getWidgetAction(widgetCursor);
                    if (action != ACTION_ID_NONE && canExecuteActionWhenTouchedOutsideOfActivePage(activePageId, action)) {
-                       eventHandling();
+                       onPointerEvent(touchEvent.type, touchEvent.x, touchEvent.y);
                    }
                 }
             }

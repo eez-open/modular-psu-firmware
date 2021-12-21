@@ -63,7 +63,6 @@ void guiTick() {
         flow::tick();
     }
 
-	eventHandling();
 	stateManagmentHook();
 }
 

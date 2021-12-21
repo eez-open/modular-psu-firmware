@@ -79,9 +79,9 @@ void setStepIndex(int value);
 void onEncoder(int counter);
 #endif
 
-void onTouchDown();
-void onTouchMove();
-void onTouchUp();
+void onTouchDown(Event &touchEvent);
+void onTouchMove(Event &touchEvent);
+void onTouchUp(Event &touchEvent);
 
 void switchToNextStepIndex();
 
@@ -142,9 +142,9 @@ bool readProfileProperties(profile::ReadContext &ctx, profile::Parameters &profi
 
 namespace edit_mode_slider {
 
-void onTouchDown();
-void onTouchMove();
-void onTouchUp();
+void onTouchDown(Event &touchEvent);
+void onTouchMove(Event &touchEvent);
+void onTouchUp(Event &touchEvent);
 
 }
 

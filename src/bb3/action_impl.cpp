@@ -1031,7 +1031,7 @@ void action_edit_animations_duration() {
     options.editValueUnit = UNIT_SECOND;
 
     options.min = 0.0f;
-    options.max = 5.0f;
+    options.max = 2.0f;
     options.def = CONF_DEFAULT_ANIMATIONS_DURATION;
 
     options.enableDefButton();

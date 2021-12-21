@@ -32,9 +32,21 @@ EEZ_THREAD_DECLARE(gui, Normal, 8192)
 
 EEZ_MESSAGE_QUEUE_DECLARE(gui, {
     uint8_t type;
-    uint32_t param;
-    int pageId;
-    Page *page;
+    union {
+        uint32_t param;
+
+        struct {
+            AppContext *appContext;
+            int pageId;
+            Page *page;
+        } changePage;
+        
+        struct {
+            EventType eventType;
+            int eventX;
+            int eventY;
+        } pointerEvent;
+    };
 });
 
 void startThread() {
@@ -74,14 +86,15 @@ void processGuiQueue(uint32_t timeout) {
     }
 
     uint8_t type = obj.type;
-    int16_t param = obj.param;
 
     if (type == GUI_QUEUE_MESSAGE_TYPE_DISPLAY_VSYNC) {
         display::update();
+    } else if (type == GUI_QUEUE_MESSAGE_TYPE_POINTER_EVENT) {
+        onPointerEvent(obj.pointerEvent.eventType, obj.pointerEvent.eventX, obj.pointerEvent.eventY);
     } else if (type == GUI_QUEUE_MESSAGE_TYPE_SHOW_PAGE) {
-        getAppContextFromId(param)->showPage(obj.pageId);
+        obj.changePage.appContext->showPage(obj.changePage.pageId);
     } else if (type == GUI_QUEUE_MESSAGE_TYPE_PUSH_PAGE) {
-        getAppContextFromId(param)->pushPage(obj.pageId, obj.page);
+        obj.changePage.appContext->pushPage(obj.changePage.pageId, obj.changePage.page);
     } else if (type == GUI_QUEUE_MESSAGE_REFRESH_SCREEN) {
         refreshScreen();
     } else if (type == GUI_QUEUE_MESSAGE_UNLOAD_EXTERNAL_ASSETS) {
@@ -93,7 +106,7 @@ void processGuiQueue(uint32_t timeout) {
     } else if (type == GUI_QUEUE_MESSAGE_DEBUGGER_INPUT_AVAILABLE) {
         flow::onDebuggerInputAvailable();
     } else {
-        onGuiQueueMessageHook(type, param);
+        onGuiQueueMessageHook(type, obj.param);
     }
 }
 
@@ -109,13 +122,22 @@ void sendMessageToGuiThread(uint8_t messageType, uint32_t messageParam, uint32_t
 	EEZ_MESSAGE_QUEUE_PUT(gui, obj, timeoutMillisec);
 }
 
+void sendPointerEventToGuiThread(EventType eventType, int eventX, int eventY) {
+    guiMessageQueueObject obj;
+    obj.type = GUI_QUEUE_MESSAGE_TYPE_POINTER_EVENT;
+    obj.pointerEvent.eventType = eventType;
+    obj.pointerEvent.eventX = eventX;
+    obj.pointerEvent.eventY = eventY;
+	EEZ_MESSAGE_QUEUE_PUT(gui, obj, 0);
+}
+
 bool pushPageInGuiThread(AppContext *appContext, int pageId, Page *page) {
     if (!isGuiThread()) {
         guiMessageQueueObject obj;
         obj.type = GUI_QUEUE_MESSAGE_TYPE_PUSH_PAGE;
-        obj.param = getAppContextId(appContext);
-        obj.pageId = pageId;
-        obj.page = page;
+        obj.changePage.appContext = appContext;
+        obj.changePage.pageId = pageId;
+        obj.changePage.page = page;
         EEZ_MESSAGE_QUEUE_PUT(gui, obj, osWaitForever);
         return true;
     }
@@ -126,8 +148,8 @@ bool showPageInGuiThread(AppContext *appContext, int pageId) {
     if (!isGuiThread()) {
         guiMessageQueueObject obj;
         obj.type = GUI_QUEUE_MESSAGE_TYPE_SHOW_PAGE;
-        obj.param = getAppContextId(appContext);
-        obj.pageId = pageId;
+        obj.changePage.appContext = appContext;
+        obj.changePage.pageId = pageId;
         EEZ_MESSAGE_QUEUE_PUT(gui, obj, osWaitForever);
         return true;
     }

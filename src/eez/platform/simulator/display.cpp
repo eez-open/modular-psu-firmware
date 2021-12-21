@@ -33,6 +33,7 @@
 
 #include <eez/gui/gui.h>
 #include <eez/gui/thread.h>
+#include <eez/gui/touch.h>
 
 #if OPTION_MOUSE
 #include <eez/mouse.h>
@@ -142,6 +143,8 @@ void syncBuffer() {
     SDL_RenderPresent(g_renderer);
 
     sendMessageToGuiThread(GUI_QUEUE_MESSAGE_TYPE_DISPLAY_VSYNC, 0, 0);
+
+    touch::tick();
 }
 
 void copySyncedBufferToScreenshotBuffer() {

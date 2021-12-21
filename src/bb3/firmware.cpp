@@ -147,8 +147,6 @@ void boot() {
 
     gui::startThread();
 
-    mouse::init();
-
 #if !CONF_SURVIVE_MODE
     if (psu::persist_conf::devConf.mcuRevisionTag == MCU_REVISION_TAG && psu::persist_conf::devConf.mcuRevision != 0) {
         g_mcuRevision = psu::persist_conf::devConf.mcuRevision;

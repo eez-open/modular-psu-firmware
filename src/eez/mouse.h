@@ -28,7 +28,6 @@ bool isMouseEnabled();
 bool isDisplayDirty();
 void updateDisplay();
 
-void getEvent(bool &mouseCursorVisible, gui::EventType &mouseEventType, int &mouseX, int &mouseY);
 void onPageChanged();
 
 #if defined(EEZ_PLATFORM_SIMULATOR)

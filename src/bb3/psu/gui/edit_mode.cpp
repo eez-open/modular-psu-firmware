@@ -372,25 +372,25 @@ void onEncoder(int counter) {
 
 #endif
 
-void test() {
+static void test(Event &touchEvent) {
     if (!g_changed) {
-        int d = eez::gui::touch::getX() - g_startPos;
+        int d = touchEvent.x - g_startPos;
         if (abs(d) >= CONF_GUI_EDIT_MODE_STEP_THRESHOLD_PX) {
             increment(d > 0 ? 1 : -1, true);
         }
     }
 }
 
-void onTouchDown() {
-    g_startPos = eez::gui::touch::getX();
+void onTouchDown(Event &touchEvent) {
+    g_startPos = touchEvent.x;
     g_changed = false;
 }
 
-void onTouchMove() {
-    test();
+void onTouchMove(Event &touchEvent) {
+    test(touchEvent);
 }
 
-void onTouchUp() {
+void onTouchUp(Event &touchEvent) {
 }
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -707,11 +707,11 @@ static float startValue;
 static int startX;
 static float stepValue;
 
-void onTouchDown() {
+void onTouchDown(Event &touchEvent) {
     startValue = edit_mode::getEditValue().getFloat();
-    startX = eez::gui::touch::getX();
+    startX = touchEvent.x;
 
-    int y = eez::gui::touch::getY() - g_psuAppContext.rect.y;
+    int y = touchEvent.y - g_psuAppContext.rect.y;
     if (y < TOP_BORDER) {
         y = TOP_BORDER;
     } else if (y > BOTTOM_BORDER) {
@@ -726,11 +726,11 @@ void onTouchDown() {
     stepValue = stepValues.values[MIN(stepIndex, stepValues.count - 1)];
 }
 
-void onTouchMove() {
+void onTouchMove(Event &touchEvent) {
     float min = edit_mode::getMin().getFloat();
     float max = edit_mode::getMax().getFloat();
 
-    int counter = (eez::gui::touch::getX() - startX) / DX;
+    int counter = (touchEvent.x - startX) / DX;
 
     float value = roundPrec(startValue + counter * stepValue, stepValue);
 
@@ -744,7 +744,7 @@ void onTouchMove() {
     edit_mode::setValue(value);
 }
 
-void onTouchUp() {
+void onTouchUp(Event &touchEvent) {
 }
 
 } // namespace edit_mode_slider

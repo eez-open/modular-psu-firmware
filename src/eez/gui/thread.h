@@ -20,6 +20,8 @@
 
 #include <eez/os.h>
 
+#include <eez/gui/event.h>
+
 namespace eez {
 namespace gui {
 
@@ -27,14 +29,12 @@ void startThread();
 
 enum {
     GUI_QUEUE_MESSAGE_TYPE_DISPLAY_VSYNC = 1,
+
+    GUI_QUEUE_MESSAGE_TYPE_POINTER_EVENT,
     
     GUI_QUEUE_MESSAGE_TYPE_SHOW_PAGE,
     GUI_QUEUE_MESSAGE_TYPE_PUSH_PAGE,
 
-    GUI_QUEUE_MESSAGE_MOUSE_X_MOVE,
-    GUI_QUEUE_MESSAGE_MOUSE_Y_MOVE,
-    GUI_QUEUE_MESSAGE_MOUSE_BUTTON_DOWN,
-    GUI_QUEUE_MESSAGE_MOUSE_BUTTON_UP,
     GUI_QUEUE_MESSAGE_MOUSE_DISCONNECTED,
 
     GUI_QUEUE_MESSAGE_REFRESH_SCREEN,
@@ -56,6 +56,7 @@ class AppContext;
 class Page;
 
 void sendMessageToGuiThread(uint8_t messageType, uint32_t messageParam = 0, uint32_t timeoutMillisec = osWaitForever);
+void sendPointerEventToGuiThread(EventType eventType, int eventX, int eventY);
 bool pushPageInGuiThread(AppContext *appContext, int pageId, Page *page);
 bool showPageInGuiThread(AppContext *appContext, int pageId);
 

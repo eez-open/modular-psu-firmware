@@ -25,10 +25,11 @@ enum EventType {
     EVENT_TYPE_TOUCH_NONE,
     EVENT_TYPE_TOUCH_DOWN,
     EVENT_TYPE_TOUCH_MOVE,
+    EVENT_TYPE_TOUCH_UP,
+
     EVENT_TYPE_LONG_TOUCH,
     EVENT_TYPE_EXTRA_LONG_TOUCH,
-    EVENT_TYPE_AUTO_REPEAT,
-    EVENT_TYPE_TOUCH_UP
+    EVENT_TYPE_AUTO_REPEAT
 };
 
 struct Event {
@@ -37,7 +38,7 @@ struct Event {
     int y;
 };
 
-void eventHandling();
+void onPointerEvent(EventType eventType, int eventX, int eventY);
 
 extern bool g_isLongTouch;
 

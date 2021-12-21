@@ -1411,7 +1411,7 @@ void tick4() {
     // call every 10 ms
     static int counter = 0;
     if (++counter == 10) {
-        touch::tickHighPriority();
+        touch::tick();
         counter = 0;
     }
 #endif

@@ -62,33 +62,10 @@ static void onWidgetTouch(const WidgetCursor &widgetCursor, Event &touchEvent);
 
 ////////////////////////////////////////////////////////////////////////////////
 
-void eventHandling() {
+void onPointerEvent(EventType eventType, int eventX, int eventY) {
 	if (isEventHandlingDisabledHook()) {
 		return;
 	}
-
-	touch::tick();
-
-	auto eventType = touch::getEventType();
-
-    bool mouseCursorVisible = false;
-    EventType mouseEventType = EVENT_TYPE_TOUCH_NONE;
-    int mouseX = 0;
-    int mouseY = 0;
-#if OPTION_MOUSE
-    mouse::getEvent(mouseCursorVisible, mouseEventType, mouseX, mouseY);
-#endif
-
-    int eventX;
-    int eventY;
-    if (eventType == EVENT_TYPE_TOUCH_NONE && mouseCursorVisible) {
-        eventType = mouseEventType;
-        eventX = mouseX;
-        eventY = mouseY;
-    } else {
-        eventX = touch::getX();
-        eventY = touch::getY();
-    }
 
     static uint32_t m_lastAutoRepeatEventTimeMs;
     static uint32_t m_touchDownTimeMs;

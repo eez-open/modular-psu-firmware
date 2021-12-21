@@ -24,13 +24,11 @@ namespace eez {
 namespace gui {
 namespace touch {
 
-void tickHighPriority();
-
 void tick();
 
-EventType getEventType();
-int getX();
-int getY();
+EventType getLastEventType();
+int getLastX();
+int getLastY();
 
 } // namespace touch
 } // namespace gui

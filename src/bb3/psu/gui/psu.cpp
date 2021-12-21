@@ -607,21 +607,21 @@ void PsuAppContext::onPageTouch(const WidgetCursor &foundWidget, Event &touchEve
 
     if (touchEvent.type == EVENT_TYPE_TOUCH_DOWN) {
         if (activePageId == PAGE_ID_EDIT_MODE_SLIDER) {
-            edit_mode_slider::onTouchDown();
+            edit_mode_slider::onTouchDown(touchEvent);
         } else if (activePageId == PAGE_ID_EDIT_MODE_STEP) {
-            edit_mode_step::onTouchDown();
+            edit_mode_step::onTouchDown(touchEvent);
         }
     } else if (touchEvent.type == EVENT_TYPE_TOUCH_MOVE) {
         if (activePageId == PAGE_ID_EDIT_MODE_SLIDER) {
-            edit_mode_slider::onTouchMove();
+            edit_mode_slider::onTouchMove(touchEvent);
         } else if (activePageId == PAGE_ID_EDIT_MODE_STEP) {
-            edit_mode_step::onTouchMove();
+            edit_mode_step::onTouchMove(touchEvent);
         }        
     } else if (touchEvent.type == EVENT_TYPE_TOUCH_UP) {
         if (activePageId == PAGE_ID_EDIT_MODE_SLIDER) {
-            edit_mode_slider::onTouchUp();
+            edit_mode_slider::onTouchUp(touchEvent);
         } else if (activePageId == PAGE_ID_EDIT_MODE_STEP) {
-            edit_mode_step::onTouchUp();
+            edit_mode_step::onTouchUp(touchEvent);
         } else if (activePageId == PAGE_ID_TOUCH_CALIBRATION_INTRO) {
             enterTouchCalibration(this);
         }
@@ -1141,10 +1141,10 @@ bool PsuAppContext::canExecuteActionWhenTouchedOutsideOfActivePage(int pageId, i
 
 void PsuAppContext::pageRenderCustom(int i, WidgetCursor &widgetCursor) {
     if (getActivePageId() == PAGE_ID_TOUCH_CALIBRATION_YES_NO || getActivePageId() == PAGE_ID_TOUCH_CALIBRATION_YES_NO_CANCEL) {
-        auto eventType = touch::getEventType();
+        auto eventType = touch::getLastEventType();
         if (eventType == EVENT_TYPE_TOUCH_DOWN || eventType == EVENT_TYPE_TOUCH_MOVE) {
-            int x = MIN(MAX(touch::getX(), 1), display::getDisplayWidth() - 2);
-            int y = MIN(MAX(touch::getY(), 1), display::getDisplayHeight() - 2);
+            int x = MIN(MAX(touch::getLastX(), 1), display::getDisplayWidth() - 2);
+            int y = MIN(MAX(touch::getLastY(), 1), display::getDisplayHeight() - 2);
             display::setColor(255, 255, 255);
             display::fillRect(x - 1, y - 1, x + 1, y + 1);
         }
@@ -2461,15 +2461,7 @@ AppContext *getAppContextFromId(int16_t id) {
 }
 
 void onGuiQueueMessageHook(uint8_t type, int16_t param) {
-	if (type == GUI_QUEUE_MESSAGE_MOUSE_X_MOVE) {
-		mouse::onMouseXMove(param);
-	} else if (type == GUI_QUEUE_MESSAGE_MOUSE_Y_MOVE) {
-		mouse::onMouseYMove(param);
-	} else if (type == GUI_QUEUE_MESSAGE_MOUSE_BUTTON_DOWN) {
-		mouse::onMouseButtonDown(param);
-	} else if (type == GUI_QUEUE_MESSAGE_MOUSE_BUTTON_UP) {
-		mouse::onMouseButtonUp(param);
-	} else if (type == GUI_QUEUE_MESSAGE_MOUSE_DISCONNECTED) {
+	if (type == GUI_QUEUE_MESSAGE_MOUSE_DISCONNECTED) {
 		mouse::onMouseDisconnected();
 	} else if (type == GUI_QUEUE_MESSAGE_FLOW_START) {
 		scripting::startFlowScript();

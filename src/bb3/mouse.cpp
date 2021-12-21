@@ -29,97 +29,83 @@
 using namespace eez::gui;
 using namespace eez::gui::display;
 
-#define CONF_GUI_MOUSE_TIMEOUT_MS 10 * 1000
-
 namespace eez {
 namespace mouse {
 
 static bool g_mouseCursorVisible;
-static int g_mouseCursorX;
-static int g_mouseCursorY;
+MouseInfo g_mouseInfo;
 
-static bool g_mouseDown;
-static uint32_t g_mouseCursorLastActivityTimeMs;
-
-static bool g_mouseWasDown;
-static int g_mouseWasCursorX;
-static int g_mouseWasCursorY;
+static uint32_t g_lastEventTime;
+static EventType g_lastEventType = EVENT_TYPE_TOUCH_NONE;
+static int g_lastEventX = -1;
+static int g_lastEventY = -1;
 
 static WidgetCursor g_foundWidgetAtMouse;
 
 static bool g_lastMouseCursorVisible;
 static int g_lastMouseCursorX;
 static int g_lastMouseCursorY;
-static WidgetCursor g_lastFoundWidgetAtMouse;
 
-MouseInfo g_mouseInfo;
+void onMouseEvent() {
+    g_mouseCursorVisible = true;
 
-void init() {
-    g_mouseCursorX = getDisplayWidth() / 2;
-    g_mouseCursorY = getDisplayHeight() / 2;
-}
+    auto pressed = g_mouseInfo.button1 || g_mouseInfo.button2 || g_mouseInfo.button3;
+    int x = g_mouseInfo.x;
+    int y = g_mouseInfo.y;
 
-void getEvent(bool &mouseCursorVisible, EventType &mouseEventType, int &mouseX, int &mouseY) {
-    uint32_t tickCount = millis();
-
-    if (g_mouseCursorVisible && !g_mouseDown) {
-        int32_t diff = tickCount - g_mouseCursorLastActivityTimeMs;
-        if (diff >= CONF_GUI_MOUSE_TIMEOUT_MS) {
-            g_mouseCursorVisible = false;
-        }
-    }
-
-    mouseEventType = EVENT_TYPE_TOUCH_NONE;
-
-    if (g_mouseCursorVisible) {
-		if (!g_mouseWasDown && g_mouseDown) {
-			mouseEventType = EVENT_TYPE_TOUCH_DOWN;
-		} else if (g_mouseWasDown && !g_mouseDown) {
-			mouseEventType = EVENT_TYPE_TOUCH_UP;
+	auto eventType = g_lastEventType;
+	if (pressed) {
+		if (g_lastEventType == EVENT_TYPE_TOUCH_NONE || g_lastEventType == EVENT_TYPE_TOUCH_UP) {
+			eventType = EVENT_TYPE_TOUCH_DOWN;
 		} else {
-			if (g_mouseDown && (g_mouseWasCursorX != g_mouseCursorX || g_mouseWasCursorY != g_mouseCursorY)) {
-				mouseEventType = EVENT_TYPE_TOUCH_MOVE;
+			if (g_lastEventType == EVENT_TYPE_TOUCH_DOWN) {
+				eventType = EVENT_TYPE_TOUCH_MOVE;
 			}
 		}
-
-		g_mouseWasDown = g_mouseDown;
-		g_mouseWasCursorX = g_mouseCursorX;
-		g_mouseWasCursorY = g_mouseCursorY;
-
-		auto foundWidgetAtMouse = findWidget(g_mouseCursorX, g_mouseCursorY, false);
-		if (getWidgetTouchFunction(foundWidgetAtMouse)) {
-			g_foundWidgetAtMouse = foundWidgetAtMouse;
-		} else {
-			g_foundWidgetAtMouse = 0;
+	} else {
+		if (g_lastEventType == EVENT_TYPE_TOUCH_DOWN || g_lastEventType == EVENT_TYPE_TOUCH_MOVE) {
+			eventType = EVENT_TYPE_TOUCH_UP;
+		} else if (g_lastEventType == EVENT_TYPE_TOUCH_UP) {
+			eventType = EVENT_TYPE_TOUCH_NONE;
 		}
+	}
 
-	    mouseCursorVisible = true;
-	    mouseX = g_mouseCursorX;
-	    mouseY = g_mouseCursorY;
-    } else {
-		g_mouseWasDown = false;
-		g_mouseWasCursorX = 0;
-		g_mouseWasCursorY = 0;
-
-		g_foundWidgetAtMouse = 0;
-
-	    mouseCursorVisible = false;
-	    mouseX = 0;
-	    mouseY = 0;
-    }
+	if (eventType != g_lastEventType || x != g_lastEventX || y != g_lastEventY) {
+		g_lastEventType = eventType;
+		g_lastEventX = x;
+		g_lastEventY = y;
+		if (g_lastEventType != EVENT_TYPE_TOUCH_NONE) {
+			g_lastEventTime = millis();
+			sendPointerEventToGuiThread(g_lastEventType, x, y);
+		}
+	} else {
+		static const uint32_t SEND_TOUC_MOVE_EVENT_EVERY_MS = 20;
+		if (g_lastEventType == EVENT_TYPE_TOUCH_MOVE) {
+			auto time = millis();
+			if (time - g_lastEventTime > SEND_TOUC_MOVE_EVENT_EVERY_MS) {
+				g_lastEventTime = time;
+				sendPointerEventToGuiThread(g_lastEventType, g_lastEventX, g_lastEventY);
+			}
+		}
+	}
 }
 
 bool isDisplayDirty() {
     if (
         g_lastMouseCursorVisible != g_mouseCursorVisible ||
-        g_lastMouseCursorX != g_mouseCursorX ||
-        g_lastMouseCursorY != g_mouseCursorY ||
-        g_lastFoundWidgetAtMouse != g_foundWidgetAtMouse
+        g_lastMouseCursorX != g_mouseInfo.x ||
+        g_lastMouseCursorY != g_mouseInfo.y
     ) {
     	g_lastMouseCursorVisible = g_mouseCursorVisible;
-    	g_lastMouseCursorX = g_mouseCursorX;
-    	g_lastMouseCursorY = g_mouseCursorY;
-        g_lastFoundWidgetAtMouse = g_foundWidgetAtMouse;
+    	g_lastMouseCursorX = g_mouseInfo.x;
+    	g_lastMouseCursorY = g_mouseInfo.y;
+
+        auto foundWidgetAtMouse = findWidget(g_mouseInfo.x, g_mouseInfo.y, false);
+        if (getWidgetTouchFunction(foundWidgetAtMouse)) {
+            g_foundWidgetAtMouse = foundWidgetAtMouse;
+        } else {
+            g_foundWidgetAtMouse = 0;
+        }
 
     	return true;
     }
@@ -176,41 +162,23 @@ void onPageChanged() {
     g_foundWidgetAtMouse = 0;
 }
 
-void onMouseXMove(int x) {
-    g_mouseCursorX = x;
-    g_mouseCursorVisible = true;
-    g_mouseCursorLastActivityTimeMs = millis();
-}
-
-void onMouseYMove(int y) {
-    g_mouseCursorY = y;
-    g_mouseCursorVisible = true;
-    g_mouseCursorLastActivityTimeMs = millis();
-}
-
-void onMouseButtonDown(int button) {
-    g_mouseCursorVisible = true;
-    g_mouseCursorLastActivityTimeMs = millis();
-    g_mouseDown = true;
-}
-
-void onMouseButtonUp(int button) {
-    g_mouseCursorVisible = true;
-    g_mouseCursorLastActivityTimeMs = millis();
-    g_mouseDown = false;
-}
-
 void onMouseDisconnected() {
     g_mouseCursorVisible = false;
-    g_mouseDown = false;
+
+    g_lastEventType = EVENT_TYPE_TOUCH_NONE;
+    g_lastEventX = -1;
+    g_lastEventY = -1;
 }
 
 #if defined(EEZ_PLATFORM_STM32)
-static int16_t g_xMouse = -1;
-static int16_t g_yMouse = -1;
+static volatile int16_t g_xMouse = -1;
+static volatile int16_t g_yMouse = -1;
 
 void onMouseEvent(USBH_HandleTypeDef *phost) {
     HID_MOUSE_Info_TypeDef *info = USBH_HID_GetMouseInfo(phost);
+
+    g_mouseInfo.dx = info->x;
+    g_mouseInfo.dy = info->y;
 
     if (info->x != 0) {
         if (g_xMouse == -1) {
@@ -223,7 +191,6 @@ void onMouseEvent(USBH_HandleTypeDef *phost) {
         if (g_xMouse >= getDisplayWidth()) {
             g_xMouse = getDisplayWidth() - 1;
         }
-        sendMessageToGuiThread(GUI_QUEUE_MESSAGE_MOUSE_X_MOVE, g_xMouse, 10);
     }
 
     if (info->y != 0) {
@@ -237,64 +204,30 @@ void onMouseEvent(USBH_HandleTypeDef *phost) {
         if (g_yMouse >= getDisplayHeight()) {
             g_yMouse = getDisplayHeight() - 1;
         }
-        sendMessageToGuiThread(GUI_QUEUE_MESSAGE_MOUSE_Y_MOVE, g_yMouse, 10);
     }
 
-    if (!g_mouseInfo.button1 && info->buttons[0]) {
-        sendMessageToGuiThread(GUI_QUEUE_MESSAGE_MOUSE_BUTTON_DOWN, 1, 50);
-    }
-    if (g_mouseInfo.button1 && !info->buttons[0]) {
-        sendMessageToGuiThread(GUI_QUEUE_MESSAGE_MOUSE_BUTTON_UP, 1, 50);
-    }
-
-    if (!g_mouseInfo.button2 && info->buttons[1]) {
-        sendMessageToGuiThread(GUI_QUEUE_MESSAGE_MOUSE_BUTTON_DOWN, 2, 50);
-    }
-    if (g_mouseInfo.button2 && !info->buttons[1]) {
-        sendMessageToGuiThread(GUI_QUEUE_MESSAGE_MOUSE_BUTTON_UP, 2, 50);
-    }
-
-    if (!g_mouseInfo.button3 && info->buttons[2]) {
-        sendMessageToGuiThread(GUI_QUEUE_MESSAGE_MOUSE_BUTTON_DOWN, 3, 50);
-    }
-    if (g_mouseInfo.button3 && !info->buttons[2]) {
-        sendMessageToGuiThread(GUI_QUEUE_MESSAGE_MOUSE_BUTTON_UP, 3, 50);
-    }
-
-    g_mouseInfo.x = info->x;
-    g_mouseInfo.y = info->y;
+    g_mouseInfo.x = g_xMouse;
+    g_mouseInfo.y = g_yMouse;
     
     g_mouseInfo.button1 = info->buttons[0];
     g_mouseInfo.button2 = info->buttons[1];
     g_mouseInfo.button3 = info->buttons[2];
 
     memset(&keyboard::g_keyboardInfo, 0, sizeof(keyboard::KeyboardInfo));
+
+    onMouseEvent();
 }
 #endif
 
 #if defined(EEZ_PLATFORM_SIMULATOR)
 void onMouseEvent(bool mouseButton1IsPressed, int mouseX, int mouseY) {
-    if (mouseX != g_mouseInfo.x) {
-        sendMessageToGuiThread(GUI_QUEUE_MESSAGE_MOUSE_X_MOVE, (uint32_t)(int16_t)mouseX, 10);
-    }
-
-    if (mouseY != g_mouseInfo.y) {
-        sendMessageToGuiThread(GUI_QUEUE_MESSAGE_MOUSE_Y_MOVE, (uint32_t)(int16_t)mouseY, 10);
-    }
-
-    if (!g_mouseInfo.button1 && mouseButton1IsPressed) {
-        sendMessageToGuiThread(GUI_QUEUE_MESSAGE_MOUSE_BUTTON_DOWN, 1, 50);
-    }
-
-    if (g_mouseInfo.button1 && !mouseButton1IsPressed) {
-        sendMessageToGuiThread(GUI_QUEUE_MESSAGE_MOUSE_BUTTON_UP, 1, 50);
-    }
-
     g_mouseInfo.x = mouseX;
     g_mouseInfo.y = mouseY;
     g_mouseInfo.button1 = mouseButton1IsPressed;
     g_mouseInfo.button2 = 0;
     g_mouseInfo.button3 = 0;
+
+    onMouseEvent();
 }
 #endif
 

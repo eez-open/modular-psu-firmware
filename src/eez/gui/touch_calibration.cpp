@@ -91,9 +91,9 @@ void touchCalibrationDialogCancel() {
 	onTouchCalibrationCancelHook();
 }
 
-void selectTouchCalibrationPoint() {
-    g_points[g_currentPoint].x = touch::getX();
-    g_points[g_currentPoint].y = touch::getY();
+void selectTouchCalibrationPoint(Event &touchEvent) {
+    g_points[g_currentPoint].x = touchEvent.x;
+    g_points[g_currentPoint].y = touchEvent.y;
 
     g_currentPoint++;
     g_pointStartTime = millis();
@@ -142,7 +142,7 @@ void onTouchCalibrationPageTouch(const WidgetCursor &foundWidget, Event &touchEv
     } else if (touchEvent.type == EVENT_TYPE_TOUCH_UP) {
         if (isTouchPointActivated()) {
             g_activeWidget = 0;
-            selectTouchCalibrationPoint();
+            selectTouchCalibrationPoint(touchEvent);
         }
     }
 }
