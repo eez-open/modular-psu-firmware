@@ -296,6 +296,7 @@ HAL_StatusTypeDef HAL_RTC_Init(RTC_HandleTypeDef *hrtc)
   /* Set RTC state */
   hrtc->State = HAL_RTC_STATE_BUSY;
 
+  // mvladic: DO NOT REMOVE!
   // we do a "hard" initialization only if the INITS flag is not set;
   // with a backup battery the RTC keeps its initialization after a reset.
   if (HAL_IS_BIT_CLR(RTC->ISR, RTC_FLAG_INITS)) {

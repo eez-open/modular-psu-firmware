@@ -2103,7 +2103,6 @@ void stateManagmentHook() {
 #if defined(EEZ_PLATFORM_SIMULATOR)
     g_frontPanelAppContext.stateManagment();
 #endif
-
     g_psuAppContext.stateManagment();
 
 	scripting::flowTick();

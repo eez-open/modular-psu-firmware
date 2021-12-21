@@ -59,7 +59,7 @@
 
 void mainTask(void *);
 
-EEZ_THREAD_DECLARE(main, Normal, 8192);
+EEZ_THREAD_DECLARE(main, Normal, 12 * 1024);
 
 #endif
 

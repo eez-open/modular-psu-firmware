@@ -32,6 +32,7 @@
 #include <eez/os.h>
 
 #include <eez/gui/gui.h>
+#include <eez/gui/thread.h>
 
 #if OPTION_MOUSE
 #include <eez/mouse.h>
@@ -39,23 +40,14 @@
 
 #include <eez/gui/display-private.h>
 
-using namespace eez::gui;
-
 namespace eez {
 namespace gui {
 namespace display {
 
 ////////////////////////////////////////////////////////////////////////////////
 
-static bool g_isOn;
-
 static SDL_Window *g_mainWindow;
 static SDL_Renderer *g_renderer;
-
-static uint32_t *g_buffer;
-static uint32_t *g_lastBuffer;
-
-static bool g_takeScreenshot;
 
 ////////////////////////////////////////////////////////////////////////////////
 
@@ -73,7 +65,7 @@ std::string getFullPath(std::string category, std::string path) {
     return path;
 }
 
-bool init() {
+void initDriver() {
     // Set texture filtering to linear
     if (!SDL_SetHint(SDL_HINT_RENDER_SCALE_QUALITY, "1")) {
         printf("Warning: Linear texture filtering not enabled!");
@@ -84,14 +76,15 @@ bool init() {
 
     if (g_mainWindow == NULL) {
         printf("Window could not be created! SDL Error: %s\n", SDL_GetError());
-        return false;
+        return;
     }
 
     // Create renderer
     g_renderer = SDL_CreateRenderer(g_mainWindow, -1, SDL_RENDERER_ACCELERATED | SDL_RENDERER_PRESENTVSYNC);
     if (g_renderer == NULL) {
+		g_mainWindow = NULL;
         printf("Renderer could not be created! SDL Error: %s\n", SDL_GetError());
-        return false;
+        return;
     }
 
     SDL_SetRenderDrawBlendMode(g_renderer, SDL_BLENDMODE_BLEND);
@@ -121,70 +114,15 @@ bool init() {
         SDL_CaptureMouse(SDL_TRUE);
     }
 #endif
-
-    return true;
 }
 
-void *getBufferPointer() {
-    return g_buffer;
-}
-
-void setBufferPointer(void *buffer) {
-    g_buffer = (uint32_t *)buffer;
-}
-
-void turnOn() {
-    if (!isOn()) {
-        g_isOn = true;
-
-        memset(VRAM_BUFFER1_START_ADDRESS, 0, VRAM_BUFFER_SIZE);
-        memset(VRAM_BUFFER2_START_ADDRESS, 0, VRAM_BUFFER_SIZE);
-        memset(VRAM_ANIMATION_BUFFER1_START_ADDRESS, 0, VRAM_BUFFER_SIZE);
-
-        g_buffer = (uint32_t *)VRAM_BUFFER1_START_ADDRESS;
-
-        g_buffers[0].bufferPointer = (uint32_t *)VRAM_AUX_BUFFER1_START_ADDRESS;
-        g_buffers[1].bufferPointer = (uint32_t *)VRAM_AUX_BUFFER2_START_ADDRESS;
-        g_buffers[2].bufferPointer = (uint32_t *)VRAM_AUX_BUFFER3_START_ADDRESS;
-        g_buffers[3].bufferPointer = (uint32_t *)VRAM_AUX_BUFFER4_START_ADDRESS;
-        g_buffers[4].bufferPointer = (uint32_t *)VRAM_AUX_BUFFER5_START_ADDRESS;
-        g_buffers[5].bufferPointer = (uint32_t *)VRAM_AUX_BUFFER6_START_ADDRESS;
-
-        refreshScreen();
-    }
-}
-
-void renderBuffer(uint32_t *buffer);
-
-void turnOff() {
-    if (isOn()) {
-        g_isOn = false;
-
-		auto appContext = getAppContextFromId(APP_CONTEXT_ID_DEVICE);
-
-        // clear screen
-        setColor(0, 0, 0);
-        fillRect(appContext->rect.x, appContext->rect.y, appContext->rect.x + appContext->rect.w - 1, appContext->rect.y + appContext->rect.h - 1);
-        renderBuffer(g_buffer);
-    }
-}
-
-bool isOn() {
-    return g_isOn;
-}
-
-void updateBrightness() {
-}
-
-void renderBuffer(uint32_t *buffer) {
-    g_lastBuffer = buffer;
-
-    if (!isOn()) {
-        return;
+void syncBuffer() {
+    if (!g_mainWindow) {
+		return;
     }
 
     SDL_Surface *rgbSurface = SDL_CreateRGBSurfaceFrom(
-        buffer, DISPLAY_WIDTH, DISPLAY_HEIGHT, 32, 4 * DISPLAY_WIDTH, 0, 0, 0, 0);
+        (uint32_t *)g_syncedBuffer, DISPLAY_WIDTH, DISPLAY_HEIGHT, 32, 4 * DISPLAY_WIDTH, 0, 0, 0, 0);
     if (rgbSurface != NULL) {
         SDL_Texture *texture = SDL_CreateTextureFromSurface(g_renderer, rgbSurface);
         if (texture != NULL) {
@@ -202,32 +140,13 @@ void renderBuffer(uint32_t *buffer) {
         printf("Unable to render text surface! SDL Error: %s\n", SDL_GetError());
     }
     SDL_RenderPresent(g_renderer);
+
+    sendMessageToGuiThread(GUI_QUEUE_MESSAGE_TYPE_DISPLAY_VSYNC, 0, 0);
 }
 
-void animate() {
-    uint32_t *bufferOld;
-    uint32_t *bufferNew;
-
-    if (g_buffer == (uint32_t *)VRAM_BUFFER1_START_ADDRESS) {
-        bufferOld = (uint32_t *)VRAM_BUFFER2_START_ADDRESS;
-        bufferNew = (uint32_t *)VRAM_BUFFER1_START_ADDRESS;
-    } else {
-        bufferOld = (uint32_t *)VRAM_BUFFER1_START_ADDRESS;
-        bufferNew = (uint32_t *)VRAM_BUFFER2_START_ADDRESS;
-    }
-
-    float t = (millis() - g_animationState.startTime) / (1000.0f * g_animationState.duration);
-    if (t < 1.0f) {
-        g_animationState.callback(t, bufferOld, bufferNew, VRAM_ANIMATION_BUFFER1_START_ADDRESS);
-        renderBuffer((uint32_t *)VRAM_ANIMATION_BUFFER1_START_ADDRESS);
-    } else {
-        g_animationState.enabled = false;
-    }
-}
-
-void doTakeScreenshot() {
-	auto appContext = getAppContextFromId(APP_CONTEXT_ID_DEVICE);
-    uint8_t *src = (uint8_t *)(g_lastBuffer + appContext->rect.y * DISPLAY_WIDTH + appContext->rect.x);
+void copySyncedBufferToScreenshotBuffer() {
+    auto appContext = getAppContextFromId(APP_CONTEXT_ID_DEVICE);
+    uint8_t *src = (uint8_t *)(g_renderBuffer + appContext->rect.y * DISPLAY_WIDTH + appContext->rect.x);
     uint8_t *dst = SCREENSHOOT_BUFFER_START_ADDRESS;
 
     int srcAdvance = (DISPLAY_WIDTH - 480) * 4;
@@ -245,101 +164,6 @@ void doTakeScreenshot() {
         }
         src += srcAdvance;
     }
-
-    g_takeScreenshot = false;
-    g_screenshotAllocated = true;
-}
-
-void sync() {
-	if (g_mainWindow == nullptr) {
-		init();
-	}
-
-	static uint32_t g_lastTickCount;
-    uint32_t tickCount = millis();
-    int32_t diff = 1000 / 60 - (tickCount - g_lastTickCount);
-    g_lastTickCount = tickCount;
-    if (diff > 0 && diff < 1000 / 60) {
-        SDL_Delay(diff);
-    }
-
-    if (!isOn()) {
-        return;
-    }
-
-#ifdef EEZ_CONF_GUI_CALC_FPS
-    if (g_calcFpsEnabled) {
-	    calcFPS();
-    }
-#endif
-
-    if (!g_screenshotAllocated && g_animationState.enabled) {
-        animate();
-        if (!g_animationState.enabled) {
-            finishAnimation();
-        }
-        clearDirty();
-		return;
-    }
-
-    if (g_takeScreenshot) {
-        doTakeScreenshot();
-    }
-
-    if (isDirty()) {
-        renderBuffer(g_buffer);
-
-        if (g_buffer == (uint32_t *)VRAM_BUFFER1_START_ADDRESS) {
-            g_buffer = (uint32_t *)VRAM_BUFFER2_START_ADDRESS;
-        } else {
-            g_buffer = (uint32_t *)VRAM_BUFFER1_START_ADDRESS;
-        }
-
-        clearDirty();
-    }
-}
-
-void finishAnimation() {
-    renderBuffer(g_buffer);
-
-    auto oldBuffer = g_buffer;
-
-    if (g_buffer == (uint32_t *)VRAM_BUFFER1_START_ADDRESS) {
-        g_buffer = (uint32_t *)VRAM_BUFFER2_START_ADDRESS;
-    } else {
-        g_buffer = (uint32_t *)VRAM_BUFFER1_START_ADDRESS;
-    }
-
-    bitBlt(oldBuffer, 0, 0, getDisplayWidth() - 1, getDisplayHeight() - 1);
-}
-
-////////////////////////////////////////////////////////////////////////////////
-
-int getDisplayWidth() {
-    return DISPLAY_WIDTH;
-}
-
-int getDisplayHeight() {
-    return DISPLAY_HEIGHT;
-}
-
-////////////////////////////////////////////////////////////////////////////////
-
-const uint8_t *takeScreenshot() {
-    while (g_screenshotAllocated) {
-    }
-
-	g_takeScreenshot = true;
-
-#ifdef __EMSCRIPTEN__
-    doTakeScreenshot();
-#endif
-
-	do {
-		osDelay(0);
-	} while (g_takeScreenshot);
-
-    return SCREENSHOOT_BUFFER_START_ADDRESS;
 }
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -348,11 +172,11 @@ void startPixelsDraw() {
 }
 
 void drawPixel(int x, int y) {
-    *(g_buffer + y * DISPLAY_WIDTH + x) = color16to32(g_fc);
+    *(g_renderBuffer + y * DISPLAY_WIDTH + x) = color16to32(g_fc);
 }
 
 void drawPixel(int x, int y, uint8_t opacity) {
-    auto dest = g_buffer + y * DISPLAY_WIDTH + x;
+    auto dest = g_renderBuffer + y * DISPLAY_WIDTH + x;
     auto destUint8 = (uint8_t *)dest;
     *dest = blendColor(
         color16to32(g_fc, opacity), 
@@ -365,7 +189,8 @@ void endPixelsDraw() {
 
 void fillRect(int x1, int y1, int x2, int y2) {
     uint32_t color32 = color16to32(g_fc, g_opacity);
-    uint32_t *dst = g_buffer + y1 * DISPLAY_WIDTH + x1;
+
+	uint32_t *dst = g_renderBuffer + y1 * DISPLAY_WIDTH + x1;
     int width = x2 - x1 + 1;
     int height = y2 - y1 + 1;
     int nl = DISPLAY_WIDTH - width;
@@ -403,8 +228,8 @@ void fillRect(void *dstBuffer, int x1, int y1, int x2, int y2) {
 void bitBlt(int x1, int y1, int x2, int y2, int dstx, int dsty) {
     int width = x2 - x1 + 1;
 
-    uint32_t *src = g_buffer + y1 * DISPLAY_WIDTH + x1;
-    uint32_t *dst = g_buffer + dsty * DISPLAY_WIDTH + dstx;
+    uint32_t *src = g_renderBuffer + y1 * DISPLAY_WIDTH + x1;
+    uint32_t *dst = g_renderBuffer + dsty * DISPLAY_WIDTH + dstx;
     int nl = DISPLAY_WIDTH - width;
 
     for (int y = y1; y <= y2; y++, src += nl, dst += nl) {
@@ -418,7 +243,7 @@ void bitBlt(int x1, int y1, int x2, int y2, int dstx, int dsty) {
 }
 
 void bitBlt(void *src, int x1, int y1, int x2, int y2) {
-    bitBlt(src, g_buffer, x1, y1, x2, y2);
+    bitBlt(src, g_renderBuffer, x1, y1, x2, y2);
     setDirty();
 }
 
@@ -435,7 +260,7 @@ void bitBlt(void *src, void *dst, int x1, int y1, int x2, int y2) {
 
 void bitBlt(void *src, void *dst, int sx, int sy, int sw, int sh, int dx, int dy, uint8_t opacity) {
     if (dst == nullptr) {
-        dst = g_buffer;
+        dst = g_renderBuffer;
     }
 
     if (opacity == 255) {
@@ -459,7 +284,7 @@ void bitBlt(void *src, void *dst, int sx, int sy, int sw, int sh, int dx, int dy
 }
 
 void drawBitmap(Image *image, int x, int y) {
-    uint32_t *dst = g_buffer + y * DISPLAY_WIDTH + x;
+    uint32_t *dst = g_renderBuffer + y * DISPLAY_WIDTH + x;
     int nlDst = DISPLAY_WIDTH - image->width;
 
     if (image->bpp == 32) {
@@ -515,7 +340,7 @@ void drawGlyph(const uint8_t *src, uint32_t srcLineOffset, int x_glyph, int y_gl
     ((uint8_t *)&pixel)[2] = COLOR_TO_R(g_fc);
     uint8_t *pixelAlpha = ((uint8_t *)&pixel) + 3;
 
-    uint32_t *dst = g_buffer + y_glyph * DISPLAY_WIDTH + x_glyph;
+    uint32_t *dst = g_renderBuffer + y_glyph * DISPLAY_WIDTH + x_glyph;
     int nlDst = DISPLAY_WIDTH - width;
 
     for (int y = 0; y < height; y++) {

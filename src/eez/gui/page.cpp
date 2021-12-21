@@ -264,6 +264,7 @@ void ToastMessagePage::init(AppContext *appContext, ToastType type, const Value&
         }
     } else {
         line2Widget.type = WIDGET_TYPE_NONE;
+        line3Widget.type = WIDGET_TYPE_NONE;
     }
 
     if (actionLabel) {
@@ -277,6 +278,8 @@ void ToastMessagePage::init(AppContext *appContext, ToastType type, const Value&
         actionWidget.h = actionLabelHeight;
 
 		yText += textHeight;
+    } else {
+        actionWidget.type = WIDGET_TYPE_NONE;
     }
 
 	x = appContext->rect.x + (appContext->rect.w - width) / 2;

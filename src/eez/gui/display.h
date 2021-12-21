@@ -20,10 +20,16 @@
 
 #include <stdint.h>
 
-#include <eez/gui_conf.h>
+#if defined(EEZ_PLATFORM_STM32)
+	typedef uint16_t *VideoBuffer;
+#endif
+#if defined(EEZ_PLATFORM_SIMULATOR)
+	typedef uint32_t *VideoBuffer;
+#endif
+
+#include <eez/gui/animation.h>
 #include <eez/gui/font.h>
 #include <eez/gui/geometry.h>
-
 #include <eez/gui/image.h>
 
 static const int CURSOR_WIDTH = 2;
@@ -47,8 +53,9 @@ namespace display {
 #define COLOR_TO_G(C) (uint8_t((((C) >> 5) << 2) & 0xFF))
 #define COLOR_TO_B(C) (uint8_t(((C) << 3) & 0xFF))
 
-void sync();
-void finishAnimation();
+extern VideoBuffer g_renderBuffer;
+
+void init();
 
 void turnOn();
 void turnOff();
@@ -58,12 +65,36 @@ void onThemeChanged();
 void onLuminocityChanged();
 void updateBrightness();
 
+void update();
+
+void animate(Buffer startBuffer, void (*callback)(float t, VideoBuffer bufferOld, VideoBuffer bufferNew, VideoBuffer bufferDst), float duration = -1);
+
+void beginRendering();
+int beginBufferRendering();
+void endBufferRendering(int bufferIndex, int x, int y, int width, int height, bool withShadow, uint8_t opacity, int xOffset, int yOffset, gui::Rect *backdrop);
+void endRendering();
+
+VideoBuffer getBufferPointer();
+
+const uint8_t *takeScreenshot();
+void releaseScreenshot();
+
+#ifdef EEZ_CONF_GUI_CALC_FPS
+extern bool g_calcFpsEnabled;
+#if defined(EEZ_CONF_STYLE_ID_FPS_GRAPH)
+extern bool g_drawFpsGraphEnabled;
+#endif
+extern uint32_t g_fpsAvg;
+void drawFpsGraph(int x, int y, int w, int h, const Style *style);
+#endif
+
+
 uint32_t color16to32(uint16_t color, uint8_t opacity = 255);
 uint16_t color32to16(uint32_t color);
 uint32_t blendColor(uint32_t fgColor, uint32_t bgColor);
 
-int getDisplayWidth();
-int getDisplayHeight();
+inline int getDisplayWidth() { return DISPLAY_WIDTH; }
+inline int getDisplayHeight() { return DISPLAY_HEIGHT;  }
 
 uint8_t getDisplayBackgroundLuminosityStepHook();
 uint8_t getSelectedThemeIndexHook();
@@ -104,30 +135,11 @@ void drawRect(int x1, int y1, int x2, int y2);
 void drawFocusFrame(int x, int y, int w, int h);
 void fillRoundedRect(int x1, int y1, int x2, int y2, int lineWidth, int r, bool drawLine, bool fill);
 
-void drawStr(const char *text, int textLength, int x, int y, int clip_x1, int clip_y1, int clip_x2,int clip_y2, gui::font::Font &font, int cursorPosition);
+void drawStr(const char *text, int textLength, int x, int y, int clip_x1, int clip_y1, int clip_x2, int clip_y2, gui::font::Font &font, int cursorPosition);
 int getCharIndexAtPosition(int xPos, const char *text, int textLength, int x, int y, int clip_x1, int clip_y1, int clip_x2,int clip_y2, gui::font::Font &font);
 int getCursorXPosition(int cursorPosition, const char *text, int textLength, int x, int y, int clip_x1, int clip_y1, int clip_x2,int clip_y2, gui::font::Font &font);
 int8_t measureGlyph(uint8_t encoding, gui::font::Font &font);
 int measureStr(const char *text, int textLength, gui::font::Font &font, int max_width = 0);
-
-void beginRendering();
-int beginBufferRendering();
-void endBufferRendering(int bufferIndex, int x, int y, int width, int height, bool withShadow, uint8_t opacity, int xOffset, int yOffset, gui::Rect *backdrop);
-void endRendering();
-
-void *getBufferPointer();
-
-const uint8_t *takeScreenshot();
-void releaseScreenshot();
-
-#ifdef EEZ_CONF_GUI_CALC_FPS
-extern bool g_calcFpsEnabled;
-#if defined(EEZ_CONF_STYLE_ID_FPS_GRAPH)
-extern bool g_drawFpsGraphEnabled;
-#endif
-extern uint32_t g_fpsAvg;
-void drawFpsGraph(int x, int y, int w, int h, const Style *style);
-#endif
 
 } // namespace display
 } // namespace gui

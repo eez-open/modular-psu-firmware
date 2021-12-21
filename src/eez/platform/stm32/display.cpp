@@ -16,8 +16,6 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#if defined(EEZ_PLATFORM_STM32)
-
 #include <assert.h>
 #include <math.h>
 #include <memory.h>
@@ -33,33 +31,46 @@
 #include <eez/os.h>
 
 #include <eez/gui/gui.h>
+#include <eez/gui/thread.h>
+#include <eez/gui/display.h>
 #include <eez/gui/display-private.h>
 
-#include <eez/platform/stm32/display.h>
+void HAL_LTDC_LineEventCallback(LTDC_HandleTypeDef *hltdc) {
+    using namespace eez::gui;
+    using namespace eez::gui::display;
 
-using namespace eez::gui;
+    auto layer = (LTDC_Layer_TypeDef *)((uint32_t)hltdc->Instance + 0x84U);
+    layer->CFBAR = (uint32_t)g_syncedBuffer;
+    hltdc->Instance->SRCR = LTDC_SRCR_IMR;
+
+    sendMessageToGuiThread(GUI_QUEUE_MESSAGE_TYPE_DISPLAY_VSYNC, 0, 0);
+}
 
 namespace eez {
 namespace gui {
 namespace display {
 
-////////////////////////////////////////////////////////////////////////////////
-
-DisplayState g_displayState;
-
-static uint16_t *g_bufferDraw;
-
-static uint16_t *g_bufferOld;
-static uint16_t *g_bufferNew;
-static uint16_t *g_animationBuffer;
-
-static bool g_takeScreenshot;
-
-////////////////////////////////////////////////////////////////////////////////
+#define DMA2D_WAIT if (g_waitDMA) { while (HAL_DMA2D_PollForTransfer(&hdma2d, 1000) != HAL_OK); g_waitDMA = false; }
 
 static bool g_waitDMA;
 
-#define DMA2D_WAIT if (g_waitDMA) { while (HAL_DMA2D_PollForTransfer(&hdma2d, 1000) != HAL_OK); g_waitDMA = false; }
+void initDriver() {
+	__HAL_RCC_DMA2D_CLK_ENABLE();
+}
+
+void syncBuffer() {
+    DMA2D_WAIT;
+    static const uint32_t LINE_INTERRUPT_POSITION = (LTDC->AWCR & 0x7FF) - 1;
+    HAL_LTDC_ProgramLineEvent(&hltdc, LINE_INTERRUPT_POSITION);
+}
+
+static void bitBltRGB888(uint16_t *src, uint8_t *dst, int x, int y, int width, int height);
+void copySyncedBufferToScreenshotBuffer() {
+    bitBltRGB888(g_syncedBuffer, SCREENSHOOT_BUFFER_START_ADDRESS, 0, 0, DISPLAY_WIDTH, DISPLAY_HEIGHT);
+    DMA2D_WAIT;
+}
+
+////////////////////////////////////////////////////////////////////////////////
 
 inline uint32_t vramOffset(uint16_t *vram, int x, int y) {
     return (uint32_t)(vram + y * DISPLAY_WIDTH + x);
@@ -184,7 +195,7 @@ void bitBlt(void *src, int srcBpp, uint32_t srcLineOffset, uint16_t *dst, int x,
 }
 
 void bitBlt(void *src, int x1, int y1, int x2, int y2) {
-    bitBlt(src, g_bufferDraw, x1, y1, x2, y2);
+    bitBlt(src, g_renderBuffer, x1, y1, x2, y2);
     setDirty();
 }
 
@@ -206,7 +217,7 @@ void bitBlt(uint16_t *src, uint16_t *dst, int x, int y, int width, int height) {
     g_waitDMA = true;
 }
 
-void bitBltRGB888(uint16_t *src, uint8_t *dst, int x, int y, int width, int height) {
+static void bitBltRGB888(uint16_t *src, uint8_t *dst, int x, int y, int width, int height) {
     hdma2d.Init.Mode = DMA2D_M2M_PFC;
     hdma2d.Init.ColorMode = DMA2D_OUTPUT_RGB888;
     hdma2d.Init.OutputOffset = DISPLAY_WIDTH - width;
@@ -252,7 +263,7 @@ void bitBlt(uint16_t *src, uint16_t *dst, int x, int y, int width, int height, i
 
 void bitBlt(void *src, void *dst, int sx, int sy, int sw, int sh, int dx, int dy, uint8_t opacity) {
     if (dst == nullptr) {
-        dst = g_bufferDraw;
+        dst = g_renderBuffer;
     }
 
     auto srcOffset = vramOffset((uint16_t *)src, sx, sy);
@@ -301,177 +312,16 @@ void bitBlt(void *src, void *dst, int sx, int sy, int sw, int sh, int dx, int dy
 
 ////////////////////////////////////////////////////////////////////////////////
 
-void *getBufferPointer() {
-    return g_bufferDraw;
-}
-
-void setBufferPointer(void *buffer) {
-    g_bufferDraw = (uint16_t *)buffer;
-}
-
-void turnOn() {
-    if (g_displayState != ON && g_displayState != TURNING_ON) {
-        __HAL_RCC_DMA2D_CLK_ENABLE();
-
-        // clear video RAM
-        g_bufferOld = (uint16_t *)VRAM_BUFFER2_START_ADDRESS;
-        g_bufferNew = (uint16_t *)VRAM_BUFFER1_START_ADDRESS;
-        g_bufferDraw = g_bufferNew;
-
-        g_buffers[0].bufferPointer = (uint16_t *)(VRAM_AUX_BUFFER1_START_ADDRESS);
-        g_buffers[1].bufferPointer = (uint16_t *)(VRAM_AUX_BUFFER2_START_ADDRESS);
-        g_buffers[2].bufferPointer = (uint16_t *)(VRAM_AUX_BUFFER3_START_ADDRESS);
-        g_buffers[3].bufferPointer = (uint16_t *)(VRAM_AUX_BUFFER4_START_ADDRESS);
-        g_buffers[4].bufferPointer = (uint16_t *)(VRAM_AUX_BUFFER5_START_ADDRESS);
-        g_buffers[5].bufferPointer = (uint16_t *)(VRAM_AUX_BUFFER6_START_ADDRESS);
-
-        fillRect(g_bufferOld, 0, 0, DISPLAY_WIDTH, DISPLAY_HEIGHT, 0);
-        fillRect(g_bufferNew, 0, 0, DISPLAY_WIDTH, DISPLAY_HEIGHT, 0);
-
-        DMA2D_WAIT;
-
-        // set video RAM address
-        //setAddress(g_bufferDraw);
-
-        turnOnStartHook();
-    }
-}
-
-void turnOff() {
-    if (g_displayState != OFF && g_displayState != TURNING_OFF) {
-        turnOffStartHook();
-    }
-}
-
-bool isOn() {
-    return g_displayState == ON || g_displayState == TURNING_ON;
-}
-
-////////////////////////////////////////////////////////////////////////////////
-
-static inline void syncBuffer(uint16_t *buffer) {
-    DMA2D_WAIT;
-    
-    // wait for VSYNC
-    while (!(LTDC->CDSR & LTDC_CDSR_VSYNCS)) { osDelay(0); }
-
-    // Configure the color frame buffer start address
-    auto layer = (LTDC_Layer_TypeDef *)((uint32_t)hltdc.Instance + 0x84U);
-    layer->CFBAR = (uint32_t)buffer;
-    // Set the Immediate Reload type
-    hltdc.Instance->SRCR = LTDC_SRCR_IMR;
-}
-
-void animate() {
-    float t = (millis() - g_animationState.startTime) / (1000.0f * g_animationState.duration);
-    if (t < 1.0f) {
-        g_animationBuffer = g_animationBuffer == (uint16_t *)VRAM_ANIMATION_BUFFER1_START_ADDRESS
-                         ? (uint16_t *)VRAM_ANIMATION_BUFFER2_START_ADDRESS
-                         : (uint16_t *)VRAM_ANIMATION_BUFFER1_START_ADDRESS;
-
-        g_animationState.callback(t, g_bufferOld, g_bufferDraw, g_animationBuffer);
-
-        syncBuffer(g_animationBuffer);
-    } else {
-        g_animationState.enabled = false;
-    }
-}
-
-void swapBuffers() {
-    syncBuffer(g_bufferDraw);
-
-    auto temp = g_bufferNew;
-    g_bufferNew = g_bufferOld;
-    g_bufferOld = temp;
-
-    g_bufferDraw = g_bufferNew;
-}
-
-void sync() {
-    if (g_displayState == OFF) {
-        return;
-    }
-
-    if (g_displayState == TURNING_OFF) {
-        turnOffTickHook();
-        return;
-    }
-
-#ifdef EEZ_CONF_GUI_CALC_FPS
-    if (g_calcFpsEnabled) {
-        calcFPS();
-    }
-#endif
-
-    if (g_displayState == TURNING_ON) {
-        turnOnTickHook();
-    }
-
-    if (!g_screenshotAllocated && g_animationState.enabled) {
-        animate();
-        if (!g_animationState.enabled) {
-            finishAnimation();
-        }
-        clearDirty();
-        return;
-    }
-
-    if (isDirty()) {
-        clearDirty();
-        swapBuffers();
-    }
-
-    if (g_takeScreenshot) {
-        bitBltRGB888(g_bufferOld, SCREENSHOOT_BUFFER_START_ADDRESS, 0, 0, DISPLAY_WIDTH, DISPLAY_HEIGHT);
-        DMA2D_WAIT;
-        g_takeScreenshot = false;
-        g_screenshotAllocated = true;
-    }
-}
-
-void finishAnimation() {
-    auto oldBuffer = g_bufferDraw;
-    swapBuffers();
-    bitBlt(oldBuffer, 0, 0, getDisplayWidth() - 1, getDisplayHeight() - 1);
-}
-
-////////////////////////////////////////////////////////////////////////////////
-
-int getDisplayWidth() {
-    return DISPLAY_WIDTH;
-}
-
-int getDisplayHeight() {
-    return DISPLAY_HEIGHT;
-}
-
-////////////////////////////////////////////////////////////////////////////////
-
-const uint8_t *takeScreenshot() {
-    while (g_screenshotAllocated) {
-    }
-
-    g_takeScreenshot = true;
-
-    do {
-        osDelay(0);
-    } while (g_takeScreenshot);
-
-    return SCREENSHOOT_BUFFER_START_ADDRESS;
-}
-
-////////////////////////////////////////////////////////////////////////////////
-
 void startPixelsDraw() {
     DMA2D_WAIT;
 }
 
 void drawPixel(int x, int y) {
-    *(g_bufferDraw + y * DISPLAY_WIDTH + x) = g_fc;
+    *(g_renderBuffer + y * DISPLAY_WIDTH + x) = g_fc;
 }
 
 void drawPixel(int x, int y, uint8_t opacity) {
-    auto dest = g_bufferDraw + y * DISPLAY_WIDTH + x;
+    auto dest = g_renderBuffer + y * DISPLAY_WIDTH + x;
     *dest = color32to16(
         blendColor(
             color16to32(g_fc, opacity),
@@ -485,19 +335,19 @@ void endPixelsDraw() {
 }
 
 void fillRect(int x1, int y1, int x2, int y2) {
-    fillRect(g_bufferDraw, x1, y1, x2 - x1 + 1, y2 - y1 + 1, g_fc);
+    fillRect(g_renderBuffer, x1, y1, x2 - x1 + 1, y2 - y1 + 1, g_fc);
 
     setDirty();
 }
 
 void bitBlt(int x1, int y1, int x2, int y2, int dstx, int dsty) {
-    bitBlt(g_bufferDraw, g_bufferDraw, x1, y1, x2-x1+1, y2-y1+1, dstx, dsty);
+    bitBlt(g_renderBuffer, g_renderBuffer, x1, y1, x2-x1+1, y2-y1+1, dstx, dsty);
 
     setDirty();
 }
 
 void drawBitmap(Image *image, int x, int y) {
-    bitBlt(image->pixels, image->bpp, image->lineOffset, g_bufferDraw, x, y, image->width, image->height);
+    bitBlt(image->pixels, image->bpp, image->lineOffset, g_renderBuffer, x, y, image->width, image->height);
 
     setDirty();
 }
@@ -540,7 +390,7 @@ void drawStrInit() {
 
 void drawGlyph(const uint8_t *src, uint32_t srcLineOffset, int x, int y, int width, int height) {
     uint32_t lineOffset = DISPLAY_WIDTH - width;
-    uint32_t dst = vramOffset(g_bufferDraw, x, y);
+    uint32_t dst = vramOffset(g_renderBuffer, x, y);
 
     DMA2D_WAIT;
 
@@ -556,5 +406,3 @@ void drawGlyph(const uint8_t *src, uint32_t srcLineOffset, int x, int y, int wid
 } // namespace display
 } // namespace gui
 } // namespace eez
-
-#endif // EEZ_PLATFORM_STM32

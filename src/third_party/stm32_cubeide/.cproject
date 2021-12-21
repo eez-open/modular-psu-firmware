@@ -731,9 +731,6 @@
 							<tool id="com.st.stm32cube.ide.mcu.gnu.managedbuild.tool.objcopy.symbolsrec.1848461566" name="MCU Output Converter Motorola S-rec with symbols" superClass="com.st.stm32cube.ide.mcu.gnu.managedbuild.tool.objcopy.symbolsrec.803673296"/>
 						</toolChain>
 					</folderInfo>
-					<fileInfo id="com.st.stm32cube.ide.mcu.gnu.managedbuild.config.exe.debug.1388326417.817635047" name="fs.cpp" rcbsApplicability="disable" resourcePath="eez/fs/simulator/fs.cpp" toolsToInvoke="com.st.stm32cube.ide.mcu.gnu.managedbuild.tool.cpp.compiler.2086139482.1853384974">
-						<tool id="com.st.stm32cube.ide.mcu.gnu.managedbuild.tool.cpp.compiler.2086139482.1853384974" name="MCU G++ Compiler" superClass="com.st.stm32cube.ide.mcu.gnu.managedbuild.tool.cpp.compiler.2086139482"/>
-					</fileInfo>
 					<folderInfo id="com.st.stm32cube.ide.mcu.gnu.managedbuild.config.exe.debug.1388326417.2004961906" name="/" resourcePath="eez/flow">
 						<toolChain id="com.st.stm32cube.ide.mcu.gnu.managedbuild.toolchain.exe.debug.14090111" name="MCU ARM GCC" superClass="com.st.stm32cube.ide.mcu.gnu.managedbuild.toolchain.exe.debug" unusedChildren="">
 							<option id="com.st.stm32cube.ide.mcu.option.internal.toolchain.type.1357444020.1325250182" name="Internal Toolchain Type" superClass="com.st.stm32cube.ide.mcu.option.internal.toolchain.type.1357444020"/>
@@ -784,17 +781,17 @@
 						</toolChain>
 					</folderInfo>
 					<sourceEntries>
-						<entry flags="VALUE_WORKSPACE_PATH|RESOLVED" kind="sourcePath" name="Core"/>
-						<entry flags="VALUE_WORKSPACE_PATH|RESOLVED" kind="sourcePath" name="Drivers"/>
-						<entry flags="VALUE_WORKSPACE_PATH|RESOLVED" kind="sourcePath" name="FATFS"/>
 						<entry flags="VALUE_WORKSPACE_PATH|RESOLVED" kind="sourcePath" name="LIBJPEG"/>
-						<entry flags="VALUE_WORKSPACE_PATH|RESOLVED" kind="sourcePath" name="LWIP"/>
-						<entry flags="VALUE_WORKSPACE_PATH|RESOLVED" kind="sourcePath" name="Middlewares"/>
-						<entry flags="VALUE_WORKSPACE_PATH|RESOLVED" kind="sourcePath" name="USB_DEVICE"/>
+						<entry excluding="ports/bare-arm|lib/utils/gchelper_m3.s|lib/utils/gchelper_m0.s|extmod/virtpin.c|extmod/vfs.c|extmod/vfs_reader.c|extmod/vfs_posix.c|extmod/vfs_posix_file.c|extmod/vfs_lfs.c|extmod/vfs_fat.c|extmod/vfs_fat_file.c|extmod/vfs_fat_diskio.c|extmod/vfs_blockdev.c|extmod/uos_dupterm.c|extmod/modwebrepl.c|extmod/moduzlib.c|extmod/moduwebsocket.c|extmod/modutimeq.c|extmod/modussl_mbedtls.c|extmod/modussl_axtls.c|extmod/moduselect.c|extmod/modure.c|extmod/modurandom.c|extmod/modujson.c|extmod/moduheapq.c|extmod/moduhashlib.c|extmod/moductypes.c|extmod/moducryptolib.c|extmod/modubinascii.c|extmod/modframebuf.c|extmod/modbluetooth.c|extmod/machine_spi.c|extmod/machine_signal.c|extmod/machine_pulse.c|extmod/machine_pinbase.c|extmod/machine_mem.c|extmod/machine_i2c.c" flags="VALUE_WORKSPACE_PATH|RESOLVED" kind="sourcePath" name="micropython"/>
+						<entry flags="VALUE_WORKSPACE_PATH|RESOLVED" kind="sourcePath" name="Core"/>
 						<entry flags="VALUE_WORKSPACE_PATH|RESOLVED" kind="sourcePath" name="Utilities"/>
+						<entry flags="VALUE_WORKSPACE_PATH|RESOLVED" kind="sourcePath" name="FATFS"/>
 						<entry excluding="gui/document_stm32.cpp|gui/document_simulator.cpp|libs/image/nanojpeg.c|fs/simulator|libs/mqtt|platform/simulator|mcu/simulator" flags="VALUE_WORKSPACE_PATH|RESOLVED" kind="sourcePath" name="bb3"/>
 						<entry excluding="fs/simulator/fs.cpp|platform/simulator|libs/mqtt|libs/sd_fat/simulator|libs/image/nanojpeg.c|gui/document_stm32.cpp|gui/document_simulator.cpp" flags="VALUE_WORKSPACE_PATH|RESOLVED" kind="sourcePath" name="eez"/>
-						<entry excluding="ports/bare-arm|lib/utils/gchelper_m3.s|lib/utils/gchelper_m0.s|extmod/virtpin.c|extmod/vfs.c|extmod/vfs_reader.c|extmod/vfs_posix.c|extmod/vfs_posix_file.c|extmod/vfs_lfs.c|extmod/vfs_fat.c|extmod/vfs_fat_file.c|extmod/vfs_fat_diskio.c|extmod/vfs_blockdev.c|extmod/uos_dupterm.c|extmod/modwebrepl.c|extmod/moduzlib.c|extmod/moduwebsocket.c|extmod/modutimeq.c|extmod/modussl_mbedtls.c|extmod/modussl_axtls.c|extmod/moduselect.c|extmod/modure.c|extmod/modurandom.c|extmod/modujson.c|extmod/moduheapq.c|extmod/moduhashlib.c|extmod/moductypes.c|extmod/moducryptolib.c|extmod/modubinascii.c|extmod/modframebuf.c|extmod/modbluetooth.c|extmod/machine_spi.c|extmod/machine_signal.c|extmod/machine_pulse.c|extmod/machine_pinbase.c|extmod/machine_mem.c|extmod/machine_i2c.c" flags="VALUE_WORKSPACE_PATH|RESOLVED" kind="sourcePath" name="micropython"/>
+						<entry flags="VALUE_WORKSPACE_PATH|RESOLVED" kind="sourcePath" name="LWIP"/>
+						<entry flags="VALUE_WORKSPACE_PATH|RESOLVED" kind="sourcePath" name="Middlewares"/>
+						<entry flags="VALUE_WORKSPACE_PATH|RESOLVED" kind="sourcePath" name="Drivers"/>
+						<entry flags="VALUE_WORKSPACE_PATH|RESOLVED" kind="sourcePath" name="USB_DEVICE"/>
 					</sourceEntries>
 				</configuration>
 			</storageModule>

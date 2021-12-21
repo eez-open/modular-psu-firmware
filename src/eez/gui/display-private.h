@@ -26,6 +26,34 @@ namespace eez {
 namespace gui {
 namespace display {
 
+void initDriver();
+
+#if defined(EEZ_PLATFORM_STM32)
+typedef uint16_t *VideoBuffer;
+#endif
+#if defined(EEZ_PLATFORM_SIMULATOR)
+typedef uint32_t *VideoBuffer;
+#endif
+
+enum DisplayState {
+    OFF,
+    TURNING_ON,
+    ON,
+    TURNING_OFF
+};
+
+extern DisplayState g_displayState;
+
+void turnOnStartHook();
+void turnOnTickHook();
+void turnOffStartHook();
+void turnOffTickHook();
+
+extern VideoBuffer g_syncedBuffer;
+void syncBuffer();
+
+void copySyncedBufferToScreenshotBuffer();
+
 extern uint16_t g_fc, g_bc;
 extern uint8_t g_opacity;
 
@@ -36,9 +64,9 @@ void drawGlyph(const uint8_t *src, uint32_t srcLineOffset, int x, int y, int wid
 
 static const int NUM_BUFFERS = 6;
 
-struct Buffer {
-    void *bufferPointer;
-    void *previousBuffer;
+struct RenderBuffer {
+    VideoBuffer bufferPointer;
+    VideoBuffer previousBuffer;
     int x;
     int y;
     int width;
@@ -49,9 +77,9 @@ struct Buffer {
     int yOffset;
     gui::Rect *backdrop;
 };
-extern Buffer g_buffers[NUM_BUFFERS];
+extern RenderBuffer g_renderBuffers[NUM_BUFFERS];
 
-void setBufferPointer(void *buffer);
+void setBufferPointer(VideoBuffer buffer);
 
 extern bool g_dirty;
 inline void clearDirty() { g_dirty = false; }

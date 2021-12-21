@@ -38,9 +38,6 @@ EEZ_MESSAGE_QUEUE_DECLARE(gui, {
 });
 
 void startThread() {
-    loadMainAssets(assets, sizeof(assets));
-    display::onThemeChanged();
-    guiInit();
 	EEZ_MESSAGE_QUEUE_CREATE(gui, 10);
 	EEZ_THREAD_CREATE(gui, mainLoop);
 }
@@ -49,8 +46,14 @@ void oneIter();
 
 void mainLoop(void *) {
 #ifdef __EMSCRIPTEN__
+    if (!g_isMainAssetsLoaded) {
+        guiInit();
+    }
 	oneIter();
 #else
+
+    guiInit();
+
     while (1) {
 
 #ifdef EEZ_PLATFORM_SIMULATOR
@@ -65,38 +68,38 @@ void mainLoop(void *) {
 }
 
 void processGuiQueue(uint32_t timeout) {
-	while (true) {
-        guiMessageQueueObject obj;
-		if (!EEZ_MESSAGE_QUEUE_GET(gui, obj, timeout)) {
-            return;
-        }
+    guiMessageQueueObject obj;
+    if (!EEZ_MESSAGE_QUEUE_GET(gui, obj, timeout)) {
+        return;
+    }
 
-		uint8_t type = obj.type;
-		int16_t param = obj.param;
+    uint8_t type = obj.type;
+    int16_t param = obj.param;
 
-		if (type == GUI_QUEUE_MESSAGE_TYPE_SHOW_PAGE) {
-			getAppContextFromId(param)->showPage(obj.pageId);
-		} else if (type == GUI_QUEUE_MESSAGE_TYPE_PUSH_PAGE) {
-			getAppContextFromId(param)->pushPage(obj.pageId, obj.page);
-		} else if (type == GUI_QUEUE_MESSAGE_REFRESH_SCREEN) {
-			refreshScreen();
-		} else if (type == GUI_QUEUE_MESSAGE_UNLOAD_EXTERNAL_ASSETS) {
-			unloadExternalAssets();
-		} else if (type == GUI_QUEUE_MESSAGE_DEBUGGER_CLIENT_CONNECTED) {
-			flow::onDebuggerClientConnected();
-		} else if (type == GUI_QUEUE_MESSAGE_DEBUGGER_CLIENT_DISCONNECTED) {
-			flow::onDebuggerClientDisconnected();
-		} else if (type == GUI_QUEUE_MESSAGE_DEBUGGER_INPUT_AVAILABLE) {
-			flow::onDebuggerInputAvailable();
-		} else {
-			onGuiQueueMessageHook(type, param);
-		}
-	}
+    if (type == GUI_QUEUE_MESSAGE_TYPE_DISPLAY_VSYNC) {
+        display::update();
+    } else if (type == GUI_QUEUE_MESSAGE_TYPE_SHOW_PAGE) {
+        getAppContextFromId(param)->showPage(obj.pageId);
+    } else if (type == GUI_QUEUE_MESSAGE_TYPE_PUSH_PAGE) {
+        getAppContextFromId(param)->pushPage(obj.pageId, obj.page);
+    } else if (type == GUI_QUEUE_MESSAGE_REFRESH_SCREEN) {
+        refreshScreen();
+    } else if (type == GUI_QUEUE_MESSAGE_UNLOAD_EXTERNAL_ASSETS) {
+        unloadExternalAssets();
+    } else if (type == GUI_QUEUE_MESSAGE_DEBUGGER_CLIENT_CONNECTED) {
+        flow::onDebuggerClientConnected();
+    } else if (type == GUI_QUEUE_MESSAGE_DEBUGGER_CLIENT_DISCONNECTED) {
+        flow::onDebuggerClientDisconnected();
+    } else if (type == GUI_QUEUE_MESSAGE_DEBUGGER_INPUT_AVAILABLE) {
+        flow::onDebuggerInputAvailable();
+    } else {
+        onGuiQueueMessageHook(type, param);
+    }
 }
 
 void oneIter() {
-	processGuiQueue(5);
-	guiTick();
+	processGuiQueue(100);
+    guiTick();
 }
 
 void sendMessageToGuiThread(uint8_t messageType, uint32_t messageParam, uint32_t timeoutMillisec) {

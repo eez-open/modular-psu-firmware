@@ -75,61 +75,6 @@ AppContext *getAppContextFromId(int16_t id);
 
 ////////////////////////////////////////////////////////////////////////////////
 
-enum Buffer {
-    BUFFER_OLD,
-    BUFFER_NEW,
-    BUFFER_SOLID_COLOR
-};
-
-struct AnimationState {
-    bool enabled;
-    uint32_t startTime;
-    float duration;
-    Buffer startBuffer;
-    void (*callback)(float t, void *bufferOld, void *bufferNew, void *bufferDst);
-    float (*easingRects)(float x, float x1, float y1, float x2, float y2);
-    float (*easingOpacity)(float x, float x1, float y1, float x2, float y2);
-};
-
-enum Opacity {
-    OPACITY_SOLID,
-    OPACITY_FADE_IN,
-    OPACITY_FADE_OUT
-};
-
-enum Position {
-    POSITION_TOP_LEFT,
-    POSITION_TOP,
-    POSITION_TOP_RIGHT,
-    POSITION_LEFT,
-    POSITION_CENTER,
-    POSITION_RIGHT,
-    POSITION_BOTTOM_LEFT,
-    POSITION_BOTTOM,
-    POSITION_BOTTOM_RIGHT
-};
-
-struct AnimRect {
-    Buffer buffer;
-    Rect srcRect;
-    Rect dstRect;
-    uint16_t color;
-    Opacity opacity;
-    Position position;
-};
-
-extern AnimationState g_animationState;
-
-#define MAX_ANIM_RECTS 10
-
-extern AnimRect g_animRects[MAX_ANIM_RECTS];
-
-void animateOpen(const Rect &srcRect, const Rect &dstRect);
-void animateClose(const Rect &srcRect, const Rect &dstRect);
-void animateRects(AppContext *appContext, Buffer startBuffer, int numRects, float duration = -1, const Rect *clipRect = nullptr);
-
-////////////////////////////////////////////////////////////////////////////////
-
 float getDefaultAnimationDurationHook();
 
 void executeExternalActionHook(const WidgetCursor &widgetCursor, int16_t actionId);

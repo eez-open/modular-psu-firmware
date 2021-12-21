@@ -456,11 +456,6 @@ void init() {
 
     // remember this g_devConf to be used to detect when it changes
     memcpy(&g_savedDevConf, &g_devConf, sizeof(DeviceConfiguration));
-
-#if OPTION_DISPLAY
-    onLuminocityChanged();
-    onThemeChanged();
-#endif
 }
 
 void initChannels() {

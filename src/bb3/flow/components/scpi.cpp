@@ -20,6 +20,7 @@
 
 #include <eez/alloc.h>
 
+#include <eez/flow/flow.h>
 #include <eez/flow/components.h>
 #include <eez/flow/flow_defs_v3.h>
 #include <eez/flow/expression.h>
@@ -215,6 +216,10 @@ void scpiComponentInit() {
 }
 
 void executeScpi() {
+	if (!isFlowRunningHook()) {
+		return;
+	}
+
 	g_scpiDataLen = 0;
 	g_lastError = 0;
 

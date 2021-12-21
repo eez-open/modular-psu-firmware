@@ -406,6 +406,7 @@ NVIC.EXTI15_10_IRQn=true\:5\:0\:false\:false\:true\:true\:true\:true
 NVIC.EXTI9_5_IRQn=true\:5\:0\:false\:false\:true\:true\:true\:true
 NVIC.ForceEnableDMAVector=true
 NVIC.HardFault_IRQn=true\:0\:0\:false\:false\:true\:false\:false\:false
+NVIC.LTDC_IRQn=true\:5\:0\:false\:false\:true\:true\:true\:true
 NVIC.MemoryManagement_IRQn=true\:0\:0\:false\:false\:true\:false\:false\:false
 NVIC.NonMaskableInt_IRQn=true\:0\:0\:false\:false\:true\:false\:false\:true
 NVIC.OTG_FS_IRQn=true\:5\:0\:false\:false\:true\:true\:false\:true

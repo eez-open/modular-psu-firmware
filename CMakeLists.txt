@@ -171,7 +171,7 @@ list (APPEND header_files ${header_bb3_conf_eez})
 source_group("bb3\\conf\\eez" FILES ${header_bb3_conf_eez})
 
 set(src_bb3_gui
-    src/bb3/gui/display.cpp
+    src/bb3/gui/display-hooks.cpp
     src/bb3/gui/document.cpp
 )
 list (APPEND src_files ${src_bb3_gui})
@@ -311,6 +311,7 @@ list (APPEND header_files ${header_bb3_psu_scpi})
 source_group("bb3\\psu\\scpi" FILES ${src_bb3_psu_scpi} ${header_bb3_psu_scpi})
 
 set(src_eez_gui
+    src/eez/gui/animation.cpp
     src/eez/gui/app_context.cpp
     src/eez/gui/assets.cpp
     src/eez/gui/data.cpp
@@ -332,6 +333,7 @@ set(src_eez_gui
 )
 list (APPEND src_files ${src_eez_gui})
 set(header_eez_gui
+    src/eez/gui/animation.h
     src/eez/gui/app_context.h
     src/eez/gui/assets.h
     src/eez/gui/data.h
