@@ -41,12 +41,12 @@ void getInputWidgetParams(const gui::WidgetCursor &widgetCursor, Value &min, Val
 	auto maxValue = get(widgetCursor, widget->max);
 	auto precisionValue = get(widgetCursor, widget->precision);
 
-	float base10 = getUnitBase10(unit);
+	float factor = getUnitFactor(unit);
 	auto baseUnit = getBaseUnit(unit);
 
-	min = Value(minValue.toFloat() * base10, baseUnit);
-	max = Value(maxValue.toFloat() * base10, baseUnit);
-	precision = Value(precisionValue.toFloat() * base10, baseUnit);
+	min = Value(minValue.toFloat() * factor, baseUnit);
+	max = Value(maxValue.toFloat() * factor, baseUnit);
+	precision = Value(precisionValue.toFloat() * factor, baseUnit);
 }
 
 Value getInputWidgetMin(const gui::WidgetCursor &widgetCursor) {
@@ -65,8 +65,8 @@ Value getInputWidgetMin(const gui::WidgetCursor &widgetCursor) {
 	auto baseUnit = getBaseUnit(unit);
 
 	auto value = get(widgetCursor, widget->min);
-	float base10 = getUnitBase10(unit);
-	return Value(value.toFloat() * base10, baseUnit);
+	float factor = getUnitFactor(unit);
+	return Value(value.toFloat() * factor, baseUnit);
 }
 
 Value getInputWidgetMax(const gui::WidgetCursor &widgetCursor) {
@@ -85,8 +85,8 @@ Value getInputWidgetMax(const gui::WidgetCursor &widgetCursor) {
 	auto baseUnit = getBaseUnit(unit);
 
 	auto value = get(widgetCursor, widget->max);
-	float base10 = getUnitBase10(unit);
-	return Value(value.toFloat() * base10, baseUnit);
+	float factor = getUnitFactor(unit);
+	return Value(value.toFloat() * factor, baseUnit);
 }
 
 Value getInputWidgetPrecision(const gui::WidgetCursor &widgetCursor) {
@@ -105,8 +105,8 @@ Value getInputWidgetPrecision(const gui::WidgetCursor &widgetCursor) {
 	auto baseUnit = getBaseUnit(unit);
 
 	auto value = get(widgetCursor, widget->precision);
-	float base10 = getUnitBase10(unit);
-	return Value(value.toFloat() * base10, baseUnit);
+	float factor = getUnitFactor(unit);
+	return Value(value.toFloat() * factor, baseUnit);
 }
 
 Unit getInputWidgetUnit(const gui::WidgetCursor &widgetCursor) {
@@ -133,9 +133,9 @@ Value getInputWidgetData(const gui::WidgetCursor &widgetCursor, const Value &dat
 
 	if (widget->flags & INPUT_WIDGET_TYPE_NUMBER) {
 		auto unit = getInputWidgetUnit(widgetCursor);
-		float base10 = getUnitBase10(unit);
+		float factor = getUnitFactor(unit);
 		auto baseUnit = getBaseUnit(unit);
-    	return Value(dataValue.toFloat() * base10, baseUnit);
+    	return Value(dataValue.toFloat() * factor, baseUnit);
 	} else {
 		return get(widgetCursor, widget->data);
 	}

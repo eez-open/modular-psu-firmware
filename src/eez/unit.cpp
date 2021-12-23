@@ -101,7 +101,7 @@ const Unit g_baseUnit[] = {
 	UNIT_AMPER_PP, // UNIT_MICRO_AMPER_PP
 };
 
-const float g_base10[] = {
+const float g_unitFactor[] = {
 	1.0f, // UNIT_NONE
 	1.0f, // UNIT_VOLT
 	1E-3f, // UNIT_MILLI_VOLT
@@ -202,11 +202,103 @@ Unit getBaseUnit(Unit unit) {
 	return g_baseUnit[unit];
 }
 
-float getUnitBase10(Unit unit) {
+float getUnitFactor(Unit unit) {
     if (unit == UNIT_UNKNOWN) {
         return 1.0f;
     }
-	return g_base10[unit];
+	return g_unitFactor[unit];
+}
+
+static Unit getDerivedUnit(Unit unit, float factor) {
+	if (unit == UNIT_UNKNOWN) {
+		return UNIT_UNKNOWN;
+	}
+
+	for (size_t i = 0; i < sizeof(g_baseUnit); i++) {
+		if (g_baseUnit[i] == g_baseUnit[unit] && g_unitFactor[i] == factor) {
+			return (Unit)i;
+		}
+	}
+
+	return UNIT_UNKNOWN;
+}
+
+static const float FACTORS[] = { 1E-12F, 1E-9F, 1E-6F, 1E-3F, 1E0F, 1E3F, 1E6F, 1E9F, 1E12F };
+
+Unit findDerivedUnit(float value, Unit unit) {
+	Unit result;
+
+	for (int factorIndex = 1; ; factorIndex++) {
+		float factor = FACTORS[factorIndex];
+		if (factor > 1.0F) {
+			break;
+		}
+		if (value < factor) {
+			result = getDerivedUnit(unit, FACTORS[factorIndex - 1]);
+			if (result != UNIT_UNKNOWN) {
+				return result;
+			}
+		}
+	}
+
+	for (int factorIndex = sizeof(FACTORS) / sizeof(float) - 1; factorIndex >= 0; factorIndex--) {
+		float factor = FACTORS[factorIndex];
+		if (factor == 1.0F) {
+			break;
+		}
+		if (value >= factor) {
+			result = getDerivedUnit(unit, factor);
+			if (result != UNIT_UNKNOWN) {
+				return result;
+			}
+		}
+	}
+
+	return unit;
+}
+
+float getSmallerFactor(float factor) {
+	for (int factorIndex = sizeof(FACTORS) / sizeof(float) - 1; factorIndex > 0; factorIndex--) {
+		float itFactor = FACTORS[factorIndex];
+		if (itFactor < factor) {
+			return itFactor;
+		}
+	}
+	return FACTORS[0];
+}
+
+Unit getSmallerUnit(Unit unit, float min, float precision) {
+	float factor = getUnitFactor(unit);
+	if (precision <= factor || min <= factor) {
+		return getDerivedUnit(unit, getSmallerFactor(factor));
+	}
+	return UNIT_UNKNOWN;
+}
+
+Unit getBiggestUnit(Unit unit, float max) {
+	for (int factorIndex = sizeof(FACTORS) / sizeof(float) - 1; factorIndex >= 0; factorIndex--) {
+		float factor = FACTORS[factorIndex];
+		if (max >= factor) {
+			auto result = getDerivedUnit(unit, factor);
+			if (result != UNIT_UNKNOWN) {
+				return result;
+			}
+		}
+	}
+	return UNIT_UNKNOWN;
+}
+
+Unit getSmallestUnit(Unit unit, float min, float precision) {
+	for (int factorIndex = 0; factorIndex < sizeof(FACTORS) / sizeof(float); factorIndex++) {
+		float factor = FACTORS[factorIndex];
+		if (precision <= factor || min <= factor) {
+			auto result = getDerivedUnit(unit, factor);
+			if (result != UNIT_UNKNOWN) {
+				return result;
+			}
+		}
+	}
+	return UNIT_UNKNOWN;
 }
 
 } // namespace eez

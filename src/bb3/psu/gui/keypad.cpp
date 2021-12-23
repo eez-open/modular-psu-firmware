@@ -101,6 +101,14 @@ void NumericKeypad::onEncoderClicked() {
 	ok();
 }
 
+float NumericKeypad::getPrecision() {
+	auto channel = Channel::getBySlotIndex(m_options.slotIndex, m_options.subchannelIndex);
+	if (channel) {
+		return psu::channel_dispatcher::getValuePrecision(*channel, m_startValue.getUnit(), m_startValue.getFloat());
+	}
+	return m_options.encoderPrecision;
+}
+
 void NumericKeypad::onEncoder(int counter) {
 	if (m_state == START) {
 		if (m_appContext->getActivePageId() == PAGE_ID_EDIT_MODE_KEYPAD) {
@@ -108,13 +116,7 @@ void NumericKeypad::onEncoder(int counter) {
 		}
 
 		if (m_startValue.getType() == VALUE_TYPE_FLOAT) {
-			float precision;
-			auto channel = Channel::getBySlotIndex(m_options.slotIndex, m_options.subchannelIndex);
-			if (channel) {
-				precision = psu::channel_dispatcher::getValuePrecision(*channel, m_startValue.getUnit(), m_startValue.getFloat());
-			} else {
-				precision = m_options.encoderPrecision;
-			}
+			float precision = getPrecision();
 			float newValue = m_startValue.getFloat() + counter * precision;
 			newValue = roundPrec(newValue, precision);
 			newValue = clamp(newValue, m_options.min, m_options.max);

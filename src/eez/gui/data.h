@@ -451,13 +451,6 @@ struct Value {
 
 	//////////
 
-    bool isPico() const;
-    bool isNano() const;
-    bool isMicro() const;
-    bool isMilli() const;
-    bool isKilo() const;
-    bool isMega() const;
-
   public:
 	uint8_t type;
 	uint8_t unit;

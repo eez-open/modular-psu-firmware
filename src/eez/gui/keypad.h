@@ -165,15 +165,7 @@ public:
     bool isEditing();
 
     Unit getEditUnit();
-    Unit getValueUnit();
     
-    void switchToPico();
-    void switchToNano();
-    void switchToMicro();
-    void switchToMilli();
-    void switchToKilo();
-    void switchToMega();
-
     void getKeypadText(char *text, size_t count) override;
     virtual bool getText(char *text, size_t count);
 
@@ -202,6 +194,8 @@ public:
 
     virtual int getCursorPosition() override;
 
+    virtual float getPrecision();
+
     NumericKeypadOptions m_options;
 
 protected:
@@ -214,20 +208,6 @@ protected:
     void appendEditUnit(char *text, size_t maxTextLength);
     double getValue();
     char getDotSign();
-
-    bool isPico();
-    bool isNano();
-    bool isMicro();
-    bool isMilli();
-    bool isKilo();
-    bool isMega();
-
-    Unit getPicoUnit();
-    Unit getNanoUnit();
-    Unit getMicroUnit();
-    Unit getMilliUnit();
-    Unit getKiloUnit();
-    Unit getMegaUnit();
 
     void toggleEditUnit();
     bool checkNumSignificantDecimalDigits();

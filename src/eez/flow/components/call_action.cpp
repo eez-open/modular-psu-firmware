@@ -49,6 +49,7 @@ void executeCallActionComponent(FlowState *flowState, unsigned componentIndex) {
 
 	if (flowIndex >= (int)flowState->flowDefinition->flows.count) {
 		executeActionFunction(flowIndex - flowState->flowDefinition->flows.count);
+		propagateValueThroughSeqout(flowState, componentIndex);
 		return;
 	}
 

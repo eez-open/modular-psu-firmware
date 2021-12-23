@@ -43,6 +43,14 @@ bool SelectWidgetState::updateState() {
 }
 
 void SelectWidgetState::render() {
+    const WidgetCursor &widgetCursor = g_widgetCursor;
+	auto widget = (const SelectWidget *)widgetCursor.widget;
+
+	drawRectangle(
+		widgetCursor.x, widgetCursor.y, (int)widget->w, (int)widget->h,
+		getStyle(widget->style), false
+	);
+	
 	repainted = true;
 }
 

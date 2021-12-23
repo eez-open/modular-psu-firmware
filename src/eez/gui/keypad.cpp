@@ -338,19 +338,7 @@ void NumericKeypad::init(
         m_options.flags.dotButtonEnabled = true;
     }
 
-    if (m_startValue.isPico()) {
-        switchToPico();
-    } else if (m_startValue.isNano()) {
-        switchToNano();
-    } else if (m_startValue.isMicro()) {
-        switchToMicro();
-    } else if (m_startValue.isMilli()) {
-        switchToMilli();
-    } else if (m_startValue.isKilo()) {
-        switchToKilo();
-    } else if (m_startValue.isMega()) {
-        switchToMega();
-    }
+    m_options.editValueUnit = findDerivedUnit(m_startValue.getFloat(), m_startValue.getUnit());
 
     m_minChars = 0;
     m_maxChars = 16;
@@ -405,158 +393,6 @@ Unit NumericKeypad::getEditUnit() {
     return m_options.editValueUnit;
 }
 
-Unit NumericKeypad::getValueUnit() {
-    if (m_options.editValueUnit == UNIT_MILLI_VOLT)
-        return UNIT_VOLT;
-    if (m_options.editValueUnit == UNIT_MILLI_VOLT_PP)
-        return UNIT_VOLT_PP;
-    if (m_options.editValueUnit == UNIT_MILLI_AMPER || m_options.editValueUnit == UNIT_MICRO_AMPER)
-        return UNIT_AMPER;
-    if (m_options.editValueUnit == UNIT_MILLI_AMPER_PP || m_options.editValueUnit == UNIT_MICRO_AMPER_PP)
-        return UNIT_AMPER_PP;
-    if (m_options.editValueUnit == UNIT_MILLI_SECOND)
-        return UNIT_SECOND;
-    if (m_options.editValueUnit == UNIT_MILLI_WATT)
-        return UNIT_WATT;
-    if (m_options.editValueUnit == UNIT_OHM)
-        return UNIT_KOHM;
-    if (m_options.editValueUnit == UNIT_KOHM)
-        return UNIT_MOHM;
-    if (m_options.editValueUnit == UNIT_MOHM)
-        return UNIT_OHM;
-    if (m_options.editValueUnit == UNIT_HERTZ)
-        return UNIT_KHERTZ;
-    if (m_options.editValueUnit == UNIT_KHERTZ)
-        return UNIT_MHERTZ;
-    if (m_options.editValueUnit == UNIT_MHERTZ)
-        return UNIT_MILLI_HERTZ;
-    if (m_options.editValueUnit == UNIT_MILLI_HERTZ)
-        return UNIT_HERTZ;
-    if (m_options.editValueUnit == UNIT_FARAD)
-        return UNIT_MILLI_FARAD;
-    if (m_options.editValueUnit == UNIT_MILLI_FARAD)
-        return UNIT_MICRO_FARAD;
-    if (m_options.editValueUnit == UNIT_MICRO_FARAD)
-        return UNIT_NANO_FARAD;
-    if (m_options.editValueUnit == UNIT_NANO_FARAD)
-        return UNIT_PICO_FARAD;
-    if (m_options.editValueUnit == UNIT_PICO_FARAD)
-        return UNIT_FARAD;
-    return m_options.editValueUnit;
-}
-
-bool NumericKeypad::isPico() {
-    return m_options.editValueUnit == UNIT_PICO_FARAD;
-}
-
-bool NumericKeypad::isNano() {
-    return m_options.editValueUnit == UNIT_NANO_FARAD;
-}
-
-bool NumericKeypad::isMicro() {
-    return m_options.editValueUnit == UNIT_MICRO_AMPER || m_options.editValueUnit == UNIT_MICRO_AMPER_PP || m_options.editValueUnit == UNIT_MICRO_FARAD;
-}
-
-bool NumericKeypad::isMilli() {
-    return m_options.editValueUnit == UNIT_MILLI_VOLT ||
-        m_options.editValueUnit == UNIT_MILLI_VOLT_PP ||
-        m_options.editValueUnit == UNIT_MILLI_AMPER ||
-        m_options.editValueUnit == UNIT_MILLI_AMPER_PP ||
-        m_options.editValueUnit == UNIT_MILLI_WATT ||
-        m_options.editValueUnit == UNIT_MILLI_SECOND ||
-        m_options.editValueUnit == UNIT_MILLI_FARAD ||
-        m_options.editValueUnit == UNIT_MILLI_HERTZ;
-}
-
-bool NumericKeypad::isKilo() {
-    return m_options.editValueUnit == UNIT_KOHM || m_options.editValueUnit == UNIT_KHERTZ;
-}
-
-bool NumericKeypad::isMega() {
-    return m_options.editValueUnit == UNIT_MOHM || m_options.editValueUnit == UNIT_MHERTZ;
-}
-
-Unit NumericKeypad::getPicoUnit() {
-    if (m_options.editValueUnit == UNIT_FARAD || m_options.editValueUnit == UNIT_MILLI_FARAD || m_options.editValueUnit == UNIT_MICRO_FARAD || m_options.editValueUnit == UNIT_NANO_FARAD || m_options.editValueUnit == UNIT_PICO_FARAD)
-        return UNIT_PICO_FARAD;
-    return m_options.editValueUnit;
-}
-
-Unit NumericKeypad::getNanoUnit() {
-    if (m_options.editValueUnit == UNIT_FARAD || m_options.editValueUnit == UNIT_MILLI_FARAD || m_options.editValueUnit == UNIT_MICRO_FARAD || m_options.editValueUnit == UNIT_NANO_FARAD || m_options.editValueUnit == UNIT_PICO_FARAD)
-        return UNIT_NANO_FARAD;
-    return m_options.editValueUnit;
-}
-
-Unit NumericKeypad::getMicroUnit() {
-    if (m_options.editValueUnit == UNIT_AMPER || m_options.editValueUnit == UNIT_MILLI_AMPER)
-        return UNIT_MICRO_AMPER;
-    if (m_options.editValueUnit == UNIT_AMPER_PP || m_options.editValueUnit == UNIT_MILLI_AMPER_PP)
-        return UNIT_MICRO_AMPER_PP;
-    if (m_options.editValueUnit == UNIT_FARAD || m_options.editValueUnit == UNIT_MILLI_FARAD || m_options.editValueUnit == UNIT_MICRO_FARAD || m_options.editValueUnit == UNIT_NANO_FARAD || m_options.editValueUnit == UNIT_PICO_FARAD)
-        return UNIT_MICRO_FARAD;
-    return m_options.editValueUnit;
-}
-
-Unit NumericKeypad::getMilliUnit() {
-    if (m_options.editValueUnit == UNIT_VOLT)
-        return UNIT_MILLI_VOLT;
-    if (m_options.editValueUnit == UNIT_VOLT_PP)
-        return UNIT_MILLI_VOLT_PP;
-    if (m_options.editValueUnit == UNIT_AMPER || m_options.editValueUnit == UNIT_MICRO_AMPER)
-        return UNIT_MILLI_AMPER;
-    if (m_options.editValueUnit == UNIT_AMPER_PP || m_options.editValueUnit == UNIT_MICRO_AMPER_PP)
-        return UNIT_MILLI_AMPER_PP;
-    if (m_options.editValueUnit == UNIT_WATT)
-        return UNIT_MILLI_WATT;
-    if (m_options.editValueUnit == UNIT_SECOND)
-        return UNIT_MILLI_SECOND;
-    if (m_options.editValueUnit == UNIT_FARAD || m_options.editValueUnit == UNIT_MILLI_FARAD || m_options.editValueUnit == UNIT_MICRO_FARAD || m_options.editValueUnit == UNIT_NANO_FARAD || m_options.editValueUnit == UNIT_PICO_FARAD)
-        return UNIT_MILLI_FARAD;
-    if (m_options.editValueUnit == UNIT_HERTZ || m_options.editValueUnit == UNIT_MILLI_HERTZ || m_options.editValueUnit == UNIT_KHERTZ || m_options.editValueUnit == UNIT_MHERTZ)
-        return UNIT_MILLI_HERTZ;
-    return m_options.editValueUnit;
-}
-
-Unit NumericKeypad::getKiloUnit() {
-    if (m_options.editValueUnit == UNIT_OHM || m_options.editValueUnit == UNIT_KOHM || m_options.editValueUnit == UNIT_MOHM)
-        return UNIT_KOHM;
-    if (m_options.editValueUnit == UNIT_HERTZ || m_options.editValueUnit == UNIT_MILLI_HERTZ || m_options.editValueUnit == UNIT_KHERTZ || m_options.editValueUnit == UNIT_MHERTZ)
-        return UNIT_KHERTZ;
-    return m_options.editValueUnit;
-}
-
-Unit NumericKeypad::getMegaUnit() {
-    if (m_options.editValueUnit == UNIT_OHM || m_options.editValueUnit == UNIT_KOHM || m_options.editValueUnit == UNIT_MOHM)
-        return UNIT_MOHM;
-    if (m_options.editValueUnit == UNIT_HERTZ || m_options.editValueUnit == UNIT_MILLI_HERTZ || m_options.editValueUnit == UNIT_KHERTZ || m_options.editValueUnit == UNIT_MHERTZ)
-        return UNIT_MHERTZ;
-    return m_options.editValueUnit;
-}
-
-void NumericKeypad::switchToPico() {
-    m_options.editValueUnit = getPicoUnit();
-}
-
-void NumericKeypad::switchToNano() {
-    m_options.editValueUnit = getNanoUnit();
-}
-
-void NumericKeypad::switchToMicro() {
-    m_options.editValueUnit = getMicroUnit();
-}
-
-void NumericKeypad::switchToMilli() {
-    m_options.editValueUnit = getMilliUnit();
-}
-
-void NumericKeypad::switchToKilo() {
-    m_options.editValueUnit = getKiloUnit();
-}
-
-void NumericKeypad::switchToMega() {
-    m_options.editValueUnit = getMegaUnit();
-}
 
 bool NumericKeypad::isMicroAmperAllowed() {
     return true;
@@ -566,106 +402,53 @@ bool NumericKeypad::isAmperAllowed() {
 	return true;
 }
 
+float NumericKeypad::getPrecision() {
+    return m_options.encoderPrecision;
+}
+
 Unit NumericKeypad::getSwitchToUnit() {
-    if (m_options.editValueUnit == UNIT_VOLT)
-        return UNIT_MILLI_VOLT;
-    if (m_options.editValueUnit == UNIT_VOLT_PP)
-        return UNIT_MILLI_VOLT_PP;
-    if (m_options.editValueUnit == UNIT_MILLI_VOLT)
-        return UNIT_VOLT;
-    if (m_options.editValueUnit == UNIT_MILLI_VOLT_PP)
-        return UNIT_VOLT_PP;
-    if (m_options.editValueUnit == UNIT_AMPER)
-        return UNIT_MILLI_AMPER;
-    if (m_options.editValueUnit == UNIT_AMPER_PP)
-        return UNIT_MILLI_AMPER_PP;
-    if (m_options.editValueUnit == UNIT_MILLI_AMPER) {
+    Unit unit = getSmallerUnit(m_options.editValueUnit, m_options.min, getPrecision());
+    if (unit == UNIT_UNKNOWN) {
+        unit = getBiggestUnit(m_options.editValueUnit, m_options.max);
+    }
+
+	if (unit == UNIT_UNKNOWN) {
+		return m_options.editValueUnit;
+	}
+
+    if (unit == UNIT_MICRO_AMPER) {
         if (isMicroAmperAllowed()) {
             return UNIT_MICRO_AMPER;
         } else {
-            return UNIT_AMPER;
+            return getBiggestUnit(m_options.editValueUnit, m_options.max);
         }
     }
-    if (m_options.editValueUnit == UNIT_MILLI_AMPER_PP) {
+
+    if (unit == UNIT_MICRO_AMPER_PP) {
         if (isMicroAmperAllowed()) {
             return UNIT_MICRO_AMPER_PP;
         } else {
-            return UNIT_AMPER_PP;
+            return getBiggestUnit(m_options.editValueUnit, m_options.max);
         }
     }
-    if (m_options.editValueUnit == UNIT_MICRO_AMPER) {
+
+    if (unit == UNIT_AMPER) {
         if (isAmperAllowed()) {
             return UNIT_AMPER;
         } else {
-            return UNIT_MILLI_AMPER;
+            return getSmallestUnit(m_options.editValueUnit, m_options.min, getPrecision());
         }
     }
-    if (m_options.editValueUnit == UNIT_MICRO_AMPER_PP) {
+
+    if (unit == UNIT_AMPER_PP) {
         if (isAmperAllowed()) {
             return UNIT_AMPER_PP;
         } else {
-            return UNIT_MILLI_AMPER_PP;
+            return getSmallestUnit(m_options.editValueUnit, m_options.min, getPrecision());
         }
     }
-    if (m_options.editValueUnit == UNIT_WATT)
-        return UNIT_MILLI_WATT;
-    if (m_options.editValueUnit == UNIT_MILLI_WATT)
-        return UNIT_WATT;
-    if (m_options.editValueUnit == UNIT_SECOND)
-        return UNIT_MILLI_SECOND;
-    if (m_options.editValueUnit == UNIT_MILLI_SECOND)
-        return UNIT_SECOND;
-    if (m_options.editValueUnit == UNIT_OHM)
-        return UNIT_KOHM;
-    if (m_options.editValueUnit == UNIT_KOHM)
-        return UNIT_MOHM;
-    if (m_options.editValueUnit == UNIT_MOHM)
-        return UNIT_OHM;
-    if (m_options.editValueUnit == UNIT_HERTZ) {
-        if (m_options.max >= 1000.0f) {
-            return UNIT_KHERTZ;
-        } else if (m_options.min < 1.0f) {
-            return UNIT_MILLI_HERTZ;
-        }
-        return UNIT_HERTZ;
-    }
-    if (m_options.editValueUnit == UNIT_KHERTZ) {
-        if (m_options.max >= 1000000.0f) {
-            return UNIT_MHERTZ;
-        } else if (m_options.min < 1.0f) {
-            return UNIT_MILLI_HERTZ;
-        } else if (m_options.min < 1000.0f) {
-            return UNIT_HERTZ;
-        }
-        return UNIT_KHERTZ;
-    }
-    if (m_options.editValueUnit == UNIT_MHERTZ) {
-        if (m_options.min < 1.0f) {
-            return UNIT_MILLI_HERTZ;
-        } else if (m_options.min < 1000.0f) {
-            return UNIT_HERTZ;
-        } else if (m_options.min < 1000000.0f) {
-            return UNIT_KHERTZ;
-        }
-        return UNIT_MHERTZ;
-    }
-    if (m_options.editValueUnit == UNIT_MILLI_HERTZ) {
-        if (m_options.max >= 1.0f) {
-            return UNIT_HERTZ;
-        }
-        return UNIT_MILLI_HERTZ;
-    }
-    if (m_options.editValueUnit == UNIT_FARAD)
-        return UNIT_MILLI_FARAD;
-    if (m_options.editValueUnit == UNIT_MILLI_FARAD)
-        return UNIT_MICRO_FARAD;
-    if (m_options.editValueUnit == UNIT_MICRO_FARAD)
-        return UNIT_NANO_FARAD;
-    if (m_options.editValueUnit == UNIT_NANO_FARAD)
-        return UNIT_PICO_FARAD;
-    if (m_options.editValueUnit == UNIT_PICO_FARAD)
-        return UNIT_FARAD;
-    return m_options.editValueUnit;
+        
+    return unit;
 }
 
 void NumericKeypad::toggleEditUnit() {
@@ -717,23 +500,7 @@ double NumericKeypad::getValue() {
         return NAN;
     }
 
-    double value = sign * (a + b);
-
-    if (isPico()) {
-        value /= 1E12f;
-    } else if (isNano()) {
-        value /= 1E9f;
-    } else if (isMicro()) {
-        value /= 1000000;
-    } else if (isMilli()) {
-        value /= 1000;
-    } else if (isKilo()) {
-        value *= 1000;
-    } else if (isMega()) {
-        value *= 1000000;
-    }
-
-    return value;
+    return sign * (a + b) * getUnitFactor(m_options.editValueUnit);
 }
 
 bool NumericKeypad::checkNumSignificantDecimalDigits() {
@@ -1101,27 +868,9 @@ void data_keypad_unit_enabled(DataOperationEnum operation, const WidgetCursor &w
     if (operation == DATA_OPERATION_GET) {
         NumericKeypad *keypad = getActiveNumericKeypad();
         if (keypad) {
-            value = keypad->m_options.editValueUnit == UNIT_VOLT ||
-                    keypad->m_options.editValueUnit == UNIT_MILLI_VOLT ||
-                    keypad->m_options.editValueUnit == UNIT_AMPER ||
-                    keypad->m_options.editValueUnit == UNIT_MILLI_AMPER ||
-                    keypad->m_options.editValueUnit == UNIT_MICRO_AMPER ||
-                    keypad->m_options.editValueUnit == UNIT_WATT ||
-                    keypad->m_options.editValueUnit == UNIT_MILLI_WATT ||
-                    keypad->m_options.editValueUnit == UNIT_SECOND ||
-                    keypad->m_options.editValueUnit == UNIT_MILLI_SECOND ||
-                    keypad->m_options.editValueUnit == UNIT_OHM ||
-                    keypad->m_options.editValueUnit == UNIT_KOHM ||
-                    keypad->m_options.editValueUnit == UNIT_MOHM ||
-                    keypad->m_options.editValueUnit == UNIT_HERTZ ||
-                    keypad->m_options.editValueUnit == UNIT_MILLI_HERTZ ||
-                    keypad->m_options.editValueUnit == UNIT_KHERTZ ||
-                    keypad->m_options.editValueUnit == UNIT_MHERTZ ||
-                    keypad->m_options.editValueUnit == UNIT_FARAD ||
-                    keypad->m_options.editValueUnit == UNIT_MILLI_FARAD ||
-                    keypad->m_options.editValueUnit == UNIT_MICRO_FARAD ||
-                    keypad->m_options.editValueUnit == UNIT_NANO_FARAD ||
-                    keypad->m_options.editValueUnit == UNIT_PICO_FARAD;
+            value = 
+                getSmallestUnit(keypad->m_options.editValueUnit, keypad->m_options.min, keypad->getPrecision()) !=
+                getBiggestUnit(keypad->m_options.editValueUnit, keypad->m_options.max);
         }
     }
 }

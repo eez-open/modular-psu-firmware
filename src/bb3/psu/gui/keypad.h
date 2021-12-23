@@ -38,6 +38,8 @@ public:
 	void onEncoder(int counter) override;
 #endif
 
+	float getPrecision() override;
+
 private:
 	bool getText(char *text, size_t count) override;
 	bool isMicroAmperAllowed() override;

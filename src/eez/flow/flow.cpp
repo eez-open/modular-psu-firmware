@@ -267,11 +267,15 @@ void dataOperation(int16_t dataId, DataOperationEnum operation, const gui::Widge
 			if (component->type == WIDGET_TYPE_INPUT) {
 				auto inputWidget = (InputWidget *)widgetCursor.widget;
 				if (inputWidget->flags & INPUT_WIDGET_TYPE_NUMBER) {
-					Value precisionValue = getInputWidgetPrecision(widgetCursor);
-					float precision = precisionValue.toFloat();
-					float valueFloat = value.toFloat();
-					Unit unit = getInputWidgetUnit(widgetCursor);
-					setValue(flowDataId, widgetCursor, Value(roundPrec(valueFloat, precision) / getUnitBase10(unit), VALUE_TYPE_FLOAT));
+					if (value.isInt32()) {
+						setValue(flowDataId, widgetCursor, value);
+					} else {
+						Value precisionValue = getInputWidgetPrecision(widgetCursor);
+						float precision = precisionValue.toFloat();
+						float valueFloat = value.toFloat();
+						Unit unit = getInputWidgetUnit(widgetCursor);
+						setValue(flowDataId, widgetCursor, Value(roundPrec(valueFloat, precision) / getUnitFactor(unit), VALUE_TYPE_FLOAT));
+					}
 				} else {
 					setValue(flowDataId, widgetCursor, value);
 				}

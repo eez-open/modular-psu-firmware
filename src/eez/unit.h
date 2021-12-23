@@ -76,8 +76,17 @@ Unit getUnitFromName(const char *unitName);
 
 int getScpiUnit(Unit unit);
 
+// for UNIT_MILLI_VOLT returns UNIT_VOLT, etc...
 Unit getBaseUnit(Unit unit);
 
-float getUnitBase10(Unit unit);
+// returns 1.0 form UNIT_VOLT, returns 1E-3 for UNIT_MILLI_VOLT, 1E-6 for UNIT_MICRO_AMPER, 1E3 for UNIT_KOHM, etc
+float getUnitFactor(Unit unit);
+
+// if value is 0.01 and unit is UNIT_VOLT returns UNIT_MILLI_VOLT, etc
+Unit findDerivedUnit(float value, Unit unit);
+
+Unit getSmallerUnit(Unit unit, float min, float precision);
+Unit getBiggestUnit(Unit unit, float max);
+Unit getSmallestUnit(Unit unit, float min, float precision);
 
 } // namespace eez
