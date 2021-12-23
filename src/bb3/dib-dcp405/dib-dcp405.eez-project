@@ -1310,7 +1310,8 @@
           "customOutputs": [],
           "style": {
             "inheritFrom": "labels_and_colors_channel"
-          }
+          },
+          "invertColors": true
         },
         {
           "type": "Rectangle",
@@ -1323,7 +1324,8 @@
           "customOutputs": [],
           "style": {
             "inheritFrom": "labels_and_colors_channel"
-          }
+          },
+          "invertColors": true
         },
         {
           "type": "Rectangle",
@@ -1336,7 +1338,8 @@
           "customOutputs": [],
           "style": {
             "inheritFrom": "labels_and_colors_channel"
-          }
+          },
+          "invertColors": true
         }
       ],
       "connectionLines": [],
@@ -1533,7 +1536,7 @@
               "wireID": "4778acb0-db87-4743-9b39-51b2d98a4c39",
               "customInputs": [],
               "customOutputs": [],
-              "data": "",
+              "data": "trigger_is_initiated",
               "action": "trigger_generate_manual",
               "style": {
                 "inheritFrom": "trigger_button_24"
@@ -1744,7 +1747,7 @@
               "wireID": "0bd48fc4-7054-403a-a924-33df0d2f39de",
               "customInputs": [],
               "customOutputs": [],
-              "data": "",
+              "data": "trigger_is_initiated",
               "action": "trigger_generate_manual",
               "style": {
                 "inheritFrom": "trigger_button_24"
@@ -2738,7 +2741,7 @@
                   "wireID": "9591215f-49b6-4c7b-acc5-5a06e3b6c982",
                   "customInputs": [],
                   "customOutputs": [],
-                  "data": "",
+                  "data": "trigger_is_initiated",
                   "action": "trigger_generate_manual",
                   "style": {
                     "inheritFrom": "trigger_button_14"
@@ -2947,7 +2950,7 @@
                   "wireID": "ca9818a7-d92d-4464-bb55-3bca1b5ab1af",
                   "customInputs": [],
                   "customOutputs": [],
-                  "data": "",
+                  "data": "trigger_is_initiated",
                   "action": "trigger_generate_manual",
                   "style": {
                     "inheritFrom": "trigger_button_14"
@@ -3871,7 +3874,7 @@
                       "customInputs": [],
                       "customOutputs": [],
                       "style": {
-                        "inheritFrom": "default"
+                        "inheritFrom": "default_inverse"
                       }
                     },
                     {
@@ -3884,7 +3887,7 @@
                       "customInputs": [],
                       "customOutputs": [],
                       "style": {
-                        "inheritFrom": "default"
+                        "inheritFrom": "default_inverse"
                       }
                     },
                     {
@@ -4193,7 +4196,7 @@
                       "customInputs": [],
                       "customOutputs": [],
                       "style": {
-                        "inheritFrom": "default"
+                        "inheritFrom": "default_inverse"
                       }
                     },
                     {
@@ -4206,7 +4209,7 @@
                       "customInputs": [],
                       "customOutputs": [],
                       "style": {
-                        "inheritFrom": "default"
+                        "inheritFrom": "default_inverse"
                       }
                     },
                     {
@@ -4517,7 +4520,7 @@
                       "customInputs": [],
                       "customOutputs": [],
                       "style": {
-                        "inheritFrom": "default"
+                        "inheritFrom": "default_inverse"
                       }
                     },
                     {
@@ -4530,7 +4533,7 @@
                       "customInputs": [],
                       "customOutputs": [],
                       "style": {
-                        "inheritFrom": "default"
+                        "inheritFrom": "default_inverse"
                       }
                     },
                     {
@@ -4703,7 +4706,7 @@
                       "customInputs": [],
                       "customOutputs": [],
                       "style": {
-                        "inheritFrom": "default"
+                        "inheritFrom": "default_inverse"
                       }
                     },
                     {
@@ -4826,7 +4829,7 @@
                   "wireID": "4efd022e-a14a-4eb1-e608-6cc5c4d5cf2b",
                   "customInputs": [],
                   "customOutputs": [],
-                  "data": "",
+                  "data": "trigger_is_initiated",
                   "action": "trigger_generate_manual",
                   "style": {
                     "inheritFrom": "trigger_button_24"

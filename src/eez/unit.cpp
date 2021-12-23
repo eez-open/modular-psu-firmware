@@ -289,7 +289,7 @@ Unit getBiggestUnit(Unit unit, float max) {
 }
 
 Unit getSmallestUnit(Unit unit, float min, float precision) {
-	for (int factorIndex = 0; factorIndex < sizeof(FACTORS) / sizeof(float); factorIndex++) {
+	for (int factorIndex = 0; factorIndex < int(sizeof(FACTORS) / sizeof(float)); factorIndex++) {
 		float factor = FACTORS[factorIndex];
 		if (precision <= factor || min <= factor) {
 			auto result = getDerivedUnit(unit, factor);

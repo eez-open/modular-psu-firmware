@@ -1421,7 +1421,8 @@
                             "customOutputs": [],
                             "style": {
                               "inheritFrom": "default"
-                            }
+                            },
+                            "invertColors": true
                           },
                           {
                             "type": "RectangleWidget",
@@ -1434,7 +1435,8 @@
                             "customOutputs": [],
                             "style": {
                               "inheritFrom": "default"
-                            }
+                            },
+                            "invertColors": true
                           },
                           {
                             "type": "Container",
@@ -1797,7 +1799,8 @@
                             "customOutputs": [],
                             "style": {
                               "inheritFrom": "default"
-                            }
+                            },
+                            "invertColors": true
                           },
                           {
                             "type": "RectangleWidget",
@@ -1810,7 +1813,8 @@
                             "customOutputs": [],
                             "style": {
                               "inheritFrom": "default"
-                            }
+                            },
+                            "invertColors": true
                           },
                           {
                             "type": "Container",
@@ -1866,7 +1870,7 @@
                                     "wireID": "4778acb0-db87-4743-9b39-51b2d98a4c39",
                                     "customInputs": [],
                                     "customOutputs": [],
-                                    "data": "",
+                                    "data": "aout_trigger_is_initiated",
                                     "action": "trigger_generate_manual",
                                     "style": {
                                       "inheritFrom": "trigger_button_14"
@@ -2319,7 +2323,8 @@
                             "customOutputs": [],
                             "style": {
                               "inheritFrom": "default"
-                            }
+                            },
+                            "invertColors": true
                           },
                           {
                             "type": "RectangleWidget",
@@ -2332,7 +2337,8 @@
                             "customOutputs": [],
                             "style": {
                               "inheritFrom": "default"
-                            }
+                            },
+                            "invertColors": true
                           },
                           {
                             "type": "Container",
@@ -2804,7 +2810,8 @@
                                       "inheritFrom": "default",
                                       "backgroundColor": "text_enable_background",
                                       "activeColor": "text_enable_background"
-                                    }
+                                    },
+                                    "invertColors": true
                                   }
                                 ]
                               }
@@ -3554,7 +3561,8 @@
                                     "customOutputs": [],
                                     "style": {
                                       "inheritFrom": "default"
-                                    }
+                                    },
+                                    "invertColors": true
                                   },
                                   {
                                     "type": "Text",
@@ -3588,7 +3596,8 @@
                             "customOutputs": [],
                             "style": {
                               "inheritFrom": "default"
-                            }
+                            },
+                            "invertColors": true
                           },
                           {
                             "type": "RectangleWidget",
@@ -3601,7 +3610,8 @@
                             "customOutputs": [],
                             "style": {
                               "inheritFrom": "default"
-                            }
+                            },
+                            "invertColors": true
                           },
                           {
                             "type": "Container",
@@ -3657,7 +3667,7 @@
                                     "wireID": "4778acb0-db87-4743-9b39-51b2d98a4c39",
                                     "customInputs": [],
                                     "customOutputs": [],
-                                    "data": "",
+                                    "data": "aout_trigger_is_initiated",
                                     "action": "trigger_generate_manual",
                                     "style": {
                                       "inheritFrom": "trigger_button_14"
@@ -3747,7 +3757,7 @@
                                     "wireID": "4778acb0-db87-4743-9b39-51b2d98a4c39",
                                     "customInputs": [],
                                     "customOutputs": [],
-                                    "data": "",
+                                    "data": "aout_trigger_is_initiated",
                                     "action": "trigger_generate_manual",
                                     "style": {
                                       "inheritFrom": "trigger_button_14"
@@ -4272,7 +4282,8 @@
                             "customOutputs": [],
                             "style": {
                               "inheritFrom": "default"
-                            }
+                            },
+                            "invertColors": true
                           },
                           {
                             "type": "RectangleWidget",
@@ -4285,7 +4296,8 @@
                             "customOutputs": [],
                             "style": {
                               "inheritFrom": "default"
-                            }
+                            },
+                            "invertColors": true
                           },
                           {
                             "type": "Container",
@@ -4648,7 +4660,8 @@
                             "customOutputs": [],
                             "style": {
                               "inheritFrom": "default"
-                            }
+                            },
+                            "invertColors": true
                           },
                           {
                             "type": "RectangleWidget",
@@ -4661,7 +4674,8 @@
                             "customOutputs": [],
                             "style": {
                               "inheritFrom": "default"
-                            }
+                            },
+                            "invertColors": true
                           },
                           {
                             "type": "Container",
@@ -4717,7 +4731,7 @@
                                     "wireID": "4778acb0-db87-4743-9b39-51b2d98a4c39",
                                     "customInputs": [],
                                     "customOutputs": [],
-                                    "data": "",
+                                    "data": "aout_trigger_is_initiated",
                                     "action": "trigger_generate_manual",
                                     "style": {
                                       "inheritFrom": "trigger_button_14",
@@ -5171,7 +5185,8 @@
                             "customOutputs": [],
                             "style": {
                               "inheritFrom": "default"
-                            }
+                            },
+                            "invertColors": true
                           },
                           {
                             "type": "RectangleWidget",
@@ -5184,7 +5199,8 @@
                             "customOutputs": [],
                             "style": {
                               "inheritFrom": "default"
-                            }
+                            },
+                            "invertColors": true
                           },
                           {
                             "type": "Container",
@@ -5647,7 +5663,8 @@
                                       "inheritFrom": "default",
                                       "backgroundColor": "text_enable_background",
                                       "activeColor": "text_enable_background"
-                                    }
+                                    },
+                                    "invertColors": true
                                   }
                                 ]
                               }
@@ -6398,7 +6415,8 @@
                                     "customOutputs": [],
                                     "style": {
                                       "inheritFrom": "default"
-                                    }
+                                    },
+                                    "invertColors": true
                                   },
                                   {
                                     "type": "Text",
@@ -6432,7 +6450,8 @@
                             "customOutputs": [],
                             "style": {
                               "inheritFrom": "default"
-                            }
+                            },
+                            "invertColors": true
                           },
                           {
                             "type": "RectangleWidget",
@@ -6445,7 +6464,8 @@
                             "customOutputs": [],
                             "style": {
                               "inheritFrom": "default"
-                            }
+                            },
+                            "invertColors": true
                           },
                           {
                             "type": "Container",
@@ -6501,7 +6521,7 @@
                                     "wireID": "4778acb0-db87-4743-9b39-51b2d98a4c39",
                                     "customInputs": [],
                                     "customOutputs": [],
-                                    "data": "",
+                                    "data": "aout_trigger_is_initiated",
                                     "action": "trigger_generate_manual",
                                     "style": {
                                       "inheritFrom": "trigger_button_14"
@@ -6591,7 +6611,7 @@
                                     "wireID": "4778acb0-db87-4743-9b39-51b2d98a4c39",
                                     "customInputs": [],
                                     "customOutputs": [],
-                                    "data": "",
+                                    "data": "aout_trigger_is_initiated",
                                     "action": "trigger_generate_manual",
                                     "style": {
                                       "inheritFrom": "trigger_button_14"
@@ -7131,7 +7151,8 @@
                             "customOutputs": [],
                             "style": {
                               "inheritFrom": "default"
-                            }
+                            },
+                            "invertColors": true
                           },
                           {
                             "type": "RectangleWidget",
@@ -7144,7 +7165,8 @@
                             "customOutputs": [],
                             "style": {
                               "inheritFrom": "default"
-                            }
+                            },
+                            "invertColors": true
                           },
                           {
                             "type": "Container",
@@ -7507,7 +7529,8 @@
                             "customOutputs": [],
                             "style": {
                               "inheritFrom": "default"
-                            }
+                            },
+                            "invertColors": true
                           },
                           {
                             "type": "RectangleWidget",
@@ -7520,7 +7543,8 @@
                             "customOutputs": [],
                             "style": {
                               "inheritFrom": "default"
-                            }
+                            },
+                            "invertColors": true
                           },
                           {
                             "type": "Container",
@@ -7576,7 +7600,7 @@
                                     "wireID": "4778acb0-db87-4743-9b39-51b2d98a4c39",
                                     "customInputs": [],
                                     "customOutputs": [],
-                                    "data": "",
+                                    "data": "aout_trigger_is_initiated",
                                     "action": "trigger_generate_manual",
                                     "style": {
                                       "inheritFrom": "trigger_button_14"
@@ -8029,7 +8053,8 @@
                             "customOutputs": [],
                             "style": {
                               "inheritFrom": "default"
-                            }
+                            },
+                            "invertColors": true
                           },
                           {
                             "type": "RectangleWidget",
@@ -8042,7 +8067,8 @@
                             "customOutputs": [],
                             "style": {
                               "inheritFrom": "default"
-                            }
+                            },
+                            "invertColors": true
                           },
                           {
                             "type": "Container",
@@ -8508,7 +8534,8 @@
                                       "inheritFrom": "default",
                                       "backgroundColor": "text_enable_background",
                                       "activeColor": "text_enable_background"
-                                    }
+                                    },
+                                    "invertColors": true
                                   }
                                 ]
                               }
@@ -9264,7 +9291,8 @@
                                     "customOutputs": [],
                                     "style": {
                                       "inheritFrom": "default"
-                                    }
+                                    },
+                                    "invertColors": true
                                   },
                                   {
                                     "type": "Text",
@@ -9298,7 +9326,8 @@
                             "customOutputs": [],
                             "style": {
                               "inheritFrom": "default"
-                            }
+                            },
+                            "invertColors": true
                           },
                           {
                             "type": "RectangleWidget",
@@ -9311,7 +9340,8 @@
                             "customOutputs": [],
                             "style": {
                               "inheritFrom": "default"
-                            }
+                            },
+                            "invertColors": true
                           },
                           {
                             "type": "Container",
@@ -9367,7 +9397,7 @@
                                     "wireID": "4778acb0-db87-4743-9b39-51b2d98a4c39",
                                     "customInputs": [],
                                     "customOutputs": [],
-                                    "data": "",
+                                    "data": "aout_trigger_is_initiated",
                                     "action": "trigger_generate_manual",
                                     "style": {
                                       "inheritFrom": "trigger_button_14"
@@ -9457,7 +9487,7 @@
                                     "wireID": "4778acb0-db87-4743-9b39-51b2d98a4c39",
                                     "customInputs": [],
                                     "customOutputs": [],
-                                    "data": "",
+                                    "data": "aout_trigger_is_initiated",
                                     "action": "trigger_generate_manual",
                                     "style": {
                                       "inheritFrom": "trigger_button_14"
@@ -9980,7 +10010,8 @@
                             "customOutputs": [],
                             "style": {
                               "inheritFrom": "default"
-                            }
+                            },
+                            "invertColors": true
                           },
                           {
                             "type": "RectangleWidget",
@@ -9993,7 +10024,8 @@
                             "customOutputs": [],
                             "style": {
                               "inheritFrom": "default"
-                            }
+                            },
+                            "invertColors": true
                           },
                           {
                             "type": "Container",
@@ -10356,7 +10388,8 @@
                             "customOutputs": [],
                             "style": {
                               "inheritFrom": "default"
-                            }
+                            },
+                            "invertColors": true
                           },
                           {
                             "type": "RectangleWidget",
@@ -10369,7 +10402,8 @@
                             "customOutputs": [],
                             "style": {
                               "inheritFrom": "default"
-                            }
+                            },
+                            "invertColors": true
                           },
                           {
                             "type": "Container",
@@ -10425,7 +10459,7 @@
                                     "wireID": "4778acb0-db87-4743-9b39-51b2d98a4c39",
                                     "customInputs": [],
                                     "customOutputs": [],
-                                    "data": "",
+                                    "data": "aout_trigger_is_initiated",
                                     "action": "trigger_generate_manual",
                                     "style": {
                                       "inheritFrom": "trigger_button_14"
@@ -10878,7 +10912,8 @@
                             "customOutputs": [],
                             "style": {
                               "inheritFrom": "default"
-                            }
+                            },
+                            "invertColors": true
                           },
                           {
                             "type": "RectangleWidget",
@@ -10891,7 +10926,8 @@
                             "customOutputs": [],
                             "style": {
                               "inheritFrom": "default"
-                            }
+                            },
+                            "invertColors": true
                           },
                           {
                             "type": "Container",
@@ -11354,7 +11390,8 @@
                                       "inheritFrom": "default",
                                       "backgroundColor": "text_enable_background",
                                       "activeColor": "text_enable_background"
-                                    }
+                                    },
+                                    "invertColors": true
                                   }
                                 ]
                               }
@@ -12105,7 +12142,8 @@
                                     "customOutputs": [],
                                     "style": {
                                       "inheritFrom": "default"
-                                    }
+                                    },
+                                    "invertColors": true
                                   },
                                   {
                                     "type": "Text",
@@ -12139,7 +12177,8 @@
                             "customOutputs": [],
                             "style": {
                               "inheritFrom": "default"
-                            }
+                            },
+                            "invertColors": true
                           },
                           {
                             "type": "RectangleWidget",
@@ -12152,7 +12191,8 @@
                             "customOutputs": [],
                             "style": {
                               "inheritFrom": "default"
-                            }
+                            },
+                            "invertColors": true
                           },
                           {
                             "type": "Container",
@@ -12208,7 +12248,7 @@
                                     "wireID": "4778acb0-db87-4743-9b39-51b2d98a4c39",
                                     "customInputs": [],
                                     "customOutputs": [],
-                                    "data": "",
+                                    "data": "aout_trigger_is_initiated",
                                     "action": "trigger_generate_manual",
                                     "style": {
                                       "inheritFrom": "trigger_button_14"
@@ -12298,7 +12338,7 @@
                                     "wireID": "4778acb0-db87-4743-9b39-51b2d98a4c39",
                                     "customInputs": [],
                                     "customOutputs": [],
-                                    "data": "",
+                                    "data": "aout_trigger_is_initiated",
                                     "action": "trigger_generate_manual",
                                     "style": {
                                       "inheritFrom": "trigger_button_14"
@@ -12825,7 +12865,7 @@
                   "customInputs": [],
                   "customOutputs": [],
                   "style": {
-                    "inheritFrom": "default"
+                    "inheritFrom": "default_inverse"
                   }
                 },
                 {
@@ -13000,7 +13040,8 @@
                             "customOutputs": [],
                             "style": {
                               "inheritFrom": "default"
-                            }
+                            },
+                            "invertColors": true
                           },
                           {
                             "type": "RectangleWidget",
@@ -13013,7 +13054,8 @@
                             "customOutputs": [],
                             "style": {
                               "inheritFrom": "default"
-                            }
+                            },
+                            "invertColors": true
                           },
                           {
                             "type": "Container",
@@ -13132,7 +13174,7 @@
                   "customInputs": [],
                   "customOutputs": [],
                   "style": {
-                    "inheritFrom": "default"
+                    "inheritFrom": "default_inverse"
                   }
                 },
                 {
@@ -13350,7 +13392,7 @@
                   "customInputs": [],
                   "customOutputs": [],
                   "style": {
-                    "inheritFrom": "default"
+                    "inheritFrom": "default_inverse"
                   }
                 },
                 {
@@ -13466,7 +13508,8 @@
                                     "customOutputs": [],
                                     "style": {
                                       "inheritFrom": "default"
-                                    }
+                                    },
+                                    "invertColors": true
                                   },
                                   {
                                     "type": "Text",
@@ -13500,7 +13543,8 @@
                             "customOutputs": [],
                             "style": {
                               "inheritFrom": "default"
-                            }
+                            },
+                            "invertColors": true
                           },
                           {
                             "type": "RectangleWidget",
@@ -13513,7 +13557,8 @@
                             "customOutputs": [],
                             "style": {
                               "inheritFrom": "default"
-                            }
+                            },
+                            "invertColors": true
                           },
                           {
                             "type": "Container",
@@ -13654,7 +13699,7 @@
                                     "wireID": "4778acb0-db87-4743-9b39-51b2d98a4c39",
                                     "customInputs": [],
                                     "customOutputs": [],
-                                    "data": "",
+                                    "data": "aout_trigger_is_initiated",
                                     "action": "trigger_generate_manual",
                                     "style": {
                                       "inheritFrom": "trigger_button_14"
@@ -13686,7 +13731,7 @@
                   "customInputs": [],
                   "customOutputs": [],
                   "style": {
-                    "inheritFrom": "default"
+                    "inheritFrom": "default_inverse"
                   }
                 },
                 {
@@ -14167,7 +14212,8 @@
                             "customOutputs": [],
                             "style": {
                               "inheritFrom": "default"
-                            }
+                            },
+                            "invertColors": true
                           },
                           {
                             "type": "RectangleWidget",
@@ -14180,7 +14226,8 @@
                             "customOutputs": [],
                             "style": {
                               "inheritFrom": "default"
-                            }
+                            },
+                            "invertColors": true
                           },
                           {
                             "type": "Container",
@@ -14744,7 +14791,8 @@
                                   "customOutputs": [],
                                   "style": {
                                     "inheritFrom": "default"
-                                  }
+                                  },
+                                  "invertColors": true
                                 },
                                 {
                                   "type": "Container",
@@ -14785,7 +14833,8 @@
                                           "customOutputs": [],
                                           "style": {
                                             "inheritFrom": "default"
-                                          }
+                                          },
+                                          "invertColors": true
                                         },
                                         {
                                           "type": "Container",
@@ -15230,7 +15279,8 @@
                                   "customOutputs": [],
                                   "style": {
                                     "inheritFrom": "default"
-                                  }
+                                  },
+                                  "invertColors": true
                                 },
                                 {
                                   "type": "Container",
@@ -15355,7 +15405,8 @@
                                   "customOutputs": [],
                                   "style": {
                                     "inheritFrom": "default"
-                                  }
+                                  },
+                                  "invertColors": true
                                 },
                                 {
                                   "type": "Container",
@@ -16256,7 +16307,8 @@
                                     "customOutputs": [],
                                     "style": {
                                       "inheritFrom": "default"
-                                    }
+                                    },
+                                    "invertColors": true
                                   },
                                   {
                                     "type": "Text",
@@ -16290,7 +16342,8 @@
                             "customOutputs": [],
                             "style": {
                               "inheritFrom": "default"
-                            }
+                            },
+                            "invertColors": true
                           },
                           {
                             "type": "RectangleWidget",
@@ -16303,7 +16356,8 @@
                             "customOutputs": [],
                             "style": {
                               "inheritFrom": "default"
-                            }
+                            },
+                            "invertColors": true
                           },
                           {
                             "type": "Container",
@@ -16444,7 +16498,7 @@
                                     "wireID": "4778acb0-db87-4743-9b39-51b2d98a4c39",
                                     "customInputs": [],
                                     "customOutputs": [],
-                                    "data": "",
+                                    "data": "aout_trigger_is_initiated",
                                     "action": "trigger_generate_manual",
                                     "style": {
                                       "inheritFrom": "trigger_button_14"
@@ -16716,7 +16770,8 @@
                                 "customOutputs": [],
                                 "style": {
                                   "inheritFrom": "default"
-                                }
+                                },
+                                "invertColors": true
                               }
                             ]
                           }
@@ -16993,7 +17048,8 @@
           "customOutputs": [],
           "style": {
             "inheritFrom": "labels_and_colors_slot"
-          }
+          },
+          "invertColors": true
         },
         {
           "type": "Rectangle",
@@ -17006,7 +17062,8 @@
           "customOutputs": [],
           "style": {
             "inheritFrom": "labels_and_colors_slot"
-          }
+          },
+          "invertColors": true
         },
         {
           "type": "Rectangle",
@@ -17019,7 +17076,8 @@
           "customOutputs": [],
           "style": {
             "inheritFrom": "labels_and_colors_slot"
-          }
+          },
+          "invertColors": true
         }
       ],
       "connectionLines": [],
@@ -17087,7 +17145,7 @@
               "customInputs": [],
               "customOutputs": [],
               "style": {
-                "inheritFrom": "default"
+                "inheritFrom": "default_inverse"
               }
             },
             {
@@ -17176,7 +17234,8 @@
                     "customOutputs": [],
                     "style": {
                       "inheritFrom": "default"
-                    }
+                    },
+                    "invertColors": true
                   }
                 ]
               }
@@ -17253,7 +17312,7 @@
               "customInputs": [],
               "customOutputs": [],
               "style": {
-                "inheritFrom": "default"
+                "inheritFrom": "default_inverse"
               }
             },
             {
@@ -17955,7 +18014,8 @@
                             "customOutputs": [],
                             "style": {
                               "inheritFrom": "default"
-                            }
+                            },
+                            "invertColors": true
                           }
                         ]
                       }
@@ -18523,7 +18583,8 @@
                         "customOutputs": [],
                         "style": {
                           "inheritFrom": "default"
-                        }
+                        },
+                        "invertColors": true
                       },
                       {
                         "type": "Select",
@@ -18782,7 +18843,8 @@
                       "customOutputs": [],
                       "style": {
                         "inheritFrom": "status_bgnd"
-                      }
+                      },
+                      "invertColors": true
                     }
                   ]
                 },
@@ -19024,7 +19086,8 @@
                         "customOutputs": [],
                         "style": {
                           "inheritFrom": "default"
-                        }
+                        },
+                        "invertColors": true
                       },
                       {
                         "type": "RectangleWidget",
@@ -19037,7 +19100,8 @@
                         "customOutputs": [],
                         "style": {
                           "inheritFrom": "default"
-                        }
+                        },
+                        "invertColors": true
                       },
                       {
                         "type": "RectangleWidget",
@@ -19050,7 +19114,8 @@
                         "customOutputs": [],
                         "style": {
                           "inheritFrom": "default"
-                        }
+                        },
+                        "invertColors": true
                       },
                       {
                         "type": "Container",
@@ -19214,7 +19279,8 @@
                       "customOutputs": [],
                       "style": {
                         "inheritFrom": "status_bgnd"
-                      }
+                      },
+                      "invertColors": true
                     }
                   ]
                 },
@@ -19658,7 +19724,8 @@
                   "customOutputs": [],
                   "style": {
                     "inheritFrom": "default"
-                  }
+                  },
+                  "invertColors": true
                 }
               ]
             }
@@ -19783,7 +19850,8 @@
                       "customOutputs": [],
                       "style": {
                         "inheritFrom": "status_bgnd"
-                      }
+                      },
+                      "invertColors": true
                     }
                   ]
                 },
@@ -20182,7 +20250,8 @@
                   "customOutputs": [],
                   "style": {
                     "inheritFrom": "default"
-                  }
+                  },
+                  "invertColors": true
                 },
                 {
                   "type": "RectangleWidget",
@@ -20195,7 +20264,8 @@
                   "customOutputs": [],
                   "style": {
                     "inheritFrom": "default"
-                  }
+                  },
+                  "invertColors": true
                 },
                 {
                   "type": "Container",
@@ -20368,7 +20438,8 @@
                       "customOutputs": [],
                       "style": {
                         "inheritFrom": "status_bgnd"
-                      }
+                      },
+                      "invertColors": true
                     }
                   ]
                 },
@@ -20519,7 +20590,8 @@
                   "customOutputs": [],
                   "style": {
                     "inheritFrom": "default"
-                  }
+                  },
+                  "invertColors": true
                 },
                 {
                   "type": "RectangleWidget",
@@ -20532,7 +20604,8 @@
                   "customOutputs": [],
                   "style": {
                     "inheritFrom": "default"
-                  }
+                  },
+                  "invertColors": true
                 },
                 {
                   "type": "RectangleWidget",
@@ -20545,7 +20618,8 @@
                   "customOutputs": [],
                   "style": {
                     "inheritFrom": "default"
-                  }
+                  },
+                  "invertColors": true
                 },
                 {
                   "type": "Text",
@@ -20703,7 +20777,8 @@
                       "customOutputs": [],
                       "style": {
                         "inheritFrom": "status_bgnd"
-                      }
+                      },
+                      "invertColors": true
                     }
                   ]
                 },

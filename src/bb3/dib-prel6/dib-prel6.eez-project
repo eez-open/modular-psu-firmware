@@ -1818,7 +1818,7 @@
                   "customInputs": [],
                   "customOutputs": [],
                   "style": {
-                    "inheritFrom": "default"
+                    "inheritFrom": "default_inverse"
                   }
                 },
                 {
@@ -1831,7 +1831,7 @@
                   "customInputs": [],
                   "customOutputs": [],
                   "style": {
-                    "inheritFrom": "default"
+                    "inheritFrom": "default_inverse"
                   }
                 },
                 {
@@ -1844,7 +1844,7 @@
                   "customInputs": [],
                   "customOutputs": [],
                   "style": {
-                    "inheritFrom": "default"
+                    "inheritFrom": "default_inverse"
                   }
                 },
                 {
@@ -1857,7 +1857,7 @@
                   "customInputs": [],
                   "customOutputs": [],
                   "style": {
-                    "inheritFrom": "default"
+                    "inheritFrom": "default_inverse"
                   }
                 },
                 {
@@ -1870,7 +1870,7 @@
                   "customInputs": [],
                   "customOutputs": [],
                   "style": {
-                    "inheritFrom": "default"
+                    "inheritFrom": "default_inverse"
                   }
                 },
                 {
@@ -2300,7 +2300,8 @@
           "customOutputs": [],
           "style": {
             "inheritFrom": "labels_and_colors_slot"
-          }
+          },
+          "invertColors": true
         },
         {
           "type": "Rectangle",
@@ -2313,7 +2314,8 @@
           "customOutputs": [],
           "style": {
             "inheritFrom": "labels_and_colors_slot"
-          }
+          },
+          "invertColors": true
         },
         {
           "type": "Rectangle",
@@ -2326,7 +2328,8 @@
           "customOutputs": [],
           "style": {
             "inheritFrom": "labels_and_colors_slot"
-          }
+          },
+          "invertColors": true
         }
       ],
       "connectionLines": [],
