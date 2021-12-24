@@ -55,6 +55,7 @@ namespace gui {
     WIDGET_TYPE(Canvas,        CANVAS,         22) \
     WIDGET_TYPE(Gauge,         GAUGE,          23) \
     WIDGET_TYPE(Input,         INPUT,          24) \
+	WIDGET_TYPE(Roller,        ROLLER,         25) \
 
 #define WIDGET_TYPE(NAME_PASCAL_CASE, NAME, ID) WIDGET_TYPE_##NAME = ID,
 enum WidgetTypes {

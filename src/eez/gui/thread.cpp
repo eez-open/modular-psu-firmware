@@ -119,12 +119,12 @@ void sendMessageToGuiThread(uint8_t messageType, uint32_t messageParam, uint32_t
 }
 
 void sendTouchEventToGuiThread(Event &touchEvent) {
+	touchEvent.time = millis();
+
     guiMessageQueueObject obj;
     obj.type = GUI_QUEUE_MESSAGE_TYPE_TOUCH_EVENT;
     obj.touchEvent = touchEvent;
 	EEZ_MESSAGE_QUEUE_PUT(gui, obj, 0);
-
-	touchEvent.time = millis();
 }
 
 bool pushPageInGuiThread(AppContext *appContext, int pageId, Page *page) {

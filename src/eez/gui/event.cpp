@@ -56,7 +56,7 @@ static bool g_extraLongTouchGenerated;
 
 ////////////////////////////////////////////////////////////////////////////////
 
-static void processTouchEvent(EventType type, int x, int y);
+static void processTouchEvent(EventType type, Event &touchEvent);
 static void onPageTouch(const WidgetCursor &foundWidget, Event &touchEvent);
 static void onWidgetDefaultTouch(const WidgetCursor &widgetCursor, Event &touchEvent);
 static void onWidgetTouch(const WidgetCursor &widgetCursor, Event &touchEvent);
@@ -117,33 +117,33 @@ void processTouchEvent(Event &touchEvent) {
             m_lastAutoRepeatEventTimeMs = tickCountMs;
             g_longTouchGenerated = false;
             g_extraLongTouchGenerated = false;
-            processTouchEvent(EVENT_TYPE_TOUCH_DOWN, touchEvent.x, touchEvent.y);
+            processTouchEvent(EVENT_TYPE_TOUCH_DOWN, touchEvent);
         } else if (touchEvent.type == EVENT_TYPE_TOUCH_MOVE) {
-            processTouchEvent(EVENT_TYPE_TOUCH_MOVE, touchEvent.x, touchEvent.y);
+            processTouchEvent(EVENT_TYPE_TOUCH_MOVE, touchEvent);
 
             if (!g_longTouchGenerated && int32_t(tickCountMs - m_touchDownTimeMs) >= CONF_GUI_LONG_TOUCH_TIMEOUT_MS) {
                 g_longTouchGenerated = true;
-                processTouchEvent(EVENT_TYPE_LONG_TOUCH, touchEvent.x, touchEvent.y);
+                processTouchEvent(EVENT_TYPE_LONG_TOUCH, touchEvent);
             }
 
             if (g_longTouchGenerated && !g_extraLongTouchGenerated && int32_t(tickCountMs - m_touchDownTimeMs) >= CONF_GUI_EXTRA_LONG_TOUCH_TIMEOUT_MS) {
                 g_extraLongTouchGenerated = true;
-                processTouchEvent(EVENT_TYPE_EXTRA_LONG_TOUCH, touchEvent.x, touchEvent.y);
+                processTouchEvent(EVENT_TYPE_EXTRA_LONG_TOUCH, touchEvent);
             }
 
             if (int32_t(tickCountMs - m_lastAutoRepeatEventTimeMs) >= (m_lastAutoRepeatEventTimeMs == m_touchDownTimeMs ? CONF_GUI_KEYPAD_FIRST_AUTO_REPEAT_DELAY_MS : CONF_GUI_KEYPAD_NEXT_AUTO_REPEAT_DELAY_MS)) {
-                processTouchEvent(EVENT_TYPE_AUTO_REPEAT, touchEvent.x, touchEvent.y);
+                processTouchEvent(EVENT_TYPE_AUTO_REPEAT, touchEvent);
                 m_lastAutoRepeatEventTimeMs = tickCountMs;
             }
         } else if (touchEvent.type == EVENT_TYPE_TOUCH_UP) {
-            processTouchEvent(EVENT_TYPE_TOUCH_UP, touchEvent.x, touchEvent.y);
+            processTouchEvent(EVENT_TYPE_TOUCH_UP, touchEvent);
         }
     }
 }
 
-static void processTouchEvent(EventType type, int x, int y) {
+static void processTouchEvent(EventType type, Event &touchEvent) {
     if (type == EVENT_TYPE_TOUCH_DOWN) {
-        g_foundWidgetAtDown = findWidget(x, y);
+        g_foundWidgetAtDown = findWidget(touchEvent.x, touchEvent.y);
         g_onTouchFunction = getWidgetTouchFunction(g_foundWidgetAtDown);
         if (!g_onTouchFunction) {
             g_onTouchFunction = onPageTouch;
@@ -153,11 +153,8 @@ static void processTouchEvent(EventType type, int x, int y) {
     }
 
     if (g_onTouchFunction) {
-        Event event;
+        Event event = touchEvent;
         event.type = type;
-        event.x = x;
-        event.y = y;
-
         g_onTouchFunction(g_foundWidgetAtDown, event);
     }
 }

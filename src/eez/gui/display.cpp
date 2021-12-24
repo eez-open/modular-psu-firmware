@@ -713,6 +713,10 @@ void drawFocusFrame(int x, int y, int w, int h) {
     fillRect(x, y + h - lineWidth, x + w - 1, y + h - 1);
 }
 
+void drawRoundedRect(int x1, int y1, int x2, int y2, int lineWidth, int r) {
+    fillRoundedRect(x1, y1, x2, y2, lineWidth, r, true, false);
+}
+
 void fillRoundedRect(int x1, int y1, int x2, int y2, int lineWidth, int r, bool drawLine, bool fill) {
 	// init AGG
 	agg::rendering_buffer rbuf;

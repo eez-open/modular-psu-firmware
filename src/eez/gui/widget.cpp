@@ -45,6 +45,7 @@
 #include <eez/gui/widgets/multiline_text.h>
 #include <eez/gui/widgets/progress.h>
 #include <eez/gui/widgets/rectangle.h>
+#include <eez/gui/widgets/roller.h>
 #include <eez/gui/widgets/scroll_bar.h>
 #include <eez/gui/widgets/text.h>
 #include <eez/gui/widgets/toggle_button.h>
