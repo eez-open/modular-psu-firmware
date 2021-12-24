@@ -30,41 +30,38 @@ bool RollerWidgetState::updateState() {
     const WidgetCursor &widgetCursor = g_widgetCursor;
 	auto widget = (const RollerWidget *)widgetCursor.widget;
     bool hasPreviousState = widgetCursor.hasPreviousState && !dirty;
-    WIDGET_STATE(data, get(widgetCursor, widget->data));
-	if (!dragging && speed != 0) {
-		offsetAtEndOfDragging += speed * 100;
-		offset = int(offsetAtEndOfDragging);
-		speed *= 0.9f;
-		printf("%d, %g\n", offset, speed);
 
-		if (fabs(speed) < 0.001) {
-			speed = 0;
+	if (target) {
+		float t = 1.0f * (millis() - targetStartTime) / (targetEndTime - targetStartTime);
+		if (t < 1.0f) {
+			t = remapOutQuad(t, 0, 0, 1, 1);
+			int newOffset = (int)(targetStartOffset + t * (targetEndOffset - targetStartOffset));
+			WIDGET_STATE(offset, newOffset);
+			printf("%g, %d\n", t, newOffset);
+		} else {
+			target = false;
+			offset = 0;
+
 			const Style* style = getStyle(widget->style);
-
 			font::Font font = styleGetFont(style);
 			if (font) {
 				auto textHeight = font.getHeight();
 
 				auto oldPosition = data.getInt();
-				int newPosition;
-				if (offset > 0) {
-					newPosition = (oldPosition * textHeight + offset + textHeight - 1) / textHeight;
-				} else {
-					newPosition = (oldPosition * textHeight + offset) / textHeight;
-				}
+
+				int newPosition = oldPosition + targetEndOffset / textHeight;
+
 				if (newPosition < 1) {
 					newPosition = 1;
 				}
 
 				set(widgetCursor, widget->data, newPosition);
 			}
-
-			offset = 0;
-		} else {
-			hasPreviousState = false;
 		}
-
 	}
+
+	WIDGET_STATE(data, get(widgetCursor, widget->data));
+
 	return !hasPreviousState;
 }
 
@@ -128,21 +125,52 @@ bool RollerWidgetState::hasOnTouch() {
 
 void RollerWidgetState::onTouch(const WidgetCursor &widgetCursor, Event &touchEvent) {
     if (touchEvent.type == EVENT_TYPE_TOUCH_DOWN) {
+		target = false;
         yAtDown = touchEvent.y;
         offsetAtDown = offset;
-		dragging = true;
-		startTime = touchEvent.time;
+		target = false;
+		timeLast = touchEvent.time;
+		yLast = touchEvent.y;
     } else if (touchEvent.type == EVENT_TYPE_TOUCH_MOVE) {
         auto newOffset = offsetAtDown + yAtDown - touchEvent.y;
         if (newOffset != offset) {
             offset = newOffset;
 			dirty = true;
         }
+
+		speed = 1.0f * (yLast - touchEvent.y) / (touchEvent.time - timeLast);
+		timeLast = touchEvent.time;
+		yLast = touchEvent.y;
 	} else if (touchEvent.type == EVENT_TYPE_TOUCH_UP) {
-		uint32_t endTime = touchEvent.time;
-		speed = 1.0f * offset / (endTime - startTime);
-		offsetAtEndOfDragging = offset;
-		dragging = false;
+		auto widget = (const RollerWidget *)widgetCursor.widget;
+		const Style* style = getStyle(widget->style);
+		font::Font font = styleGetFont(style);
+		if (font) {
+			auto textHeight = font.getHeight();
+
+			target = true;
+			targetStartOffset = offset;
+			targetStartTime = millis();
+
+			float lines;
+			if (fabs(speed) < 0.5) {
+				lines = 1.0f * offset / textHeight;
+			} else {
+				lines = offset + speed * 10;
+			}
+
+			targetEndOffset = roundf(lines) * textHeight;
+
+			auto oldPosition = data.getInt();
+			int newPosition = oldPosition + targetEndOffset / textHeight;
+			if (newPosition < 1) {
+				newPosition = 1;
+			}
+
+			targetEndOffset = (newPosition - oldPosition) * textHeight;
+			targetEndTime = targetStartTime + abs(newPosition - oldPosition) * 16 / 2;
+		}
+
 	}
 }
 

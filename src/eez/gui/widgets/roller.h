@@ -28,14 +28,20 @@ struct RollerWidgetState : public WidgetState {
     Value data;
 
     int offset = 0;
-    bool dirty = false;
-	bool dragging = false;
-	uint32_t startTime;
-	float speed = 0;
-	int offsetAtEndOfDragging;
 
-    int yAtDown;
-    int offsetAtDown;
+	bool dirty = false;
+
+	int yAtDown;
+	int offsetAtDown;
+	uint32_t timeLast;
+	int yLast;
+	float speed;
+
+	bool target;
+	int targetStartOffset;
+	int targetEndOffset;
+	uint32_t targetStartTime;
+	uint32_t targetEndTime;
 
     bool updateState() override;
     void render() override;
