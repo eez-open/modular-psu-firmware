@@ -28,7 +28,7 @@ namespace gui {
 
 void mainLoop(void *);
 
-EEZ_THREAD_DECLARE(gui, Normal, 8192)
+EEZ_THREAD_DECLARE(gui, Normal, 12 * 1024)
 
 EEZ_MESSAGE_QUEUE_DECLARE(gui, {
     uint8_t type;
@@ -46,7 +46,7 @@ EEZ_MESSAGE_QUEUE_DECLARE(gui, {
 });
 
 void startThread() {
-	EEZ_MESSAGE_QUEUE_CREATE(gui, 10);
+	EEZ_MESSAGE_QUEUE_CREATE(gui, 20);
 	EEZ_THREAD_CREATE(gui, mainLoop);
 }
 
