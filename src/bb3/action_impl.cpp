@@ -380,7 +380,7 @@ void channelsEnumDefinition(DataOperationEnum operation, const WidgetCursor &wid
 }
 
 void action_ch_settings_copy() {
-    pushSelectFromEnumPage(channelsEnumDefinition, -1, nullptr, onChannelCopyDestinationSelected, false, false);
+	pushSelectFromEnumPage(channelsEnumDefinition, -1, nullptr, onChannelCopyDestinationSelected, false, false);
 }
 
 void action_ch_settings_calibration_toggle_enable() {
@@ -1017,7 +1017,7 @@ void onSetSelectedThemeIndex(uint16_t value) {
 }
 
 void action_select_theme() {
-    pushSelectFromEnumPage(themesEnumDefinition, persist_conf::devConf.selectedThemeIndex, NULL, onSetSelectedThemeIndex);
+	pushSelectFromEnumPage(themesEnumDefinition, persist_conf::devConf.selectedThemeIndex, NULL, onSetSelectedThemeIndex);
 }
 
 void onSetAnimationsDuration(float value) {
@@ -1056,8 +1056,8 @@ void action_user_switch_clicked() {
         return;
     }
 
-    if (getActiveSelectEnumDefinition() == g_enumDefinitions[ENUM_DEFINITION_USER_SWITCH_ACTION]) {
-        popSelectFromEnumPage();
+    if (SelectFromEnumPage::getActiveSelectEnumDefinition() == g_enumDefinitions[ENUM_DEFINITION_USER_SWITCH_ACTION]) {
+		SelectFromEnumPage::popSelectFromEnumPage();
         return;
     }
 
@@ -1136,11 +1136,11 @@ void action_select_user_switch_action() {
         return;
     }
 
-    if (getActiveSelectEnumDefinition() == g_enumDefinitions[ENUM_DEFINITION_USER_SWITCH_ACTION]) {
-    	popSelectFromEnumPage();
+    if (SelectFromEnumPage::getActiveSelectEnumDefinition() == g_enumDefinitions[ENUM_DEFINITION_USER_SWITCH_ACTION]) {
+		SelectFromEnumPage::popSelectFromEnumPage();
     } else {
         clearFoundWidgetAtDown();
-        pushSelectFromEnumPage(ENUM_DEFINITION_USER_SWITCH_ACTION, persist_conf::devConf.userSwitchAction, nullptr, onSetUserSwitchAction);
+		pushSelectFromEnumPage(ENUM_DEFINITION_USER_SWITCH_ACTION, persist_conf::devConf.userSwitchAction, nullptr, onSetUserSwitchAction);
     }
 }
 
@@ -1160,7 +1160,7 @@ void onSetModuleType(uint16_t moduleType) {
 
 void selectSlotModuleType(int slotIndex) {
     hmi::selectSlot(slotIndex);
-    pushSelectFromEnumPage(&g_frontPanelAppContext, ENUM_DEFINITION_MODULE_TYPE, g_slots[slotIndex]->moduleType, NULL, onSetModuleType);
+	pushSelectFromEnumPage(&g_frontPanelAppContext, ENUM_DEFINITION_MODULE_TYPE, g_slots[slotIndex]->moduleType, NULL, onSetModuleType);
 }
 
 void action_front_panel_select_slot1() {
@@ -1268,7 +1268,7 @@ void onSetUsbMode(uint16_t value) {
 }
 
 void action_select_usb_mode() {
-    pushSelectFromEnumPage(ENUM_DEFINITION_USB_MODE, g_usbMode, nullptr, onSetUsbMode);
+	pushSelectFromEnumPage(ENUM_DEFINITION_USB_MODE, g_usbMode, nullptr, onSetUsbMode);
 }
 
 void action_select_usb_device_class() {
@@ -1281,7 +1281,7 @@ void action_select_usb_device_class() {
         sendMessageToLowPriorityThread(THREAD_MESSAGE_SELECT_USB_DEVICE_CLASS, value);
     };
 
-    pushSelectFromEnumPage(ENUM_DEFINITION_USB_DEVICE_CLASS, g_usbDeviceClass, isUsbDeviceClassDisabled, onSetUsbDeviceClass);
+	pushSelectFromEnumPage(ENUM_DEFINITION_USB_DEVICE_CLASS, g_usbDeviceClass, isUsbDeviceClassDisabled, onSetUsbDeviceClass);
 }
 
 void action_select_mass_storage_device() {

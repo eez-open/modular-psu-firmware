@@ -412,6 +412,51 @@ void ToastMessagePage::executeActionWithoutParam() {
 
 ////////////////////////////////////////////////////////////////////////////////
 
+SelectFromEnumPage g_selectFromEnumPage;
+
+void SelectFromEnumPage::pushSelectFromEnumPage(
+    AppContext *appContext,
+    const EnumItem *enumItems,
+    uint16_t currentValue,
+    bool (*disabledCallback)(uint16_t value),
+    void (*onSet)(uint16_t),
+    bool smallFont,
+    bool showRadioButtonIcon
+) {
+	g_selectFromEnumPage.init(appContext, enumItems, currentValue, disabledCallback, onSet, smallFont, showRadioButtonIcon);
+    appContext->pushPage(INTERNAL_PAGE_ID_SELECT_FROM_ENUM, &g_selectFromEnumPage);
+}
+
+void SelectFromEnumPage::pushSelectFromEnumPage(
+    AppContext *appContext,
+    void (*enumDefinitionFunc)(DataOperationEnum operation, const WidgetCursor &widgetCursor, Value &value),
+    uint16_t currentValue,
+    bool (*disabledCallback)(uint16_t value),
+    void (*onSet)(uint16_t),
+    bool smallFont,
+    bool showRadioButtonIcon
+) {
+	g_selectFromEnumPage.init(appContext, enumDefinitionFunc, currentValue, disabledCallback, onSet, smallFont, showRadioButtonIcon);
+    appContext->pushPage(INTERNAL_PAGE_ID_SELECT_FROM_ENUM, &g_selectFromEnumPage);
+}
+
+const EnumItem *SelectFromEnumPage::getActiveSelectEnumDefinition() {
+    if (g_selectFromEnumPage.appContext && g_selectFromEnumPage.appContext->getActivePage() == &g_selectFromEnumPage) {
+        return g_selectFromEnumPage.getEnumDefinition();
+    }
+    return nullptr;
+}
+
+void SelectFromEnumPage::selectEnumItem() {
+    g_selectFromEnumPage.doSelectEnumItem();
+}
+
+void SelectFromEnumPage::popSelectFromEnumPage() {
+    if (g_selectFromEnumPage.appContext) {
+        g_selectFromEnumPage.appContext->popPage();
+    }
+}
+
 void SelectFromEnumPage::init(
     AppContext *appContext_,
     const EnumItem *enumDefinition_,
@@ -631,7 +676,7 @@ WidgetCursor SelectFromEnumPage::findWidgetInternalPage(int x, int y, bool click
     return WidgetCursor();
 }
 
-void SelectFromEnumPage::selectEnumItem() {
+void SelectFromEnumPage::doSelectEnumItem() {
     int itemIndex = getFoundWidgetAtDown().widget->data;
 	if (onSet) {
 		onSet(getValue(itemIndex));

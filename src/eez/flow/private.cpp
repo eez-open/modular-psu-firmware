@@ -69,10 +69,6 @@ bool isComponentReadyToRun(FlowState *flowState, unsigned componentIndex) {
 	auto assets = flowState->assets;
 	auto component = flowState->flow->components.item(assets, componentIndex);
 
-	if (component->type < 1000) {
-		return false;
-	}
-
 	if (component->type == defs_v3::COMPONENT_TYPE_CATCH_ERROR_ACTION) {
 		return false;
 	}
@@ -308,15 +304,8 @@ void assignValue(FlowState *flowState, int componentIndex, Value &dstValue, cons
 		set(g_widgetCursor, dstValue.getInt(), srcValue);
 	} else {
 		Value *pDstValue = dstValue.pValueValue;
-		
-		if (pDstValue->isInt32OrLess()) {
-			pDstValue->int32Value = srcValue.toInt32();
-		} else if (pDstValue->isFloat()) {
-			pDstValue->floatValue = srcValue.toFloat();
-		} else if (pDstValue->isDouble()) {
-			pDstValue->doubleValue = srcValue.toDouble();
-		} else if (pDstValue->isAnyStringType()) {
-			*pDstValue = srcValue.toString(0x30a91156);
+		if (assignValue(*pDstValue, srcValue)) {
+			onValueChanged(pDstValue);
 		} else {
 			char errorMessage[100];
 			snprintf(errorMessage, sizeof(errorMessage), "Can not assign %s to %s\n",
@@ -324,8 +313,6 @@ void assignValue(FlowState *flowState, int componentIndex, Value &dstValue, cons
 			);
 			throwError(flowState, componentIndex, errorMessage);
 		}
-		
-		onValueChanged(pDstValue);
 	}
 }
 

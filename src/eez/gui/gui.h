@@ -60,10 +60,11 @@ inline bool isPageInternal(int pageId) { return pageId > FIRST_INTERNAL_PAGE_ID;
 
 inline int getWidgetAction(const WidgetCursor &widgetCursor) {
     if (widgetCursor.widget->type == WIDGET_TYPE_INPUT) {
-        return EEZ_CONF_ACTION_ID_EDIT;
-    } else {
-		return widgetCursor.widget->action;
+		if (widgetCursor.widget->action == ACTION_ID_NONE) {
+			return EEZ_CONF_ACTION_ID_EDIT;
+		}
     }
+	return widgetCursor.widget->action;
 }
 
 void executeAction(const WidgetCursor &widgetCursor, int actionId);
@@ -101,8 +102,6 @@ int overrideStyleHook(const WidgetCursor &widgetCursor, int styleId);
 uint16_t overrideStyleColorHook(const WidgetCursor &widgetCursor, const Style *style);
 uint16_t overrideActiveStyleColorHook(const WidgetCursor &widgetCursor, const Style *style);
 uint16_t transformColorHook(uint16_t color);
-
-void selectEnumItemHook();
 
 } // namespace gui
 } // namespace eez

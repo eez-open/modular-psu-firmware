@@ -48,6 +48,7 @@ void executeCatchErrorComponent(FlowState *flowState, unsigned componentIndex);
 void executeLoopComponent(FlowState *flowState, unsigned componentIndex);
 void executeScpiComponent(FlowState *flowState, unsigned componentIndex);
 void executeShowPageComponent(FlowState *flowState, unsigned componentIndex);
+void executeRollerWidgetComponent(FlowState *flowState, unsigned componentIndex);
 
 void executeComponent(FlowState *flowState, unsigned componentIndex) {
 	auto component = flowState->flow->components.item(flowState->assets, componentIndex);
@@ -88,6 +89,10 @@ void executeComponent(FlowState *flowState, unsigned componentIndex) {
 		executeScpiComponent(flowState, componentIndex);
 	}  else if (component->type == defs_v3::COMPONENT_TYPE_SHOW_PAGE_ACTION) {
 		executeShowPageComponent(flowState, componentIndex);
+	} else if (component->type < 1000) {
+		if (component->type == defs_v3::COMPONENT_TYPE_ROLLER_WIDGET) {
+			executeRollerWidgetComponent(flowState, componentIndex);
+		}
 	} else {
 		char errorMessage[100];
 		snprintf(errorMessage, sizeof(errorMessage), "Unknown component at index = %d, type = %d\n", componentIndex, component->type);

@@ -39,6 +39,7 @@
 #include <eez/gui/widgets/button.h>
 #include <eez/gui/widgets/canvas.h>
 #include <eez/gui/widgets/display_data.h>
+#include <eez/gui/widgets/drop_down_list.h>
 #include <eez/gui/widgets/gauge.h>
 #include <eez/gui/widgets/input.h>
 #include <eez/gui/widgets/list_graph.h>
@@ -47,6 +48,8 @@
 #include <eez/gui/widgets/rectangle.h>
 #include <eez/gui/widgets/roller.h>
 #include <eez/gui/widgets/scroll_bar.h>
+#include <eez/gui/widgets/slider.h>
+#include <eez/gui/widgets/switch.h>
 #include <eez/gui/widgets/text.h>
 #include <eez/gui/widgets/toggle_button.h>
 #include <eez/gui/widgets/up_down.h>

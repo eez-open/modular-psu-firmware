@@ -64,6 +64,11 @@ void SelectWidgetState::enumChildren() {
 			repainted = false;
 			widgetCursor.refreshed = true;
 		}
+
+		if (!widgetCursor.refreshed) {
+			const Style* style = getStyle(widgetCursor.widget->style);
+			widgetCursor.pushBackground(widgetCursor.x, widgetCursor.y, style, false);
+		}
 	}
 
 	if (widgetIndex != -1) {
@@ -78,6 +83,10 @@ void SelectWidgetState::enumChildren() {
 	}
 
 	if (g_findCallback == nullptr) {
+		if (!widgetCursor.refreshed) {
+			widgetCursor.popBackground();
+		}
+
 		widgetCursor.refreshed = savedRefreshed;
 	}
 }

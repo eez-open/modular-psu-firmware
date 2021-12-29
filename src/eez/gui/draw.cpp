@@ -50,19 +50,26 @@ bool styleIsVertAlignBottom(const Style *style) {
 void drawBorderAndBackground(int &x1, int &y1, int &x2, int &y2, const Style *style, uint16_t color, bool ignoreLuminocity) {
     const WidgetCursor& widgetCursor = g_widgetCursor;
 
-	bool hasBorder = style->borderSizeTop > 0 || style->borderSizeRight > 0 || style->borderSizeBottom > 0 || style->borderSizeLeft > 0;
-    int borderRadius = style->borderRadius;
-
 	bool isTransparent = true;
-	if (color != TRANSPARENT_COLOR_INDEX && style->opacity == 255 && !(hasBorder && borderRadius > 0)) {
-		// non-transparent color
-		isTransparent = false;
-	}
-	else if (style->backgroundImage) {
-		auto bitmap = getBitmap(style->backgroundImage);
-		if (bitmap->bpp != 32) {
-			// non-transparent bitmap
+	bool hasBorder = false;
+	bool hasBorderRadius = false;
+
+	if (style) {
+		hasBorder = style->borderSizeTop > 0 || style->borderSizeRight > 0 || style->borderSizeBottom > 0 || style->borderSizeLeft > 0;
+
+		hasBorderRadius =
+			style->borderRadiusTLX > 0 || style->borderRadiusTLY > 0 || style->borderRadiusTRX > 0 || style->borderRadiusTRY > 0 ||
+			style->borderRadiusBRX > 0 || style->borderRadiusBRY > 0 || style->borderRadiusBLX > 0 || style->borderRadiusBLY > 0;
+
+		if (color != TRANSPARENT_COLOR_INDEX && style && style->opacity == 255 && !(hasBorder && hasBorderRadius)) {
+			// non-transparent color
 			isTransparent = false;
+		} else if (style->backgroundImage) {
+			auto bitmap = getBitmap(style->backgroundImage);
+			if (bitmap->bpp != 32) {
+				// non-transparent bitmap
+				isTransparent = false;
+			}
 		}
 	}
 
@@ -137,12 +144,16 @@ void drawBorderAndBackground(int &x1, int &y1, int &x2, int &y2, const Style *st
 		}
 	}
 
+	if (!style) {
+		return;
+	}
+
     if (hasBorder) {
 		if (style->borderColor != TRANSPARENT_COLOR_INDEX) {
 			display::setColor(style->borderColor, ignoreLuminocity);
 		}
 
-        if (borderRadius > 0) {
+        if (hasBorderRadius) {
 			if (color != TRANSPARENT_COLOR_INDEX) {
 				display::setBackColor(color, ignoreLuminocity);
 			}
@@ -158,7 +169,18 @@ void drawBorderAndBackground(int &x1, int &y1, int &x2, int &y2, const Style *st
                 lineWidth = style->borderSizeLeft;
             }
 
-            display::fillRoundedRect(x1, y1, x2, y2, lineWidth, style->borderRadius, style->borderColor != TRANSPARENT_COLOR_INDEX, color != TRANSPARENT_COLOR_INDEX);
+            auto savedOpacity = display::setOpacity(style->opacity);
+            display::AggDrawing aggDrawing;
+            display::aggInit(aggDrawing);
+            display::fillRoundedRect(
+                aggDrawing,
+				x1, y1, x2, y2,
+				lineWidth,
+				style->borderRadiusTLX, style->borderRadiusTLY, style->borderRadiusTRX, style->borderRadiusTRY,
+				style->borderRadiusBRX, style->borderRadiusBRY, style->borderRadiusBLX, style->borderRadiusBLY,
+				style->borderColor != TRANSPARENT_COLOR_INDEX, color != TRANSPARENT_COLOR_INDEX
+			);
+            display::setOpacity(savedOpacity);
 
             lineWidth++;
 
@@ -189,7 +211,26 @@ void drawBorderAndBackground(int &x1, int &y1, int &x2, int &y2, const Style *st
         y1 += style->borderSizeTop;
         x2 -= style->borderSizeRight;
         y2 -= style->borderSizeBottom;
-    }
+	} else {
+		if (hasBorderRadius) {
+			if (color != TRANSPARENT_COLOR_INDEX) {
+				display::setBackColor(color, ignoreLuminocity);
+		        auto savedOpacity = display::setOpacity(style->opacity);
+                display::AggDrawing aggDrawing;
+                display::aggInit(aggDrawing);
+                display::fillRoundedRect(
+                    aggDrawing,
+					x1, y1, x2, y2,
+					0,
+					style->borderRadiusTLX, style->borderRadiusTLY, style->borderRadiusTRX, style->borderRadiusTRY,
+					style->borderRadiusBRX, style->borderRadiusBRY, style->borderRadiusBLX, style->borderRadiusBLY,
+					style->borderColor != TRANSPARENT_COLOR_INDEX, color != TRANSPARENT_COLOR_INDEX
+				);
+		        display::setOpacity(savedOpacity);
+			}
+			return;
+		}
+	}
 
 	if (color != TRANSPARENT_COLOR_INDEX) {
 		display::setColor(color, ignoreLuminocity);
@@ -224,28 +265,31 @@ void drawText(
     bool active, bool blink, bool ignoreLuminocity,
     uint16_t *overrideColor, uint16_t *overrideBackgroundColor,
     uint16_t *overrideActiveColor, uint16_t *overrideActiveBackgroundColor,
-    bool useSmallerFontIfDoesNotFit, int cursorPosition, int xScroll
+    bool useSmallerFontIfDoesNotFit, int cursorPosition, int xScroll,
+	bool boolSkipBackground
 ) {
     int x1 = x;
     int y1 = y;
     int x2 = x + w - 1;
     int y2 = y + h - 1;
 
-    uint16_t backgroundColor;
-    if (active || blink) {
-        if (overrideActiveBackgroundColor) {
-            backgroundColor = *overrideActiveBackgroundColor;
-        } else {
-            backgroundColor = style->activeBackgroundColor;
-        }
-    } else {
-        if (overrideBackgroundColor) {
-            backgroundColor = *overrideBackgroundColor;
-        } else {
-            backgroundColor = style->backgroundColor;
-        }
-    }
-    drawBorderAndBackground(x1, y1, x2, y2, style, backgroundColor, ignoreLuminocity);
+	if (!boolSkipBackground) {
+		uint16_t backgroundColor;
+		if (active || blink) {
+			if (overrideActiveBackgroundColor) {
+				backgroundColor = *overrideActiveBackgroundColor;
+			} else {
+				backgroundColor = style->activeBackgroundColor;
+			}
+		} else {
+			if (overrideBackgroundColor) {
+				backgroundColor = *overrideBackgroundColor;
+			} else {
+				backgroundColor = style->backgroundColor;
+			}
+		}
+		drawBorderAndBackground(x1, y1, x2, y2, style, backgroundColor, ignoreLuminocity);
+	}
 
     font::Font font = styleGetFont(style);
 	if (!font) {
@@ -670,7 +714,7 @@ void drawRectangle(int x, int y, int w, int h, const Style *style, bool active, 
         int x2 = x + w - 1;
         int y2 = y + h - 1;
 
-        drawBorderAndBackground(x1, y1, x2, y2, style, active ? style->activeBackgroundColor : style->backgroundColor, ignoreLuminocity);
+        drawBorderAndBackground(x1, y1, x2, y2, style, style ? (active ? style->activeBackgroundColor : style->backgroundColor) : TRANSPARENT_COLOR_INDEX, ignoreLuminocity);
     }
 }
 

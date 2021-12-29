@@ -751,6 +751,24 @@ void Agg2D::roundedRect(double x1, double y1, double x2, double y2,
 
 
 //------------------------------------------------------------------------
+void Agg2D::roundedRect(double x1, double y1, double x2, double y2,
+                        double rtlx, double rtly, double rtrx, double rtry,
+                        double rbrx, double rbry, double rblx, double rbly)
+{
+    m_path.remove_all();
+    agg::rounded_rect rc;
+    rc.rect(x1, y1, x2, y2);
+    //rc.radius(10, 10, 20, 20, 30, 30, 40, 40);
+	rc.radius(rtlx, rtly, rtrx, rtry, rblx, rbly, rbrx, rbry);
+    rc.normalize_radius();
+    rc.approximation_scale(worldToScreen(1.0) * g_approxScale);
+    //m_path.add_path(rc, 0, false);
+    m_path.concat_path(rc,0); // JME
+    drawPath(FillAndStroke);
+}
+
+
+//------------------------------------------------------------------------
 void Agg2D::ellipse(double cx, double cy, double rx, double ry)
 {
     m_path.remove_all();

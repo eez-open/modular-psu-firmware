@@ -588,6 +588,23 @@ ValueTypeNameFunction g_valueTypeNames[] = {
 
 ////////////////////////////////////////////////////////////////////////////////
 
+bool assignValue(Value &dstValue, const Value &srcValue) {
+    if (dstValue.isInt32OrLess()) {
+        dstValue.int32Value = srcValue.toInt32();
+    } else if (dstValue.isFloat()) {
+        dstValue.floatValue = srcValue.toFloat();
+    } else if (dstValue.isDouble()) {
+        dstValue.doubleValue = srcValue.toDouble();
+    } else if (dstValue.isAnyStringType()) {
+        dstValue = srcValue.toString(0x30a91156);
+    } else {
+        return false;
+    }
+    return true;
+}
+
+////////////////////////////////////////////////////////////////////////////////
+
 uint16_t getPageIndexFromValue(const Value &value) {
     return value.getFirstUInt16();
 }

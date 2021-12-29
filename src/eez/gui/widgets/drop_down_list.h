@@ -21,48 +21,21 @@
 namespace eez {
 namespace gui {
 
-struct RollerWidget : public Widget {
-	int16_t min;
-	int16_t max;
-    int16_t text;
-    int16_t selectedValueStyle;
-    int16_t unselectedValueStyle;
-    uint16_t componentIndex;
+struct DropDownListWidget : public Widget {
+	int16_t options;
 };
 
-struct RollerWidgetState : public WidgetState {
-    Value data;
-
-	int minValue = 1;
-	int maxValue = 100;
-
-    int textHeight;
-
-    bool isDragging = false;
-    bool isRunning = false;
-
-    float position = 0;
-    float velocity = 0;
-
-    int dragOrigin = 0;
-    int dragStartPosition = 0;
-    int dragPosition = 0;
-
-    bool updateState() override;
+struct DropDownListWidgetState : public WidgetState {
+	WidgetStateFlags flags;
+	Value data;
+	Value options;
+	
+	bool updateState() override;
     void render() override;
 
     bool hasOnTouch() override;
 	void onTouch(const WidgetCursor &widgetCursor, Event &touchEvent) override;
-
-private:
-    void updatePosition();
-    bool isMoving();
-    void applyDragForce();
-    void applySnapForce();
-    void applyEdgeForce();
-    void applyForce(float force);
 };
-
 
 } // namespace gui
 } // namespace eez

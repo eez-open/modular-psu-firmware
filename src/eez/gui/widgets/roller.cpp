@@ -19,9 +19,15 @@
 #include <stdio.h>
 
 #include <eez/util.h>
+#include <eez/sound.h>
 
 #include <eez/gui/gui.h>
 #include <eez/gui/widgets/roller.h>
+
+#include <eez/flow/components/roller_widget.h>
+
+static const float FRICTION = 0.1f;
+static const float BOUNCE_FORCE = 0.1f;
 
 namespace eez {
 namespace gui {
@@ -29,38 +35,61 @@ namespace gui {
 bool RollerWidgetState::updateState() {
     const WidgetCursor &widgetCursor = g_widgetCursor;
 	auto widget = (const RollerWidget *)widgetCursor.widget;
-    bool hasPreviousState = widgetCursor.hasPreviousState && !dirty;
+    bool hasPreviousState = widgetCursor.hasPreviousState;
 
-	if (target) {
-		float t = 1.0f * (millis() - targetStartTime) / (targetEndTime - targetStartTime);
-		if (t < 1.0f) {
-			t = remapOutQuad(t, 0, 0, 1, 1);
-			int newOffset = (int)(targetStartOffset + t * (targetEndOffset - targetStartOffset));
-			WIDGET_STATE(offset, newOffset);
-			printf("%g, %d\n", t, newOffset);
-		} else {
-			target = false;
-			offset = 0;
+	const Style* selectedValueStyle = getStyle(widget->selectedValueStyle);
+	font::Font fontSelectedValue = styleGetFont(selectedValueStyle);
+	if (!fontSelectedValue) {
+		return true;
+	}
 
-			const Style* style = getStyle(widget->style);
-			font::Font font = styleGetFont(style);
-			if (font) {
-				auto textHeight = font.getHeight();
+	textHeight = selectedValueStyle->paddingTop + fontSelectedValue.getHeight() + selectedValueStyle->paddingBottom;
 
-				auto oldPosition = data.getInt();
+    minValue = get(widgetCursor, widget->min).toInt32();
+    maxValue = get(widgetCursor, widget->max).toInt32();
 
-				int newPosition = oldPosition + targetEndOffset / textHeight;
+    Value dataValue = get(widgetCursor, widget->data);
 
-				if (newPosition < 1) {
-					newPosition = 1;
-				}
-
-				set(widgetCursor, widget->data, newPosition);
-			}
+	if (widgetCursor.flowState) {
+		auto executionState = (flow::RollerWidgetComponenentExecutionState *)widgetCursor.flowState->componenentExecutionStates[widget->componentIndex];
+		if (executionState && executionState->clear) {
+			executionState->clear = false;
+			isRunning = true;
+			velocity = 0;
+			applyForce(-1.5f * position * FRICTION);
 		}
 	}
 
-	WIDGET_STATE(data, get(widgetCursor, widget->data));
+    float oldPosition = position;
+
+    if (isRunning) {
+        updatePosition();
+
+		auto newDataValue = minValue + int(roundf(-position / textHeight));
+		if (newDataValue < minValue) {
+			newDataValue = minValue;
+		} else if (newDataValue > maxValue) {
+			newDataValue = maxValue;
+		}
+
+		if (newDataValue != dataValue.getInt()) {
+			dataValue = newDataValue;
+			set(widgetCursor, widget->data, data);
+			sound::playClick();
+		}
+
+        if (!isMoving()) {
+            isRunning = false;
+        }
+    } else {
+        position = -(dataValue.getInt() - minValue) * textHeight;
+    }
+
+    if (oldPosition != position) {
+        hasPreviousState = false;
+    }
+
+	WIDGET_STATE(data, dataValue);
 
 	return !hasPreviousState;
 }
@@ -69,54 +98,111 @@ void RollerWidgetState::render() {
     const WidgetCursor &widgetCursor = g_widgetCursor;
     auto widget = (const RollerWidget *)widgetCursor.widget;
     const Style* style = getStyle(widget->style);
+    const Style* selectedValueStyle = getStyle(widget->selectedValueStyle);
+    const Style* unselectedValueStyle = getStyle(widget->unselectedValueStyle);
 
-    font::Font font = styleGetFont(style);
-	if (!font) {
+    font::Font fontSelectedValue = styleGetFont(selectedValueStyle);
+	if (!fontSelectedValue) {
 		return;
 	}
 
-    drawRectangle(
+	font::Font fontUnselectedValue = styleGetFont(unselectedValueStyle);
+	if (!fontUnselectedValue) {
+		return;
+	}
+
+	drawRectangle(
         widgetCursor.x, widgetCursor.y, (int)widget->w, (int)widget->h,
         style
     );
 
-    auto textHeight = font.getHeight();
+	display::AggDrawing aggDrawing;
+	display::aggInit(aggDrawing);
+	
+	auto x = widgetCursor.x;
 
-	auto position = data.getInt();
-	if (position < 1) {
-		position = 1;
-	}
+	int rectHeight = selectedValueStyle->borderSizeTop + textHeight + selectedValueStyle->borderSizeBottom;
 
-    auto x = widgetCursor.x;
-    auto y = widgetCursor.y + (widget->h - textHeight) / 2 - (position - 1) * textHeight - offset;
+	display::setColor(selectedValueStyle->borderColor);
+	auto yCenter = widgetCursor.y + (widget->h - rectHeight) / 2;
+	display::drawRoundedRect(
+		aggDrawing,
+		x, yCenter, x + widget->w - 1, yCenter + rectHeight - 1, selectedValueStyle->borderSizeLeft,
+		selectedValueStyle->borderRadiusTLX, selectedValueStyle->borderRadiusTLY, selectedValueStyle->borderRadiusTRX, selectedValueStyle->borderRadiusTRY,
+		selectedValueStyle->borderRadiusBRX, selectedValueStyle->borderRadiusBRY, selectedValueStyle->borderRadiusBLX, selectedValueStyle->borderRadiusBLY
+	);
 
-    display::setColor(style->color);
+	int clip1_x1 = widgetCursor.x;
+	int clip1_y1 = widgetCursor.y;
+	int clip1_x2 = widgetCursor.x + widget->w - 1;
+	int clip1_y2 = yCenter - 1;
 
-    for (int i = 1; ; i++) {
-        char text[100];
-        snprintf(text, sizeof(text), "%d", i);
+	int clip2_x1 = widgetCursor.x;
+	int clip2_y1 = yCenter + selectedValueStyle->borderSizeTop;
+	int clip2_x2 = widgetCursor.x + widget->w - 1;
+	int clip2_y2 = yCenter + rectHeight - selectedValueStyle->borderSizeBottom;
 
-		auto textLength = strlen(text);
+	int clip3_x1 = widgetCursor.x;
+	int clip3_y1 = yCenter + rectHeight;
+	int clip3_x2 = widgetCursor.x + widget->w - 1;
+	int clip3_y2 = widgetCursor.y + widget->h - 1;
 
-        int textWidth = display::measureStr(text, textLength, font, 0);
+    auto y = widgetCursor.y + (widget->h - textHeight) / 2 + (int)roundf(position);
 
-        display::drawStr(
-            text, textLength,
-            x + (widget->w - textWidth) / 2, y,
-            widgetCursor.x, widgetCursor.y, widgetCursor.x + widget->w - 1, widgetCursor.y + widget->h - 1,
-            font,
-            -1
-        );
+	display::setColor(unselectedValueStyle->color);
 
-        y += textHeight;
-
+    for (int i = minValue; i <= maxValue; i++, y += textHeight) {
+        if (y + textHeight <= widgetCursor.y) {
+            continue;
+        }
         if (y >= widgetCursor.y + widget->h) {
             break;
         }
+
+        set(widgetCursor, widget->data, i);
+
+        Value textValue = get(widgetCursor, widget->text);
+
+        char text[100];
+        textValue.toText(text, sizeof(text));
+
+		auto textLength = strlen(text);
+
+		int textWidth = display::measureStr(text, textLength, fontUnselectedValue, 0);
+		if (y < clip1_y2) {
+			display::drawStr(
+				text, textLength,
+				x + (widget->w - textWidth) / 2, y,
+				clip1_x1, clip1_y1, clip1_x2, clip1_y2,
+				fontUnselectedValue,
+				-1
+			);
+		} else {
+			display::drawStr(
+				text, textLength,
+				x + (widget->w - textWidth) / 2, y,
+				clip3_x1, clip3_y1, clip3_x2, clip3_y2,
+				fontUnselectedValue,
+				-1
+			);
+		}
+
+		if (y + textHeight >= clip2_y1 || y < clip2_y2) {
+			int textWidth = display::measureStr(text, textLength, fontSelectedValue, 0);
+
+			display::setColor(selectedValueStyle->color);
+			display::drawStr(
+				text, textLength,
+				x + (widget->w - textWidth) / 2, y,
+				clip2_x1, clip2_y1, clip2_x2, clip2_y2,
+				fontSelectedValue,
+				-1
+			);
+			display::setColor(unselectedValueStyle->color);
+		}
     }
 
-    auto yCenter = widgetCursor.y + (widget->h - textHeight) / 2;
-    display::drawRoundedRect(x, yCenter - 1, x + widget->w - 1, yCenter + textHeight + 2 - 1, 1, 4);
+    set(widgetCursor, widget->data, data);
 }
 
 bool RollerWidgetState::hasOnTouch() {
@@ -125,53 +211,93 @@ bool RollerWidgetState::hasOnTouch() {
 
 void RollerWidgetState::onTouch(const WidgetCursor &widgetCursor, Event &touchEvent) {
     if (touchEvent.type == EVENT_TYPE_TOUCH_DOWN) {
-		target = false;
-        yAtDown = touchEvent.y;
-        offsetAtDown = offset;
-		target = false;
-		timeLast = touchEvent.time;
-		yLast = touchEvent.y;
+        dragOrigin = touchEvent.y;
+        dragStartPosition = position;
+        dragPosition = dragStartPosition;
     } else if (touchEvent.type == EVENT_TYPE_TOUCH_MOVE) {
-        auto newOffset = offsetAtDown + yAtDown - touchEvent.y;
-        if (newOffset != offset) {
-            offset = newOffset;
-			dirty = true;
-        }
-
-		speed = 1.0f * (yLast - touchEvent.y) / (touchEvent.time - timeLast);
-		timeLast = touchEvent.time;
-		yLast = touchEvent.y;
-	} else if (touchEvent.type == EVENT_TYPE_TOUCH_UP) {
-		auto widget = (const RollerWidget *)widgetCursor.widget;
-		const Style* style = getStyle(widget->style);
-		font::Font font = styleGetFont(style);
-		if (font) {
-			auto textHeight = font.getHeight();
-
-			target = true;
-			targetStartOffset = offset;
-			targetStartTime = millis();
-
-			float lines;
-			if (fabs(speed) < 0.5) {
-				lines = 1.0f * offset / textHeight;
-			} else {
-				lines = offset + speed * 10;
-			}
-
-			targetEndOffset = roundf(lines) * textHeight;
-
-			auto oldPosition = data.getInt();
-			int newPosition = oldPosition + targetEndOffset / textHeight;
-			if (newPosition < 1) {
-				newPosition = 1;
-			}
-
-			targetEndOffset = (newPosition - oldPosition) * textHeight;
-			targetEndTime = targetStartTime + abs(newPosition - oldPosition) * 16 / 2;
+		if (abs(touchEvent.y - dragOrigin) > 10) {
+			isDragging = true;
+			isRunning = true;
+			dragPosition = dragStartPosition + (touchEvent.y - dragOrigin);
 		}
-
+	} else if (touchEvent.type == EVENT_TYPE_TOUCH_UP || touchEvent.type == EVENT_TYPE_AUTO_REPEAT) {
+		if (!isDragging) {
+			isRunning = true;
+			if (touchEvent.y < widgetCursor.y + (widgetCursor.widget->h - textHeight) / 2) {
+				applyForce(textHeight * FRICTION);
+			} else if (touchEvent.y > widgetCursor.y + (widgetCursor.widget->h - textHeight) / 2 + textHeight) {
+				applyForce(-textHeight * FRICTION);
+			}
+		} else {
+			if (touchEvent.type == EVENT_TYPE_TOUCH_UP) {
+				isDragging = false;
+			}
+		}
 	}
+}
+
+void RollerWidgetState::updatePosition() {
+    applyDragForce();
+    applySnapForce();
+    applyEdgeForce();
+
+    auto inverseFriction = 1.0f - FRICTION;
+    velocity *= inverseFriction;
+    position += velocity;
+}
+
+bool RollerWidgetState::isMoving() {
+    return isDragging || fabs(velocity) >= 0.01f;
+}
+
+void RollerWidgetState::applyDragForce() {
+    if (!isDragging) {
+        return;
+    }
+    auto dragVelocity = dragPosition - position;
+    applyForce(dragVelocity - velocity);
+}
+
+void RollerWidgetState::applySnapForce() {
+    if (isDragging) {
+        return;
+    }
+
+    // Make sure position ends at multiply of textHeight
+    auto restPosition = position + velocity / FRICTION;
+    auto targetRestPosition = roundf(restPosition / textHeight) * textHeight;
+    applyForce(FRICTION * (targetRestPosition - position) - velocity);
+}
+
+void RollerWidgetState::applyEdgeForce() {
+    if (isDragging) {
+        return;
+    }
+
+    float edgeFrom = -(maxValue - minValue) * textHeight;
+    float edgeTo = 0;
+
+    if (position > edgeTo) {
+        auto distanceToEdge = edgeTo - position;
+        auto force = distanceToEdge * BOUNCE_FORCE;
+        auto restPosition = position + (velocity + force) / FRICTION;
+        if (restPosition <= edgeTo) {
+            force -= velocity;
+        }
+        applyForce(force);
+    } else if (position < edgeFrom) {
+        auto distanceToEdge = edgeFrom - position;
+        auto force = distanceToEdge * BOUNCE_FORCE;
+        auto restPosition = position + (velocity + force) / FRICTION;
+        if (restPosition >= edgeFrom) {
+            force -= velocity;
+        }
+        applyForce(force);
+    }
+}
+
+void RollerWidgetState::applyForce(float force) {
+    velocity += force;
 }
 
 } // namespace gui

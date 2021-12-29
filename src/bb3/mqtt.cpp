@@ -20,27 +20,6 @@
 
 #include <stdlib.h>
 
-#if defined(EEZ_PLATFORM_STM32)
-#include <tcpip.h>
-#include <api.h>
-#include <mqtt.h>
-#include <mqtt_priv.h>
-#include <ip_addr.h>
-#include <dns.h>
-#endif
-
-#if defined(EEZ_PLATFORM_SIMULATOR)
-extern "C" {
-#include <mqtt.h>
-}
-#include <unistd.h>
-#include <stdio.h>
-#if defined(WIN32)
-#include <ws2tcpip.h>
-#endif
-#include <posix_sockets.h>
-#endif
-
 #include <bb3/firmware.h>
 #include <eez/debug.h>
 #include <bb3/mqtt.h>
@@ -61,6 +40,27 @@ extern "C" {
 
 #if OPTION_FAN
 #include <bb3/aux_ps/fan.h>
+#endif
+
+#if defined(EEZ_PLATFORM_STM32)
+#include <tcpip.h>
+#include <api.h>
+#include <mqtt.h>
+#include <mqtt_priv.h>
+#include <ip_addr.h>
+#include <dns.h>
+#endif
+
+#if defined(EEZ_PLATFORM_SIMULATOR)
+extern "C" {
+#include <mqtt.h>
+}
+#include <unistd.h>
+#include <stdio.h>
+#if defined(WIN32)
+#include <ws2tcpip.h>
+#endif
+#include <posix_sockets.h>
 #endif
 
 namespace eez {

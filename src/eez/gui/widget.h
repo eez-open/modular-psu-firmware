@@ -56,6 +56,9 @@ namespace gui {
     WIDGET_TYPE(Gauge,         GAUGE,          23) \
     WIDGET_TYPE(Input,         INPUT,          24) \
 	WIDGET_TYPE(Roller,        ROLLER,         25) \
+	WIDGET_TYPE(Switch,        SWITCH,         26) \
+	WIDGET_TYPE(Slider,        SLIDER,         27) \
+	WIDGET_TYPE(DropDownList,  DROP_DOWN_LIST, 28) \
 
 #define WIDGET_TYPE(NAME_PASCAL_CASE, NAME, ID) WIDGET_TYPE_##NAME = ID,
 enum WidgetTypes {

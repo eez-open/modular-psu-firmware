@@ -22,7 +22,7 @@
 namespace eez {
 namespace flow {
 
-static const unsigned QUEUE_SIZE = 100;
+static const unsigned QUEUE_SIZE = 200;
 static struct {
 	FlowState *flowState;
 	unsigned componentIndex;

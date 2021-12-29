@@ -99,13 +99,9 @@ extern "C" {
     char *OUR_strndup(const char *s, size_t n);
 #endif
 
-#ifndef min
-#define min(a, b)  (((a) < (b)) ? (a) : (b))
-#endif
+#define scpi_min(a, b)  (((a) < (b)) ? (a) : (b))
 
-#ifndef max
-#define max(a, b)  (((a) > (b)) ? (a) : (b))
-#endif
+#define scpi_max(a, b)  (((a) > (b)) ? (a) : (b))
 
 #if 0
 #define max(a,b) \

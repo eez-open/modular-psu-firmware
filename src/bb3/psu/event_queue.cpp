@@ -33,8 +33,6 @@
 #include <bb3/psu/event_queue.h>
 #include <bb3/psu/sd_card.h>
 
-#include <eez/fs/fs.h>
-
 #if OPTION_ETHERNET
 #include <bb3/mcu/ethernet.h>
 #endif
@@ -46,6 +44,8 @@
 #include <bb3/psu/gui/psu.h>
 #include <bb3/psu/gui/animations.h>
 #endif
+
+#include <eez/fs/fs.h>
 
 using namespace eez::psu::gui;
 

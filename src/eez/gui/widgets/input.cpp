@@ -137,7 +137,7 @@ Value getInputWidgetData(const gui::WidgetCursor &widgetCursor, const Value &dat
 		auto baseUnit = getBaseUnit(unit);
     	return Value(dataValue.toFloat() * factor, baseUnit);
 	} else {
-		return get(widgetCursor, widget->data);
+		return dataValue;
 	}
 }
 
@@ -186,6 +186,12 @@ void InputWidgetState::render() {
 
 	char text[MAX_TEXT_LEN + 1];
 	data.toText(text, sizeof(text));
+
+	if ((widget->flags & INPUT_WIDGET_TYPE_TEXT) && (widget->flags & INPUT_WIDGET_PASSWORD_FLAG)) {
+		for (int i = 0; text[i]; i++) {
+			text[i] = '*';
+		}
+	}
 
 	drawText(
 		text, -1,

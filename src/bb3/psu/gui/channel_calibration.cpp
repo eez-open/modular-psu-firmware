@@ -1348,7 +1348,7 @@ void action_select_channel_calibration_value_type() {
     if (calibrationBase->hasSupportForCurrentDualRange()) {
         pushSelectFromEnumPage(ENUM_DEFINITION_CALIBRATION_VALUE_TYPE_DUAL_RANGE, calibrationBase->getCalibrationValueType(), nullptr, onSetChannelCalibrationValueType);
     } else {
-        pushSelectFromEnumPage(ENUM_DEFINITION_CALIBRATION_VALUE_TYPE, calibrationBase->getCalibrationValueType(), nullptr, onSetChannelCalibrationValueType);
+		pushSelectFromEnumPage(ENUM_DEFINITION_CALIBRATION_VALUE_TYPE, calibrationBase->getCalibrationValueType(), nullptr, onSetChannelCalibrationValueType);
     }
 }
 

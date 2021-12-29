@@ -33,6 +33,12 @@ Value op_mul(const Value& a1, const Value& b1);
 Value op_div(const Value& a1, const Value& b1);
 Value op_mod(const Value& a1, const Value& b1);
 
+Value op_left_shift(const Value& a1, const Value& b1);
+Value op_right_shift(const Value& a1, const Value& b1);
+Value op_binary_and(const Value& a1, const Value& b1);
+Value op_binary_or(const Value& a1, const Value& b1);
+Value op_binary_xor(const Value& a1, const Value& b1);
+
 Value op_eq(const Value& a1, const Value& b1);
 Value op_neq(const Value& a1, const Value& b1);
 Value op_less(const Value& a1, const Value& b1);

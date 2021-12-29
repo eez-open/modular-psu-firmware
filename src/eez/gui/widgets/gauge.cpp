@@ -26,9 +26,6 @@
 #include <eez/gui/data.h>
 #include <eez/gui/widgets/gauge.h>
 
-#include <agg2d.h>
-#include <agg_rendering_buffer.h>
-
 namespace eez {
 namespace gui {
 
@@ -143,10 +140,10 @@ void GaugeWidgetState::render() {
 	fillRect(widgetCursor.x, widgetCursor.y, widgetCursor.x + widget->w - 1, widgetCursor.y + widget->h - 1);
 
 	// init AGG
-	agg::rendering_buffer rbuf;
-	rbuf.attach((uint8_t *)getBufferPointer(), getDisplayWidth(), getDisplayHeight(), getDisplayWidth() * DISPLAY_BPP / 8);
-	Agg2D graphics;
-	graphics.attach(rbuf.buf(), rbuf.width(), rbuf.height(), rbuf.stride());
+	display::AggDrawing aggDrawing;
+	display::aggInit(aggDrawing);
+	auto &graphics = aggDrawing.graphics;
+
 	graphics.clipBox(widgetCursor.x, widgetCursor.y, widgetCursor.x + widget->w, widgetCursor.y + widget->h);
 	graphics.translate(widgetCursor.x, widgetCursor.y);
 
@@ -160,7 +157,8 @@ void GaugeWidgetState::render() {
 			style->borderSizeLeft / 2.0,
 			widget->w - style->borderSizeLeft,
 			widget->h - style->borderSizeLeft,
-			style->borderRadius
+			style->borderRadiusTLX, style->borderRadiusTLY, style->borderRadiusTRX, style->borderRadiusTRY,
+			style->borderRadiusBRX, style->borderRadiusBRY, style->borderRadiusBLX, style->borderRadiusBLY
 		);
 	}
 

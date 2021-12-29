@@ -287,6 +287,9 @@ public:
     void roundedRect(double x1, double y1, double x2, double y2,
                      double rxBottom, double ryBottom,
                      double rxTop,    double ryTop);
+    void roundedRect(double x1, double y1, double x2, double y2,
+                     double rtlx, double rtly, double rtrx, double rtry,
+                     double rbrx, double rbry, double rblx, double rbly);
     void ellipse(double cx, double cy, double rx, double ry);
     void arc(double cx, double cy, double rx, double ry, double start, double sweep);
     void star(double cx, double cy, double r1, double r2, double startAngle, int numRays);

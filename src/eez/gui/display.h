@@ -20,6 +20,9 @@
 
 #include <stdint.h>
 
+#include <agg2d.h>
+#include <agg_rendering_buffer.h>
+
 #if defined(EEZ_PLATFORM_STM32)
 	typedef uint16_t *VideoBuffer;
 #endif
@@ -133,8 +136,41 @@ void drawHLine(int x, int y, int l);
 void drawVLine(int x, int y, int l);
 void drawRect(int x1, int y1, int x2, int y2);
 void drawFocusFrame(int x, int y, int w, int h);
-void drawRoundedRect(int x1, int y1, int x2, int y2, int lineWidth, int r);
-void fillRoundedRect(int x1, int y1, int x2, int y2, int lineWidth, int r, bool drawLine, bool fill);
+
+// AGG based drawing
+struct AggDrawing {
+    agg::rendering_buffer rbuf;
+	Agg2D graphics;
+};
+
+void aggInit(AggDrawing& aggDrawing);
+
+void drawRoundedRect(
+	AggDrawing &aggDrawing,
+	double x1, double y1, double x2, double y2,
+	double lineWidth, 
+	double rtlx, double rtly, double rtrx, double rtry,
+	double rbrx, double rbry, double rblx, double rbly
+);
+
+void fillRoundedRect(
+	AggDrawing &aggDrawing,
+	double x1, double y1, double x2, double y2,
+	double lineWidth,
+	double rtlx, double rtly, double rtrx, double rtry,
+	double rbrx, double rbry, double rblx, double rbly,
+	bool drawLine, bool fill,
+	double clip_x1 = -1, double clip_y1 = -1, double clip_x2 = -1, double clip_y2 = -1
+);
+
+void fillRoundedRect(
+	AggDrawing &aggDrawing,
+	double x1, double y1, double x2, double y2,
+	double lineWidth,
+	double r,
+	bool drawLine, bool fill,
+	double clip_x1 = -1, double clip_y1 = -1, double clip_x2 = -1, double clip_y2 = -1
+);
 
 void drawStr(const char *text, int textLength, int x, int y, int clip_x1, int clip_y1, int clip_x2, int clip_y2, gui::font::Font &font, int cursorPosition);
 int getCharIndexAtPosition(int xPos, const char *text, int textLength, int x, int y, int clip_x1, int clip_y1, int clip_x2,int clip_y2, gui::font::Font &font);

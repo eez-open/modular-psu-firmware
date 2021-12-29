@@ -88,37 +88,6 @@ void dialogCancel();
 void dialogOk();
 void dialogLater();
 
-void pushSelectFromEnumPage(
-    AppContext *appContext,
-    EnumDefinition enumDefinition,
-    uint16_t currentValue, 
-    bool (*disabledCallback)(uint16_t value), 
-    void (*onSet)(uint16_t),
-    bool smallFont = false,
-    bool showRadioButtonIcon = true
-);
-void pushSelectFromEnumPage(
-    AppContext *appContext,
-    EnumItem *enumItems,
-    uint16_t currentValue, 
-    bool (*disabledCallback)(uint16_t value), 
-    void (*onSet)(uint16_t),
-    bool smallFont = false,
-    bool showRadioButtonIcon = true
-);
-void pushSelectFromEnumPage(
-    AppContext *appContext,
-    void(*enumDefinitionFunc)(DataOperationEnum operation, const WidgetCursor &widgetCursor, Value &value),
-    uint16_t currentValue,
-    bool(*disabledCallback)(uint16_t value),
-    void(*onSet)(uint16_t),
-    bool smallFont = false,
-    bool showRadioButtonIcon = true
-);
-
-const EnumItem *getActiveSelectEnumDefinition();
-void popSelectFromEnumPage();
-
 void showMainPage();
 void goBack();
 void takeScreenshot();
@@ -348,6 +317,16 @@ inline void hideProgressPage() {
     g_psuAppContext.hideProgressPage();
 }
 
+void pushSelectFromEnumPage(
+    AppContext *appContext,
+    EnumDefinition enumDefinition,
+    uint16_t currentValue, 
+    bool (*disabledCallback)(uint16_t value), 
+    void (*onSet)(uint16_t),
+    bool smallFont = false,
+    bool showRadioButtonIcon = true
+);
+
 inline void pushSelectFromEnumPage(
     EnumDefinition enumDefinition,
     uint16_t currentValue, 
@@ -367,7 +346,7 @@ inline void pushSelectFromEnumPage(
     bool smallFont = false,
     bool showRadioButtonIcon = true
 ) {
-    pushSelectFromEnumPage(&g_psuAppContext, enumItems, currentValue, disabledCallback, onSet, smallFont, showRadioButtonIcon);
+	SelectFromEnumPage::pushSelectFromEnumPage(&g_psuAppContext, enumItems, currentValue, disabledCallback, onSet, smallFont, showRadioButtonIcon);
 }
 
 inline void pushSelectFromEnumPage(
@@ -378,7 +357,7 @@ inline void pushSelectFromEnumPage(
     bool smallFont = false,
     bool showRadioButtonIcon = true
 ) {
-    pushSelectFromEnumPage(&g_psuAppContext, enumDefinitionFunc, currentValue, disabledCallback, onSet, smallFont, showRadioButtonIcon);
+	SelectFromEnumPage::pushSelectFromEnumPage(&g_psuAppContext, enumDefinitionFunc, currentValue, disabledCallback, onSet, smallFont, showRadioButtonIcon);
 }
 
 inline void showAsyncOperationInProgress(const char *message = nullptr, void (*checkStatus)() = nullptr) {

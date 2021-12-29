@@ -148,8 +148,16 @@ struct Style {
     uint8_t borderSizeBottom;
     uint8_t borderSizeLeft;
 
-    uint16_t borderRadius;
     uint16_t borderColor;
+
+    uint8_t borderRadiusTLX;
+	uint8_t borderRadiusTLY;
+    uint8_t borderRadiusTRX;
+	uint8_t borderRadiusTRY;
+    uint8_t borderRadiusBLX;
+	uint8_t borderRadiusBLY;
+    uint8_t borderRadiusBRX;
+	uint8_t borderRadiusBRY;
 
     uint8_t font;
     uint8_t opacity; // 0 - 255

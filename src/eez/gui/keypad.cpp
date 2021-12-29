@@ -158,11 +158,13 @@ void Keypad::key() {
 		auto textWidget = (TextWidget *)widget;
 		if (textWidget->text) {
 			key(textWidget->text.ptr(widgetCursor.assets)[0]);
+			return;
 		}
 	} else if (widget->type == WIDGET_TYPE_BUTTON) {
 		auto buttonWidget = (ButtonWidget *)widget;
 		if (buttonWidget->text) {
 			key(buttonWidget->text.ptr(widgetCursor.assets)[0]);
+			return;
 		}
 	}
 

@@ -6431,7 +6431,7 @@ void onSetAinRange(uint16_t value) {
 }
 
 void action_dib_mio168_ain_select_range() {
-    pushSelectFromEnumPage(g_ainConfigurationPage.getRangeEnumDefinition(),
+	pushSelectFromEnumPage(g_ainConfigurationPage.getRangeEnumDefinition(),
 		g_ainConfigurationPage.m_mode == MEASURE_MODE_VOLTAGE ? g_ainConfigurationPage.m_voltageRange : g_ainConfigurationPage.m_currentRange,
 		nullptr, onSetAinRange);
 }
@@ -6774,7 +6774,7 @@ void action_dib_mio168_ain_select_mode_and_range() {
 
     AinConfigurationPage::g_selectedChannelIndex = subchannelIndex;
 
-    pushSelectFromEnumPage(
+	pushSelectFromEnumPage(
 		((Mio168Module *)g_slots[slotIndex])->ainChannels[subchannelIndex - AIN_1_SUBCHANNEL_INDEX].getModeRangeEnumDefinition(),
         AinConfigurationPage::getModeRange(slotIndex, subchannelIndex),
         nullptr, 
@@ -7127,7 +7127,7 @@ void onSetVoltageRange(uint16_t value) {
 }
 
 void action_dib_mio168_aout_select_voltage_range() {
-    pushSelectFromEnumPage(g_aoutVoltageRangeEnumDefinition, g_aoutDac7760ConfigurationPage.m_voltageRange, nullptr, onSetVoltageRange);
+	pushSelectFromEnumPage(g_aoutVoltageRangeEnumDefinition, g_aoutDac7760ConfigurationPage.m_voltageRange, nullptr, onSetVoltageRange);
 }
 
 void data_dib_mio168_aout_current_range(DataOperationEnum operation, const WidgetCursor &widgetCursor, Value &value) {
@@ -7142,7 +7142,7 @@ void onSetCurrentRange(uint16_t value) {
 }
 
 void action_dib_mio168_aout_select_current_range() {
-    pushSelectFromEnumPage(g_aoutCurrentRangeEnumDefinition, g_aoutDac7760ConfigurationPage.m_currentRange, nullptr, onSetCurrentRange);
+	pushSelectFromEnumPage(g_aoutCurrentRangeEnumDefinition, g_aoutDac7760ConfigurationPage.m_currentRange, nullptr, onSetCurrentRange);
 }
 
 void action_dib_mio168_aout_toggle_output_enabled() {
@@ -7179,7 +7179,7 @@ void action_dib_mio168_aout_select_mode_and_range() {
     hmi::selectSlot(slotIndex);
     AoutDac7760ConfigurationPage::g_selectedChannelIndex = subchannelIndex;
 
-    pushSelectFromEnumPage(
+	pushSelectFromEnumPage(
         AoutDac7760ConfigurationPage::getModeRangeEnumDefinition(slotIndex, subchannelIndex),
         AoutDac7760ConfigurationPage::getModeRange(slotIndex, subchannelIndex),
         nullptr, 
@@ -7683,8 +7683,7 @@ void action_dib_mio168_select_simulator_afe_version() {
 		{ 0, 0 }
 	};
 
-	pushSelectFromEnumPage(&g_frontPanelAppContext, enumItems,
-		((Mio168Module *)g_slots[g_slotIndex])->simulatorAfeVersion, NULL, onSetSimulatorAfeVersion);
+	SelectFromEnumPage::pushSelectFromEnumPage(&g_frontPanelAppContext, enumItems, ((Mio168Module *)g_slots[g_slotIndex])->simulatorAfeVersion, NULL, onSetSimulatorAfeVersion);
 }
 
 #endif

@@ -147,6 +147,30 @@ void toastMessagePageOnEncoderHook(ToastMessagePage *toast, int counter);
 
 class SelectFromEnumPage : public InternalPage {
 public:
+    static void pushSelectFromEnumPage(
+        AppContext *appContext,
+        const EnumItem *enumItems,
+        uint16_t currentValue, 
+        bool (*disabledCallback)(uint16_t value), 
+        void (*onSet)(uint16_t),
+        bool smallFont = false,
+        bool showRadioButtonIcon = true
+    );
+
+    static void pushSelectFromEnumPage(
+        AppContext *appContext,
+        void (*enumDefinitionFunc)(DataOperationEnum operation, const WidgetCursor &widgetCursor, Value &value),
+        uint16_t currentValue,
+        bool (*disabledCallback)(uint16_t value),
+        void (*onSet)(uint16_t),
+        bool smallFont = false,
+        bool showRadioButtonIcon = true
+    );
+
+    static const EnumItem *getActiveSelectEnumDefinition();
+    static void selectEnumItem();
+    static void popSelectFromEnumPage();
+
     void init(
         AppContext *appContext_,
         const EnumItem *enumDefinition_,
@@ -171,8 +195,6 @@ public:
 
     void updateInternalPage();
     WidgetCursor findWidgetInternalPage(int x, int y, bool clicked);
-
-    void selectEnumItem();
 
     const EnumItem *getEnumDefinition() {
         return enumDefinition;
@@ -210,6 +232,8 @@ private:
 
     void getItemPosition(int itemIndex, int &x, int &y);
     void getItemLabel(int itemIndex, char *text, int count);
+
+	void doSelectEnumItem();
 };
 
 ////////////////////////////////////////////////////////////////////////////////

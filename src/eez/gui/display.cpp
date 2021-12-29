@@ -20,9 +20,6 @@
 #include <string.h>
 #include <memory.h>
 
-#include <agg2d.h>
-#include <agg_rendering_buffer.h>
-
 #include <eez/conf.h>
 #include <eez/util.h>
 
@@ -713,22 +710,50 @@ void drawFocusFrame(int x, int y, int w, int h) {
     fillRect(x, y + h - lineWidth, x + w - 1, y + h - 1);
 }
 
-void drawRoundedRect(int x1, int y1, int x2, int y2, int lineWidth, int r) {
-    fillRoundedRect(x1, y1, x2, y2, lineWidth, r, true, false);
+////////////////////////////////////////////////////////////////////////////////////////////////
+
+void aggInit(AggDrawing& aggDrawing) {
+	aggDrawing.rbuf.attach((uint8_t *)getBufferPointer(), getDisplayWidth(), getDisplayHeight(), getDisplayWidth() * DISPLAY_BPP / 8);
+	aggDrawing.graphics.attach(aggDrawing.rbuf.buf(), aggDrawing.rbuf.width(), aggDrawing.rbuf.height(), aggDrawing.rbuf.stride());
 }
 
-void fillRoundedRect(int x1, int y1, int x2, int y2, int lineWidth, int r, bool drawLine, bool fill) {
-	// init AGG
-	agg::rendering_buffer rbuf;
-	rbuf.attach((uint8_t *)getBufferPointer(), getDisplayWidth(), getDisplayHeight(), getDisplayWidth() * DISPLAY_BPP / 8);
-	Agg2D graphics;
-	graphics.attach(rbuf.buf(), rbuf.width(), rbuf.height(), rbuf.stride());
-    auto w = x2 - x1 + 1;
-    auto h = y2 - y1 + 1;
-	graphics.clipBox(x1, y1, x1 + w, y1 + h);
+void drawRoundedRect(
+    AggDrawing& aggDrawing,
+    double x1, double y1, double x2, double y2,
+    double lineWidth,
+	double rtlx, double rtly, double rtrx, double rtry,
+	double rbrx, double rbry, double rblx, double rbly
+) {
+    fillRoundedRect(
+        aggDrawing,
+        x1, y1, x2, y2,
+        lineWidth,
+        rtlx, rtly, rtrx, rtry,
+	    rbrx, rbry, rblx, rbly,
+        true, false
+    );
+}
+
+void fillRoundedRect(
+    AggDrawing& aggDrawing,
+	double x1, double y1, double x2, double y2,
+	double lineWidth,
+	double rtlx, double rtly, double rtrx, double rtry,
+	double rbrx, double rbry, double rblx, double rbly, 
+	bool drawLine, bool fill,
+	double clip_x1, double clip_y1, double clip_x2, double clip_y2
+) {
+    auto &graphics = aggDrawing.graphics;
+
+	if (clip_x1 != -1) {
+		graphics.clipBox(clip_x1, clip_y1, clip_x2 + 1, clip_y2 + 1);
+	} else {
+		graphics.clipBox(x1, y1, x2 + 1, y2 + 1);
+	}
+    graphics.masterAlpha(g_opacity / 255.0);
 	graphics.translate(x1, y1);
     graphics.lineWidth(lineWidth);
-    if (drawLine) {
+    if (lineWidth > 0 && drawLine) {
 	    graphics.lineColor(COLOR_TO_R(g_fc), COLOR_TO_G(g_fc), COLOR_TO_B(g_fc));
     } else {
         graphics.noLine();
@@ -738,7 +763,26 @@ void fillRoundedRect(int x1, int y1, int x2, int y2, int lineWidth, int r, bool 
     } else {
         graphics.noFill();
     }
-    graphics.roundedRect(lineWidth / 2.0, lineWidth / 2.0, w - lineWidth, h - lineWidth, r);
+	auto w = x2 - x1 + 1;
+	auto h = y2 - y1 + 1;
+	graphics.roundedRect(
+		lineWidth / 2.0, lineWidth / 2.0, w - lineWidth, h - lineWidth,
+		rtlx, rtly, rtrx, rtry, rbrx, rbry, rblx, rbly
+	);
+    
+	graphics.translate(-x1, -y1);
+	graphics.clipBox(0, 0, aggDrawing.rbuf.width(), aggDrawing.rbuf.height());
+}
+
+void fillRoundedRect(
+    AggDrawing& aggDrawing,
+	double x1, double y1, double x2, double y2,
+	double lineWidth,
+	double r, 
+	bool drawLine, bool fill,
+	double clip_x1, double clip_y1, double clip_x2, double clip_y2
+) {
+	fillRoundedRect(aggDrawing, x1, y1, x2, y2, lineWidth, r, r, r, r, r, r, r, r, drawLine, fill, clip_x1, clip_y1, clip_x2, clip_y2);
 }
 
 ////////////////////////////////////////////////////////////////////////////////

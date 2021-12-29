@@ -105,7 +105,7 @@ void popPage() {
 static ActionExecFunc g_internalActionExecFunctions[] = {
     0,
     // ACTION_ID_INTERNAL_SELECT_ENUM_ITEM
-    selectEnumItemHook,
+	SelectFromEnumPage::selectEnumItem,
 
     // ACTION_ID_INTERNAL_DIALOG_CLOSE
     popPage,

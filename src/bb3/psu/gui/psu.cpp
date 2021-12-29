@@ -115,8 +115,6 @@ static struct {
     int textIndex;
 } g_externalDataItemValues[MAX_NUM_EXTERNAL_DATA_ITEM_VALUES];
 
-SelectFromEnumPage g_selectFromEnumPage;
-
 int g_displayTestColorIndex = 0;
 
 bool g_setFocusCursor = false;
@@ -1722,48 +1720,9 @@ void pushSelectFromEnumPage(
     bool smallFont,
     bool showRadioButtonIcon
 ) {
-	g_selectFromEnumPage.init(appContext, g_enumDefinitions[enumDefinition], currentValue, disabledCallback, onSet, smallFont, showRadioButtonIcon);
-    appContext->pushPage(INTERNAL_PAGE_ID_SELECT_FROM_ENUM, &g_selectFromEnumPage);
+	SelectFromEnumPage::pushSelectFromEnumPage(appContext, g_enumDefinitions[enumDefinition], currentValue, disabledCallback, onSet, smallFont, showRadioButtonIcon);
 }
 
-void pushSelectFromEnumPage(
-    AppContext *appContext,
-    EnumItem *enumItems,
-    uint16_t currentValue,
-    bool (*disabledCallback)(uint16_t value),
-    void (*onSet)(uint16_t),
-    bool smallFont,
-    bool showRadioButtonIcon
-) {
-	g_selectFromEnumPage.init(appContext, enumItems, currentValue, disabledCallback, onSet, smallFont, showRadioButtonIcon);
-    appContext->pushPage(INTERNAL_PAGE_ID_SELECT_FROM_ENUM, &g_selectFromEnumPage);
-}
-
-void pushSelectFromEnumPage(
-    AppContext *appContext,
-    void(*enumDefinitionFunc)(DataOperationEnum operation, const WidgetCursor &widgetCursor, Value &value),
-    uint16_t currentValue,
-    bool(*disabledCallback)(uint16_t value),
-    void(*onSet)(uint16_t),
-    bool smallFont,
-    bool showRadioButtonIcon
-) {
-	g_selectFromEnumPage.init(appContext, enumDefinitionFunc, currentValue, disabledCallback, onSet, smallFont, showRadioButtonIcon);
-    appContext->pushPage(INTERNAL_PAGE_ID_SELECT_FROM_ENUM, &g_selectFromEnumPage);
-}
-
-const EnumItem *getActiveSelectEnumDefinition() {
-    if (g_selectFromEnumPage.appContext && g_selectFromEnumPage.appContext->getActivePage() == &g_selectFromEnumPage) {
-        return g_selectFromEnumPage.getEnumDefinition();
-    }
-    return nullptr;
-}
-
-void popSelectFromEnumPage() {
-    if (g_selectFromEnumPage.appContext) {
-        g_selectFromEnumPage.appContext->popPage();
-    }
-}
 
 void showMainPage() {
     showPage(PAGE_ID_MAIN);
@@ -2287,10 +2246,6 @@ Page *getPageFromIdHook(int pageId) {
     }
 
     return page;
-}
-
-void selectEnumItemHook() {
-    g_selectFromEnumPage.selectEnumItem();
 }
 
 int overrideStyleHook(const WidgetCursor &widgetCursor, int styleId) {

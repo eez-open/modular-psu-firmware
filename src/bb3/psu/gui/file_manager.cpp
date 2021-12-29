@@ -1417,7 +1417,7 @@ void onSetFileManagerSortBy(uint16_t value) {
 }
 
 void action_file_manager_sort_by() {
-    pushSelectFromEnumPage(ENUM_DEFINITION_FILE_MANAGER_SORT_BY, getSortFilesOption(), NULL, onSetFileManagerSortBy, true);
+	pushSelectFromEnumPage(ENUM_DEFINITION_FILE_MANAGER_SORT_BY, getSortFilesOption(), NULL, onSetFileManagerSortBy, true);
 }
 
 void action_file_manager_new_file() {

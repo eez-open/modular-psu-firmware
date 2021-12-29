@@ -1855,7 +1855,7 @@ void data_dlog_period_has_predefined_values(DataOperationEnum operation, const W
 }
 
 void action_dlog_period_select_predefined_value() {
-    pushSelectFromEnumPage(g_predefinedDlogPeriodsEnumDefinition, 0, nullptr, [] (uint16_t value) {
+	pushSelectFromEnumPage(g_predefinedDlogPeriodsEnumDefinition, 0, nullptr, [] (uint16_t value) {
 		popPage();
 		DlogParamsPage::setPeriod(g_predefinedDlogPeriods[value]);
     }, true, false);
@@ -2178,7 +2178,7 @@ void onSelectDlogViewLegendViewOption(uint16_t value) {
 }
 
 void action_dlog_view_select_legend_view_option() {
-    pushSelectFromEnumPage(ENUM_DEFINITION_DLOG_VIEW_LEGEND_VIEW_OPTION, persist_conf::devConf.viewFlags.dlogViewLegendViewOption, nullptr, onSelectDlogViewLegendViewOption);
+	pushSelectFromEnumPage(ENUM_DEFINITION_DLOG_VIEW_LEGEND_VIEW_OPTION, persist_conf::devConf.viewFlags.dlogViewLegendViewOption, nullptr, onSelectDlogViewLegendViewOption);
 }
 
 void action_dlog_view_toggle_labels() {

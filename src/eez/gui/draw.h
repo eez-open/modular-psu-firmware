@@ -38,7 +38,8 @@ void drawText(
     bool active = false, bool blink = false, bool ignoreLuminocity = false,
     uint16_t *overrideColor = nullptr, uint16_t *overrideBackgroundColor = nullptr,
     uint16_t *overrideActiveColor = nullptr, uint16_t *overrideActiveBackgroundColor = nullptr,
-    bool useSmallerFontIfDoesNotFit = false, int cursorPosition = -1, int xScroll = 0
+    bool useSmallerFontIfDoesNotFit = false, int cursorPosition = -1, int xScroll = 0,
+	bool boolSkipBackground = false
 );
 int getCharIndexAtPosition(int xPos, const char *text, int textLength, int x, int y, int w, int h, const Style *style);
 int getCursorXPosition(int cursorPosition, const char *text, int textLength, int x, int y, int w, int h, const Style *style);
