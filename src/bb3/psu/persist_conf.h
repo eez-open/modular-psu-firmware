@@ -475,6 +475,9 @@ bool saveChannelCalibration(int slotIndex, int subchannelIndex);
 uint32_t readCounter(int slotIndex, int counterIndex);
 bool writeCounter(int slotIndex, int counterIndex, uint32_t counter);
 
+void resetAllExceptOnTimeCountersMCU();
+void resetAllExceptOnTimeCountersBP3C(uint8_t slotIndex);
+
 } // namespace persist_conf
 } // namespace psu
 } // namespace eez

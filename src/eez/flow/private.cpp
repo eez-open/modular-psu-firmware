@@ -318,6 +318,25 @@ void assignValue(FlowState *flowState, int componentIndex, Value &dstValue, cons
 
 ////////////////////////////////////////////////////////////////////////////////
 
+void startAsyncExecution(FlowState *flowState, int componentIndex) {
+	flowState->numActiveComponents++;
+}
+
+void endAsyncExecution(FlowState *flowState, int componentIndex) {
+	if (--flowState->numActiveComponents == 0 && flowState->isAction) {
+		auto componentExecutionState = flowState->parentFlowState->componenentExecutionStates[flowState->parentComponentIndex];
+		if (componentExecutionState) {
+			flowState->parentFlowState->componenentExecutionStates[flowState->parentComponentIndex] = nullptr;
+			ObjectAllocator<ComponenentExecutionState>::deallocate(componentExecutionState);
+		} else {
+			throwError(flowState, componentIndex, "Unexpected: no CallAction component state\n");
+			return;
+		}
+	}
+}
+
+////////////////////////////////////////////////////////////////////////////////
+
 bool findCatchErrorComponent(FlowState *flowState, FlowState *&catchErrorFlowState, int &catchErrorComponentIndex) {
 	for (unsigned componentIndex = 0; componentIndex < flowState->flow->components.count; componentIndex++) {
 		auto component = flowState->flow->components.item(flowState->assets, componentIndex);

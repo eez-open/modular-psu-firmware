@@ -42,7 +42,6 @@
 #include <bb3/psu/gui/psu.h>
 
 #include <eez/eeprom.h>
-#include <bb3/mcu/eeprom.h>
 
 #include <bb3/bp3c/flash_slave.h>
 #include <bb3/bp3c/io_exp.h>
@@ -74,7 +73,7 @@ scpi_result_t scpi_cmd_debug(scpi_t *context) {
             taskENTER_CRITICAL();
 #endif
 
-            eeprom::resetAllExceptOnTimeCounters();
+            persist_conf::resetAllExceptOnTimeCountersMCU();
 
 #if defined(EEZ_PLATFORM_STM32)
             taskEXIT_CRITICAL();
@@ -110,7 +109,7 @@ scpi_result_t scpi_cmd_debug(scpi_t *context) {
             taskENTER_CRITICAL();
 #endif
 
-            bp3c::eeprom::resetAllExceptOnTimeCounters(slotIndex);
+            persist_conf::resetAllExceptOnTimeCountersBP3C(slotIndex);
 
 #if defined(EEZ_PLATFORM_STM32)
             taskEXIT_CRITICAL();

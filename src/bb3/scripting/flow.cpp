@@ -24,6 +24,8 @@
 #include <bb3/scripting/scpi_context.h>
 #include <bb3/scripting/thread.h>
 
+#include <bb3/psu/gui/keypad.h>
+
 #include <eez/flow/flow.h>
 
 namespace eez {
@@ -127,6 +129,20 @@ bool isFlowRunningHook() {
 
 void replacePageHook(int16_t pageId) {
 	eez::psu::gui::replacePage(pageId);
+}
+
+void showKeyboardHook(Value label, Value initialText, Value minChars, Value maxChars, bool isPassword, void(*onOk)(char *), void(*onCancel)()) {
+	eez::psu::gui::startTextKeypad(label.getString(), initialText.getString(), minChars.toInt32(), maxChars.toInt32(), isPassword, onOk, onCancel);
+}
+
+void showKeypadHook(Value label, Value initialValue, Value min, Value max, Unit unit, void(*onOk)(float), void(*onCancel)()) {
+	NumericKeypadOptions options;
+	options.pageId = PAGE_ID_NUMERIC_KEYPAD;
+	options.min = min.toFloat();
+	options.max = max.toFloat();
+	options.editValueUnit = unit;
+
+	eez::psu::gui::startNumericKeypad(&eez::psu::gui::g_psuAppContext, label.getString(), initialValue, options, onOk, nullptr, onCancel);
 }
 
 void stopScriptHook() {

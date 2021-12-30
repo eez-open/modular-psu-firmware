@@ -69,6 +69,9 @@ namespace persist_conf {
 
 ////////////////////////////////////////////////////////////////////////////////
 
+static const uint16_t MCU_EEPROM_ONTIME_START_ADDRESS = 64;
+static const uint16_t BP3C_EEPROM_ONTIME_START_ADDRESS = 40;
+
 static const uint16_t MODULE_CONF_VERSION = 1;
 static const uint16_t MODULE_SERIAL_NO_VERSION = 1;
 static const uint16_t CH_CAL_CONF_VERSION = 4;
@@ -792,6 +795,43 @@ void toggleMaxChannelIndex(int channelIndex) {
 
 ////////////////////////////////////////////////////////////////////////////////
 
+void resetAllExceptOnTimeCountersMCU() {
+	uint8_t buffer[64];
+
+	memset(buffer, 0xFF, 64);
+
+	uint32_t address;
+
+	for (address = 0; address < MCU_EEPROM_ONTIME_START_ADDRESS; address += 64) {
+		WATCHDOG_RESET(WATCHDOG_LONG_OPERATION);
+		eeprom::write(buffer, MIN(MCU_EEPROM_ONTIME_START_ADDRESS - address, 64), (uint16_t)address);
+	}
+
+	for (address = MCU_EEPROM_ONTIME_START_ADDRESS + 6 * sizeof(uint32_t); address < eeprom::EEPROM_SIZE; address += 64) {
+		WATCHDOG_RESET(WATCHDOG_LONG_OPERATION);
+		eeprom::write(buffer, MIN(eeprom::EEPROM_SIZE - address, 64), (uint16_t)address);
+	}
+}
+
+void resetAllExceptOnTimeCountersBP3C(uint8_t slotIndex) {
+    uint8_t buffer[64];
+    
+    memset(buffer, 0xFF, 64);
+
+    uint32_t address;
+
+    for (address = 0; address < BP3C_EEPROM_ONTIME_START_ADDRESS; address += 64) {
+        WATCHDOG_RESET(WATCHDOG_LONG_OPERATION);
+        bp3c::eeprom::write(slotIndex, buffer, MIN(BP3C_EEPROM_ONTIME_START_ADDRESS - address, 64), (uint16_t)address);
+    }
+
+    for (address = BP3C_EEPROM_ONTIME_START_ADDRESS + 6 * sizeof(uint32_t); address < bp3c::eeprom::EEPROM_SIZE; address += 64) {
+        WATCHDOG_RESET(WATCHDOG_LONG_OPERATION);
+		bp3c::eeprom::write(slotIndex, buffer, MIN(bp3c::eeprom::EEPROM_SIZE - address, 64), (uint16_t)address);
+    }
+
+}
+
 uint32_t readTotalOnTime(int type) {
     uint32_t buffer[6];
 
@@ -799,13 +839,13 @@ uint32_t readTotalOnTime(int type) {
 
     for (int i = 0; i < NUM_RETRIES; i++) {
         if (type == ontime::ON_TIME_COUNTER_MCU) {
-            result = confRead((uint8_t *)buffer, sizeof(buffer), eeprom::EEPROM_ONTIME_START_ADDRESS, -1);
+            result = confRead((uint8_t *)buffer, sizeof(buffer), MCU_EEPROM_ONTIME_START_ADDRESS, -1);
         } else {
             result = moduleConfRead(
                 type - ontime::ON_TIME_COUNTER_SLOT1,
                 (uint8_t *)buffer, 
                 sizeof(buffer), 
-                bp3c::eeprom::EEPROM_ONTIME_START_ADDRESS,
+                BP3C_EEPROM_ONTIME_START_ADDRESS,
                 -1
             );
         }
@@ -852,13 +892,13 @@ bool writeTotalOnTime(int type, uint32_t time) {
         // }
         // lastTime = time;
 
-        return confWrite((uint8_t *)buffer, sizeof(buffer), eeprom::EEPROM_ONTIME_START_ADDRESS);
+        return confWrite((uint8_t *)buffer, sizeof(buffer), MCU_EEPROM_ONTIME_START_ADDRESS);
     } else {
         return moduleConfWrite(
             type - ontime::ON_TIME_COUNTER_SLOT1,
             (uint8_t *)buffer, 
             sizeof(buffer), 
-            bp3c::eeprom::EEPROM_ONTIME_START_ADDRESS
+            BP3C_EEPROM_ONTIME_START_ADDRESS
         );
     }
 }

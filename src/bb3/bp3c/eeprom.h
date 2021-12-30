@@ -107,8 +107,6 @@ static const uint16_t EEPROM_PROLOG_SIZE = 6;
 static const uint16_t EEPROM_SERIAL_NO_BLOCK_START_ADDRESS = 6;
 static const uint16_t EEPROM_SERIAL_NO_BLOCK_SIZE = 24;
 
-static const uint16_t EEPROM_ONTIME_START_ADDRESS = 40;
-
 static const uint16_t MODULE_PERSIST_CONF_BLOCK_MODULE_CONFIGURATION_ADDRESS = 64;
 static const uint16_t MODULE_PERSIST_CONF_BLOCK_MODULE_CONFIGURATION_SIZE = 64;
 
@@ -127,8 +125,6 @@ bool read(uint8_t slotIndex, uint8_t *buffer, uint16_t buffer_size, uint16_t add
 bool write(uint8_t slotIndex, const uint8_t *buffer, uint16_t buffer_size, uint16_t address);
 
 void writeModuleType(uint8_t slotIndex, uint16_t moduleType);
-
-void resetAllExceptOnTimeCounters(uint8_t slotIndex);
 
 } // namespace eeprom
 } // namespace bp3c

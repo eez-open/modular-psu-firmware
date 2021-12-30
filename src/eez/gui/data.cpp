@@ -1015,6 +1015,10 @@ Value Value::toString(uint32_t id) const {
 Value Value::makeStringRef(const char *str, size_t len, uint32_t id) {
     Value value;
 
+	if (len == -1) {
+		len = strlen(str);
+	}
+
     auto stringRef = (StringRef *)alloc(sizeof(StringRef) + MAX(len + 1 - 4, 0), id);
 	if (stringRef == nullptr) {
 		return Value(VALUE_TYPE_NULL);

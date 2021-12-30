@@ -48,6 +48,9 @@ void executeCatchErrorComponent(FlowState *flowState, unsigned componentIndex);
 void executeLoopComponent(FlowState *flowState, unsigned componentIndex);
 void executeScpiComponent(FlowState *flowState, unsigned componentIndex);
 void executeShowPageComponent(FlowState *flowState, unsigned componentIndex);
+void executeShowMessageBoxComponent(FlowState *flowState, unsigned componentIndex);
+void executeShowKeyboardComponent(FlowState *flowState, unsigned componentIndex);
+void executeShowKeypadComponent(FlowState *flowState, unsigned componentIndex);
 void executeRollerWidgetComponent(FlowState *flowState, unsigned componentIndex);
 
 void executeComponent(FlowState *flowState, unsigned componentIndex) {
@@ -87,8 +90,14 @@ void executeComponent(FlowState *flowState, unsigned componentIndex) {
 		executeLoopComponent(flowState, componentIndex);
     } else if (component->type == defs_v3::COMPONENT_TYPE_SCPIACTION) {
 		executeScpiComponent(flowState, componentIndex);
-	}  else if (component->type == defs_v3::COMPONENT_TYPE_SHOW_PAGE_ACTION) {
+	} else if (component->type == defs_v3::COMPONENT_TYPE_SHOW_PAGE_ACTION) {
 		executeShowPageComponent(flowState, componentIndex);
+	} else if (component->type == defs_v3::COMPONENT_TYPE_SHOW_MESSAGE_BOX_ACTION) {
+		executeShowMessageBoxComponent(flowState, componentIndex);
+	} else if (component->type == defs_v3::COMPONENT_TYPE_SHOW_KEYBOARD_ACTION) {
+		executeShowKeyboardComponent(flowState, componentIndex);
+	} else if (component->type == defs_v3::COMPONENT_TYPE_SHOW_KEYPAD_ACTION) {
+		executeShowKeypadComponent(flowState, componentIndex);
 	} else if (component->type < 1000) {
 		if (component->type == defs_v3::COMPONENT_TYPE_ROLLER_WIDGET) {
 			executeRollerWidgetComponent(flowState, componentIndex);

@@ -25,16 +25,6 @@
 namespace eez {
 namespace eeprom {
 
-// opcodes
-static const uint8_t WREN = 6;
-static const uint8_t WRDI = 4;
-static const uint8_t RDSR = 5;
-static const uint8_t WRSR = 1;
-static const uint8_t READ = 3;
-static const uint8_t WRITE = 2;
-
-static const uint16_t EEPROM_ONTIME_START_ADDRESS = 64;
-
 static const uint16_t EEPROM_SIZE = 32768;
 
 void init();

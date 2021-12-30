@@ -529,14 +529,12 @@ source_group("bb3\\fpga" FILES ${src_bb3_fpga} ${header_bb3_fpga})
 
 set(src_bb3_mcu
     src/bb3/mcu/battery.cpp
-    src/bb3/mcu/eeprom.cpp
     src/bb3/mcu/ethernet.cpp
     src/bb3/mcu/encoder.cpp
     src/bb3/mcu/sdram.cpp) 
 list (APPEND src_files ${src_bb3_mcu})
 set(header_bb3_mcu
     src/bb3/mcu/battery.h
-    src/bb3/mcu/eeprom.h
     src/bb3/mcu/encoder.h
     src/bb3/mcu/ethernet.h
     src/bb3/mcu/sdram.h) 

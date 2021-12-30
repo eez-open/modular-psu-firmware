@@ -78,6 +78,9 @@ void setValue(uint16_t dataId, const WidgetCursor &widgetCursor, const Value& va
 
 void assignValue(FlowState *flowState, int componentIndex, Value &dstValue, const Value &srcValue);
 
+void startAsyncExecution(FlowState *flowState, int componentIndex);
+void endAsyncExecution(FlowState *flowState, int componentIndex);
+
 void throwError(FlowState *flowState, int componentIndex, const char *errorMessage);
 
 } // flow

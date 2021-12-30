@@ -47,6 +47,8 @@ void flushToDebuggerMessage();
 
 bool isFlowRunningHook();
 void replacePageHook(int16_t pageId);
+void showKeyboardHook(Value label, Value initialText, Value minChars, Value maxChars, bool isPassword, void(*onOk)(char *), void(*onCancel)());
+void showKeypadHook(Value label, Value initialValue, Value min, Value max, Unit unit, void(*onOk)(float), void(*onCancel)());
 void stopScriptHook();
 
 } // flow

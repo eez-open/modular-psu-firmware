@@ -599,7 +599,7 @@ bool SelectFromEnumPage::calcSize() {
 void SelectFromEnumPage::findPagePosition() {
     const WidgetCursor &widgetCursorAtTouchDown = getFoundWidgetAtDown();
     if (widgetCursorAtTouchDown.widget) {
-        x = widgetCursorAtTouchDown.x;
+        x = widgetCursorAtTouchDown.x + widgetCursorAtTouchDown.widget->w - width;
         int xMargin = MAX(MIN(22, (appContext->rect.w - width) / 2), 0);
         int right = appContext->rect.x + appContext->rect.w - xMargin;
         if (x + width > right) {
