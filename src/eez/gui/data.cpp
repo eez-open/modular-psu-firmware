@@ -1012,7 +1012,7 @@ Value Value::toString(uint32_t id) const {
 
 }
 
-Value Value::makeStringRef(const char *str, size_t len, uint32_t id) {
+Value Value::makeStringRef(const char *str, int len, uint32_t id) {
     Value value;
 
 	if (len == -1) {

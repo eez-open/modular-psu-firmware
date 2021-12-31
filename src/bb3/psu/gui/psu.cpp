@@ -1042,14 +1042,6 @@ int PsuAppContext::getLongTouchActionHook(const WidgetCursor &widgetCursor) {
     return AppContext::getLongTouchActionHook(widgetCursor);
 }
 
-int PsuAppContext::getExtraLongTouchActionHook(const WidgetCursor &widgetCursor) {
-#if defined(EEZ_PLATFORM_SIMULATOR)
-    return ACTION_ID_NONE;
-#else
-    return ACTION_ID_SHOW_TOUCH_CALIBRATION_INTRO;
-#endif
-}
-
 void MenuInputParams::onSet(int value) {
     g_psuAppContext.m_menuInputParams.m_input = value;
     g_psuAppContext.m_inputReady = true;
@@ -2553,6 +2545,14 @@ int askMcuRevision() {
 namespace gui {
 
 using namespace psu::gui;
+
+int getExtraLongTouchActionHook() {
+#if defined(EEZ_PLATFORM_SIMULATOR)
+    return ACTION_ID_NONE;
+#else
+    return ACTION_ID_SHOW_TOUCH_CALIBRATION_INTRO;
+#endif
+}
 
 void getTouchScreenCalibrationParamsHook(
 	int16_t &touchScreenCalTlx, int16_t &touchScreenCalTly,

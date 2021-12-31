@@ -192,7 +192,6 @@ public:
     void dialogClose();
 
     int getLongTouchActionHook(const WidgetCursor &widgetCursor) override;
-    int getExtraLongTouchActionHook(const WidgetCursor &widgetCursor) override;
 
 protected:
     bool m_pushProgressPage;

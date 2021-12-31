@@ -91,7 +91,6 @@ public:
     virtual bool isWidgetActionEnabled(const WidgetCursor &widgetCursor);
 
     virtual int getLongTouchActionHook(const WidgetCursor &widgetCursor);
-    virtual int getExtraLongTouchActionHook(const WidgetCursor &widgetCursor);
 
     void infoMessage(const char *message);
     void infoMessage(Value value);

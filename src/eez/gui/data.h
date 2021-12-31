@@ -446,7 +446,7 @@ struct Value {
 
 	Value toString(uint32_t id) const;
 
-	static Value makeStringRef(const char *str, size_t len, uint32_t id);
+	static Value makeStringRef(const char *str, int len, uint32_t id);
 	static Value concatenateString(const Value &str1, const Value &str2);
 
 	//////////

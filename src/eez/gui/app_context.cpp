@@ -387,10 +387,6 @@ int AppContext::getLongTouchActionHook(const WidgetCursor &widgetCursor) {
     return ACTION_ID_NONE;
 }
 
-int AppContext::getExtraLongTouchActionHook(const WidgetCursor &widgetCursor) {
-    return ACTION_ID_NONE;
-}
-
 void AppContext::yesNoDialog(int yesNoPageId, const char *message, void (*yes_callback)(), void (*no_callback)(), void (*cancel_callback)()) {
     set(WidgetCursor(), DATA_ID_ALERT_MESSAGE, Value(message));
 

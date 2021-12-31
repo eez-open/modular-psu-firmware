@@ -128,7 +128,11 @@ void processTouchEvent(Event &touchEvent) {
 
             if (g_longTouchGenerated && !g_extraLongTouchGenerated && int32_t(tickCountMs - m_touchDownTimeMs) >= CONF_GUI_EXTRA_LONG_TOUCH_TIMEOUT_MS) {
                 g_extraLongTouchGenerated = true;
-                processTouchEvent(EVENT_TYPE_EXTRA_LONG_TOUCH, touchEvent);
+				g_touchActionExecuted = true;
+				int action = getExtraLongTouchActionHook();
+				if (action != ACTION_ID_NONE) {
+					executeAction(WidgetCursor(), action);
+				}
             }
 
             if (int32_t(tickCountMs - m_lastAutoRepeatEventTimeMs) >= (m_lastAutoRepeatEventTimeMs == m_touchDownTimeMs ? CONF_GUI_KEYPAD_FIRST_AUTO_REPEAT_DELAY_MS : CONF_GUI_KEYPAD_NEXT_AUTO_REPEAT_DELAY_MS)) {
@@ -227,12 +231,6 @@ static void onWidgetDefaultTouch(const WidgetCursor &widgetCursor, Event &touchE
             g_isLongTouch = true;
             executeAction(widgetCursor, action);
             g_isLongTouch = false;
-        }
-    } else if (touchEvent.type == EVENT_TYPE_EXTRA_LONG_TOUCH) {
-        g_touchActionExecuted = true;
-        int action = widgetCursor.appContext->getExtraLongTouchActionHook(widgetCursor);
-        if (action != ACTION_ID_NONE) {
-            executeAction(widgetCursor, action);
         }
     } else if (touchEvent.type == EVENT_TYPE_TOUCH_UP) {
         if (!g_touchActionExecutedAtDown) {

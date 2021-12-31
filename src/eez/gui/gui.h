@@ -76,6 +76,8 @@ AppContext *getAppContextFromId(int16_t id);
 
 ////////////////////////////////////////////////////////////////////////////////
 
+int getExtraLongTouchActionHook();
+
 float getDefaultAnimationDurationHook();
 
 void executeExternalActionHook(const WidgetCursor &widgetCursor, int16_t actionId);
