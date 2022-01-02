@@ -2046,12 +2046,6 @@ bool isDefaultViewVertical() {
 namespace eez {
 namespace gui {
 
-#if EEZ_PLATFORM_STM32
-AppContext &getRootAppContext() {
-    return g_psuAppContext;
-}
-#endif
-
 void stateManagmentHook() {
 #if defined(EEZ_PLATFORM_SIMULATOR)
     g_frontPanelAppContext.stateManagment();
@@ -2063,7 +2057,7 @@ void stateManagmentHook() {
 	WATCHDOG_RESET(WATCHDOG_GUI_THREAD);
 }
 
-bool styleGetSmallerFontHook(font::Font &font) {
+static bool styleGetSmallerFontHook(font::Font &font) {
     if (font.fontData == getFontData(FONT_ID_OSWALD48)) {
         font.fontData = getFontData(FONT_ID_OSWALD38);
     } else if (font.fontData == getFontData(FONT_ID_OSWALD38)) {
@@ -2381,20 +2375,6 @@ uint16_t transformColorHook(uint16_t color) {
     return color;
 }
 
-int16_t getAppContextId(AppContext *pAppContext) {
-    if (pAppContext == &g_psuAppContext) {
-        return APP_CONTEXT_ID_DEVICE;
-    }
-    
-#if defined(EEZ_PLATFORM_SIMULATOR)
-    if (pAppContext == &g_frontPanelAppContext) {
-        return APP_CONTEXT_ID_SIMULATOR_FRONT_PANEL;
-    }
-#endif
-    
-    return -1;
-}
-
 AppContext *getAppContextFromId(int16_t id) {
     if (id == APP_CONTEXT_ID_DEVICE) {
         return &g_psuAppContext;
@@ -2651,6 +2631,7 @@ void initHooks() {
     g_hooks.overrideStyleColor = overrideStyleColorHook;
     g_hooks.overrideActiveStyleColor = overrideActiveStyleColorHook;
     g_hooks.transformColor = transformColorHook;
+    g_hooks.styleGetSmallerFont = styleGetSmallerFontHook;
     g_hooks.getDisplayBackgroundLuminosityStep = display::getDisplayBackgroundLuminosityStepHook;
     g_hooks.getSelectedThemeIndex = display::getSelectedThemeIndexHook;
     g_hooks.turnOnDisplayStart = display::turnOnDisplayStartHook;
@@ -2662,7 +2643,9 @@ void initHooks() {
     g_hooks.onTouchCalibrationOk = onTouchCalibrationOkHook;
     g_hooks.onTouchCalibrationCancel = onTouchCalibrationCancelHook;
     g_hooks.onTouchCalibrationConfirm = onTouchCalibrationConfirmHook;
-
+    g_hooks.getTouchScreenCalibrationParams = getTouchScreenCalibrationParamsHook;
+    g_hooks.setTouchScreenCalibrationParams = setTouchScreenCalibrationParamsHook;
+    g_hooks.onGuiQueueMessage = onGuiQueueMessageHook;
 }
 
 ////////////////////////////////////////////////////////////////////////////////

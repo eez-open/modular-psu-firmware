@@ -443,5 +443,13 @@ void AppContext::pushToastMessage(ToastMessagePage *toastMessage) {
     pushPage(INTERNAL_PAGE_ID_TOAST_MESSAGE, toastMessage);
 }
 
+AppContext *getRootAppContext() {
+#ifdef EEZ_PLATFORM_SIMULATOR
+    return getAppContextFromId(APP_CONTEXT_ID_SIMULATOR_FRONT_PANEL);
+#else
+    return getAppContextFromId(APP_CONTEXT_ID_DEVICE);
+#endif
+}
+
 } // namespace gui
 } // namespace eez

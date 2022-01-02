@@ -188,7 +188,7 @@ static void onPageTouch(const WidgetCursor &foundWidget, Event &touchEvent) {
 	if (foundWidget.appContext) {
 		foundWidget.appContext->onPageTouch(foundWidget, touchEvent);
 	} else {
-		getRootAppContext().onPageTouch(foundWidget, touchEvent);
+		getRootAppContext()->onPageTouch(foundWidget, touchEvent);
 	}
 }
 

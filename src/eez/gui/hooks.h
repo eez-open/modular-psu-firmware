@@ -37,6 +37,7 @@ struct Hooks {
     uint16_t (*overrideStyleColor)(const WidgetCursor &widgetCursor, const Style *style);
     uint16_t (*overrideActiveStyleColor)(const WidgetCursor &widgetCursor, const Style *style);
     uint16_t (*transformColor)(uint16_t color);
+    bool (*styleGetSmallerFont)(font::Font &font);
     uint8_t (*getDisplayBackgroundLuminosityStep)();
     uint8_t (*getSelectedThemeIndex)();
     void (*turnOnDisplayStart)();
@@ -48,6 +49,17 @@ struct Hooks {
     void (*onTouchCalibrationOk)();
     void (*onTouchCalibrationCancel)();
     void (*onTouchCalibrationConfirm)();
+    void (*getTouchScreenCalibrationParams)(
+        int16_t &touchScreenCalTlx, int16_t &touchScreenCalTly,
+        int16_t &touchScreenCalBrx, int16_t &touchScreenCalBry,
+        int16_t &touchScreenCalTrx, int16_t &touchScreenCalTry
+    );
+    void (*setTouchScreenCalibrationParams)(
+        int16_t touchScreenCalTlx, int16_t touchScreenCalTly,
+        int16_t touchScreenCalBrx, int16_t touchScreenCalBry,
+        int16_t touchScreenCalTrx, int16_t touchScreenCalTry
+    );
+    void (*onGuiQueueMessage)(uint8_t type, int16_t param);
 };
 
 extern Hooks g_hooks;

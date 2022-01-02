@@ -60,8 +60,6 @@ void sendTouchEventToGuiThread(Event &touchEvent);
 bool pushPageInGuiThread(AppContext *appContext, int pageId, Page *page);
 bool showPageInGuiThread(AppContext *appContext, int pageId);
 
-void onGuiQueueMessageHook(uint8_t type, int16_t param);
-
 bool isGuiThread();
 
 void processGuiQueue(uint32_t timeoutMillisec);

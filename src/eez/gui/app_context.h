@@ -135,7 +135,7 @@ protected:
     void pushToastMessage(ToastMessagePage *toastMessage);
 };
 
-AppContext &getRootAppContext();
+AppContext *getRootAppContext();
 
 } // namespace gui
 } // namespace eez

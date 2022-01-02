@@ -56,7 +56,5 @@ void expandRectWithShadow(int &x1, int &y1, int &x2, int &y2);
 void drawLine(int x1, int y1, int x2, int y2);
 void drawAntialiasedLine(int x1, int y1, int x2, int y2);
 
-bool styleGetSmallerFontHook(font::Font &font);
-
 } // namespace gui
 } // namespace eez

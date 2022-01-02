@@ -29,10 +29,14 @@ using namespace eez::gui;
 #include <bb3/psu/gui/keypad.h>
 
 namespace eez {
+
+namespace gui {
+void initHooks();
+void onGuiQueueMessageHook(uint8_t type, int16_t param);
+} // namespace gui
+
 namespace psu {
-
 struct Channel;
-
 namespace gui {
 
 extern bool g_askMcuRevisionInProgress;
@@ -411,11 +415,4 @@ bool isDefaultViewVertical();
 
 } // namespace gui
 } // namespace psu
-
-namespace gui {
-
-void initHooks();
-
-} // namespace gui
-
 } // namespace eez

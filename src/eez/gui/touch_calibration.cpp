@@ -52,7 +52,7 @@ bool isTouchCalibrated() {
 	int16_t touchScreenCalTrx;
 	int16_t touchScreenCalTry;
 
-	getTouchScreenCalibrationParamsHook(
+	g_hooks.getTouchScreenCalibrationParams(
 		touchScreenCalTlx, touchScreenCalTly,
 		touchScreenCalBrx, touchScreenCalBry,
 		touchScreenCalTrx, touchScreenCalTry
@@ -79,7 +79,7 @@ void enterTouchCalibration(AppContext *appContext) {
 }
 
 void touchCalibrationDialogYes() {
-	setTouchScreenCalibrationParamsHook(g_points[0].x, g_points[0].y, g_points[1].x, g_points[1].y, g_points[2].x, g_points[2].y);
+	g_hooks.setTouchScreenCalibrationParams(g_points[0].x, g_points[0].y, g_points[1].x, g_points[1].y, g_points[2].x, g_points[2].y);
 	g_hooks.onTouchCalibrationOk();
 }
 

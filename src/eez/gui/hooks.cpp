@@ -96,6 +96,10 @@ static uint16_t transformColor(uint16_t color) {
     return color;
 }
 
+static bool styleGetSmallerFont(font::Font &font) {
+    return false;
+}
+
 static uint8_t getDisplayBackgroundLuminosityStep() {
     return DISPLAY_BACKGROUND_LUMINOSITY_STEP_DEFAULT;
 }
@@ -144,6 +148,23 @@ static void onTouchCalibrationConfirm() {
     appContext->yesNoDialog(PAGE_ID_TOUCH_CALIBRATION_YES_NO, "Save changes?", touchCalibrationDialogYes, touchCalibrationDialogNo, nullptr);
 }
 
+static void getTouchScreenCalibrationParams(
+    int16_t &touchScreenCalTlx, int16_t &touchScreenCalTly,
+    int16_t &touchScreenCalBrx, int16_t &touchScreenCalBry,
+    int16_t &touchScreenCalTrx, int16_t &touchScreenCalTry
+) {
+}
+
+static void setTouchScreenCalibrationParams(
+    int16_t touchScreenCalTlx, int16_t touchScreenCalTly,
+    int16_t touchScreenCalBrx, int16_t touchScreenCalBry,
+    int16_t touchScreenCalTrx, int16_t touchScreenCalTry
+) {
+}
+
+static void onGuiQueueMessage(uint8_t type, int16_t param) {
+}
+
 ////////////////////////////////////////////////////////////////////////////////
 
 Hooks g_hooks = {
@@ -162,6 +183,7 @@ Hooks g_hooks = {
     overrideStyleColor,
     overrideActiveStyleColor,
     transformColor,
+    styleGetSmallerFont,
     getDisplayBackgroundLuminosityStep,
     getSelectedThemeIndex,
     turnOnDisplayStart,
@@ -173,6 +195,9 @@ Hooks g_hooks = {
     onTouchCalibrationOk,
     onTouchCalibrationCancel,
     onTouchCalibrationConfirm,
+    getTouchScreenCalibrationParams,
+    setTouchScreenCalibrationParams,
+    onGuiQueueMessage
 };
 
 } // namespace gui

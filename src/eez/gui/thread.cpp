@@ -102,7 +102,7 @@ void processGuiQueue(uint32_t timeout) {
     } else if (type == GUI_QUEUE_MESSAGE_DEBUGGER_INPUT_AVAILABLE) {
         flow::onDebuggerInputAvailable();
     } else {
-        onGuiQueueMessageHook(type, obj.param);
+        g_hooks.onGuiQueueMessage(type, obj.param);
     }
 }
 

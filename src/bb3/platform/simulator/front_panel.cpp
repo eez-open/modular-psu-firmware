@@ -32,12 +32,6 @@ FrontPanelAppContext g_frontPanelAppContext;
 
 ////////////////////////////////////////////////////////////////////////////////
 
-AppContext &getRootAppContext() {
-    return g_frontPanelAppContext;
-}
-
-////////////////////////////////////////////////////////////////////////////////
-
 void FrontPanelAppContext::stateManagment() {
     AppContext::stateManagment();
     if (!isPageOnStack(PAGE_ID_FRONT_PANEL)) {

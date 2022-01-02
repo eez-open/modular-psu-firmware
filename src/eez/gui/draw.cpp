@@ -297,7 +297,7 @@ void drawText(
 	}
 
     int width = display::measureStr(text, textLength, font, 0);
-    while (useSmallerFontIfDoesNotFit && width > x2 - x1 + 1 && styleGetSmallerFontHook(font)) {
+    while (useSmallerFontIfDoesNotFit && width > x2 - x1 + 1 && g_hooks.styleGetSmallerFont(font)) {
         width = display::measureStr(text, textLength, font, 0);
     }
     int height = font.getHeight();

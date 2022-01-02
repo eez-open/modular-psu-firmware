@@ -71,7 +71,6 @@ void executeAction(const WidgetCursor &widgetCursor, int actionId);
 void executeActionFunction(int actionId);
 void executeInternalAction(int actionId);
 
-int16_t getAppContextId(AppContext *pAppContext);
 AppContext *getAppContextFromId(int16_t id);
 
 extern const char *g_discardMessage;
