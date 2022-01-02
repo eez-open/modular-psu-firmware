@@ -1659,52 +1659,6 @@ void areYouSureWithMessage(const char *message, void (*yes_callback)(), void (*n
 
 ////////////////////////////////////////////////////////////////////////////////
 
-void dialogYes() {
-    auto callback = g_psuAppContext.m_dialogYesCallback;
-
-    popPage();
-
-    if (callback) {
-        callback();
-    }
-}
-
-void dialogNo() {
-    auto callback = g_psuAppContext.m_dialogNoCallback;
-
-    popPage();
-
-    if (callback) {
-        callback();
-    }
-}
-
-void dialogCancel() {
-    auto callback = g_psuAppContext.m_dialogCancelCallback;
-
-    popPage();
-
-    if (callback) {
-        callback();
-    }
-}
-
-void dialogOk() {
-    dialogYes();
-}
-
-void dialogLater() {
-    auto callback = g_psuAppContext.m_dialogLaterCallback;
-
-    popPage();
-
-    if (callback) {
-        callback();
-    }
-}
-
-////////////////////////////////////////////////////////////////////////////////
-
 void pushSelectFromEnumPage(
     AppContext *appContext,
     EnumDefinition enumDefinition,

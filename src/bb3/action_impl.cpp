@@ -126,26 +126,6 @@ void action_show_touch_calibration_intro() {
     showPage(PAGE_ID_TOUCH_CALIBRATION_INTRO);
 }
 
-void action_yes() {
-    dialogYes();
-}
-
-void action_no() {
-    dialogNo();
-}
-
-void action_ok() {
-    dialogOk();
-}
-
-void action_cancel() {
-    dialogCancel();
-}
-
-void action_later() {
-    dialogLater();
-}
-
 void action_show_previous_page() {
     Page *page = getActivePage();
     if (page && page->getDirty()) {
@@ -1176,9 +1156,6 @@ void action_front_panel_select_slot3() {
 }
 
 #endif
-
-void action_drag_overlay() {
-}
 
 void action_show_file_manager() {
     file_manager::openFileManager();

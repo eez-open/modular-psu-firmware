@@ -154,6 +154,7 @@ list (APPEND header_files ${header_eez_fs})
 source_group("eez\\fs" FILES ${src_eez_fs} ${header_eez_fs})
 
 set(src_eez_gui
+    src/eez/gui/action_impl.cpp
     src/eez/gui/animation.cpp
     src/eez/gui/app_context.cpp
     src/eez/gui/assets.cpp

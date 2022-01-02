@@ -3142,9 +3142,6 @@ void action_dlog_view_toggle_y_value_visible() {
 	}
 }
 
-void action_scroll() {
-}
-
 } // namespace gui
 
 } // namespace eez
