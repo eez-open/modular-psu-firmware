@@ -71,7 +71,7 @@ bool BarGraphWidgetState::updateState() {
 
     bool hasPreviousState = widgetCursor.hasPreviousState;
     auto widget = (const BarGraphWidget *)widgetCursor.widget;
-    const Style* style = getStyle(overrideStyleHook(widgetCursor, widget->style));
+    const Style* style = getStyle(g_hooks.overrideStyle(widgetCursor, widget->style));
 
     WIDGET_STATE(flags.active, g_isActiveWidget);
     WIDGET_STATE(flags.blinking, g_isBlinkTime && isBlinking(widgetCursor, widget->data));
@@ -103,7 +103,7 @@ void BarGraphWidgetState::render() {
     const WidgetCursor &widgetCursor = g_widgetCursor;
 
     auto widget = (const BarGraphWidget *)widgetCursor.widget;
-    const Style* style = getStyle(overrideStyleHook(widgetCursor, widget->style));
+    const Style* style = getStyle(g_hooks.overrideStyle(widgetCursor, widget->style));
 
     int x = widgetCursor.x;
     int y = widgetCursor.y;

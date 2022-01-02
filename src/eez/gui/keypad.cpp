@@ -757,6 +757,19 @@ void NumericKeypad::setDefValue() {
 
 ////////////////////////////////////////////////////////////////////////////////
 
+void onKeypadTextTouch(const WidgetCursor &widgetCursor, Event &touchEvent) {
+    if (touchEvent.type != EVENT_TYPE_TOUCH_DOWN && touchEvent.type != EVENT_TYPE_TOUCH_MOVE) {
+        return;
+    }
+
+    Keypad *keypad = getActiveKeypad();
+    if (keypad) {
+        keypad->setCursorPosition(DISPLAY_DATA_getCharIndexAtPosition(touchEvent.x, widgetCursor));
+    }
+}
+
+////////////////////////////////////////////////////////////////////////////////
+
 void data_keypad_edit_unit(DataOperationEnum operation, const WidgetCursor &widgetCursor, Value &value) {
     if (operation == DATA_OPERATION_GET) {
         Keypad *keypad = getActiveKeypad();

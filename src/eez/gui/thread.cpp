@@ -152,11 +152,6 @@ bool showPageInGuiThread(AppContext *appContext, int pageId) {
     return false;
 }
 
-void executeActionThreadHook() {
-    // why is this required?
-    osDelay(1);
-}
-
 bool isGuiThread() {
     return osThreadGetId() == g_guiTaskHandle;
 }

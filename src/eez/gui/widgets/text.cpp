@@ -43,7 +43,7 @@ bool TextWidgetState::updateState() {
 
     bool hasPreviousState = widgetCursor.hasPreviousState;
     auto widget = (const TextWidget *)widgetCursor.widget;
-    const Style *style = getStyle(overrideStyleHook(widgetCursor, widget->style));
+    const Style *style = getStyle(g_hooks.overrideStyle(widgetCursor, widget->style));
 
     WIDGET_STATE(flags.active, g_isActiveWidget);
     WIDGET_STATE(flags.focused, isFocusWidget(widgetCursor));
@@ -60,12 +60,12 @@ void TextWidgetState::render() {
     const WidgetCursor &widgetCursor = g_widgetCursor;
 
     auto widget = (const TextWidget *)widgetCursor.widget;
-    const Style *style = getStyle(overrideStyleHook(widgetCursor, widget->style));
+    const Style *style = getStyle(g_hooks.overrideStyle(widgetCursor, widget->style));
     const char *text = widget->text ? widget->text.ptr(widgetCursor.assets) : nullptr;
 
-    uint16_t overrideColor                 = flags.focused ? style->focusColor           : overrideStyleColorHook(widgetCursor, style);
+    uint16_t overrideColor                 = flags.focused ? style->focusColor           : g_hooks.overrideStyleColor(widgetCursor, style);
     uint16_t overrideBackgroundColor       = flags.focused ? style->focusBackgroundColor : style->backgroundColor;
-    uint16_t overrideActiveColor           = flags.focused ? style->focusBackgroundColor : overrideActiveStyleColorHook(widgetCursor, style);
+    uint16_t overrideActiveColor           = flags.focused ? style->focusBackgroundColor : g_hooks.overrideActiveStyleColor(widgetCursor, style);
     uint16_t overrideActiveBackgroundColor = flags.focused ? style->focusColor           : style->activeBackgroundColor;
 
     bool ignoreLuminosity = (widget->flags & IGNORE_LUMINOSITY_FLAG) != 0;

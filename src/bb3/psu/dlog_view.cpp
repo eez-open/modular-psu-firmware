@@ -2305,7 +2305,7 @@ void data_recording(DataOperationEnum operation, const WidgetCursor &widgetCurso
 			bool dragCursor = (abs((long)g_dragState.positionAtTouchDown) < CURSOR_REGION_SIZE_WIDTH / 2) && (touchDrag->y > (touchDrag->widgetCursor.widget->h - CURSOR_REGION_SIZE_HEIGHT));
 			if (dragCursor) {
 				g_dragState.dragObject = DRAG_CURSOR;
-				setFocusCursor(WidgetCursor(), DATA_ID_RECORDING);
+				g_hooks.setFocusCursor(WidgetCursor(), DATA_ID_RECORDING);
 			} else {
 				if (g_focusDataId == DATA_ID_DLOG_VISIBLE_VALUE_OFFSET || g_focusDataId == DATA_ID_DLOG_Y_VALUE_OFFSET || g_focusDataId == DATA_ID_DLOG_VISIBLE_VALUE_DIV || g_focusDataId == DATA_ID_DLOG_Y_VALUE_DIV) {
                     if (dlogValueParams && dlogValueParams->isVisible) {
@@ -2317,7 +2317,7 @@ void data_recording(DataOperationEnum operation, const WidgetCursor &widgetCurso
                     }
 				} else {
 					if (g_focusDataId != DATA_ID_DLOG_X_AXIS_DIV) {
-						setFocusCursor(WidgetCursor(), DATA_ID_DLOG_X_AXIS_OFFSET);
+						g_hooks.setFocusCursor(WidgetCursor(), DATA_ID_DLOG_X_AXIS_OFFSET);
 					}
 
 					g_dragState.dragObject = DRAG_VALUE;
@@ -2868,14 +2868,14 @@ void data_dlog_view_selected_tab(DataOperationEnum operation, const WidgetCursor
 void action_dlog_view_select_y_values_tab() {
 	g_selectedTab = TAB_Y_VALUES;
 
-	setFocusCursor(WidgetCursor(), DATA_ID_DLOG_Y_VALUE_OFFSET);
+	g_hooks.setFocusCursor(WidgetCursor(), DATA_ID_DLOG_Y_VALUE_OFFSET);
 }
 
 void action_dlog_view_select_bookmarks_tab() {
 	g_selectedTab = TAB_BOOKMARKS;
 
 	if (getRecording().parameters.bookmarksSize > BOOKMARKS_PER_PAGE) {
-		setFocusCursor(WidgetCursor(), DATA_ID_DLOG_BOOKMARKS);
+		g_hooks.setFocusCursor(WidgetCursor(), DATA_ID_DLOG_BOOKMARKS);
 	}
 }
 
@@ -2985,7 +2985,7 @@ void action_dlog_view_select_bookmark() {
         g_dlogFile.cursorOffset = cursorPosition * g_dlogFile.parameters.period;
 	}
 
-	setFocusCursor(WidgetCursor(), DATA_ID_DLOG_BOOKMARKS);
+	g_hooks.setFocusCursor(WidgetCursor(), DATA_ID_DLOG_BOOKMARKS);
 }
 
 void data_dlog_view_is_zoom_in_enabled(DataOperationEnum operation, const WidgetCursor &widgetCursor, Value &value) {
@@ -3121,7 +3121,7 @@ void action_dlog_view_select_y_value() {
     if (recording.dlogValues[valueIndex].isVisible) {
         getRecording().selectedValueIndex = getFoundWidgetAtDown().cursor;
     }
-    setFocusCursor(WidgetCursor(), DATA_ID_DLOG_Y_VALUES);
+	g_hooks.setFocusCursor(WidgetCursor(), DATA_ID_DLOG_Y_VALUES);
 }
 
 void data_dlog_y_value_is_enabled(DataOperationEnum operation, const WidgetCursor &widgetCursor, Value &value) {

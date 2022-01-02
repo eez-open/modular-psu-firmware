@@ -99,9 +99,6 @@ uint32_t blendColor(uint32_t fgColor, uint32_t bgColor);
 inline int getDisplayWidth() { return DISPLAY_WIDTH; }
 inline int getDisplayHeight() { return DISPLAY_HEIGHT;  }
 
-uint8_t getDisplayBackgroundLuminosityStepHook();
-uint8_t getSelectedThemeIndexHook();
-
 uint16_t getColor16FromIndex(uint16_t color);
 
 void setColor(uint8_t r, uint8_t g, uint8_t b);

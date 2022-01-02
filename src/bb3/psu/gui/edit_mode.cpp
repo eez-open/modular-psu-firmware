@@ -85,7 +85,7 @@ void enter(int tabIndex, bool setFocus) {
 #if OPTION_ENCODER
     if (setFocus && !isActive(&g_psuAppContext)) {
         if (!g_psuAppContext.isFocusWidget(getFoundWidgetAtDown()) || g_focusEditValue.getType() != VALUE_TYPE_UNDEFINED) {
-            setFocusCursor(getFoundWidgetAtDown(), getFoundWidgetAtDown().widget->data);
+            g_hooks.setFocusCursor(getFoundWidgetAtDown(), getFoundWidgetAtDown().widget->data);
             return;
         }
     }
@@ -97,7 +97,7 @@ void enter(int tabIndex, bool setFocus) {
         gui::selectChannelByCursor();
         widgetCursor = getFoundWidgetAtDown();
         int16_t newDataId = widgetCursor.widget->data;
-        setFocusCursor(widgetCursor, newDataId);
+		g_hooks.setFocusCursor(widgetCursor, newDataId);
         update(widgetCursor, newDataId);
 
         if (!isActive(&g_psuAppContext)) {

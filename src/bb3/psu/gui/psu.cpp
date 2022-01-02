@@ -63,6 +63,8 @@
 #include <eez/gui/touch_calibration.h>
 #include <bb3/psu/gui/labels_and_colors.h>
 
+#include <bb3/gui/display-hooks.h>
+
 #include <bb3/function_generator.h>
 
 #if OPTION_ENCODER
@@ -2481,7 +2483,7 @@ bool activePageHasBackdropHook() {
 
 OnTouchFunctionType getWidgetTouchFunctionHook(const WidgetCursor &widgetCursor) {
     if (widgetCursor.widget->data == DATA_ID_KEYPAD_TEXT) {
-        return eez::psu::gui::onKeypadTextTouch;
+        return eez::gui::onKeypadTextTouch;
     }
     return nullptr;
 }
@@ -2631,6 +2633,39 @@ void toastMessagePageOnEncoderHook(ToastMessagePage *toast, int counter) {
 		toast->appContext->popPage();
     }
 }
+
+////////////////////////////////////////////////////////////////////////////////
+
+void initHooks() {
+    g_hooks.getExtraLongTouchAction = getExtraLongTouchActionHook;
+    g_hooks.getDefaultAnimationDuration = getDefaultAnimationDurationHook;
+    g_hooks.executeExternalAction = executeExternalActionHook;
+    g_hooks.externalData = externalDataHook;
+    g_hooks.getWidgetTouchFunction = getWidgetTouchFunctionHook;
+    g_hooks.getPageFromId = getPageFromIdHook;
+    g_hooks.setFocusCursor = setFocusCursor;
+    g_hooks.stateManagment = stateManagmentHook;
+    g_hooks.activePageHasBackdrop = activePageHasBackdropHook;
+    g_hooks.isEventHandlingDisabled = isEventHandlingDisabledHook;
+    g_hooks.overrideStyle = overrideStyleHook;
+    g_hooks.overrideStyleColor = overrideStyleColorHook;
+    g_hooks.overrideActiveStyleColor = overrideActiveStyleColorHook;
+    g_hooks.transformColor = transformColorHook;
+    g_hooks.getDisplayBackgroundLuminosityStep = display::getDisplayBackgroundLuminosityStepHook;
+    g_hooks.getSelectedThemeIndex = display::getSelectedThemeIndexHook;
+    g_hooks.turnOnDisplayStart = display::turnOnDisplayStartHook;
+    g_hooks.turnOnDisplayTick = display::turnOnDisplayTickHook;
+    g_hooks.turnOffDisplayStart = display::turnOffDisplayStartHook;
+    g_hooks.turnOffDisplayTick = display::turnOffDisplayTickHook;
+    g_hooks.toastMessagePageOnEncoder = toastMessagePageOnEncoderHook;
+    g_hooks.onEnterTouchCalibration = onEnterTouchCalibrationHook;
+    g_hooks.onTouchCalibrationOk = onTouchCalibrationOkHook;
+    g_hooks.onTouchCalibrationCancel = onTouchCalibrationCancelHook;
+    g_hooks.onTouchCalibrationConfirm = onTouchCalibrationConfirmHook;
+
+}
+
+////////////////////////////////////////////////////////////////////////////////
 
 static int g_selectedMcuRevision; // 0 - None, 1 - R2B4, 2 - R3B3
 

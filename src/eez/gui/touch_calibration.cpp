@@ -74,13 +74,13 @@ void startCalibration() {
 
 void enterTouchCalibration(AppContext *appContext) {
     g_appContext = appContext;
-	onEnterTouchCalibrationHook();
+	g_hooks.onEnterTouchCalibration();
     startCalibration();
 }
 
 void touchCalibrationDialogYes() {
 	setTouchScreenCalibrationParamsHook(g_points[0].x, g_points[0].y, g_points[1].x, g_points[1].y, g_points[2].x, g_points[2].y);
-	onTouchCalibrationOkHook();
+	g_hooks.onTouchCalibrationOk();
 }
 
 void touchCalibrationDialogNo() {
@@ -88,7 +88,7 @@ void touchCalibrationDialogNo() {
 }
 
 void touchCalibrationDialogCancel() {
-	onTouchCalibrationCancelHook();
+	g_hooks.onTouchCalibrationCancel();
 }
 
 void selectTouchCalibrationPoint(Event &touchEvent) {
@@ -106,7 +106,7 @@ void selectTouchCalibrationPoint(Event &touchEvent) {
             g_points[2].y, CONF_GUI_TOUCH_CALIBRATION_M, display::getDisplayWidth(), display::getDisplayHeight());
 
         if (success) {
-			onTouchCalibrationConfirmHook();
+			g_hooks.onTouchCalibrationConfirm();
         } else {
             startCalibration();
 			g_appContext->errorMessage("Received data is invalid due to\nimprecise pointing or\ncommunication problem!", true);

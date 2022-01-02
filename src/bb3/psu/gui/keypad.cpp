@@ -170,17 +170,6 @@ NumericKeypad *startNumericKeypad(
 	return startNumericKeypad(&g_psuAppContext, label, value, options, okFloat, okUint32, cancel);
 }
 
-void onKeypadTextTouch(const WidgetCursor &widgetCursor, Event &touchEvent) {
-    if (touchEvent.type != EVENT_TYPE_TOUCH_DOWN && touchEvent.type != EVENT_TYPE_TOUCH_MOVE) {
-        return;
-    }
-
-    Keypad *keypad = getActiveKeypad();
-    if (keypad) {
-        keypad->setCursorPosition(DISPLAY_DATA_getCharIndexAtPosition(touchEvent.x, widgetCursor));
-    }
-}
-
 } // namespace gui
 } // namespace psu
 } // namespace eez

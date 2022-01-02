@@ -59,7 +59,7 @@ uint32_t getTimerChannel() {
 
 #endif
 
-void turnOnStartHook() {
+void turnOnDisplayStartHook() {
 #if defined(EEZ_PLATFORM_STM32)
     // backlight on, minimal brightness
     if (getTimer()) {
@@ -76,7 +76,7 @@ void turnOnStartHook() {
 #endif
 }
 
-void turnOnTickHook() {
+void turnOnDisplayTickHook() {
 #if defined(EEZ_PLATFORM_STM32)
     uint32_t max = 0;
     if (getTimer()) {
@@ -120,7 +120,7 @@ void updateBrightness() {
 #endif
 }
 
-void turnOffStartHook() {
+void turnOffDisplayStartHook() {
 #if defined(EEZ_PLATFORM_STM32)    
     g_displayState = TURNING_OFF;
     g_displayStateTransitionStartTime = millis();
@@ -131,7 +131,7 @@ void turnOffStartHook() {
 #endif
 }
 
-void turnOffTickHook() {
+void turnOffDisplayTickHook() {
 #if defined(EEZ_PLATFORM_STM32)    
     int32_t diff = millis() - g_displayStateTransitionStartTime;
     if (diff >= CONF_TURN_ON_OFF_ANIMATION_DURATION) {

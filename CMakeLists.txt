@@ -164,6 +164,7 @@ set(src_eez_gui
     src/eez/gui/font.cpp
     src/eez/gui/geometry.cpp
     src/eez/gui/gui.cpp
+    src/eez/gui/hooks.cpp
     src/eez/gui/keypad.cpp
     src/eez/gui/overlay.cpp
     src/eez/gui/page.cpp
@@ -187,6 +188,7 @@ set(header_eez_gui
     src/eez/gui/font.h
     src/eez/gui/geometry.h
     src/eez/gui/gui.h
+    src/eez/gui/hooks.h
     src/eez/gui/image.h
     src/eez/gui/keypad.h
     src/eez/gui/overlay.h
@@ -359,6 +361,7 @@ set(header_bb3_gui
     src/bb3/gui/document.h
     src/bb3/gui/document_simulator.h
     src/bb3/gui/document_stm32.h
+    src/bb3/gui/display-hooks.h
 )
 list (APPEND header_files ${header_bb3_gui})
 source_group("bb3\\gui" FILES ${src_bb3_gui} ${header_bb3_gui})

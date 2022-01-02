@@ -114,7 +114,7 @@ void AppContext::doShowPage(int pageId, Page *page, int previousPageId) {
     page = nullptr;
 #endif
 
-    page = page ? page : getPageFromIdHook(pageId);
+    page = page ? page : g_hooks.getPageFromId(pageId);
 
     m_pageNavigationStack[m_pageNavigationStackPointer].page = page;
     m_pageNavigationStack[m_pageNavigationStackPointer].pageId = pageId;
@@ -339,7 +339,7 @@ void AppContext::updatePage(int i, WidgetCursor &widgetCursor) {
 
 	if (g_findCallback == nullptr) {
         pageRenderCustom(i, widgetCursor);
-		display::endBufferRendering(m_pageNavigationStack[i].displayBufferIndex, x, y, width, height, withShadow, 255, 0, 0, withShadow && activePageHasBackdropHook() ? &rect : nullptr);
+		display::endBufferRendering(m_pageNavigationStack[i].displayBufferIndex, x, y, width, height, withShadow, 255, 0, 0, withShadow && g_hooks.activePageHasBackdrop() ? &rect : nullptr);
 	}
 
     m_updatePageIndex = -1;

@@ -43,10 +43,5 @@ void touchCalibrationDialogYes();
 void touchCalibrationDialogNo();
 void touchCalibrationDialogCancel();
 
-void onEnterTouchCalibrationHook();
-void onTouchCalibrationOkHook();
-void onTouchCalibrationCancelHook();
-void onTouchCalibrationConfirmHook();
-
 } // namespace gui
 } // namespace eez

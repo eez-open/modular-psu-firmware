@@ -117,7 +117,7 @@ void init() {
 
 void turnOn() {
     if (g_displayState != ON && g_displayState != TURNING_ON) {
-        turnOnStartHook();
+		g_hooks.turnOnDisplayStart();
     }
 }
 
@@ -127,7 +127,7 @@ bool isOn() {
 
 void turnOff() {
     if (g_displayState != OFF && g_displayState != TURNING_OFF) {
-        turnOffStartHook();
+		g_hooks.turnOffDisplayStart();
     }
 }
 
@@ -227,7 +227,7 @@ void animate(Buffer startBuffer, void (*callback)(float t, VideoBuffer bufferOld
 
     g_animationState.enabled = true;
     g_animationState.startTime = 0;
-    g_animationState.duration = duration != -1 ? duration : getDefaultAnimationDurationHook();
+    g_animationState.duration = duration != -1 ? duration : g_hooks.getDefaultAnimationDuration();
     g_animationState.startBuffer = startBuffer;
     g_animationState.callback = callback;
     g_animationState.easingRects = remapOutQuad;
@@ -265,9 +265,9 @@ static void animateStep() {
 
 void update() {
     if (g_displayState == TURNING_ON) {
-        turnOnTickHook();
+		g_hooks.turnOnDisplayTick();
     } else if (g_displayState == TURNING_OFF) {
-        turnOffTickHook();
+		g_hooks.turnOffDisplayTick();
     } else if (g_displayState == OFF) {
         if (g_animationState.enabled) {
             display::finishAnimation();
@@ -483,7 +483,7 @@ uint32_t blendColor(uint32_t fgColor, uint32_t bgColor) {
 }
 
 void onThemeChanged() {
-    auto selectedThemeIndex = getSelectedThemeIndexHook();
+    auto selectedThemeIndex = g_hooks.getSelectedThemeIndex();
     g_themeColors = getThemeColors(selectedThemeIndex);
     g_themeColorsCount = getThemeColorsCount(selectedThemeIndex);
     g_colors = getColors();
@@ -569,7 +569,7 @@ void hslToRgb(float h, float s, float l, float &r, float &g, float &b) {
 }
 
 void adjustColor(uint16_t &c) {
-    if (getDisplayBackgroundLuminosityStepHook() == DISPLAY_BACKGROUND_LUMINOSITY_STEP_DEFAULT) {
+    if (g_hooks.getDisplayBackgroundLuminosityStep() == DISPLAY_BACKGROUND_LUMINOSITY_STEP_DEFAULT) {
         return;
     }
 
@@ -598,7 +598,7 @@ void adjustColor(uint16_t &c) {
     float lmin = l - a;
     float lmax = l + a;
 
-    float lNew = remap((float)getDisplayBackgroundLuminosityStepHook(),
+    float lNew = remap((float)g_hooks.getDisplayBackgroundLuminosityStep(),
         (float)DISPLAY_BACKGROUND_LUMINOSITY_STEP_MIN,
         lmin,
         (float)DISPLAY_BACKGROUND_LUMINOSITY_STEP_MAX,
@@ -624,7 +624,7 @@ void adjustColor(uint16_t &c) {
 }
 
 uint16_t getColor16FromIndex(uint16_t color) {
-    color = transformColorHook(color);
+    color = g_hooks.transformColor(color);
 	return color < g_themeColorsCount ? g_themeColors[color] : g_colors[color - g_themeColorsCount];
 }
 

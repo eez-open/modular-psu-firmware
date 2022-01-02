@@ -280,7 +280,7 @@ void data_colors(DataOperationEnum operation, const WidgetCursor &widgetCursor, 
 void data_color_is_selected(DataOperationEnum operation, const WidgetCursor &widgetCursor, Value &value) {
     auto cursor = widgetCursor.cursor;
     if (operation == DATA_OPERATION_GET) {
-        value = (eez::gui::transformColorHook(LabelsAndColorsPage::g_colorDataId) - COLOR_ID_CHANNEL1) == cursor;
+        value = (eez::gui::g_hooks.transformColor(LabelsAndColorsPage::g_colorDataId) - COLOR_ID_CHANNEL1) == cursor;
     } 
 }
 

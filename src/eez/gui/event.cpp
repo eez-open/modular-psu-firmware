@@ -100,7 +100,7 @@ void onTouchEvent(bool pressed, int x, int y, Event &lastEvent) {
 }
 
 void processTouchEvent(Event &touchEvent) {
-	if (isEventHandlingDisabledHook()) {
+	if (g_hooks.isEventHandlingDisabled()) {
 		return;
 	}
 
@@ -129,7 +129,7 @@ void processTouchEvent(Event &touchEvent) {
             if (g_longTouchGenerated && !g_extraLongTouchGenerated && int32_t(tickCountMs - m_touchDownTimeMs) >= CONF_GUI_EXTRA_LONG_TOUCH_TIMEOUT_MS) {
                 g_extraLongTouchGenerated = true;
 				g_touchActionExecuted = true;
-				int action = getExtraLongTouchActionHook();
+				int action = g_hooks.getExtraLongTouchAction();
 				if (action != ACTION_ID_NONE) {
 					executeAction(WidgetCursor(), action);
 				}
@@ -178,7 +178,7 @@ OnTouchFunctionType getWidgetTouchFunction(const WidgetCursor &widgetCursor) {
             return onWidgetDefaultTouch;
         }
 
-        return getWidgetTouchFunctionHook(widgetCursor);
+        return g_hooks.getWidgetTouchFunction(widgetCursor);
     }
 
     return nullptr;

@@ -75,10 +75,6 @@ enum {
 #endif
 };
 
-////////////////////////////////////////////////////////////////////////////////
-
-void onKeypadTextTouch(const WidgetCursor &widgetCursor, Event &touchEvent);
-
 } // namespace gui
 } // namespace psu
 } // namespace eez

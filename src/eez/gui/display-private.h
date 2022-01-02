@@ -44,11 +44,6 @@ enum DisplayState {
 
 extern DisplayState g_displayState;
 
-void turnOnStartHook();
-void turnOnTickHook();
-void turnOffStartHook();
-void turnOffTickHook();
-
 extern VideoBuffer g_syncedBuffer;
 void syncBuffer();
 

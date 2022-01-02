@@ -74,36 +74,7 @@ void executeInternalAction(int actionId);
 int16_t getAppContextId(AppContext *pAppContext);
 AppContext *getAppContextFromId(int16_t id);
 
-////////////////////////////////////////////////////////////////////////////////
-
-int getExtraLongTouchActionHook();
-
-float getDefaultAnimationDurationHook();
-
-void executeExternalActionHook(const WidgetCursor &widgetCursor, int16_t actionId);
-void externalDataHook(int16_t id, DataOperationEnum operation, const WidgetCursor &widgetCursor, Value &value);
-
-OnTouchFunctionType getWidgetTouchFunctionHook(const WidgetCursor &widgetCursor);
-
-class Page;
-Page *getPageFromIdHook(int pageId);
-
-void setFocusCursor(const WidgetCursor& cursor, int16_t dataId);
-
 extern const char *g_discardMessage;
-
-void stateManagmentHook();
-
-bool activePageHasBackdropHook();
-
-void executeActionThreadHook();
-
-bool isEventHandlingDisabledHook();
-
-int overrideStyleHook(const WidgetCursor &widgetCursor, int styleId);
-uint16_t overrideStyleColorHook(const WidgetCursor &widgetCursor, const Style *style);
-uint16_t overrideActiveStyleColorHook(const WidgetCursor &widgetCursor, const Style *style);
-uint16_t transformColorHook(uint16_t color);
 
 } // namespace gui
 } // namespace eez
@@ -115,5 +86,6 @@ uint16_t transformColorHook(uint16_t color);
 #include <eez/gui/draw.h>
 #include <eez/gui/touch.h>
 #include <eez/gui/page.h>
+#include <eez/gui/hooks.h>
 
-#define DATA_OPERATION_FUNCTION(id, operation, widgetCursor, value) (id >= 0 ? g_dataOperationsFunctions[id](operation, widgetCursor, value) : externalDataHook(id, operation, widgetCursor, value))
+#define DATA_OPERATION_FUNCTION(id, operation, widgetCursor, value) (id >= 0 ? g_dataOperationsFunctions[id](operation, widgetCursor, value) : g_hooks.externalData(id, operation, widgetCursor, value))

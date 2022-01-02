@@ -414,6 +414,8 @@ bool isDefaultViewVertical();
 
 namespace gui {
 
+void initHooks();
+
 } // namespace gui
 
 } // namespace eez

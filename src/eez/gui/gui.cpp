@@ -63,7 +63,7 @@ void guiTick() {
         flow::tick();
     }
 
-	stateManagmentHook();
+	g_hooks.stateManagment();
 }
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -79,7 +79,7 @@ void executeAction(const WidgetCursor &widgetCursor, int actionId) {
 
     sound::playClick();
 
-    executeActionThreadHook();
+	g_hooks.executeActionThread();
 
     if (isInternalAction(actionId)) {
         executeInternalAction(actionId);
@@ -87,7 +87,7 @@ void executeAction(const WidgetCursor &widgetCursor, int actionId) {
         if (actionId >= 0) {
             g_actionExecFunctions[actionId]();
         } else {
-            executeExternalActionHook(widgetCursor, actionId);
+			g_hooks.executeExternalAction(widgetCursor, actionId);
         }
     }
 }

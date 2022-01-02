@@ -41,3 +41,5 @@
 /// Maximum allowed length (including label) of the keypad text.
 #define MAX_KEYPAD_TEXT_LENGTH 128
 #define MAX_KEYPAD_LABEL_LENGTH 64
+
+#define THEME_ID_DEFAULT THEME_ID_LEGACY

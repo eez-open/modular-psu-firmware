@@ -250,7 +250,7 @@ void ScrollBarWidgetState::onTouch(const WidgetCursor &widgetCursor, Event &touc
 
         auto action = getWidgetAction(widgetCursor);        
 		if (action == EEZ_CONF_ACTION_ID_SCROLL) {
-			setFocusCursor(widgetCursor, widget->data);
+			g_hooks.setFocusCursor(widgetCursor, widget->data);
 		}
     }
 }
