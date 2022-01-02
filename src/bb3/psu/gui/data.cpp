@@ -29,11 +29,11 @@
 
 #include <eez/conf.h>
 #include <bb3/system.h>
-#include <eez/util.h>
+#include <eez/core/util.h>
 #include <bb3/index.h>
 #include <bb3/file_type.h>
 #include <bb3/scripting/scripting.h>
-#include <eez/memory.h>
+#include <eez/core/memory.h>
 #include <bb3/hmi.h>
 #include <bb3/uart.h>
 #include <bb3/usb.h>

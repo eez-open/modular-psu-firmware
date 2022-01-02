@@ -21,7 +21,7 @@
 #include <bb3/psu/gui/psu.h>
 
 #include <eez/fs/fs.h>
-#include <eez/memory.h>
+#include <eez/core/memory.h>
 
 #include <bb3/scripting/scripting.h>
 #include <bb3/scripting/mp.h>

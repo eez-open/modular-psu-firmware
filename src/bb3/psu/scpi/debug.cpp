@@ -27,7 +27,7 @@
 
 #include <bb3/firmware.h>
 #include <bb3/system.h>
-#include <eez/alloc.h>
+#include <eez/core/alloc.h>
 
 #if OPTION_FAN
 #include <bb3/aux_ps/fan.h>
@@ -41,7 +41,7 @@
 #include <bb3/psu/event_queue.h>
 #include <bb3/psu/gui/psu.h>
 
-#include <eez/eeprom.h>
+#include <eez/core/eeprom.h>
 
 #include <bb3/bp3c/flash_slave.h>
 #include <bb3/bp3c/io_exp.h>

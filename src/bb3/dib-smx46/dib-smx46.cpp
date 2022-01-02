@@ -26,12 +26,13 @@
 #include <bb3/platform/stm32/spi.h>
 #endif
 
-#include "eez/debug.h"
+#include "eez/core/debug.h"
+#include "eez/core/util.h"
+
 #include "bb3/firmware.h"
 #include <bb3/system.h>
-#include "bb3/hmi.h"
-#include "eez/util.h"
-#include "bb3/gui/document.h"
+#include <bb3/hmi.h>
+#include <bb3/gui/document.h>
 #include <bb3/psu/timer.h>
 #include <bb3/psu/psu.h>
 #include <bb3/psu/profile.h>
@@ -47,9 +48,9 @@
 #include <bb3/bp3c/flash_slave.h>
 #include <bb3/psu/gui/edit_mode.h>
 
-#include "bb3/function_generator.h"
+#include <bb3/function_generator.h>
 
-#include "scpi/scpi.h"
+#include <scpi/scpi.h>
 
 #include "./dib-smx46.h"
 

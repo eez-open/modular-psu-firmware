@@ -20,7 +20,7 @@
 
 #include <spi.h>
 
-#include <eez/os.h>
+#include <eez/core/os.h>
 
 #include <bb3/index.h>
 #include <bb3/tasks.h>

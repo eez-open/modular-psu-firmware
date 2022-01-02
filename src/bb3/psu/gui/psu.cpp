@@ -25,7 +25,7 @@
 #endif
 
 #include <bb3/firmware.h>
-#include <eez/sound.h>
+#include <eez/core/sound.h>
 #include <bb3/system.h>
 #include <bb3/hmi.h>
 #include <bb3/keyboard.h>

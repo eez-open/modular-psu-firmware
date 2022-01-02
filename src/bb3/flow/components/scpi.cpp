@@ -18,7 +18,7 @@
 
 #include <stdio.h>
 
-#include <eez/alloc.h>
+#include <eez/core/alloc.h>
 
 #include <eez/flow/flow.h>
 #include <eez/flow/components.h>

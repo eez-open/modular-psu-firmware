@@ -22,12 +22,12 @@
 #include <usbd_msc_bot.h>
 #endif
 
-#include <eez/os.h>
+#include <eez/core/os.h>
 
 #include <bb3/tasks.h>
 #include <eez/flow/flow.h>
 #include <bb3/scripting/scripting.h>
-#include <eez/sound.h>
+#include <eez/core/sound.h>
 #include <bb3/hmi.h>
 #include <bb3/uart.h>
 #include <bb3/usb.h>

@@ -23,7 +23,7 @@
 #include <stdio.h>
 
 #include <bb3/firmware.h>
-#include <eez/util.h>
+#include <eez/core/util.h>
 
 #include <bb3/psu/psu.h>
 #include <bb3/psu/channel_dispatcher.h>

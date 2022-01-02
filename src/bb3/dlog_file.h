@@ -51,7 +51,7 @@ OFFSET    TYPE    WIDTH    DESCRIPTION
 
 #include <stdint.h>
 
-#include <eez/unit.h>
+#include <eez/core/unit.h>
 #include <eez/conf.h>
 
 namespace eez {

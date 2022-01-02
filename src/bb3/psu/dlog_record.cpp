@@ -20,7 +20,7 @@
 #include <assert.h>
 
 #include <bb3/index.h>
-#include <eez/sound.h>
+#include <eez/core/sound.h>
 #include <bb3/system.h>
 
 #include <bb3/psu/psu.h>
@@ -38,7 +38,7 @@
 
 #include <eez/fs/fs.h>
 
-#include <eez/memory.h>
+#include <eez/core/memory.h>
 
 //uint32_t g_debugVar1;
 //uint32_t g_debugVar2;

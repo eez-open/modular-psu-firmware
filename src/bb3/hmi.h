@@ -20,7 +20,7 @@
 
 #include <stdint.h>
 
-#include <eez/hmi.h>
+#include <eez/core/hmi.h>
 
 namespace eez {
 namespace hmi {

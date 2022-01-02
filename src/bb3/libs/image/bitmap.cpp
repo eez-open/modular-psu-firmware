@@ -18,7 +18,7 @@
 
 #include <stdint.h>
 
-#include <eez/memory.h>
+#include <eez/core/memory.h>
 #include <eez/fs/fs.h>
 #include <bb3/libs/image/bitmap.h>
 

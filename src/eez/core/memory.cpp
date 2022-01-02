@@ -16,7 +16,7 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#include <eez/memory.h>
+#include <eez/core/memory.h>
 
 #if defined(EEZ_PLATFORM_SIMULATOR)
 uint8_t g_memory[MEMORY_SIZE] = { 0 };

@@ -21,16 +21,16 @@
 #include <memory.h>
 
 #include <eez/conf.h>
-#include <eez/sound.h>
-#include <eez/os.h>
-#include <eez/util.h>
+#include <eez/core/sound.h>
+#include <eez/core/os.h>
+#include <eez/core/util.h>
 
 #if OPTION_KEYBOARD
-#include <eez/keyboard.h>
+#include <eez/core/keyboard.h>
 #endif
 
 #if OPTION_MOUSE
-#include <eez/mouse.h>
+#include <eez/core/mouse.h>
 #endif
 
 #include <eez/gui/gui.h>
@@ -38,7 +38,7 @@
 #include <eez/gui/touch_calibration.h>
 #include <eez/gui/widgets/button.h>
 
-#include <eez/hmi.h>
+#include <eez/core/hmi.h>
 
 #define CONF_GUI_TOAST_DURATION_MS 1000L
 

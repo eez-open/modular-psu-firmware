@@ -25,9 +25,9 @@
 
 #include <bb3/firmware.h>
 #include <bb3/system.h>
-#include <eez/sound.h>
+#include <eez/core/sound.h>
 #include <bb3/index.h>
-#include <eez/util.h>
+#include <eez/core/util.h>
 #include <bb3/scripting/scripting.h>
 
 #include <bb3/scpi/scpi.h>
@@ -67,7 +67,7 @@
 #endif
 
 #include <bb3/mcu/battery.h>
-#include <eez/eeprom.h>
+#include <eez/core/eeprom.h>
 
 #include <bb3/dib-dcp405/dib-dcp405.h>
 #include <bb3/dib-dcp405/ioexp.h>

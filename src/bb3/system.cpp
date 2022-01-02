@@ -18,7 +18,7 @@
 
 #include <stdio.h>
 
-#include <eez/os.h>
+#include <eez/core/os.h>
 
 #include <bb3/system.h>
 #include <bb3/firmware.h>

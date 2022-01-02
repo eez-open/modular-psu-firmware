@@ -22,7 +22,7 @@
 #include <string.h>
 #include <math.h>
 
-#include <eez/sound.h>
+#include <eez/core/sound.h>
 
 #include <eez/gui/keypad.h>
 

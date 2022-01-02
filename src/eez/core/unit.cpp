@@ -18,7 +18,7 @@
 
 #include <string.h>
 
-#include <eez/unit.h>
+#include <eez/core/unit.h>
 
 #include <scpi/types.h>
 

@@ -40,7 +40,7 @@
 
 #endif
 
-#include <eez/util.h>
+#include <eez/core/util.h>
 #include <scpi/scpi.h>
 
 namespace eez {

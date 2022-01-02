@@ -21,7 +21,7 @@
 #include <stdlib.h>
 
 #include <bb3/firmware.h>
-#include <eez/debug.h>
+#include <eez/core/debug.h>
 #include <bb3/mqtt.h>
 #include <bb3/system.h>
 

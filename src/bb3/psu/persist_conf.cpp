@@ -24,7 +24,7 @@
 #endif
 
 #include <eez/conf.h>
-#include <eez/eeprom.h>
+#include <eez/core/eeprom.h>
 
 #include <bb3/system.h>
 #include <bb3/usb.h>

@@ -23,7 +23,7 @@
 #endif
 
 #include <bb3/index.h>
-#include <eez/debug.h>
+#include <eez/core/debug.h>
 #include <bb3/usb.h>
 #include <bb3/psu/sd_card.h>
 

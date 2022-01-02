@@ -22,7 +22,7 @@
 #include <stdarg.h>
 #include <string.h>
 
-#include <eez/debug.h>
+#include <eez/core/debug.h>
 
 namespace eez {
 namespace debug {

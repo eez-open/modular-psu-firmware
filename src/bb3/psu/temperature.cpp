@@ -32,7 +32,7 @@
 #include <bb3/psu/event_queue.h>
 #include <bb3/psu/persist_conf.h>
 #include <bb3/psu/temperature.h>
-#include <eez/sound.h>
+#include <eez/core/sound.h>
 
 namespace eez {
 namespace psu {

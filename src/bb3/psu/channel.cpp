@@ -40,7 +40,7 @@
 #include <bb3/psu/ramp.h>
 #include <bb3/psu/trigger.h>
 #include <bb3/scpi/regs.h>
-#include <eez/sound.h>
+#include <eez/core/sound.h>
 #include <bb3/index.h>
 #include <bb3/function_generator.h>
 #include <bb3/gui/document.h>

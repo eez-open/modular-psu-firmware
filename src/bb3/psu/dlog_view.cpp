@@ -44,7 +44,7 @@
 
 #include <eez/fs/fs.h>
 
-#include <eez/memory.h>
+#include <eez/core/memory.h>
 
 namespace eez {
 

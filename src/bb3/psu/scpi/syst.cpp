@@ -36,7 +36,7 @@
 #include <bb3/psu/channel_dispatcher.h>
 #include <bb3/psu/datetime.h>
 #include <bb3/psu/profile.h>
-#include <eez/sound.h>
+#include <eez/core/sound.h>
 #if OPTION_DISPLAY
 #include <bb3/psu/gui/psu.h>
 #endif

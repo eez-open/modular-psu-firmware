@@ -19,7 +19,7 @@
 #include <math.h>
 #include <stdlib.h>
 
-#include <eez/sound.h>
+#include <eez/core/sound.h>
 
 #include <eez/gui/gui.h>
 #include <eez/gui/widgets/list_graph.h>

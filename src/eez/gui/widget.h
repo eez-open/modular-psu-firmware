@@ -19,7 +19,7 @@
 #pragma once
 
 #include <eez/gui/geometry.h>
-#include <eez/memory.h>
+#include <eez/core/memory.h>
 
 namespace eez {
 

@@ -18,8 +18,8 @@
 
 #include <math.h>
 
-#include <eez/alloc.h>
-#include <eez/util.h>
+#include <eez/core/alloc.h>
+#include <eez/core/util.h>
 
 #include <eez/gui/gui.h>
 #include <eez/gui/data.h>

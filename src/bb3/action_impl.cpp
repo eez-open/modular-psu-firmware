@@ -24,7 +24,7 @@
 #include <bb3/firmware.h>
 #include <bb3/system.h>
 #include <bb3/tasks.h>
-#include <eez/sound.h>
+#include <eez/core/sound.h>
 #include <bb3/index.h>
 #include <bb3/mqtt.h>
 #include <bb3/hmi.h>

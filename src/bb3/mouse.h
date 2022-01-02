@@ -22,7 +22,7 @@
 #include <usbh_hid.h>
 #endif
 
-#include <eez/mouse.h>
+#include <eez/core/mouse.h>
 
 namespace eez {
 namespace mouse {

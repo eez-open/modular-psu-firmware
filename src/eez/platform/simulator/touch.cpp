@@ -23,7 +23,7 @@
 #include <eez/gui/gui.h>
 
 #if OPTION_MOUSE
-#include <eez/mouse.h>
+#include <eez/core/mouse.h>
 #endif
 
 using namespace eez::platform::simulator;

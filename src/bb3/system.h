@@ -18,7 +18,7 @@
 
 #pragma once
 
-#include <eez/os.h>
+#include <eez/core/os.h>
 
 #if defined(EEZ_PLATFORM_STM32)
 extern volatile uint64_t g_tickCount;

@@ -19,7 +19,7 @@
 #include <string.h>
 #include <stdio.h>
 
-#include <eez/eeprom.h>
+#include <eez/core/eeprom.h>
 
 #include <bb3/psu/psu.h>
 #include <bb3/psu/devices.h>

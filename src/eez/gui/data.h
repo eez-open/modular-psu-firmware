@@ -23,13 +23,13 @@
 #include <math.h>
 #include <memory.h>
 
-#include <eez/step_values.h>
+#include <eez/core/step_values.h>
 
-#include <eez/unit.h>
-#include <eez/alloc.h>
-#include <eez/util.h>
+#include <eez/core/unit.h>
+#include <eez/core/alloc.h>
+#include <eez/core/util.h>
 #include <eez/gui/event.h>
-#include <eez/value_types.h>
+#include <eez/core/value_types.h>
 
 namespace eez {
 namespace gui {

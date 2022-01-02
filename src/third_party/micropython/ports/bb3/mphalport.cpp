@@ -41,8 +41,8 @@ extern "C" {
 #pragma warning( pop )
 #endif
 
-#include <eez/debug.h>
-#include <eez/os.h>
+#include <eez/core/debug.h>
+#include <eez/core/os.h>
 
 extern"C" void mp_hal_stdout_tx_strn(const char *str, size_t len) {
     DebugTrace("%.*s", len, str);

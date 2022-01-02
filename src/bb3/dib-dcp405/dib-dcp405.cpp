@@ -26,7 +26,7 @@
 #include <bb3/dib-dcp405/dac.h>
 #include <bb3/dib-dcp405/ioexp.h>
 
-#include <eez/unit.h>
+#include <eez/core/unit.h>
 
 #include <bb3/psu/psu.h>
 #include <bb3/psu/profile.h>

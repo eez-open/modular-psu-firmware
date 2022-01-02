@@ -16,7 +16,7 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#include <eez/eeprom.h>
+#include <eez/core/eeprom.h>
 #include <bb3/firmware.h>
 #include <bb3/psu/psu.h>
 #include <bb3/psu/profile.h>

@@ -20,7 +20,7 @@
 #include <tim.h>
 #endif
 
-#include <eez/os.h>
+#include <eez/core/os.h>
 
 #include <eez/gui/gui.h>
 #include <eez/gui/display-private.h>

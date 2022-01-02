@@ -20,8 +20,8 @@
 #include <cstddef>
 #include <limits.h>
 
-#include <eez/debug.h>
-#include <eez/os.h>
+#include <eez/core/debug.h>
+#include <eez/core/os.h>
 
 #include <eez/gui/gui.h>
 #include <eez/gui/assets.h>

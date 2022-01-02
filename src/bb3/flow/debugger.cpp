@@ -16,7 +16,7 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#include <eez/os.h>
+#include <eez/core/os.h>
 
 #include <eez/gui/thread.h>
 

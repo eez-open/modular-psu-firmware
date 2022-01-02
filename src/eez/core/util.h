@@ -21,8 +21,8 @@
 #include <stdint.h>
 #include <stdlib.h>
 
-#include <eez/os.h>
-#include <eez/unit.h>
+#include <eez/core/os.h>
+#include <eez/core/unit.h>
 
 #define clear_bit(reg, bitmask) *reg &= ~bitmask
 #define set_bit(reg, bitmask) *reg |= bitmask

@@ -18,9 +18,9 @@
 
 #include <limits.h>
 
-#include <eez/eeprom.h>
-#include <eez/os.h>
-#include <eez/sound.h>
+#include <eez/core/eeprom.h>
+#include <eez/core/os.h>
+#include <eez/core/sound.h>
 
 #include <bb3/psu/psu.h>
 

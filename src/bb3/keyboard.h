@@ -18,7 +18,7 @@
 
 #pragma once
 
-#include <eez/keyboard.h>
+#include <eez/core/keyboard.h>
 
 namespace eez {
 namespace keyboard {

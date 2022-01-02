@@ -29,7 +29,7 @@
 
 #include <bb3/index.h>
 #include <bb3/hmi.h>
-#include <eez/util.h>
+#include <eez/core/util.h>
 #include <bb3/system.h>
 #include <eez/gui/gui.h>
 #include <bb3/psu/psu.h>

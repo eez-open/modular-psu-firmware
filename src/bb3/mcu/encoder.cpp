@@ -22,8 +22,8 @@
 #include <stdio.h>
 
 #include <bb3/system.h>
-#include <eez/debug.h>
-#include <eez/util.h>
+#include <eez/core/debug.h>
+#include <eez/core/util.h>
 
 #include <bb3/mcu/encoder.h>
 

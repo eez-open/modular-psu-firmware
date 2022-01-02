@@ -25,7 +25,7 @@
 #include <stdlib.h>
 #endif
 
-#include <eez/debug.h>
+#include <eez/core/debug.h>
 #include <bb3/index.h>
 #include <bb3/system.h>
 #include <bb3/tasks.h>

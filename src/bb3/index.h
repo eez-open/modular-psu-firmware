@@ -21,9 +21,9 @@
 #include <stdint.h>
 #include <stdlib.h>
 
-#include <eez/os.h>
-#include <eez/step_values.h>
-#include <eez/unit.h>
+#include <eez/core/os.h>
+#include <eez/core/step_values.h>
+#include <eez/core/unit.h>
 
 #include <bb3/dlog_file.h>
 #include <bb3/firmware.h>

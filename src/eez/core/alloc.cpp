@@ -20,8 +20,8 @@
 #include <math.h>
 #include <assert.h>
 
-#include <eez/alloc.h>
-#include <eez/os.h>
+#include <eez/core/alloc.h>
+#include <eez/core/os.h>
 
 namespace eez {
 

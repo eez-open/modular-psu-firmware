@@ -25,10 +25,10 @@
 #include <usb_device.h>
 #endif
 
-#include <eez/alloc.h>
-#include <eez/eeprom.h>
-#include <eez/sound.h>
-#include <eez/memory.h>
+#include <eez/core/alloc.h>
+#include <eez/core/eeprom.h>
+#include <eez/core/sound.h>
+#include <eez/core/memory.h>
 
 #include <eez/gui/gui.h>
 

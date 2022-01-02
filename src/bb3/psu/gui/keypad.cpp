@@ -18,7 +18,7 @@
 
 #if OPTION_DISPLAY
 
-#include <eez/sound.h>
+#include <eez/core/sound.h>
 
 #include <eez/gui/keypad.h>
 #include <eez/gui/widgets/display_data.h>

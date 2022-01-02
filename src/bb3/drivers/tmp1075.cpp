@@ -21,9 +21,9 @@
 #include <math.h>
 #include <i2c.h>
 #include <bb3/drivers/tmp1075.h>
-#include <eez/debug.h>
-#include <eez/util.h>
-#include <eez/os.h>
+#include <eez/core/debug.h>
+#include <eez/core/util.h>
+#include <eez/core/os.h>
 
 // TMP1075 Temperature Sensor With I2C
 // http://www.ti.com/lit/ds/symlink/tmp1075.pdf

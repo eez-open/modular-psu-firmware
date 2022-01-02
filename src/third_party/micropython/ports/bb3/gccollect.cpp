@@ -43,7 +43,7 @@ extern "C" {
 
 #if MICROPY_ENABLE_GC
 
-#include <eez/debug.h>
+#include <eez/core/debug.h>
 
 typedef jmp_buf regs_t;
 static void gc_helper_get_regs(regs_t arr) {

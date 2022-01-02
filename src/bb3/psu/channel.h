@@ -20,7 +20,7 @@
 
 #include <math.h>
 
-#include <eez/util.h>
+#include <eez/core/util.h>
 #include <bb3/psu/persist_conf.h>
 #include <bb3/psu/temp_sensor.h>
 

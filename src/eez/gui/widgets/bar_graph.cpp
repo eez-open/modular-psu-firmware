@@ -19,8 +19,8 @@
 #include <math.h>
 #include <memory.h>
 
-#include <eez/os.h>
-#include <eez/util.h>
+#include <eez/core/os.h>
+#include <eez/core/util.h>
 
 #include <eez/gui/gui.h>
 #include <eez/gui/widgets/bar_graph.h>

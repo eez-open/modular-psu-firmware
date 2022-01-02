@@ -20,10 +20,10 @@
 #include <stdlib.h>
 #include <memory.h>
 
-#include <eez/alloc.h>
-#include <eez/os.h>
-#include <eez/memory.h>
-#include <eez/debug.h>
+#include <eez/core/alloc.h>
+#include <eez/core/os.h>
+#include <eez/core/memory.h>
+#include <eez/core/debug.h>
 #include <eez/flow/flow.h>
 
 #include <eez/libs/lz4/lz4.h>

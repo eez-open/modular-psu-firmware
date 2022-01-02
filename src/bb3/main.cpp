@@ -42,7 +42,7 @@
 #include <usb_device.h>
 #endif
 
-#include <eez/os.h>
+#include <eez/core/os.h>
 
 #include <bb3/firmware.h>
 #include <bb3/tasks.h>

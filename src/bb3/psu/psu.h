@@ -32,8 +32,8 @@
 
 #include <bb3/index.h>
 #include <bb3/firmware.h>
-#include <eez/util.h>
-#include <eez/debug.h>
+#include <eez/core/util.h>
+#include <eez/core/debug.h>
 
 #include <bb3/psu/channel.h>
 #include <bb3/psu/serial.h>

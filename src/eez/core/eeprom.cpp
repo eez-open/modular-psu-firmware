@@ -18,9 +18,9 @@
 
 #include <memory.h>
 
-#include <eez/eeprom.h>
-#include <eez/os.h>
-#include <eez/util.h>
+#include <eez/core/eeprom.h>
+#include <eez/core/os.h>
+#include <eez/core/util.h>
 
 //#include <bb3/system.h>
 //#include <bb3/psu/psu.h>

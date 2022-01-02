@@ -17,7 +17,7 @@
 */
 
 #include <bb3/file_type.h>
-#include <eez/util.h>
+#include <eez/core/util.h>
 
 #include <bb3/psu/psu.h>
 #include <bb3/psu/profile.h>

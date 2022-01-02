@@ -21,14 +21,14 @@
 #include <memory.h>
 
 #include <eez/conf.h>
-#include <eez/util.h>
+#include <eez/core/util.h>
 
 #if OPTION_KEYBOARD
-#include <eez/keyboard.h>
+#include <eez/core/keyboard.h>
 #endif
 
 #if OPTION_MOUSE
-#include <eez/mouse.h>
+#include <eez/core/mouse.h>
 #endif
 
 #include <eez/gui/gui.h>

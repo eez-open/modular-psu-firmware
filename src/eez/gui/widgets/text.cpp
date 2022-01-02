@@ -19,7 +19,7 @@
 #include <stdio.h>
 #include <string.h>
 
-#include <eez/util.h>
+#include <eez/core/util.h>
 
 #include <eez/gui/gui.h>
 #include <eez/gui/widgets/text.h>

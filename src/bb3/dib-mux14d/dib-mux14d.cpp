@@ -27,7 +27,7 @@
 #include <bb3/platform/stm32/spi.h>
 #endif
 
-#include <eez/debug.h>
+#include <eez/core/debug.h>
 #include <bb3/firmware.h>
 #include <bb3/system.h>
 #include <bb3/hmi.h>

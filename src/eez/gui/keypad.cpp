@@ -21,7 +21,7 @@
 #include <math.h>
 #include <string.h>
 
-#include <eez/sound.h>
+#include <eez/core/sound.h>
 
 #include <eez/gui/gui.h>
 #include <eez/gui/widgets/button.h>

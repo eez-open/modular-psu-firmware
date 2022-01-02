@@ -21,15 +21,15 @@
 #include <string.h>
 
 #include <eez/conf.h>
-#include <eez/os.h>
-#include <eez/debug.h>
+#include <eez/core/os.h>
+#include <eez/core/debug.h>
 
 #if OPTION_MOUSE
-#include <eez/mouse.h>
+#include <eez/core/mouse.h>
 #endif
 
-#include <eez/sound.h>
-#include <eez/util.h>
+#include <eez/core/sound.h>
+#include <eez/core/util.h>
 
 #include <eez/gui/gui.h>
 

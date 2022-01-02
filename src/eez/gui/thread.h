@@ -18,7 +18,7 @@
 
 #pragma once
 
-#include <eez/os.h>
+#include <eez/core/os.h>
 
 #include <eez/gui/event.h>
 

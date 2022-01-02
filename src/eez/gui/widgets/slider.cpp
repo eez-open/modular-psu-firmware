@@ -16,8 +16,8 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#include <eez/sound.h>
-#include <eez/util.h>
+#include <eez/core/sound.h>
+#include <eez/core/util.h>
 
 #include <eez/gui/gui.h>
 #include <eez/gui/widgets/slider.h>

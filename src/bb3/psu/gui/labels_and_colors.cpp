@@ -21,7 +21,7 @@
 #include <string.h>
 
 #include <bb3/hmi.h>
-#include <eez/memory.h>
+#include <eez/core/memory.h>
 #include <bb3/psu/psu.h>
 #include <bb3/psu/gui/psu.h>
 #include <bb3/psu/gui/labels_and_colors.h>

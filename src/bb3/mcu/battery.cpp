@@ -22,7 +22,7 @@
 
 #if defined(EEZ_PLATFORM_STM32)
 #include <bb3/system.h>
-#include <eez/util.h>
+#include <eez/core/util.h>
 
 #include <adc.h>
 #include <dma.h>
