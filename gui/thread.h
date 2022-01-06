@@ -18,7 +18,7 @@
 
 #pragma once
 
-#include <eez/os.h>
+#include <eez/core/os.h>
 
 #include <eez/gui/event.h>
 
@@ -59,8 +59,6 @@ void sendMessageToGuiThread(uint8_t messageType, uint32_t messageParam = 0, uint
 void sendTouchEventToGuiThread(Event &touchEvent);
 bool pushPageInGuiThread(AppContext *appContext, int pageId, Page *page);
 bool showPageInGuiThread(AppContext *appContext, int pageId);
-
-void onGuiQueueMessageHook(uint8_t type, int16_t param);
 
 bool isGuiThread();
 

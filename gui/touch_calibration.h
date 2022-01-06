@@ -23,18 +23,6 @@ using namespace eez::gui;
 namespace eez {
 namespace gui {
 
-void getTouchScreenCalibrationParamsHook(
-	int16_t &touchScreenCalTlx, int16_t &touchScreenCalTly,
-	int16_t &touchScreenCalBrx, int16_t &touchScreenCalBry,
-	int16_t &touchScreenCalTrx, int16_t &touchScreenCalTry
-);
-
-void setTouchScreenCalibrationParamsHook(
-	int16_t touchScreenCalTlx, int16_t touchScreenCalTly,
-	int16_t touchScreenCalBrx, int16_t touchScreenCalBry,
-	int16_t touchScreenCalTrx, int16_t touchScreenCalTry
-);
-
 bool isTouchCalibrated();
 void enterTouchCalibration(AppContext *appContext);
 void onTouchCalibrationPageTouch(const WidgetCursor &foundWidget, Event &touchEvent);
@@ -42,11 +30,6 @@ void onTouchCalibrationPageTouch(const WidgetCursor &foundWidget, Event &touchEv
 void touchCalibrationDialogYes();
 void touchCalibrationDialogNo();
 void touchCalibrationDialogCancel();
-
-void onEnterTouchCalibrationHook();
-void onTouchCalibrationOkHook();
-void onTouchCalibrationCancelHook();
-void onTouchCalibrationConfirmHook();
 
 } // namespace gui
 } // namespace eez

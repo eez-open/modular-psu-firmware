@@ -18,7 +18,7 @@
 
 #include <stdio.h>
 
-#include <eez/debug.h>
+#include <eez/core/debug.h>
 
 #include <eez/gui/gui.h>
 

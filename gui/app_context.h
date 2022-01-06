@@ -27,6 +27,8 @@
 namespace eez {
 namespace gui {
 
+class Page;
+
 struct PageOnStack {
     int pageId = PAGE_ID_NONE;
     Page *page = nullptr;
@@ -109,6 +111,8 @@ public:
 	void(*m_dialogCancelCallback)();
 	void(*m_dialogLaterCallback)();
 
+    virtual int getMainPageId() = 0;
+
 protected:
     PageOnStack m_pageNavigationStack[CONF_GUI_PAGE_NAVIGATION_STACK_SIZE];
     int m_pageNavigationStackPointer = 0;
@@ -116,7 +120,6 @@ protected:
 
     uint32_t m_showPageTime;
 
-    virtual int getMainPageId() = 0;
     virtual void onPageChanged(int previousPageId, int activePageId);
 
     void doShowPage(int index, Page *page, int previousPageId);
@@ -132,7 +135,7 @@ protected:
     void pushToastMessage(ToastMessagePage *toastMessage);
 };
 
-AppContext &getRootAppContext();
+AppContext *getRootAppContext();
 
 } // namespace gui
 } // namespace eez

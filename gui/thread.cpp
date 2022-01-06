@@ -16,7 +16,7 @@
 * along with this program.  If not, see http://www.gnu.org/licenses.
 */
 
-#include <eez/os.h>
+#include <eez/core/os.h>
 
 #include <eez/gui/gui.h>
 #include <eez/gui/thread.h>
@@ -102,7 +102,7 @@ void processGuiQueue(uint32_t timeout) {
     } else if (type == GUI_QUEUE_MESSAGE_DEBUGGER_INPUT_AVAILABLE) {
         flow::onDebuggerInputAvailable();
     } else {
-        onGuiQueueMessageHook(type, obj.param);
+        g_hooks.onGuiQueueMessage(type, obj.param);
     }
 }
 
@@ -150,11 +150,6 @@ bool showPageInGuiThread(AppContext *appContext, int pageId) {
         return true;
     }
     return false;
-}
-
-void executeActionThreadHook() {
-    // why is this required?
-    osDelay(1);
 }
 
 bool isGuiThread() {

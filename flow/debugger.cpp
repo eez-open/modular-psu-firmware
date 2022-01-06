@@ -21,8 +21,8 @@
 #include <stdio.h>
 #include <inttypes.h>
 
-#include <eez/debug.h>
-#include <eez/os.h>
+#include <eez/core/debug.h>
+#include <eez/core/os.h>
 
 #include <eez/flow/flow.h>
 #include <eez/flow/private.h>

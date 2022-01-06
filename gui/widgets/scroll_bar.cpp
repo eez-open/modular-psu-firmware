@@ -18,12 +18,12 @@
 
 #include <math.h>
 
-#include <eez/util.h>
-#include <eez/sound.h>
+#include <eez/core/util.h>
+#include <eez/core/sound.h>
 #include <eez/conf.h>
 
 #if OPTION_KEYBOARD
-#include <eez/keyboard.h>
+#include <eez/core/keyboard.h>
 #endif
 
 #include <eez/gui/gui.h>
@@ -250,7 +250,7 @@ void ScrollBarWidgetState::onTouch(const WidgetCursor &widgetCursor, Event &touc
 
         auto action = getWidgetAction(widgetCursor);        
 		if (action == EEZ_CONF_ACTION_ID_SCROLL) {
-			setFocusCursor(widgetCursor, widget->data);
+			g_hooks.setFocusCursor(widgetCursor, widget->data);
 		}
     }
 }

@@ -20,7 +20,7 @@
 #include <main.h>
 #endif
 
-#include <eez/os.h>
+#include <eez/core/os.h>
 
 namespace eez {
 

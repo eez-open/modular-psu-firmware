@@ -141,8 +141,6 @@ private:
     WidgetCursor lastActiveWidget;
 };
 
-void toastMessagePageOnEncoderHook(ToastMessagePage *toast, int counter);
-
 ////////////////////////////////////////////////////////////////////////////////
 
 class SelectFromEnumPage : public InternalPage {

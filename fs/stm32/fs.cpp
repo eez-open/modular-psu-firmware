@@ -23,9 +23,9 @@
 
 #include <scpi/scpi.h>
 
-#include <eez/debug.h>
-#include <eez/memory.h>
-#include <eez/util.h>
+#include <eez/core/debug.h>
+#include <eez/core/memory.h>
+#include <eez/core/util.h>
 #include <eez/fs/fs.h>
 
 #define CHECK_ERROR(desc, err) (void)(desc); (void)(err);

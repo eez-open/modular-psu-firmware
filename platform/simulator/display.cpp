@@ -26,17 +26,17 @@
 #include <SDL_image.h>
 
 #include <eez/conf.h>
-#include <eez/debug.h>
-#include <eez/memory.h>
-#include <eez/util.h>
-#include <eez/os.h>
+#include <eez/core/debug.h>
+#include <eez/core/memory.h>
+#include <eez/core/util.h>
+#include <eez/core/os.h>
 
 #include <eez/gui/gui.h>
 #include <eez/gui/thread.h>
 #include <eez/gui/touch.h>
 
 #if OPTION_MOUSE
-#include <eez/mouse.h>
+#include <eez/core/mouse.h>
 #endif
 
 #include <eez/gui/display-private.h>

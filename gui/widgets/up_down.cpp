@@ -16,12 +16,12 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#include <eez/util.h>
-#include <eez/sound.h>
+#include <eez/core/util.h>
+#include <eez/core/sound.h>
 #include <eez/conf.h>
 
 #if OPTION_KEYBOARD
-#include <eez/keyboard.h>
+#include <eez/core/keyboard.h>
 #endif
 
 #include <eez/gui/gui.h>

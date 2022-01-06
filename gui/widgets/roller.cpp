@@ -18,8 +18,8 @@
 
 #include <stdio.h>
 
-#include <eez/util.h>
-#include <eez/sound.h>
+#include <eez/core/util.h>
+#include <eez/core/sound.h>
 
 #include <eez/gui/gui.h>
 #include <eez/gui/widgets/roller.h>

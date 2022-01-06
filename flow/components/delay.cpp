@@ -16,8 +16,8 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#include <eez/alloc.h>
-#include <eez/os.h>
+#include <eez/core/alloc.h>
+#include <eez/core/os.h>
 
 #include <eez/flow/components.h>
 #include <eez/flow/flow_defs_v3.h>

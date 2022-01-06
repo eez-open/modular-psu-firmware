@@ -18,9 +18,9 @@
 
 #include <SDL.h>
 
-#include <eez/encoder.h>
-#include <eez/keyboard.h>
-#include <eez/os.h>
+#include <eez/core/encoder.h>
+#include <eez/core/keyboard.h>
+#include <eez/core/os.h>
 
 #include <eez/gui/gui.h>
 

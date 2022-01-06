@@ -19,7 +19,7 @@
 #pragma once
 
 #include <eez/conf.h>
-#include <eez/unit.h>
+#include <eez/core/unit.h>
 
 #define VALUE_TYPES \
     VALUE_TYPE(UNDEFINED)                          /*  0 */ \

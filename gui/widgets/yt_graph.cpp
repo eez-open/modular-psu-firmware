@@ -20,7 +20,7 @@
 #include <limits.h>
 
 #include <eez/conf.h>
-#include <eez/util.h>
+#include <eez/core/util.h>
 
 #include <eez/gui/gui.h>
 #include <eez/gui/widgets/yt_graph.h>

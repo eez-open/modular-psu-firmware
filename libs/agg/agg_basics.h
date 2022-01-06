@@ -19,7 +19,7 @@
 #include <cmath>
 #include "agg_config.h"
 
-#include <eez/alloc.h>
+#include <eez/core/alloc.h>
 
 //---------------------------------------------------------AGG_CUSTOM_ALLOCATOR
 #ifdef AGG_CUSTOM_ALLOCATOR

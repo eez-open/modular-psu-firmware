@@ -21,7 +21,7 @@
 #include <string.h>
 #include <inttypes.h>
 
-#include <eez/util.h>
+#include <eez/core/util.h>
 
 #include <eez/gui/gui.h>
 

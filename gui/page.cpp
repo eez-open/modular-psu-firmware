@@ -376,7 +376,7 @@ WidgetCursor ToastMessagePage::findWidgetInternalPage(int x, int y, bool clicked
 }
 
 void ToastMessagePage::onEncoder(int counter) {
-	toastMessagePageOnEncoderHook(this, counter);
+	g_hooks.toastMessagePageOnEncoder(this, counter);
 }
 
 void ToastMessagePage::onEncoderClicked() {

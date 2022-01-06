@@ -16,8 +16,8 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#include <eez/debug.h>
-#include <eez/os.h>
+#include <eez/core/debug.h>
+#include <eez/core/os.h>
 
 #include <eez/gui/gui.h>
 #include <eez/gui/widgets/containers/container.h>
@@ -31,7 +31,7 @@ bool ContainerWidgetState::updateState() {
 
 	bool hasPreviousState = widgetCursor.hasPreviousState;
 
-	WIDGET_STATE(styleId, overrideStyleHook(widgetCursor, widget->style));
+	WIDGET_STATE(styleId, g_hooks.overrideStyle(widgetCursor, widget->style));
 	WIDGET_STATE(flags.active, g_isActiveWidget);
 
 	overlay = getOverlay(widgetCursor);

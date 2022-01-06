@@ -224,6 +224,7 @@ void executeNumericKeypadOptionHook(int optionActionIndex);
 Keypad *getActiveKeypad();
 NumericKeypad *getActiveNumericKeypad();
 
+void onKeypadTextTouch(const WidgetCursor &widgetCursor, Event &touchEvent);
 
 } // namespace gui
 } // namespace eez

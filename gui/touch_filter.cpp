@@ -16,7 +16,7 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#include <eez/util.h>
+#include <eez/core/util.h>
 
 #include <eez/gui/touch_filter.h>
 

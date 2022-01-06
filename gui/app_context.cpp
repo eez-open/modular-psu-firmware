@@ -21,16 +21,16 @@
 #include <memory.h>
 
 #include <eez/conf.h>
-#include <eez/sound.h>
-#include <eez/os.h>
-#include <eez/util.h>
+#include <eez/core/sound.h>
+#include <eez/core/os.h>
+#include <eez/core/util.h>
 
 #if OPTION_KEYBOARD
-#include <eez/keyboard.h>
+#include <eez/core/keyboard.h>
 #endif
 
 #if OPTION_MOUSE
-#include <eez/mouse.h>
+#include <eez/core/mouse.h>
 #endif
 
 #include <eez/gui/gui.h>
@@ -38,7 +38,7 @@
 #include <eez/gui/touch_calibration.h>
 #include <eez/gui/widgets/button.h>
 
-#include <eez/hmi.h>
+#include <eez/core/hmi.h>
 
 #define CONF_GUI_TOAST_DURATION_MS 1000L
 
@@ -114,7 +114,7 @@ void AppContext::doShowPage(int pageId, Page *page, int previousPageId) {
     page = nullptr;
 #endif
 
-    page = page ? page : getPageFromIdHook(pageId);
+    page = page ? page : g_hooks.getPageFromId(pageId);
 
     m_pageNavigationStack[m_pageNavigationStackPointer].page = page;
     m_pageNavigationStack[m_pageNavigationStackPointer].pageId = pageId;
@@ -339,7 +339,7 @@ void AppContext::updatePage(int i, WidgetCursor &widgetCursor) {
 
 	if (g_findCallback == nullptr) {
         pageRenderCustom(i, widgetCursor);
-		display::endBufferRendering(m_pageNavigationStack[i].displayBufferIndex, x, y, width, height, withShadow, 255, 0, 0, withShadow && activePageHasBackdropHook() ? &rect : nullptr);
+		display::endBufferRendering(m_pageNavigationStack[i].displayBufferIndex, x, y, width, height, withShadow, 255, 0, 0, withShadow && g_hooks.activePageHasBackdrop() ? &rect : nullptr);
 	}
 
     m_updatePageIndex = -1;
@@ -441,6 +441,14 @@ void AppContext::errorMessageWithAction(const char *message, void (*action)(), c
 
 void AppContext::pushToastMessage(ToastMessagePage *toastMessage) {
     pushPage(INTERNAL_PAGE_ID_TOAST_MESSAGE, toastMessage);
+}
+
+AppContext *getRootAppContext() {
+#ifdef EEZ_PLATFORM_SIMULATOR
+    return getAppContextFromId(APP_CONTEXT_ID_SIMULATOR_FRONT_PANEL);
+#else
+    return getAppContextFromId(APP_CONTEXT_ID_DEVICE);
+#endif
 }
 
 } // namespace gui

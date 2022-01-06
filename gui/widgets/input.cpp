@@ -18,8 +18,8 @@
 
 #include <math.h>
 
-#include <eez/alloc.h>
-#include <eez/util.h>
+#include <eez/core/alloc.h>
+#include <eez/core/util.h>
 
 #include <eez/gui/gui.h>
 #include <eez/gui/data.h>
@@ -146,7 +146,7 @@ bool InputWidgetState::updateState() {
 
 	bool hasPreviousState = widgetCursor.hasPreviousState;
 	auto widget = (const InputWidget*)widgetCursor.widget;
-	const Style *style = getStyle(overrideStyleHook(widgetCursor, widget->style));
+	const Style *style = getStyle(g_hooks.overrideStyle(widgetCursor, widget->style));
 
 	WIDGET_STATE(flags.active, g_isActiveWidget);
 	WIDGET_STATE(flags.focused, isFocusWidget(widgetCursor));
@@ -177,11 +177,11 @@ void InputWidgetState::render() {
 		);
 	}
 
-	const Style *style = getStyle(overrideStyleHook(widgetCursor, widget->style));
+	const Style *style = getStyle(g_hooks.overrideStyle(widgetCursor, widget->style));
 
-	uint16_t overrideColor                 = flags.focused ? style->focusColor           : overrideStyleColorHook(widgetCursor, style);
+	uint16_t overrideColor                 = flags.focused ? style->focusColor           : g_hooks.overrideStyleColor(widgetCursor, style);
 	uint16_t overrideBackgroundColor       = flags.focused ? style->focusBackgroundColor : style->backgroundColor;
-	uint16_t overrideActiveColor           = flags.focused ? style->focusBackgroundColor : overrideActiveStyleColorHook(widgetCursor, style);
+	uint16_t overrideActiveColor           = flags.focused ? style->focusBackgroundColor : g_hooks.overrideActiveStyleColor(widgetCursor, style);
 	uint16_t overrideActiveBackgroundColor = flags.focused ? style->focusColor           : style->activeBackgroundColor;
 
 	char text[MAX_TEXT_LEN + 1];
