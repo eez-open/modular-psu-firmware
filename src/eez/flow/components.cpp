@@ -53,60 +53,53 @@ void executeShowKeyboardComponent(FlowState *flowState, unsigned componentIndex)
 void executeShowKeypadComponent(FlowState *flowState, unsigned componentIndex);
 void executeRollerWidgetComponent(FlowState *flowState, unsigned componentIndex);
 
+typedef void (*ExecuteComponentFunctionType)(FlowState *flowState, unsigned componentIndex);
+
+static ExecuteComponentFunctionType g_executeComponentFunctions[] = {
+	executeStartComponent,
+	executeEndComponent,
+	executeInputComponent,
+	executeOutputComponent,
+	nullptr, // COMPONENT_TYPE_WATCH_VARIABLE_ACTION
+	executeEvalExprComponent,
+	executeSetVariableComponent,
+	executeSwitchComponent,
+	executeCompareComponent,
+	executeIsTrueComponent,
+	executeConstantComponent,
+	executeLogComponent,
+	executeCallActionComponent,
+	executeDelayComponent,
+	executeErrorComponent,
+	executeCatchErrorComponent,
+	nullptr, // COMPONENT_TYPE_COUNTER_ACTION
+	executeLoopComponent,
+	executeShowPageComponent,
+	executeScpiComponent,
+	executeShowMessageBoxComponent,
+	executeShowKeyboardComponent,
+	executeShowKeypadComponent
+};
+
 void executeComponent(FlowState *flowState, unsigned componentIndex) {
 	auto component = flowState->flow->components.item(flowState->assets, componentIndex);
 
-	if (component->type == defs_v3::COMPONENT_TYPE_START_ACTION) {
-		executeStartComponent(flowState, componentIndex);
-    } else if (component->type == defs_v3::COMPONENT_TYPE_END_ACTION) {
-		executeEndComponent(flowState, componentIndex);
-	} else if (component->type == defs_v3::COMPONENT_TYPE_INPUT_ACTION) {
-		executeInputComponent(flowState, componentIndex);
-	} else if (component->type == defs_v3::COMPONENT_TYPE_OUTPUT_ACTION) {
-		executeOutputComponent(flowState, componentIndex);
-    } else if (component->type == defs_v3::COMPONENT_TYPE_EVAL_EXPR_ACTION) {
-		executeEvalExprComponent(flowState, componentIndex);
-    } else if (component->type == defs_v3::COMPONENT_TYPE_SET_VARIABLE_ACTION) {
-		executeSetVariableComponent(flowState, componentIndex);
-    } else if (component->type == defs_v3::COMPONENT_TYPE_SWITCH_ACTION) {
-		executeSwitchComponent(flowState, componentIndex);
-	} else if (component->type == defs_v3::COMPONENT_TYPE_COMPARE_ACTION) {
-		executeCompareComponent(flowState, componentIndex);
-	} else if (component->type == defs_v3::COMPONENT_TYPE_IS_TRUE_ACTION) {
-		executeIsTrueComponent(flowState, componentIndex);
-	} else if (component->type == defs_v3::COMPONENT_TYPE_CONSTANT_ACTION) {
-		executeConstantComponent(flowState, componentIndex);
-	} else if (component->type == defs_v3::COMPONENT_TYPE_LOG_ACTION) {
-		executeLogComponent(flowState, componentIndex);
-	} else if (component->type == defs_v3::COMPONENT_TYPE_CALL_ACTION_ACTION) {
-		executeCallActionComponent(flowState, componentIndex);
-	} else if (component->type == defs_v3::COMPONENT_TYPE_DELAY_ACTION) {
-		executeDelayComponent(flowState, componentIndex);
-    } else if (component->type == defs_v3::COMPONENT_TYPE_ERROR_ACTION) {
-		executeErrorComponent(flowState, componentIndex);
-    } else if (component->type == defs_v3::COMPONENT_TYPE_CATCH_ERROR_ACTION) {
-		executeCatchErrorComponent(flowState, componentIndex);
-    } else if (component->type == defs_v3::COMPONENT_TYPE_LOOP_ACTION) {
-		executeLoopComponent(flowState, componentIndex);
-    } else if (component->type == defs_v3::COMPONENT_TYPE_SCPIACTION) {
-		executeScpiComponent(flowState, componentIndex);
-	} else if (component->type == defs_v3::COMPONENT_TYPE_SHOW_PAGE_ACTION) {
-		executeShowPageComponent(flowState, componentIndex);
-	} else if (component->type == defs_v3::COMPONENT_TYPE_SHOW_MESSAGE_BOX_ACTION) {
-		executeShowMessageBoxComponent(flowState, componentIndex);
-	} else if (component->type == defs_v3::COMPONENT_TYPE_SHOW_KEYBOARD_ACTION) {
-		executeShowKeyboardComponent(flowState, componentIndex);
-	} else if (component->type == defs_v3::COMPONENT_TYPE_SHOW_KEYPAD_ACTION) {
-		executeShowKeypadComponent(flowState, componentIndex);
+	if (component->type >= defs_v3::COMPONENT_TYPE_START_ACTION) {
+		auto executeComponentFunction = g_executeComponentFunctions[component->type - defs_v3::COMPONENT_TYPE_START_ACTION];
+		if (executeComponentFunction != nullptr) {
+			executeComponentFunction(flowState, componentIndex);
+			return;
+		}
 	} else if (component->type < 1000) {
 		if (component->type == defs_v3::COMPONENT_TYPE_ROLLER_WIDGET) {
 			executeRollerWidgetComponent(flowState, componentIndex);
 		}
-	} else {
-		char errorMessage[100];
-		snprintf(errorMessage, sizeof(errorMessage), "Unknown component at index = %d, type = %d\n", componentIndex, component->type);
-		throwError(flowState, componentIndex, errorMessage);
-    }
+		return;
+	}
+
+	char errorMessage[100];
+	snprintf(errorMessage, sizeof(errorMessage), "Unknown component at index = %d, type = %d\n", componentIndex, component->type);
+	throwError(flowState, componentIndex, errorMessage);
 }
 
 } // namespace flow
