@@ -59,7 +59,7 @@ static const uint32_t FILE_VIEW_BUFFER_SIZE = 3 * 512 * 1024;
 #endif
 
 static uint8_t * const ALLOC_BUFFER = FILE_VIEW_BUFFER + FILE_VIEW_BUFFER_SIZE;
-static const uint32_t ALLOC_BUFFER_SIZE = 1024 * 1024;
+static const uint32_t ALLOC_BUFFER_SIZE = (1024 + 512) * 1024;
 
 static uint8_t * const FLOW_TO_DEBUGGER_MESSAGE_BUFFER = ALLOC_BUFFER + ALLOC_BUFFER_SIZE;
 static const uint32_t FLOW_TO_DEBUGGER_MESSAGE_BUFFER_SIZE = 32 * 1024;

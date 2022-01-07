@@ -272,10 +272,6 @@ inline bool isPageOnStack(int pageId) {
     return g_psuAppContext.isPageOnStack(pageId);
 }
 
-inline bool isExternalPageOnStack() {
-    return g_psuAppContext.isExternalPageOnStack();
-}
-
 inline Page *getPage(int pageId) {
     return g_psuAppContext.getPage(pageId);
 }

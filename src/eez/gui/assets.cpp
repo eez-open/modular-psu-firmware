@@ -48,17 +48,19 @@ bool decompressAssetsData(const uint8_t *assetsData, uint32_t assetsDataSize, As
 
 	auto header = (Header *)assetsData;
 
-	if (header->tag != HEADER_TAG) {
-		if (err) {
-			*err = SCPI_ERROR_INVALID_BLOCK_DATA;
-		}
-		return false;
+	if (header->tag == HEADER_TAG) {
+		decompressedAssets->projectMajorVersion = header->projectMajorVersion;
+		decompressedAssets->projectMinorVersion = header->projectMinorVersion;
+
+		compressedDataOffset = sizeof(Header);
+		decompressedSize = header->decompressedSize;
+	} else {
+		decompressedAssets->projectMajorVersion = PROJECT_VERSION_V2;
+		decompressedAssets->projectMinorVersion = 0;
+
+		compressedDataOffset = 4;
+		decompressedSize = header->tag;
 	}
-
-	decompressedAssets->projectVersion = header->projectVersion;
-
-	compressedDataOffset = sizeof(Header);
-	decompressedSize = header->decompressedSize;
 
 // disable warning: offsetof within non-standard-layout type ... is conditionally-supported [-Winvalid-offsetof]
 #ifdef __GNUC__
@@ -95,7 +97,7 @@ bool decompressAssetsData(const uint8_t *assetsData, uint32_t assetsDataSize, As
 		}
 		return false;
 	}
-	
+
 	return true;
 }
 
@@ -108,6 +110,8 @@ void loadMainAssets(const uint8_t *assets, uint32_t assetsSize) {
 
 void unloadExternalAssets() {
 	if (g_externalAssets) {
+		removeExternalPagesFromTheStack();
+
 		free(g_externalAssets);
 		g_externalAssets = nullptr;
 	}

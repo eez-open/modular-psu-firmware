@@ -26,9 +26,13 @@ namespace gui {
 
 static const uint32_t HEADER_TAG = 0x7A65657E;
 
+static const uint8_t PROJECT_VERSION_V2 = 2;
+static const uint8_t PROJECT_VERSION_V3 = 3;
+
 struct Header {
 	uint32_t tag; // HEADER_TAG
-	uint16_t projectVersion;
+	uint8_t projectMajorVersion;
+	uint8_t projectMinorVersion;
 	uint16_t assetsType;
 	uint32_t decompressedSize;
 };
@@ -79,7 +83,7 @@ struct ListOfAssetsPtr {
 
 	uint32_t count;
 private:
-    AssetsPtr<AssetsPtr<uint32_t>> items;
+    AssetsPtr<AssetsPtr<T>> items;
 };
 
 template<typename T>
@@ -294,9 +298,10 @@ struct FlowDefinition {
 ////////////////////////////////////////////////////////////////////////////////
 
 struct Assets {
-    uint8_t projectVersion;
+    uint8_t projectMajorVersion;
+	uint8_t projectMinorVersion;
+    uint8_t reserved;
     uint8_t external;
-    uint16_t reserved;
 
 	ListOfAssetsPtr<PageAsset> pages;
 	ListOfAssetsPtr<Style> styles;

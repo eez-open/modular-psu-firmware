@@ -78,7 +78,9 @@ static ExecuteComponentFunctionType g_executeComponentFunctions[] = {
 	executeScpiComponent,
 	executeShowMessageBoxComponent,
 	executeShowKeyboardComponent,
-	executeShowKeypadComponent
+	executeShowKeypadComponent,
+	nullptr, // COMPONENT_TYPE_STOP_ACTION
+	nullptr, // COMPONENT_TYPE_COMMENT_ACTION
 };
 
 void executeComponent(FlowState *flowState, unsigned componentIndex) {

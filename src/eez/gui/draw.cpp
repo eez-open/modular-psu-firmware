@@ -707,14 +707,25 @@ void drawBitmap(Image *image, int x, int y, int w, int h, const Style *style, bo
 
 ////////////////////////////////////////////////////////////////////////////////
 
-void drawRectangle(int x, int y, int w, int h, const Style *style, bool active, bool ignoreLuminocity) {
+void drawRectangle(int x, int y, int w, int h, const Style *style, bool active, bool ignoreLuminocity, bool invertColors) {
     if (w > 0 && h > 0) {
         int x1 = x;
         int y1 = y;
         int x2 = x + w - 1;
         int y2 = y + h - 1;
 
-        drawBorderAndBackground(x1, y1, x2, y2, style, style ? (active ? style->activeBackgroundColor : style->backgroundColor) : TRANSPARENT_COLOR_INDEX, ignoreLuminocity);
+        uint16_t color;
+        if (style) {
+            if (invertColors) {
+                color = active ? style->activeBackgroundColor : style->backgroundColor;
+            } else {
+                color = active ? style->activeColor : style->color;
+            }
+        } else {
+            color = TRANSPARENT_COLOR_INDEX;
+        }
+
+        drawBorderAndBackground(x1, y1, x2, y2, style, color, ignoreLuminocity);
     }
 }
 

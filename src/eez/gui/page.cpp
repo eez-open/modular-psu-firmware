@@ -212,6 +212,7 @@ void ToastMessagePage::init(AppContext *appContext, ToastType type, const Value&
     containerRectangleWidget.action = ACTION_ID_NONE;
     containerRectangleWidget.style = styleId;
     containerRectangleWidget.flags.ignoreLuminosity = 0;
+    containerRectangleWidget.flags.invertColors = 1;
 	containerRectangleWidget.x = 0;
 	containerRectangleWidget.y = 0;
 	containerRectangleWidget.w = width;
@@ -742,6 +743,7 @@ void MenuWithButtonsPage::init(AppContext *appContext, const char *message, cons
     m_containerRectangleWidget.action = ACTION_ID_NONE;
     m_containerRectangleWidget.style = STYLE_ID_MENU_WITH_BUTTONS_CONTAINER;
     m_containerRectangleWidget.flags.ignoreLuminosity = 0;
+	m_containerRectangleWidget.flags.invertColors = 1;
 
     m_messageTextWidget.type = WIDGET_TYPE_TEXT;
     m_messageTextWidget.data = DATA_ID_NONE;

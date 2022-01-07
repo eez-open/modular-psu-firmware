@@ -106,13 +106,6 @@ bool startScript(const char *filePath, int *err) {
 void doStopScript() {
 	g_state = STATE_STOPPING;
 
-	while (psu::gui::isExternalPageOnStack()) {
-		psu::gui::popPage();
-		osDelay(5);
-	}
-
-	osDelay(100);
-
 	if (isFlowRunning()) {
 		stopFlowScript();
 	} else {

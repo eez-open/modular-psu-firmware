@@ -58,6 +58,9 @@ bool isFocusWidget(const WidgetCursor &widgetCursor);
 void refreshScreen();
 inline bool isPageInternal(int pageId) { return pageId > FIRST_INTERNAL_PAGE_ID; }
 
+bool isExternalPageOnStack();
+void removeExternalPagesFromTheStack();
+
 inline int getWidgetAction(const WidgetCursor &widgetCursor) {
     if (widgetCursor.widget->type == WIDGET_TYPE_INPUT) {
 		if (widgetCursor.widget->action == ACTION_ID_NONE) {

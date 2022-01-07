@@ -16,6 +16,8 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
+#include <eez/core/debug.h>
+
 #include <eez/gui/gui.h>
 
 #include <eez/fs/fs.h>
@@ -24,6 +26,8 @@
 
 namespace eez {
 namespace gui {
+
+void covertV2toV3(Assets *assetsV2, Assets *assetsV3);
 
 bool loadExternalAssets(const char *filePath, int *err) {
 	unloadExternalAssets();
@@ -66,12 +70,12 @@ bool loadExternalAssets(const char *filePath, int *err) {
 
 	auto header = (Header *)fileData;
 
-	if (header->tag != HEADER_TAG) {
-		free(fileData);
-		if (err) {
-			*err = SCPI_ERROR_INVALID_BLOCK_DATA;
-		}
-		return false;
+	uint32_t decompressedSize;
+	if (header->tag == HEADER_TAG) {
+		decompressedSize = header->decompressedSize;
+	} else {
+		// PROJECT_VERSION_V2
+		decompressedSize = header->tag;
 	}
 
 // disable warning: offsetof within non-standard-layout type ... is conditionally-supported [-Winvalid-offsetof]
@@ -86,7 +90,7 @@ bool loadExternalAssets(const char *filePath, int *err) {
  #pragma GCC diagnostic pop
  #endif
 
-	size_t externalAssetsSize = decompressedDataOffset + header->decompressedSize;
+	size_t externalAssetsSize = decompressedDataOffset + decompressedSize;
 	g_externalAssets = (Assets *)alloc(externalAssetsSize, 301);
 	if (!g_externalAssets) {
 		free(g_externalAssets);
@@ -109,6 +113,26 @@ bool loadExternalAssets(const char *filePath, int *err) {
 		free(g_externalAssets);
 		g_externalAssets = nullptr;
 		return false;
+	}
+
+	if (g_externalAssets->projectMajorVersion == PROJECT_VERSION_V2) {
+		auto externalAssetsV3 = (Assets *)alloc(externalAssetsSize + 10000, 302);
+		if (!externalAssetsV3) {
+			free(g_externalAssets);
+			g_externalAssets = nullptr;
+
+			if (err) {
+				*err = SCPI_ERROR_OUT_OF_DEVICE_MEMORY;
+			}
+
+			return false;
+		}
+
+		DebugTrace("V2 size: %d\n", externalAssetsSize);
+		covertV2toV3(g_externalAssets, externalAssetsV3);
+
+		free(g_externalAssets);
+		g_externalAssets = externalAssetsV3;
 	}
 
 	return true;

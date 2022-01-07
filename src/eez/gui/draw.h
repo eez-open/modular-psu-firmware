@@ -48,7 +48,7 @@ void drawMultilineText(const char *text, int x, int y, int w, int h, const Style
 int measureMultilineText(const char *text, int x, int y, int w, int h, const Style *style, int firstLineIndent, int hangingIndent);
 
 void drawBitmap(Image *image, int x, int y, int w, int h, const Style *style, bool active);
-void drawRectangle(int x, int y, int w, int h, const Style *style, bool active = false, bool ignoreLuminocity = false);
+void drawRectangle(int x, int y, int w, int h, const Style *style, bool active = false, bool ignoreLuminocity = false, bool invertColors = true);
 
 void drawShadow(int x1, int y1, int x2, int y2);
 void expandRectWithShadow(int &x1, int &y1, int &x2, int &y2);

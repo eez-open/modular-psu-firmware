@@ -128,5 +128,13 @@ bool isFocusWidget(const WidgetCursor &widgetCursor) {
     return widgetCursor.appContext->isFocusWidget(widgetCursor);
 }
 
+bool isExternalPageOnStack() {
+	return getAppContextFromId(APP_CONTEXT_ID_DEVICE)->isExternalPageOnStack();
+}
+
+void removeExternalPagesFromTheStack() {
+	return getAppContextFromId(APP_CONTEXT_ID_DEVICE)->removeExternalPagesFromTheStack();
+}
+
 } // namespace gui
 } // namespace eez

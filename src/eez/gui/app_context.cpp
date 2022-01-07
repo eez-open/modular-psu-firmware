@@ -238,6 +238,15 @@ bool AppContext::isExternalPageOnStack() {
     return false;
 }
 
+void AppContext::removeExternalPagesFromTheStack() {
+	for (int i = 0; i <= m_pageNavigationStackPointer; ++i) {
+		if (m_pageNavigationStack[i].pageId < 0) {
+			removePageFromStack(m_pageNavigationStack[i].pageId);
+			i = 0;
+		}
+	}
+}
+
 void AppContext::showPage(int pageId) {
     if (showPageInGuiThread(this, pageId)) {
         return;
