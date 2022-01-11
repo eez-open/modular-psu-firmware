@@ -171,11 +171,6 @@ struct Style {
     uint8_t paddingBottom;
     uint8_t paddingLeft;
 
-    uint8_t marginTop;
-    uint8_t marginRight;
-    uint8_t marginBottom;
-    uint8_t marginLeft;
-
 	int16_t backgroundImage;
 };
 
