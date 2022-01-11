@@ -632,11 +632,6 @@ static uint32_t convertStyle(StyleV2 &styleV2) {
     styleV3.paddingBottom = styleV2.padding_bottom;
     styleV3.paddingLeft = styleV2.padding_left;
 
-    styleV3.marginTop = styleV2.margin_top;
-    styleV3.marginRight = styleV2.margin_right;
-    styleV3.marginBottom = styleV2.margin_bottom;
-    styleV3.marginLeft = styleV2.margin_left;
-
 	styleV3.backgroundImage = 0;
 
 	return savedOffset;
