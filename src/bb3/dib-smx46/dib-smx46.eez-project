@@ -426,7 +426,7 @@
                         "style": {
                           "inheritFrom": "default_inverse",
                           "borderSize": "0",
-                          "borderRadius": 4
+                          "borderRadius": "4"
                         }
                       }
                     ]
@@ -763,7 +763,7 @@
                     "font": "Oswald17",
                     "alignHorizontal": "left",
                     "borderSize": "0",
-                    "borderRadius": 0,
+                    "borderRadius": "0",
                     "borderColor": "text_regular",
                     "padding": "0 0 0 2"
                   },
@@ -816,7 +816,7 @@
                     "color": "text_enable_background",
                     "backgroundColor": "action_color",
                     "borderSize": "0",
-                    "borderRadius": 0,
+                    "borderRadius": "0",
                     "borderColor": "text_regular",
                     "padding": "0 0 0 2"
                   },
@@ -995,7 +995,7 @@
                         "style": {
                           "inheritFrom": "default_inverse",
                           "borderSize": "0",
-                          "borderRadius": 4
+                          "borderRadius": "4"
                         }
                       }
                     ]
@@ -1332,7 +1332,7 @@
                     "font": "Oswald17",
                     "alignHorizontal": "left",
                     "borderSize": "0",
-                    "borderRadius": 0,
+                    "borderRadius": "0",
                     "borderColor": "text_regular",
                     "padding": "0 0 0 2"
                   },
@@ -1385,7 +1385,7 @@
                     "color": "text_enable_background",
                     "backgroundColor": "action_color",
                     "borderSize": "0",
-                    "borderRadius": 0,
+                    "borderRadius": "0",
                     "borderColor": "text_regular",
                     "padding": "0 0 0 2"
                   },
@@ -1564,7 +1564,7 @@
                         "style": {
                           "inheritFrom": "default_inverse",
                           "borderSize": "0",
-                          "borderRadius": 4
+                          "borderRadius": "4"
                         }
                       }
                     ]
@@ -1901,7 +1901,7 @@
                     "font": "Oswald17",
                     "alignHorizontal": "left",
                     "borderSize": "0",
-                    "borderRadius": 0,
+                    "borderRadius": "0",
                     "borderColor": "text_regular",
                     "padding": "0 0 0 2"
                   },
@@ -1954,7 +1954,7 @@
                     "color": "text_enable_background",
                     "backgroundColor": "action_color",
                     "borderSize": "0",
-                    "borderRadius": 0,
+                    "borderRadius": "0",
                     "borderColor": "text_regular",
                     "padding": "0 0 0 2"
                   },
@@ -2134,7 +2134,7 @@
                         "style": {
                           "inheritFrom": "default_inverse",
                           "borderSize": "0",
-                          "borderRadius": 4
+                          "borderRadius": "4"
                         }
                       }
                     ]
@@ -2471,7 +2471,7 @@
                     "font": "Oswald17",
                     "alignHorizontal": "left",
                     "borderSize": "0",
-                    "borderRadius": 0,
+                    "borderRadius": "0",
                     "borderColor": "text_regular",
                     "padding": "0 0 0 2"
                   },
@@ -2524,7 +2524,7 @@
                     "color": "text_enable_background",
                     "backgroundColor": "action_color",
                     "borderSize": "0",
-                    "borderRadius": 0,
+                    "borderRadius": "0",
                     "borderColor": "text_regular",
                     "padding": "0 0 0 2"
                   },
@@ -2753,7 +2753,7 @@
                           "backgroundColor": "action_color",
                           "activeBackgroundColor": "action_color",
                           "borderSize": "0",
-                          "borderRadius": 5
+                          "borderRadius": "5"
                         }
                       }
                     ]
@@ -2782,9 +2782,9 @@
                         "customOutputs": [],
                         "style": {
                           "inheritFrom": "default",
-                          "backgroundColor": "Background",
+                          "backgroundColor": "background",
                           "borderSize": "1",
-                          "borderRadius": 8,
+                          "borderRadius": "8",
                           "borderColor": "action_color"
                         }
                       },
@@ -3237,7 +3237,7 @@
                     "font": "Oswald17",
                     "alignHorizontal": "left",
                     "borderSize": "0",
-                    "borderRadius": 0,
+                    "borderRadius": "0",
                     "borderColor": "text_regular",
                     "padding": "0 0 0 2"
                   },
@@ -3291,7 +3291,7 @@
                     "color": "text_enable_background",
                     "backgroundColor": "action_color",
                     "borderSize": "0",
-                    "borderRadius": 0,
+                    "borderRadius": "0",
                     "borderColor": "text_regular",
                     "padding": "0 0 0 2"
                   },
@@ -4071,7 +4071,7 @@
                               "backgroundColor": "action_color",
                               "activeBackgroundColor": "action_color",
                               "borderSize": "0",
-                              "borderRadius": 7
+                              "borderRadius": "7"
                             }
                           }
                         ]
@@ -4100,9 +4100,9 @@
                             "customOutputs": [],
                             "style": {
                               "inheritFrom": "default",
-                              "backgroundColor": "Background",
+                              "backgroundColor": "background",
                               "borderSize": "1",
-                              "borderRadius": 8,
+                              "borderRadius": "8",
                               "borderColor": "action_color"
                             }
                           },
@@ -4615,7 +4615,7 @@
                 "alignHorizontal": "center",
                 "alignVertical": "center",
                 "borderSize": "0",
-                "borderRadius": 0,
+                "borderRadius": "0",
                 "padding": "3"
               },
               "text": "\\u00be Pinout",

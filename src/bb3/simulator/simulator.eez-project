@@ -226,7 +226,7 @@
             "activeColor": "#ffffff",
             "activeBackgroundColor": "#9b9b00",
             "borderSize": 2,
-            "borderRadius": 4,
+            "borderRadius": "4",
             "borderColor": "#808080"
           },
           "text": "Select"
@@ -251,7 +251,7 @@
             "activeColor": "#ffffff",
             "activeBackgroundColor": "#9b9b00",
             "borderSize": 2,
-            "borderRadius": 4,
+            "borderRadius": "4",
             "borderColor": "#808080"
           },
           "text": "Select"
@@ -276,7 +276,7 @@
             "activeColor": "#ffffff",
             "activeBackgroundColor": "#9b9b00",
             "borderSize": 2,
-            "borderRadius": 4,
+            "borderRadius": "4",
             "borderColor": "#808080"
           },
           "text": "Select"
@@ -857,8 +857,8 @@
       "name": "front_panel_default",
       "font": "Oswald14",
       "color": "text_regular",
-      "backgroundColor": "Background",
-      "activeColor": "Background",
+      "backgroundColor": "background",
+      "activeColor": "background",
       "activeBackgroundColor": "text_regular",
       "borderColor": "#ffffff",
       "padding": 0
