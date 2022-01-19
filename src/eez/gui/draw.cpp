@@ -623,7 +623,7 @@ struct MultilineTextRender {
     }
 };
 
-void drawMultilineText(const char *text, int x, int y, int w, int h, const Style *style, bool active, int firstLineIndent, int hangingIndent) {
+void drawMultilineText(const char *text, int x, int y, int w, int h, const Style *style, bool active, bool blinking, int firstLineIndent, int hangingIndent) {
     MultilineTextRender multilineTextRender;
 
     multilineTextRender.text = text;
@@ -632,7 +632,7 @@ void drawMultilineText(const char *text, int x, int y, int w, int h, const Style
     multilineTextRender.x2 = x + w - 1;
     multilineTextRender.y2 = y + h - 1;
     multilineTextRender.style = style;
-    multilineTextRender.active = active;
+    multilineTextRender.active = active || blinking;
     multilineTextRender.firstLineIndent = firstLineIndent;
     multilineTextRender.hangingIndent = hangingIndent;
 
