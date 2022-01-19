@@ -26,6 +26,7 @@
 #include <eez/flow/expression.h>
 #include <eez/flow/queue.h>
 #include <eez/flow/debugger.h>
+#include <eez/flow/hooks.h>
 
 #include <bb3/psu/psu.h>
 #include <bb3/psu/datetime.h>

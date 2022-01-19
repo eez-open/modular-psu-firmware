@@ -123,19 +123,19 @@ void dataOperation(int16_t dataId, DataOperationEnum operation, const gui::Widge
 namespace eez {
 namespace flow {
 
-bool isFlowRunningHook() {
+bool isFlowRunning() {
 	return scripting::isFlowRunning();
 }
 
-void replacePageHook(int16_t pageId) {
+void replacePage(int16_t pageId) {
 	eez::psu::gui::replacePage(pageId);
 }
 
-void showKeyboardHook(Value label, Value initialText, Value minChars, Value maxChars, bool isPassword, void(*onOk)(char *), void(*onCancel)()) {
+void showKeyboard(Value label, Value initialText, Value minChars, Value maxChars, bool isPassword, void(*onOk)(char *), void(*onCancel)()) {
 	eez::psu::gui::startTextKeypad(label.getString(), initialText.getString(), minChars.toInt32(), maxChars.toInt32(), isPassword, onOk, onCancel);
 }
 
-void showKeypadHook(Value label, Value initialValue, Value min, Value max, Unit unit, void(*onOk)(float), void(*onCancel)()) {
+void showKeypad(Value label, Value initialValue, Value min, Value max, Unit unit, void(*onOk)(float), void(*onCancel)()) {
 	NumericKeypadOptions options;
 	options.pageId = PAGE_ID_NUMERIC_KEYPAD;
 	options.min = min.toFloat();
@@ -145,7 +145,7 @@ void showKeypadHook(Value label, Value initialValue, Value min, Value max, Unit 
 	eez::psu::gui::startNumericKeypad(&eez::psu::gui::g_psuAppContext, label.getString(), initialValue, options, onOk, nullptr, onCancel);
 }
 
-void stopScriptHook() {
+void stopScript() {
 	scripting::stopScript();
 }
 

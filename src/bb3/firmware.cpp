@@ -72,6 +72,8 @@
 #include <bb3/bp3c/eeprom.h>
 #include <bb3/bp3c/io_exp.h>
 
+#include <bb3/flow/flow.h>
+
 ////////////////////////////////////////////////////////////////////////////////
 
 int g_mcuRevision;
@@ -95,6 +97,8 @@ bool g_shutdown;
 
 void boot() {
     assert((uint32_t)(MEMORY_END - MEMORY_BEGIN) <= MEMORY_SIZE);
+
+    eez::flow::init();
 
     psu::serial::initScpi();
 #if OPTION_ETHERNET
