@@ -63,7 +63,7 @@ void (*showKeyboardHook)(Value label, Value initialText, Value minChars, Value m
 void (*showKeypadHook)(Value label, Value initialValue, Value min, Value max, Unit unit, void(*onOk)(float), void(*onCancel)()) = showKeypad;
 void (*stopScriptHook)() = stopScript;
 
-extern void (*scpiComponentInitHook)() = scpiComponentInit;
+void (*scpiComponentInitHook)() = scpiComponentInit;
 
 void (*startToDebuggerMessageHook)() = startToDebuggerMessage;
 void (*writeDebuggerBufferHook)(const char *buffer, uint32_t length) = writeDebuggerBuffer;
