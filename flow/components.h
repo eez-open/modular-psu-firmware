@@ -19,12 +19,14 @@
 #pragma once
 
 #include <eez/flow/private.h>
+#include <eez/flow/flow_defs_v3.h>
 
 namespace eez {
 namespace flow {
 
-void scpiComponentInit();
-	
+typedef void (*ExecuteComponentFunctionType)(FlowState *flowState, unsigned componentIndex);
+void registerComponent(ComponentTypes componentType, ExecuteComponentFunctionType executeComponentFunction);
+
 void executeComponent(FlowState *flowState, unsigned componentIndex);
 
 } // flow
