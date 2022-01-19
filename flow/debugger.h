@@ -45,10 +45,6 @@ void logScpiQueryResult(FlowState *flowState, unsigned componentIndex, const cha
 
 void onPageChanged(int pageId);
 
-void startToDebuggerMessage();
-void writeDebuggerBuffer(const char *buffer, uint32_t length);
-void finishToDebuggerMessage();
-
 void processDebuggerInput(char *buffer, uint32_t length);
 
 } // flow

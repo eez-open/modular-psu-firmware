@@ -27,6 +27,7 @@
 #include <eez/flow/flow.h>
 #include <eez/flow/private.h>
 #include <eez/flow/debugger.h>
+#include <eez/flow/hooks.h>
 
 namespace eez {
 namespace flow {
@@ -93,16 +94,16 @@ static void setDebuggerState(DebuggerState newState) {
 		g_debuggerState = newState;
 
 		if (g_debuggerIsConnected) {
-			startToDebuggerMessage();
+			startToDebuggerMessageHook();
 
 			char buffer[100];
 			snprintf(buffer, sizeof(buffer), "%d\t%d\n",
 				MESSAGE_TO_DEBUGGER_STATE_CHANGED,
 				g_debuggerState
 			);
-			writeDebuggerBuffer(buffer, strlen(buffer));
+			writeDebuggerBufferHook(buffer, strlen(buffer));
 
-			finishToDebuggerMessage();
+			finishToDebuggerMessageHook();
 		}
 	}
 }
@@ -217,13 +218,13 @@ int outputBufferPosition = 0;
 #define WRITE_TO_OUTPUT_BUFFER(ch) \
 	outputBuffer[outputBufferPosition++] = ch; \
 	if (outputBufferPosition == sizeof(outputBuffer)) { \
-		writeDebuggerBuffer(outputBuffer, outputBufferPosition); \
+		writeDebuggerBufferHook(outputBuffer, outputBufferPosition); \
 		outputBufferPosition = 0; \
 	}
 
 #define FLUSH_OUTPUT_BUFFER() \
 	if (outputBufferPosition > 0) { \
-		writeDebuggerBuffer(outputBuffer, outputBufferPosition); \
+		writeDebuggerBufferHook(outputBuffer, outputBufferPosition); \
 		outputBufferPosition = 0; \
 	}
 
@@ -359,14 +360,14 @@ void writeValue(const Value &value) {
 
 	stringAppendString(tempStr, sizeof(tempStr), "\n");
 
-	writeDebuggerBuffer(tempStr, strlen(tempStr));
+	writeDebuggerBufferHook(tempStr, strlen(tempStr));
 }
 
 ////////////////////////////////////////////////////////////////////////////////
 
 void onStarted(Assets *assets) {
     if (g_debuggerIsConnected) {
-		startToDebuggerMessage();
+		startToDebuggerMessageHook();
 
 		auto flowDefinition = assets->flowDefinition.ptr(assets);
 
@@ -379,18 +380,18 @@ void onStarted(Assets *assets) {
 				(int)i,
                 (int)pValue
             );
-            writeDebuggerBuffer(buffer, strlen(buffer));
+            writeDebuggerBufferHook(buffer, strlen(buffer));
 
 			writeValue(*pValue);
         }
 
-		finishToDebuggerMessage();
+		finishToDebuggerMessageHook();
     }
 }
 
 void onAddToQueue(FlowState *flowState, int sourceComponentIndex, int sourceOutputIndex, unsigned targetComponentIndex, int targetInputIndex) {
     if (g_debuggerIsConnected) {
-		startToDebuggerMessage();
+		startToDebuggerMessageHook();
 
         char buffer[100];
 		snprintf(buffer, sizeof(buffer), "%d\t%d\t%d\t%d\t%d\t%d\n",
@@ -401,46 +402,46 @@ void onAddToQueue(FlowState *flowState, int sourceComponentIndex, int sourceOutp
 			targetComponentIndex,
 			targetInputIndex
 		);
-        writeDebuggerBuffer(buffer, strlen(buffer));
+        writeDebuggerBufferHook(buffer, strlen(buffer));
 
-		finishToDebuggerMessage();
+		finishToDebuggerMessageHook();
     }
 }
 
 void onRemoveFromQueue() {
     if (g_debuggerIsConnected) {
-		startToDebuggerMessage();
+		startToDebuggerMessageHook();
 
         char buffer[100];
 		snprintf(buffer, sizeof(buffer), "%d\n",
 			MESSAGE_TO_DEBUGGER_REMOVE_FROM_QUEUE
 		);
-        writeDebuggerBuffer(buffer, strlen(buffer));
+        writeDebuggerBufferHook(buffer, strlen(buffer));
 
-		finishToDebuggerMessage();
+		finishToDebuggerMessageHook();
     }
 }
 
 void onValueChanged(const Value *pValue) {
     if (g_debuggerIsConnected) {
-		startToDebuggerMessage();
+		startToDebuggerMessageHook();
 
         char buffer[100];
 		snprintf(buffer, sizeof(buffer), "%d\t%d\t",
 			MESSAGE_TO_DEBUGGER_VALUE_CHANGED,
             (int)pValue
 		);
-        writeDebuggerBuffer(buffer, strlen(buffer));
+        writeDebuggerBufferHook(buffer, strlen(buffer));
         
 		writeValue(*pValue);
 
-		finishToDebuggerMessage();
+		finishToDebuggerMessageHook();
     }
 }
 
 void onFlowStateCreated(FlowState *flowState) {
     if (g_debuggerIsConnected) {
-		startToDebuggerMessage();
+		startToDebuggerMessageHook();
 
         char buffer[100];
 		snprintf(buffer, sizeof(buffer), "%d\t%d\t%d\t%d\t%d\n",
@@ -450,7 +451,7 @@ void onFlowStateCreated(FlowState *flowState) {
 			(int)(flowState->parentFlowState ? flowState->parentFlowState->flowStateIndex : -1),
 			flowState->parentComponentIndex
 		);
-        writeDebuggerBuffer(buffer, strlen(buffer));
+        writeDebuggerBufferHook(buffer, strlen(buffer));
 		
 		auto flow = flowState->flow;
 
@@ -464,7 +465,7 @@ void onFlowStateCreated(FlowState *flowState) {
 				(int)i,
                 (int)pValue
             );
-            writeDebuggerBuffer(buffer, strlen(buffer));
+            writeDebuggerBufferHook(buffer, strlen(buffer));
 
 			writeValue(*pValue);
         }
@@ -481,34 +482,34 @@ void onFlowStateCreated(FlowState *flowState) {
 					(int)i,
 					(int)pValue
 				);
-				writeDebuggerBuffer(buffer, strlen(buffer));
+				writeDebuggerBufferHook(buffer, strlen(buffer));
 
 				writeValue(*pValue);
 			}
         }
 
-		finishToDebuggerMessage();
+		finishToDebuggerMessageHook();
 	}
 }
 
 void onFlowStateDestroyed(FlowState *flowState) {
 	if (g_debuggerIsConnected) {
-		startToDebuggerMessage();
+		startToDebuggerMessageHook();
 
 		char buffer[100];
 		snprintf(buffer, sizeof(buffer), "%d\t%d\n",
 			MESSAGE_TO_DEBUGGER_FLOW_STATE_DESTROYED,
 			(int)flowState->flowStateIndex
 		);
-		writeDebuggerBuffer(buffer, strlen(buffer));
+		writeDebuggerBufferHook(buffer, strlen(buffer));
 
-		finishToDebuggerMessage();
+		finishToDebuggerMessageHook();
 	}
 }
 
 void onFlowError(FlowState *flowState, int componentIndex, const char *errorMessage) {
 	if (g_debuggerIsConnected) {
-		startToDebuggerMessage();
+		startToDebuggerMessageHook();
 		
 		char buffer[100];
 		snprintf(buffer, sizeof(buffer), "%d\t%d\t%d\t",
@@ -516,10 +517,10 @@ void onFlowError(FlowState *flowState, int componentIndex, const char *errorMess
 			(int)flowState->flowStateIndex,
 			componentIndex
 		);
-		writeDebuggerBuffer(buffer, strlen(buffer));
+		writeDebuggerBufferHook(buffer, strlen(buffer));
 		writeString(errorMessage);
 
-		finishToDebuggerMessage();
+		finishToDebuggerMessageHook();
 	}
 }
 
@@ -559,7 +560,7 @@ void writeLogMessage(const char *str, size_t len) {
 
 void logInfo(FlowState *flowState, unsigned componentIndex, const char *message) {
 	if (g_debuggerIsConnected) {
-		startToDebuggerMessage();
+		startToDebuggerMessageHook();
 				
 		char buffer[256];
 		snprintf(buffer, sizeof(buffer), "%d\t%d\t%d\t%d\t",
@@ -568,16 +569,16 @@ void logInfo(FlowState *flowState, unsigned componentIndex, const char *message)
             (int)flowState->flowStateIndex,
 			componentIndex
 		);
-		writeDebuggerBuffer(buffer, strlen(buffer));
+		writeDebuggerBufferHook(buffer, strlen(buffer));
 		writeLogMessage(message);
 
-		finishToDebuggerMessage();
+		finishToDebuggerMessageHook();
     }
 }
 
 void logScpiCommand(FlowState *flowState, unsigned componentIndex, const char *cmd) {
 	if (g_debuggerIsConnected) {
-		startToDebuggerMessage();
+		startToDebuggerMessageHook();
 
 		char buffer[256];
 		snprintf(buffer, sizeof(buffer), "%d\t%d\t%d\t%d\tSCPI COMMAND: ",
@@ -586,16 +587,16 @@ void logScpiCommand(FlowState *flowState, unsigned componentIndex, const char *c
             (int)flowState->flowStateIndex,
 			componentIndex
 		);
-		writeDebuggerBuffer(buffer, strlen(buffer));
+		writeDebuggerBufferHook(buffer, strlen(buffer));
 		writeLogMessage(cmd);
 
-		finishToDebuggerMessage();
+		finishToDebuggerMessageHook();
     }
 }
 
 void logScpiQuery(FlowState *flowState, unsigned componentIndex, const char *query) {
 	if (g_debuggerIsConnected) {
-		startToDebuggerMessage();
+		startToDebuggerMessageHook();
 
 		char buffer[256];
 		snprintf(buffer, sizeof(buffer), "%d\t%d\t%d\t%d\tSCPI QUERY: ",
@@ -604,16 +605,16 @@ void logScpiQuery(FlowState *flowState, unsigned componentIndex, const char *que
             (int)flowState->flowStateIndex,
 			componentIndex
 		);
-		writeDebuggerBuffer(buffer, strlen(buffer));
+		writeDebuggerBufferHook(buffer, strlen(buffer));
 		writeLogMessage(query);
 
-		finishToDebuggerMessage();
+		finishToDebuggerMessageHook();
     }
 }
 
 void logScpiQueryResult(FlowState *flowState, unsigned componentIndex, const char *resultText, size_t resultTextLen) {
 	if (g_debuggerIsConnected) {
-		startToDebuggerMessage();
+		startToDebuggerMessageHook();
 
 		char buffer[256];
 		snprintf(buffer, sizeof(buffer) - 1, "%d\t%d\t%d\t%d\tSCPI QUERY RESULT: ",
@@ -622,25 +623,25 @@ void logScpiQueryResult(FlowState *flowState, unsigned componentIndex, const cha
             (int)flowState->flowStateIndex,
 			componentIndex
 		);
-		writeDebuggerBuffer(buffer, strlen(buffer));
+		writeDebuggerBufferHook(buffer, strlen(buffer));
 		writeLogMessage(resultText, resultTextLen);
 
-		finishToDebuggerMessage();
+		finishToDebuggerMessageHook();
     }
 }
 
 void onPageChanged(int pageId) {
 	if (g_debuggerIsConnected) {
-		startToDebuggerMessage();
+		startToDebuggerMessageHook();
 
 		char buffer[100];
 		snprintf(buffer, sizeof(buffer), "%d\t%d\n",
 			MESSAGE_TO_DEBUGGER_PAGE_CHANGED,
 			-pageId - 1
 		);
-		writeDebuggerBuffer(buffer, strlen(buffer));
+		writeDebuggerBufferHook(buffer, strlen(buffer));
 
-		finishToDebuggerMessage();
+		finishToDebuggerMessageHook();
 	}
 }
 

@@ -19,6 +19,7 @@
 #include <eez/flow/flow.h>
 #include <eez/flow/components.h>
 #include <eez/flow/debugger.h>
+#include <eez/flow/hooks.h>
 
 namespace eez {
 namespace flow {
