@@ -24,6 +24,8 @@
 namespace eez {
 namespace flow {
 
+using defs_v3::ComponentTypes;
+
 typedef void (*ExecuteComponentFunctionType)(FlowState *flowState, unsigned componentIndex);
 void registerComponent(ComponentTypes componentType, ExecuteComponentFunctionType executeComponentFunction);
 
