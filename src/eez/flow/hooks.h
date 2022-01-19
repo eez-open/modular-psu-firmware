@@ -19,7 +19,7 @@
 #pragma once
 
 #include <stdint.h>
-#include <eez/gui.h>
+#include <eez/gui/gui.h>
 
 namespace eez {
 namespace flow {
