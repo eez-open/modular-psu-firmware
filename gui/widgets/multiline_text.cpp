@@ -29,7 +29,9 @@ bool MultilineTextWidgetState::updateState() {
 
     bool hasPreviousState = widgetCursor.hasPreviousState;
     auto widget = (const MultilineTextWidget *)widgetCursor.widget;
+    const Style *style = getStyle(g_hooks.overrideStyle(widgetCursor, widget->style));
 
+    WIDGET_STATE(flags.blinking, g_isBlinkTime && styleIsBlink(style));
     WIDGET_STATE(flags.active, g_isActiveWidget);
     WIDGET_STATE(data, widget->data ? get(widgetCursor, widget->data) : 0);
 
@@ -46,21 +48,21 @@ void MultilineTextWidgetState::render() {
         if (data.isString()) {
             drawMultilineText(data.getString(), widgetCursor.x,
                 widgetCursor.y, (int)widget->w, (int)widget->h, style,
-                flags.active,
+                flags.active, flags.blinking,
                 widget->firstLineIndent, widget->hangingIndent);
         } else {
             char text[64];
             data.toText(text, sizeof(text));
             drawMultilineText(text, widgetCursor.x, widgetCursor.y, (int)widget->w,
                 (int)widget->h, style,
-                flags.active,
+                flags.active, flags.blinking,
                 widget->firstLineIndent, widget->hangingIndent);
         }
     } else if (widget->text) {
         drawMultilineText(
             widget->text.ptr(widgetCursor.assets), 
             widgetCursor.x, widgetCursor.y, (int)widget->w, (int)widget->h,
-            style, flags.active,
+            style, flags.active, flags.blinking,
             widget->firstLineIndent, widget->hangingIndent);
     }
 };
