@@ -46,7 +46,6 @@ void executeDelayComponent(FlowState *flowState, unsigned componentIndex);
 void executeErrorComponent(FlowState *flowState, unsigned componentIndex);
 void executeCatchErrorComponent(FlowState *flowState, unsigned componentIndex);
 void executeLoopComponent(FlowState *flowState, unsigned componentIndex);
-void executeScpiComponent(FlowState *flowState, unsigned componentIndex);
 void executeShowPageComponent(FlowState *flowState, unsigned componentIndex);
 void executeShowMessageBoxComponent(FlowState *flowState, unsigned componentIndex);
 void executeShowKeyboardComponent(FlowState *flowState, unsigned componentIndex);
@@ -75,13 +74,19 @@ static ExecuteComponentFunctionType g_executeComponentFunctions[] = {
 	nullptr, // COMPONENT_TYPE_COUNTER_ACTION
 	executeLoopComponent,
 	executeShowPageComponent,
-	executeScpiComponent,
+	nullptr, // COMPONENT_TYPE_SCPIACTION
 	executeShowMessageBoxComponent,
 	executeShowKeyboardComponent,
 	executeShowKeypadComponent,
 	nullptr, // COMPONENT_TYPE_STOP_ACTION
 	nullptr, // COMPONENT_TYPE_COMMENT_ACTION
 };
+
+void registerComponent(ComponentTypes componentType, ExecuteComponentFunctionType executeComponentFunction) {
+	if (component->type >= defs_v3::COMPONENT_TYPE_START_ACTION) {
+		g_executeComponentFunctions[component->type - defs_v3::COMPONENT_TYPE_START_ACTION] = executeComponentFunction;
+	}
+}
 
 void executeComponent(FlowState *flowState, unsigned componentIndex) {
 	auto component = flowState->flow->components.item(flowState->assets, componentIndex);

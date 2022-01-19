@@ -19,16 +19,22 @@
 #pragma once
 
 #include <stdint.h>
-#include <eez/gui/gui.h>
+
+#include <eez/flow/private.h>
+#include <eez/gui/data.h>
 
 namespace eez {
 namespace flow {
+
+using eez::gui::Value;
 
 extern bool (*isFlowRunningHook)();
 extern void (*replacePageHook)(int16_t pageId);
 extern void (*showKeyboardHook)(Value label, Value initialText, Value minChars, Value maxChars, bool isPassword, void(*onOk)(char *), void(*onCancel)());
 extern void (*showKeypadHook)(Value label, Value initialValue, Value min, Value max, Unit unit, void(*onOk)(float), void(*onCancel)());
 extern void (*stopScriptHook)();
+
+extern void (*scpiComponentInitHook)();
 
 extern void (*startToDebuggerMessageHook)();
 extern void (*writeDebuggerBufferHook)(const char *buffer, uint32_t length);

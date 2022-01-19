@@ -19,6 +19,7 @@
 #include <math.h>
 
 #include <eez/flow/hooks.h>
+#include <eez/gui/gui.h>
 
 namespace eez {
 namespace flow {
@@ -27,18 +28,21 @@ static bool isFlowRunning() {
 	return true;
 }
 
-static void replacePageHook(int16_t pageId) {
+static void replacePage(int16_t pageId) {
 	eez::gui::getAppContextFromId(APP_CONTEXT_ID_DEVICE)->replacePage(pageId);
 }
 
-static void showKeyboardHook(Value label, Value initialText, Value minChars, Value maxChars, bool isPassword, void(*onOk)(char *), void(*onCancel)()) {
+static void showKeyboard(Value label, Value initialText, Value minChars, Value maxChars, bool isPassword, void(*onOk)(char *), void(*onCancel)()) {
 }
 
-static void showKeypadHook(Value label, Value initialValue, Value min, Value max, Unit unit, void(*onOk)(float), void(*onCancel)()) {
+static void showKeypad(Value label, Value initialValue, Value min, Value max, Unit unit, void(*onOk)(float), void(*onCancel)()) {
 }
 
-static void stopScriptHook() {
+static void stopScript() {
 	assert(false);
+}
+
+static void scpiComponentInit() {
 }
 
 static void startToDebuggerMessage() {
@@ -58,6 +62,9 @@ void (*replacePageHook)(int16_t pageId) = replacePage;
 void (*showKeyboardHook)(Value label, Value initialText, Value minChars, Value maxChars, bool isPassword, void(*onOk)(char *), void(*onCancel)()) = showKeyboard;
 void (*showKeypadHook)(Value label, Value initialValue, Value min, Value max, Unit unit, void(*onOk)(float), void(*onCancel)()) = showKeypad;
 void (*stopScriptHook)() = stopScript;
+
+extern void (*scpiComponentInitHook)() = scpiComponentInit;
+extern void (*executeScpiComponentHook)(FlowState *flowState, unsigned componentIndex) = executeScpiComponent;
 
 void (*startToDebuggerMessageHook)() = startToDebuggerMessage;
 void (*writeDebuggerBufferHook)(const char *buffer, uint32_t length) = writeDebuggerBuffer;

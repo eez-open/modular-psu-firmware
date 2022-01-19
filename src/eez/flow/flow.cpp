@@ -56,7 +56,7 @@ unsigned start(Assets *assets) {
 
 	queueReset();
 
-	scpiComponentInit();
+	scpiComponentInitHook();
 
 	fixAssetValues(assets);
 
