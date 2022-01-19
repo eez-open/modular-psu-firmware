@@ -22,6 +22,7 @@
 #include <eez/gui/thread.h>
 
 #include <eez/flow/flow.h>
+#include <eez/flow/hooks.h>
 
 namespace eez {
 namespace gui {
@@ -100,7 +101,7 @@ void processGuiQueue(uint32_t timeout) {
     } else if (type == GUI_QUEUE_MESSAGE_DEBUGGER_CLIENT_DISCONNECTED) {
         flow::onDebuggerClientDisconnected();
     } else if (type == GUI_QUEUE_MESSAGE_DEBUGGER_INPUT_AVAILABLE) {
-        flow::onDebuggerInputAvailable();
+        flow::onDebuggerInputAvailableHook();
     } else {
         g_hooks.onGuiQueueMessage(type, obj.param);
     }

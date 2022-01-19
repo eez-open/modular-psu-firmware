@@ -27,6 +27,7 @@
 #include <eez/flow/queue.h>
 #include <eez/flow/debugger.h>
 #include <eez/flow/flow_defs_v3.h>
+#include <eez/flow/hooks.h>
 
 using namespace eez::gui;
 

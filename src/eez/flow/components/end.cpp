@@ -18,6 +18,7 @@
 
 #include <eez/flow/flow.h>
 #include <eez/flow/components.h>
+#include <eez/flow/hooks.h>
 
 using namespace eez::gui;
 

@@ -22,6 +22,7 @@
 #include <eez/flow/expression.h>
 #include <eez/flow/operations.h>
 #include <eez/flow/private.h>
+#include <eez/flow/hooks.h>
 
 #include <eez/gui/gui.h>
 
