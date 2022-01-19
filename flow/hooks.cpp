@@ -64,7 +64,6 @@ void (*showKeypadHook)(Value label, Value initialValue, Value min, Value max, Un
 void (*stopScriptHook)() = stopScript;
 
 extern void (*scpiComponentInitHook)() = scpiComponentInit;
-extern void (*executeScpiComponentHook)(FlowState *flowState, unsigned componentIndex) = executeScpiComponent;
 
 void (*startToDebuggerMessageHook)() = startToDebuggerMessage;
 void (*writeDebuggerBufferHook)(const char *buffer, uint32_t length) = writeDebuggerBuffer;
