@@ -83,8 +83,8 @@ static ExecuteComponentFunctionType g_executeComponentFunctions[] = {
 };
 
 void registerComponent(ComponentTypes componentType, ExecuteComponentFunctionType executeComponentFunction) {
-	if (component->type >= defs_v3::COMPONENT_TYPE_START_ACTION) {
-		g_executeComponentFunctions[component->type - defs_v3::COMPONENT_TYPE_START_ACTION] = executeComponentFunction;
+	if (componentType >= defs_v3::COMPONENT_TYPE_START_ACTION) {
+		g_executeComponentFunctions[componentType - defs_v3::COMPONENT_TYPE_START_ACTION] = executeComponentFunction;
 	}
 }
 
