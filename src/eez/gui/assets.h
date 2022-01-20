@@ -46,11 +46,11 @@ extern Assets *g_externalAssets;
 template<typename T>
 struct AssetsPtr {
     T* ptr() {
-        return (T *)(MEMORY_BEGIN + offset); // 4 is offset of Assets::pages
+        return (T *)(MEMORY_BEGIN + offset);
     }
 
 	const T* ptr() const {
-		return (const T *)(MEMORY_BEGIN + offset); // 4 is offset of Assets::pages
+		return (const T *)(MEMORY_BEGIN + offset);
 	}
 	
 	void operator=(T* ptr) {
@@ -68,13 +68,11 @@ private:
 template<typename T>
 struct ListOfAssetsPtr {
     T* item(int i) {
-		auto assetPtr = items.ptr();
-        return (T *)assetPtr[i].ptr();
+        return (T *)items.ptr()[i].ptr();
     }
 
 	const T* item(int i) const {
-		auto assetPtr = items.ptr();
-        return (const T *)assetPtr[i].ptr();
+        return (const T *)items.ptr()[i].ptr();
 	}
 
 	auto itemsPtr() const {
