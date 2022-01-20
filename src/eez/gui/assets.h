@@ -252,7 +252,11 @@ static const uint16_t BREAKPOINT_DISABLED = 2;
 struct Component {
     uint16_t type;
     uint16_t breakpoint;
+
+	// These are indexes to Flow::componentInputs.
+	// We use this to check if component is ready to run (i.e. all mandatory inputs have a value).
 	ListOfFundamentalType<uint16_t> inputs;
+
 	ListOfAssetsPtr<PropertyValue> propertyValues;
 	ListOfAssetsPtr<ComponentOutput> outputs;
 	int16_t errorCatchOutput;
@@ -271,15 +275,17 @@ struct WidgetActionItem {
 
 #define COMPONENT_INPUT_FLAG_IS_SEQ_INPUT   (1 << 0)
 #define COMPONENT_INPUT_FLAG_IS_OPTIONAL (1 << 1)
-
-struct ComponentInput {
-	uint8_t flags;
-};
+typedef uint8_t ComponentInput;
 
 struct Flow {
 	ListOfAssetsPtr<Component> components;
 	ListOfAssetsPtr<Value> localVariables;
-	ListOfAssetsPtr<ComponentInput> componentInputs;
+
+	// List of all component inputs of all components in this flow
+	// When flow state is created we reserve this many Value's in memory
+	// to keep the latest value of component input.
+	ListOfFundamentalType<ComponentInput> componentInputs;
+
 	ListOfAssetsPtr<WidgetDataItem> widgetDataItems;
 	ListOfAssetsPtr<WidgetActionItem> widgetActions;
 };

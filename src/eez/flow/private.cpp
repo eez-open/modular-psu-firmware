@@ -82,16 +82,16 @@ bool isComponentReadyToRun(FlowState *flowState, unsigned componentIndex) {
 	for (unsigned inputIndex = 0; inputIndex < component->inputs.count; inputIndex++) {
 		auto inputValueIndex = component->inputs.ptr(assets)[inputIndex];
 
-		auto input = flowState->flow->componentInputs.item(assets, inputValueIndex);
+		auto input = flowState->flow->componentInputs.ptr(assets)[inputValueIndex];
 
-		if (input->flags & COMPONENT_INPUT_FLAG_IS_SEQ_INPUT) {
+		if (input & COMPONENT_INPUT_FLAG_IS_SEQ_INPUT) {
 			numSeqInputs++;
 			auto &value = flowState->values[inputValueIndex];
 			if (value.type != VALUE_TYPE_UNDEFINED) {
 				numDefinedSeqInputs++;
 			}
 		} else {
-			if (!(input->flags & COMPONENT_INPUT_FLAG_IS_OPTIONAL)) {
+			if (!(input & COMPONENT_INPUT_FLAG_IS_OPTIONAL)) {
 				auto &value = flowState->values[inputValueIndex];
 				if (value.type == VALUE_TYPE_UNDEFINED) {
 					// non optional data input is undefined
@@ -228,7 +228,7 @@ void propagateValue(FlowState *flowState, unsigned componentIndex, unsigned outp
 		if (*pValue != value) {
 			*pValue = value;
 
-			if (!(flowState->flow->componentInputs.item(assets, connection->targetInputIndex)->flags & COMPONENT_INPUT_FLAG_IS_SEQ_INPUT)) {
+			if (!(flowState->flow->componentInputs.ptr(assets)[connection->targetInputIndex] & COMPONENT_INPUT_FLAG_IS_SEQ_INPUT)) {
 				onValueChanged(pValue);
 			}
 		}

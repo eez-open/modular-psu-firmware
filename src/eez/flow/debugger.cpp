@@ -137,14 +137,10 @@ void processDebuggerInput(char *buffer, uint32_t length) {
 				setDebuggerState(DEBUGGER_STATE_PAUSED);
 			} else if (messageFromDebugger == MESSAGE_FROM_DEBUGGER_SINGLE_STEP) {
 				setDebuggerState(DEBUGGER_STATE_SINGLE_STEP);
-			} else {
-				if (
-					messageFromDebugger >= MESSAGE_FROM_DEBUGGER_ADD_BREAKPOINT &&
-					messageFromDebugger <= MESSAGE_FROM_DEBUGGER_DISABLE_BREAKPOINT
-				) {
-					return;
-				}
-
+			} else if (
+				messageFromDebugger >= MESSAGE_FROM_DEBUGGER_ADD_BREAKPOINT &&
+				messageFromDebugger <= MESSAGE_FROM_DEBUGGER_DISABLE_BREAKPOINT
+			) {
 				char *p;
 				auto flowIndex = (uint32_t)strtol(g_inputFromDebugger + 2, &p, 10);
 				auto componentIndex = (uint32_t)strtol(p + 1, nullptr, 10);
@@ -471,8 +467,8 @@ void onFlowStateCreated(FlowState *flowState) {
         }
 
 		for (uint32_t i = 0; i < flow->componentInputs.count; i++) {
-			auto input = flow->componentInputs.item(flowState->assets, i);
-			if (!(input->flags & COMPONENT_INPUT_FLAG_IS_SEQ_INPUT)) {
+			auto input = flow->componentInputs.ptr(flowState->assets)[i];
+			if (!(input & COMPONENT_INPUT_FLAG_IS_SEQ_INPUT)) {
 				auto pValue = &flowState->values[i];
 
 				char buffer[100];
