@@ -53,7 +53,7 @@ void UpDownWidgetState::render() {
 
     if (widget->downButtonText) {
         drawText(
-            widget->downButtonText.ptr(widgetCursor.assets), -1,
+            widget->downButtonText.ptr(), -1,
             widgetCursor.x, widgetCursor.y, buttonWidth, (int)widget->h,
             buttonsStyle,
             flags.active && segment == UP_DOWN_WIDGET_SEGMENT_DOWN_BUTTON
@@ -71,7 +71,7 @@ void UpDownWidgetState::render() {
 
     if (widget->upButtonText) {
         drawText(
-            widget->upButtonText.ptr(widgetCursor.assets), -1, 
+            widget->upButtonText.ptr(), -1, 
             widgetCursor.x + widget->w - buttonWidth, widgetCursor.y, buttonWidth, (int)widget->h,
             buttonsStyle,
             flags.active && segment == UP_DOWN_WIDGET_SEGMENT_UP_BUTTON

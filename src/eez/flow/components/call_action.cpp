@@ -38,8 +38,7 @@ struct CallActionComponenentExecutionState : public ComponenentExecutionState {
 };
 
 void executeCallActionComponent(FlowState *flowState, unsigned componentIndex) {
-	auto assets = flowState->assets;
-	auto component = (CallActionActionComponent *)flowState->flow->components.item(assets, componentIndex);
+	auto component = (CallActionActionComponent *)flowState->flow->components.item(componentIndex);
 
 	auto flowIndex = component->flowIndex;
 	if (flowIndex < 0) {
@@ -59,7 +58,7 @@ void executeCallActionComponent(FlowState *flowState, unsigned componentIndex) {
 		return;
 	}
 
-	FlowState *actionFlowState = initActionFlowState(assets, flowIndex, flowState, componentIndex);
+	FlowState *actionFlowState = initActionFlowState(flowIndex, flowState, componentIndex);
 
 	if (actionFlowState->numActiveComponents == 0) {
 		freeFlowState(actionFlowState);

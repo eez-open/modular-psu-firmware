@@ -34,31 +34,30 @@ struct ShowKeyboardActionComponent : public Component {
 };
 
 void executeShowKeyboardComponent(FlowState *flowState, unsigned componentIndex) {
- 	auto assets = flowState->assets;
-	auto component = (ShowKeyboardActionComponent *)flowState->flow->components.item(assets, componentIndex);
+	auto component = (ShowKeyboardActionComponent *)flowState->flow->components.item(componentIndex);
 
-    auto labelPropertyValue = component->propertyValues.item(assets, defs_v3::SHOW_KEYBOARD_ACTION_COMPONENT_PROPERTY_LABEL);
+    auto labelPropertyValue = component->propertyValues.item(defs_v3::SHOW_KEYBOARD_ACTION_COMPONENT_PROPERTY_LABEL);
     Value labelValue;
     if (!evalExpression(flowState, componentIndex, labelPropertyValue->evalInstructions, labelValue)) {
         throwError(flowState, componentIndex, "Failed to evaluate Label in ShowKeyboard\n");
         return;
     }
 
-    auto initialTextPropertyValue = component->propertyValues.item(assets, defs_v3::SHOW_KEYBOARD_ACTION_COMPONENT_PROPERTY_INITAL_TEXT);
+    auto initialTextPropertyValue = component->propertyValues.item(defs_v3::SHOW_KEYBOARD_ACTION_COMPONENT_PROPERTY_INITAL_TEXT);
     Value initialTextValue;
     if (!evalExpression(flowState, componentIndex, initialTextPropertyValue->evalInstructions, initialTextValue)) {
         throwError(flowState, componentIndex, "Failed to evaluate InitialText in ShowKeyboard\n");
         return;
     }
 
-    auto minCharsPropertyValue = component->propertyValues.item(assets, defs_v3::SHOW_KEYBOARD_ACTION_COMPONENT_PROPERTY_MIN_CHARS);
+    auto minCharsPropertyValue = component->propertyValues.item(defs_v3::SHOW_KEYBOARD_ACTION_COMPONENT_PROPERTY_MIN_CHARS);
     Value minCharsValue;
     if (!evalExpression(flowState, componentIndex, minCharsPropertyValue->evalInstructions, minCharsValue)) {
         throwError(flowState, componentIndex, "Failed to evaluate MinChars in ShowKeyboard\n");
         return;
     }
 
-    auto maxCharsPropertyValue = component->propertyValues.item(assets, defs_v3::SHOW_KEYBOARD_ACTION_COMPONENT_PROPERTY_MAX_CHARS);
+    auto maxCharsPropertyValue = component->propertyValues.item(defs_v3::SHOW_KEYBOARD_ACTION_COMPONENT_PROPERTY_MAX_CHARS);
     Value maxCharsValue;
     if (!evalExpression(flowState, componentIndex, maxCharsPropertyValue->evalInstructions, maxCharsValue)) {
         throwError(flowState, componentIndex, "Failed to evaluate MaxChars in ShowKeyboard\n");

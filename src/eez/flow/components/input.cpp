@@ -29,8 +29,7 @@ struct InputActionComponent : public Component {
 };
 
 void executeInputComponent(FlowState *flowState, unsigned componentIndex) {
- 	auto assets = flowState->assets;
-	auto component = (InputActionComponent *)flowState->flow->components.item(assets, componentIndex);
+	auto component = (InputActionComponent *)flowState->flow->components.item(componentIndex);
 
 	if (!flowState->parentFlowState) {
 		throwError(flowState, componentIndex, "No parentFlowState in Input\n");
@@ -51,10 +50,10 @@ void executeInputComponent(FlowState *flowState, unsigned componentIndex) {
         return;
     }
 
-    auto parentComponentInputs = flowState->parentComponent->inputs.ptr(assets);
+    auto parentComponentInputs = flowState->parentComponent->inputs.ptr();
     auto flowInputIndex = parentComponentInputs[parentComponentInputIndex];
 
-    auto parentFlow = flowState->flowDefinition->flows.item(assets, flowState->parentFlowState->flowIndex);
+    auto parentFlow = flowState->flowDefinition->flows.item(flowState->parentFlowState->flowIndex);
     if (flowInputIndex >= parentFlow->componentInputs.count) {
         throwError(flowState, componentIndex, "Invalid input index of parent component in Input\n");
         return;

@@ -35,11 +35,10 @@ struct SwitchActionComponent : public Component {
 };
 
 void executeSwitchComponent(FlowState *flowState, unsigned componentIndex) {
-    auto assets = flowState->assets;
-    auto component = (SwitchActionComponent *)flowState->flow->components.item(assets, componentIndex);
+    auto component = (SwitchActionComponent *)flowState->flow->components.item(componentIndex);
 
     for (uint32_t testIndex = 0; testIndex < component->tests.count; testIndex++) {
-        auto test = component->tests.item(assets, testIndex);
+        auto test = component->tests.item(testIndex);
 
         Value conditionValue;
         if (!evalExpression(flowState, componentIndex, test->conditionInstructions, conditionValue)) {

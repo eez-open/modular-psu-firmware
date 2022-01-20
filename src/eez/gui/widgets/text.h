@@ -34,7 +34,7 @@ struct TextWidgetState : public WidgetState {
     void render() override;
 };
 
-void TextWidget_autoSize(Assets *assets, TextWidget& widget);
+void TextWidget_autoSize(TextWidget& widget);
 
 } // namespace gui
 } // namespace eez

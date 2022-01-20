@@ -29,10 +29,9 @@ namespace eez {
 namespace flow {
 
 void executeLogComponent(FlowState *flowState, unsigned componentIndex) {
-    auto assets = flowState->assets;
-    auto component = flowState->flow->components.item(assets, componentIndex);
+    auto component = flowState->flow->components.item(componentIndex);
 
-    auto propertyValue = component->propertyValues.item(assets, defs_v3::LOG_ACTION_COMPONENT_PROPERTY_VALUE);
+    auto propertyValue = component->propertyValues.item(defs_v3::LOG_ACTION_COMPONENT_PROPERTY_VALUE);
 
     Value value;
     if (!evalExpression(flowState, componentIndex, propertyValue->evalInstructions, value)) {

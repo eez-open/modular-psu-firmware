@@ -26,10 +26,9 @@ namespace eez {
 namespace flow {
 
 void executeIsTrueComponent(FlowState *flowState, unsigned componentIndex) {
-    auto assets = flowState->assets;
-    auto component = (Component *)flowState->flow->components.item(assets, componentIndex);
+    auto component = (Component *)flowState->flow->components.item(componentIndex);
 
-	auto propertyValue = component->propertyValues.item(assets, defs_v3::IS_TRUE_ACTION_COMPONENT_PROPERTY_VALUE);
+	auto propertyValue = component->propertyValues.item(defs_v3::IS_TRUE_ACTION_COMPONENT_PROPERTY_VALUE);
 	Value srcValue;
 	if (!evalExpression(flowState, componentIndex, propertyValue->evalInstructions, srcValue)) {
 		throwError(flowState, componentIndex, "Failed to evaluate Value in IsTrue\n");

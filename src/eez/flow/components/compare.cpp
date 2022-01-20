@@ -30,8 +30,7 @@ struct CompareActionComponent : public Component {
 };
 
 void executeCompareComponent(FlowState *flowState, unsigned componentIndex) {
-    auto assets = flowState->assets;
-    auto component = (CompareActionComponent *)flowState->flow->components.item(assets, componentIndex);
+    auto component = (CompareActionComponent *)flowState->flow->components.item(componentIndex);
 
     Value conditionValue;
     if (!evalExpression(flowState, componentIndex, component->conditionInstructions, conditionValue)) {

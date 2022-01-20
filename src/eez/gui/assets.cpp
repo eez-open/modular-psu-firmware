@@ -98,6 +98,17 @@ bool decompressAssetsData(const uint8_t *assetsData, uint32_t assetsDataSize, As
 		return false;
 	}
 
+	if (decompressedAssets->projectMajorVersion == PROJECT_VERSION_V3) {
+		// adjust offsets which are relative to decompressedAssets + 4 to be realative to MEMORY_BEGIN
+		auto reallocationTablePtr = decompressedAssets->reallocationTable.ptr();
+		reallocationTablePtr = (uint32_t *)((uint8_t *)reallocationTablePtr - MEMORY_BEGIN + (uint8_t *)decompressedAssets + 4);
+		uint32_t offset = (uint8_t *)decompressedAssets + 4 - MEMORY_BEGIN;
+		for (uint32_t i = 0; i < decompressedAssets->reallocationTable.count; i++) {
+			uint32_t *addr = (uint32_t *)((uint8_t *)decompressedAssets + 4 + reallocationTablePtr[i]);
+			*addr += offset;
+		}
+	}
+
 	return true;
 }
 
@@ -121,12 +132,12 @@ void unloadExternalAssets() {
 
 const PageAsset* getPageAsset(int pageId) {
 	if (pageId > 0) {
-		return g_mainAssets->pages.item(g_mainAssets, (pageId - 1));
+		return g_mainAssets->pages.item((pageId - 1));
 	} else if (pageId < 0) {
 		if (g_externalAssets == nullptr) {
 			return nullptr;
 		}
-		return g_externalAssets->pages.item(g_externalAssets, (-pageId - 1));
+		return g_externalAssets->pages.item((-pageId - 1));
 	}
 	return nullptr;
 }
@@ -134,11 +145,11 @@ const PageAsset* getPageAsset(int pageId) {
 const PageAsset* getPageAsset(int pageId, WidgetCursor& widgetCursor) {
 	if (pageId < 0) {
 		widgetCursor.assets = g_externalAssets;
-		widgetCursor.flowState = flow::getFlowState(-pageId - 1, widgetCursor);
+		widgetCursor.flowState = flow::getFlowState(g_externalAssets, -pageId - 1, widgetCursor);
 	} else {
 	    widgetCursor.assets = g_mainAssets;
 		if (g_mainAssets->flowDefinition) {
-			widgetCursor.flowState = flow::getFlowState(pageId - 1, widgetCursor);
+			widgetCursor.flowState = flow::getFlowState(g_mainAssets, pageId - 1, widgetCursor);
 		}
     }
 	return getPageAsset(pageId);
@@ -146,50 +157,50 @@ const PageAsset* getPageAsset(int pageId, WidgetCursor& widgetCursor) {
 
 const Style *getStyle(int styleID) {
 	if (styleID > 0) {
-		return g_mainAssets->styles.item(g_mainAssets, styleID - 1);
+		return g_mainAssets->styles.item(styleID - 1);
 	} else if (styleID < 0) {
 		if (g_externalAssets == nullptr) {
 			return getStyle(EEZ_CONF_STYLE_ID_DEFAULT);
 		}
-		return g_externalAssets->styles.item(g_externalAssets, -styleID - 1);
+		return g_externalAssets->styles.item(-styleID - 1);
 	}
 	return getStyle(EEZ_CONF_STYLE_ID_DEFAULT);
 }
 
 const FontData *getFontData(int fontID) {
 	if (fontID > 0) {
-		return g_mainAssets->fonts.item(g_mainAssets, fontID - 1);
+		return g_mainAssets->fonts.item(fontID - 1);
 	} else if (fontID < 0) {
 		if (g_externalAssets == nullptr) {
 			return nullptr;
 		}
-		return g_externalAssets->fonts.item(g_externalAssets, -fontID - 1);
+		return g_externalAssets->fonts.item(-fontID - 1);
 	}
 	return nullptr;
 }
 
 const Bitmap *getBitmap(int bitmapID) {
 	if (bitmapID > 0) {
-		return g_mainAssets->bitmaps.item(g_mainAssets, bitmapID - 1);
+		return g_mainAssets->bitmaps.item(bitmapID - 1);
 	} else if (bitmapID < 0) {
 		if (g_externalAssets == nullptr) {
 			return nullptr;
 		}
-		return g_externalAssets->bitmaps.item(g_externalAssets, -bitmapID - 1);
+		return g_externalAssets->bitmaps.item(-bitmapID - 1);
 	}
 	return nullptr;
 }
 
 int getThemesCount() {
-	return (int)g_mainAssets->colorsDefinition.ptr(g_mainAssets)->themes.count;
+	return (int)g_mainAssets->colorsDefinition.ptr()->themes.count;
 }
 
 Theme *getTheme(int i) {
-	return g_mainAssets->colorsDefinition.ptr(g_mainAssets)->themes.item(g_mainAssets, i);
+	return g_mainAssets->colorsDefinition.ptr()->themes.item(i);
 }
 
 const char *getThemeName(int i) {
-	return getTheme(i)->name.ptr(g_mainAssets);
+	return getTheme(i)->name.ptr();
 }
 
 const uint32_t getThemeColorsCount(int themeIndex) {
@@ -197,11 +208,11 @@ const uint32_t getThemeColorsCount(int themeIndex) {
 }
 
 const uint16_t *getThemeColors(int themeIndex) {
-	return getTheme(themeIndex)->colors.ptr(g_mainAssets);
+	return getTheme(themeIndex)->colors.ptr();
 }
 
 const uint16_t *getColors() {
-	return g_mainAssets->colorsDefinition.ptr(g_mainAssets)->colors.ptr(g_mainAssets);
+	return g_mainAssets->colorsDefinition.ptr()->colors.ptr();
 }
 
 int getExternalAssetsMainPageId() {
@@ -222,7 +233,7 @@ const char *getActionName(const WidgetCursor &widgetCursor, int16_t actionId) {
 		return "";
 	}
 
-	return widgetCursor.assets->actionNames.item(widgetCursor.assets, actionId);
+	return widgetCursor.assets->actionNames.item(actionId);
 }
 
 int16_t getDataIdFromName(const WidgetCursor &widgetCursor, const char *name) {
@@ -231,7 +242,7 @@ int16_t getDataIdFromName(const WidgetCursor &widgetCursor, const char *name) {
 	}
 
 	for (uint32_t i = 0; i < widgetCursor.assets->variableNames.count; i++) {
-		if (strcmp(widgetCursor.assets->variableNames.item(widgetCursor.assets, i), name) == 0) {
+		if (strcmp(widgetCursor.assets->variableNames.item(i), name) == 0) {
 			return -((int16_t)i + 1);
 		}
 	}

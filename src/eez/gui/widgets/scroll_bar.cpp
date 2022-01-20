@@ -91,7 +91,7 @@ void ScrollBarWidgetState::render() {
         // draw left button
         if (widget->leftButtonText) {
             drawText(
-                widget->leftButtonText.ptr(widgetCursor.assets), -1, 
+                widget->leftButtonText.ptr(), -1, 
                 widgetCursor.x, 
                 widgetCursor.y, 
                 isHorizontal ? buttonSize : (int)widget->w, 
@@ -138,7 +138,7 @@ void ScrollBarWidgetState::render() {
         // draw right button
         if (widget->rightButtonText) {
             drawText(
-                widget->rightButtonText.ptr(widgetCursor.assets), -1,
+                widget->rightButtonText.ptr(), -1,
                 isHorizontal ? widgetCursor.x + widget->w - buttonSize : widgetCursor.x, 
                 isHorizontal ? widgetCursor.y : widgetCursor.y + widget->h - buttonSize, 
                 isHorizontal ? buttonSize : (int)widget->w, 

@@ -30,8 +30,7 @@ struct SetVariableActionComponent : public Component {
 };
 
 void executeSetVariableComponent(FlowState *flowState, unsigned componentIndex) {
-    auto assets = flowState->assets;
-    auto component = (SetVariableActionComponent *)flowState->flow->components.item(assets, componentIndex);
+    auto component = (SetVariableActionComponent *)flowState->flow->components.item(componentIndex);
 
 	Value dstValue;
 	if (!evalAssignableExpression(flowState, componentIndex, component->assignableExpressionEvalInstructions, dstValue)) {
@@ -39,7 +38,7 @@ void executeSetVariableComponent(FlowState *flowState, unsigned componentIndex) 
 		return;
 	}
 
-	auto propertyValue = component->propertyValues.item(assets, defs_v3::SET_VARIABLE_ACTION_COMPONENT_PROPERTY_VALUE);
+	auto propertyValue = component->propertyValues.item(defs_v3::SET_VARIABLE_ACTION_COMPONENT_PROPERTY_VALUE);
 	Value srcValue;
 	if (!evalExpression(flowState, componentIndex, propertyValue->evalInstructions, srcValue)) {
 		throwError(flowState, componentIndex, "Failed to evaluate Value in SetVariable\n");

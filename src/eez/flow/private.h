@@ -64,7 +64,7 @@ extern uint32_t g_lastFlowStateIndex;
 
 void fixAssetValues(Assets *assets);
 
-FlowState *initActionFlowState(Assets *assets, int flowIndex, FlowState *parentFlowState, int parentComponentIndex);
+FlowState *initActionFlowState(int flowIndex, FlowState *parentFlowState, int parentComponentIndex);
 FlowState *initPageFlowState(Assets *assets, int flowIndex, FlowState *parentFlowState, int parentComponentIndex);
 
 void freeFlowState(FlowState *flowState);

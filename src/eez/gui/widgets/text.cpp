@@ -31,10 +31,10 @@ static const size_t MAX_TEXT_LEN = 128;
 namespace eez {
 namespace gui {
 
-void TextWidget_autoSize(Assets *assets, TextWidget& widget) {
+void TextWidget_autoSize(TextWidget& widget) {
     const Style *style = getStyle(widget.style);
     font::Font font = styleGetFont(style);
-    widget.w = style->borderSizeLeft + style->paddingLeft + display::measureStr(widget.text.ptr(assets), -1, font, 0) + style->borderSizeRight + style->paddingRight;
+    widget.w = style->borderSizeLeft + style->paddingLeft + display::measureStr(widget.text.ptr(), -1, font, 0) + style->borderSizeRight + style->paddingRight;
     widget.h = style->borderSizeTop + style->paddingTop + font.getHeight() + style->borderSizeBottom + style->paddingBottom;
 }
 
@@ -50,7 +50,7 @@ bool TextWidgetState::updateState() {
 
     WIDGET_STATE(flags.blinking, g_isBlinkTime && styleIsBlink(style));
     
-    const char *text = widget->text ? widget->text.ptr(widgetCursor.assets) : nullptr;
+    const char *text = widget->text ? widget->text.ptr() : nullptr;
 	WIDGET_STATE(data, !(text && text[0]) && widget->data ? get(widgetCursor, widget->data) : 0);
 
     return !hasPreviousState;
@@ -61,7 +61,7 @@ void TextWidgetState::render() {
 
     auto widget = (const TextWidget *)widgetCursor.widget;
     const Style *style = getStyle(g_hooks.overrideStyle(widgetCursor, widget->style));
-    const char *text = widget->text ? widget->text.ptr(widgetCursor.assets) : nullptr;
+    const char *text = widget->text ? widget->text.ptr() : nullptr;
 
     uint16_t overrideColor                 = flags.focused ? style->focusColor           : g_hooks.overrideStyleColor(widgetCursor, style);
     uint16_t overrideBackgroundColor       = flags.focused ? style->focusBackgroundColor : style->backgroundColor;

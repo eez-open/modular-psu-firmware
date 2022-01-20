@@ -40,7 +40,7 @@ void ListWidgetState::enumChildren() {
     if (count > 0) {
         auto widget = (const ListWidget *)widgetCursor.widget;
 
-		const Widget *childWidget = widget->itemWidget.ptr(widgetCursor.assets);
+		const Widget *childWidget = widget->itemWidget.ptr();
 		auto savedWidget = widgetCursor.widget;
 		widgetCursor.widget = childWidget;
 

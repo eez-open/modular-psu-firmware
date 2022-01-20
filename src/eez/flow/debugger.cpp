@@ -146,11 +146,11 @@ void processDebuggerInput(char *buffer, uint32_t length) {
 				auto componentIndex = (uint32_t)strtol(p + 1, nullptr, 10);
 
 				auto assets = g_mainPageFlowState->assets;
-				auto flowDefinition = assets->flowDefinition.ptr(assets);
+				auto flowDefinition = assets->flowDefinition.ptr();
 				if (flowIndex >= 0 && flowIndex < flowDefinition->flows.count) {
-					auto flow = flowDefinition->flows.item(assets, flowIndex);
+					auto flow = flowDefinition->flows.item(flowIndex);
 					if (componentIndex >= 0 && componentIndex < flow->components.count) {
-						auto component = flow->components.item(assets, componentIndex);
+						auto component = flow->components.item(componentIndex);
 						
 						component->breakpoint = messageFromDebugger == MESSAGE_FROM_DEBUGGER_ADD_BREAKPOINT ||
 							messageFromDebugger == MESSAGE_FROM_DEBUGGER_ENABLE_BREAKPOINT ? 1 : 0;
@@ -195,7 +195,7 @@ bool canExecuteStep(FlowState *&flowState, unsigned &componentIndex) {
     if (g_skipNextBreakpoint) {
         g_skipNextBreakpoint = false;
     } else {
-        auto component = flowState->flow->components.item(flowState->assets, componentIndex);
+        auto component = flowState->flow->components.item(componentIndex);
         if (component->breakpoint) {
             g_skipNextBreakpoint = true;
 			setDebuggerState(DEBUGGER_STATE_PAUSED);
@@ -365,10 +365,10 @@ void onStarted(Assets *assets) {
     if (g_debuggerIsConnected) {
 		startToDebuggerMessageHook();
 
-		auto flowDefinition = assets->flowDefinition.ptr(assets);
+		auto flowDefinition = assets->flowDefinition.ptr();
 
 		for (uint32_t i = 0; i < flowDefinition->globalVariables.count; i++) {
-			auto pValue = flowDefinition->globalVariables.item(assets, i);
+			auto pValue = flowDefinition->globalVariables.item(i);
 
             char buffer[100];
             snprintf(buffer, sizeof(buffer), "%d\t%d\t%d\t",
@@ -467,7 +467,7 @@ void onFlowStateCreated(FlowState *flowState) {
         }
 
 		for (uint32_t i = 0; i < flow->componentInputs.count; i++) {
-			auto input = flow->componentInputs.ptr(flowState->assets)[i];
+			auto input = flow->componentInputs.ptr()[i];
 			if (!(input & COMPONENT_INPUT_FLAG_IS_SEQ_INPUT)) {
 				auto pValue = &flowState->values[i];
 

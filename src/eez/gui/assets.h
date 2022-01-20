@@ -45,16 +45,16 @@ extern Assets *g_externalAssets;
 
 template<typename T>
 struct AssetsPtr {
-    T* ptr(Assets *assets) {
-        return (T *)((uint8_t *)assets + 4 + offset); // 4 is offset of Assets::pages
+    T* ptr() {
+        return (T *)(MEMORY_BEGIN + offset); // 4 is offset of Assets::pages
     }
 
-	const T* ptr(Assets *assets) const {
-		return (const T *)((uint8_t *)assets + 4 + offset); // 4 is offset of Assets::pages
+	const T* ptr() const {
+		return (const T *)(MEMORY_BEGIN + offset); // 4 is offset of Assets::pages
 	}
 	
 	void operator=(T* ptr) {
-        offset = (uint8_t *)ptr - ((uint8_t *)g_mainAssets + 4);
+        offset = (uint8_t *)ptr - MEMORY_BEGIN;
     }
 
     explicit operator bool() const {
@@ -67,18 +67,18 @@ private:
 
 template<typename T>
 struct ListOfAssetsPtr {
-    T* item(Assets *assets, int i) {
-		auto assetPtr = items.ptr(assets);
-        return (T *)assetPtr[i].ptr(assets);
+    T* item(int i) {
+		auto assetPtr = items.ptr();
+        return (T *)assetPtr[i].ptr();
     }
 
-	const T* item(Assets *assets, int i) const {
-		auto assetPtr = items.ptr(assets);
-        return (const T *)assetPtr[i].ptr(assets);
+	const T* item(int i) const {
+		auto assetPtr = items.ptr();
+        return (const T *)assetPtr[i].ptr();
 	}
 
-	auto itemsPtr(Assets *assets) const {
-		return items.ptr(assets);
+	auto itemsPtr() const {
+		return items.ptr();
 	}
 
 	uint32_t count;
@@ -88,8 +88,8 @@ private:
 
 template<typename T>
 struct ListOfFundamentalType {
-    T *ptr(Assets *assets) {
-        return items.ptr(assets);
+    T *ptr() {
+        return items.ptr();
     }
 
 	uint32_t count;
@@ -312,6 +312,8 @@ struct Assets {
 	ListOfAssetsPtr<const char> actionNames;
 	ListOfAssetsPtr<const char> variableNames;
 	AssetsPtr<FlowDefinition> flowDefinition;
+
+	ListOfFundamentalType<uint32_t> reallocationTable;
 };
 
 ////////////////////////////////////////////////////////////////////////////////

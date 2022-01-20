@@ -38,7 +38,7 @@ static const uint32_t MEMORY_SIZE = 64 * 1024 * 1024;
 
 static uint8_t * const DECOMPRESSED_ASSETS_START_ADDRESS = MEMORY_BEGIN;
 #if defined(EEZ_PLATFORM_STM32)
-static const uint32_t MAX_DECOMPRESSED_ASSETS_SIZE = (3 * 512 + 96) * 1024;
+static const uint32_t MAX_DECOMPRESSED_ASSETS_SIZE = (3 * 512 + 128) * 1024;
 #endif
 #if defined(EEZ_PLATFORM_SIMULATOR)
 static const uint32_t MAX_DECOMPRESSED_ASSETS_SIZE = 8 * 1024 * 1024;

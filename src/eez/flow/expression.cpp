@@ -29,7 +29,6 @@ namespace flow {
 EvalStack g_stack;
 
 static bool evalExpression(FlowState *flowState, const uint8_t *instructions, int *numInstructionBytes) {
-	auto assets = flowState->assets;
 	auto flowDefinition = flowState->flowDefinition;
 	auto flow = flowState->flow;
 
@@ -39,7 +38,7 @@ static bool evalExpression(FlowState *flowState, const uint8_t *instructions, in
 		auto instructionType = instruction & EXPR_EVAL_INSTRUCTION_TYPE_MASK;
 		auto instructionArg = instruction & EXPR_EVAL_INSTRUCTION_PARAM_MASK;
 		if (instructionType == EXPR_EVAL_INSTRUCTION_TYPE_PUSH_CONSTANT) {
-			if (!g_stack.push(*flowDefinition->constants.item(assets, instructionArg))) {
+			if (!g_stack.push(*flowDefinition->constants.item(instructionArg))) {
 				return false;
 			}
 		} else if (instructionType == EXPR_EVAL_INSTRUCTION_TYPE_PUSH_INPUT) {
@@ -52,7 +51,7 @@ static bool evalExpression(FlowState *flowState, const uint8_t *instructions, in
 			}
 		} else if (instructionType == EXPR_EVAL_INSTRUCTION_TYPE_PUSH_GLOBAL_VAR) {
 			if ((uint32_t)instructionArg < flowDefinition->globalVariables.count) {
-				if (!g_stack.push(flowDefinition->globalVariables.item(assets, instructionArg))) {
+				if (!g_stack.push(flowDefinition->globalVariables.item(instructionArg))) {
 					return false;
 				}
 			} else {
@@ -170,13 +169,12 @@ bool evalAssignableExpression(FlowState *flowState, int componentIndex, const ui
 int16_t getNativeVariableId(const WidgetCursor &widgetCursor) {
 	if (widgetCursor.flowState) {
 		FlowState *flowState = widgetCursor.flowState;
-		auto assets = flowState->assets;
 		auto flow = flowState->flow;
 
-		WidgetDataItem *widgetDataItem = flow->widgetDataItems.item(assets, -(widgetCursor.widget->data + 1));
+		WidgetDataItem *widgetDataItem = flow->widgetDataItems.item(-(widgetCursor.widget->data + 1));
 		if (widgetDataItem && widgetDataItem->componentIndex != -1 && widgetDataItem->propertyValueIndex != -1) {
-			auto component = flow->components.item(assets, widgetDataItem->componentIndex);
-			auto propertyValue = component->propertyValues.item(assets, widgetDataItem->propertyValueIndex);
+			auto component = flow->components.item(widgetDataItem->componentIndex);
+			auto propertyValue = component->propertyValues.item(widgetDataItem->propertyValueIndex);
 
 			g_stack.sp = 0;
 			g_stack.flowState = flowState;

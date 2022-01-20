@@ -26,14 +26,13 @@ namespace eez {
 namespace flow {
 
 void executeErrorComponent(FlowState *flowState, unsigned componentIndex) {
-    auto assets = flowState->assets;
-    auto component = (Component *)flowState->flow->components.item(assets, componentIndex);
+    auto component = (Component *)flowState->flow->components.item(componentIndex);
 
 	if (flowState->parentFlowState && flowState->isAction) {
 		flowState->parentFlowState->numActiveComponents--;
 	}
 
-	auto propertyValue = component->propertyValues.item(assets, defs_v3::EVAL_EXPR_ACTION_COMPONENT_PROPERTY_EXPRESSION);
+	auto propertyValue = component->propertyValues.item(defs_v3::EVAL_EXPR_ACTION_COMPONENT_PROPERTY_EXPRESSION);
 	Value expressionValue;
 	if (!evalExpression(flowState, componentIndex, propertyValue->evalInstructions, expressionValue)) {
 		throwError(flowState, componentIndex, "Failed to evaluate Message in Error\n");

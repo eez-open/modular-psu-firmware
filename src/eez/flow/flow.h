@@ -31,7 +31,7 @@ unsigned start(eez::gui::Assets *assets);
 void tick();
 void stop();
 
-FlowState *getFlowState(int16_t pageId, const WidgetCursor &widgetCursor);
+FlowState *getFlowState(Assets *assets, int16_t pageId, const WidgetCursor &widgetCursor);
 int getPageIndex(FlowState *flowState);
 
 void executeFlowAction(const WidgetCursor &widgetCursor, int16_t actionId);

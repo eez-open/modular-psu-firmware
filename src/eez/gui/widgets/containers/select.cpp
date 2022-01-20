@@ -75,7 +75,7 @@ void SelectWidgetState::enumChildren() {
 		auto widget = (const SelectWidget *)widgetCursor.widget;
 
 		auto savedWidget = widgetCursor.widget;
-		widgetCursor.widget = widget->widgets.item(widgetCursor.assets, widgetIndex);
+		widgetCursor.widget = widget->widgets.item(widgetIndex);
 
         enumWidget();
 

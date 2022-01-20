@@ -751,7 +751,7 @@ void MenuWithButtonsPage::init(AppContext *appContext, const char *message, cons
     m_messageTextWidget.style = STYLE_ID_MENU_WITH_BUTTONS_MESSAGE;
     m_messageTextWidget.text = message;
     m_messageTextWidget.flags = 0;
-    TextWidget_autoSize(g_mainAssets, m_messageTextWidget);
+    TextWidget_autoSize(m_messageTextWidget);
 
     size_t i;
 
@@ -762,7 +762,7 @@ void MenuWithButtonsPage::init(AppContext *appContext, const char *message, cons
         m_buttonTextWidgets[i].style = STYLE_ID_MENU_WITH_BUTTONS_BUTTON;
         m_buttonTextWidgets[i].text = menuItems[i];
         m_buttonTextWidgets[i].flags = 0;
-        TextWidget_autoSize(g_mainAssets, m_buttonTextWidgets[i]);
+        TextWidget_autoSize(m_buttonTextWidgets[i]);
     }
 
     m_numButtonTextWidgets = i;
