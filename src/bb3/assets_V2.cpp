@@ -78,6 +78,8 @@ static AssetsV2 *g_assetsV2;
 static Assets *g_assetsV3;
 static uint32_t g_offsetV3;
 
+static uint32_t g_offsetAdjust;
+
 ////////////////////////////////////////////////////////////////////////////////
 
 void covertV2toV3(Assets *assetsV2, Assets *assetsV3) {
@@ -90,6 +92,8 @@ void covertV2toV3(Assets *assetsV2, Assets *assetsV3) {
 	g_assetsV3 = assetsV3;
 	g_offsetV3 = sizeof(Assets) - 4;
 
+	g_offsetAdjust = (uint8_t *)assetsV3 + 4 - MEMORY_BEGIN;
+
 	convertPages();
 	convertStyles();
 	convertFonts();
@@ -98,8 +102,6 @@ void covertV2toV3(Assets *assetsV2, Assets *assetsV3) {
 	convertActionNames();
 	convertVariableNames();
 	convertFlowDefinition();
-
-	DebugTrace("V3 size: %d\n", g_offsetV3);
 }
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -252,6 +254,11 @@ static void convertWidgetList(WidgetList &widgetList, AssetsV3List *listV3) {
 	WidgetV2 *widgets = (WidgetV2 *)((uint8_t *)g_documentV2 + widgetList.first);
 	for (uint32_t i = 0; i < widgetList.count; i++) {
 		list[i] = convertWidget(widgets[i]);
+	}
+
+	listV3->first += g_offsetAdjust;
+	for (uint32_t i = 0; i < widgetList.count; i++) {
+		list[i] += g_offsetAdjust;
 	}
 }
 
@@ -532,7 +539,7 @@ static uint32_t convertText(uint32_t textOffset) {
 	stringCopy(textV3, length, textV2);
 	auto savedOffset = g_offsetV3;
 	ADD_V3_OFFSET(length);
-	return savedOffset;
+	return savedOffset + g_offsetAdjust;
 }
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -589,6 +596,11 @@ static void convertStyleList(StyleList &styleList, AssetsV3List *listV3) {
 	StyleV2 *styles = (StyleV2 *)((uint8_t *)g_stylesV2 + styleList.first);
 	for (uint32_t i = 0; i < styleList.count; i++) {
 		list[i] = convertStyle(styles[i]);
+	}
+
+	listV3->first += g_offsetAdjust;
+	for (uint32_t i = 0; i < styleList.count; i++) {
+		list[i] += g_offsetAdjust;
 	}
 }
 
@@ -684,6 +696,11 @@ static void convertBitmaps() {
 		memcpy(bitmapDataV3, bitmapDataV2, size);
 		ADD_V3_OFFSET(size);
 	}
+
+	listV3->first += g_offsetAdjust;
+	for (uint32_t i = 0; i < count; i++) {
+		list[i] += g_offsetAdjust;
+	}
 }
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -719,7 +736,7 @@ static void convertNameList(NameList &nameList, AssetsV3List *listV3) {
 	listV3->count = nameList.count;
 	listV3->first = g_offsetV3;
 
-	uint32_t *list = (uint32_t *)((uint8_t *)g_assetsV3 + 4 +  g_offsetV3);
+	uint32_t *list = (uint32_t *)((uint8_t *)g_assetsV3 + 4 + g_offsetV3);
 
 	ADD_V3_OFFSET(nameList.count * sizeof(uint32_t));
 
@@ -727,6 +744,8 @@ static void convertNameList(NameList &nameList, AssetsV3List *listV3) {
 	for (uint32_t i = 0; i < nameList.count; i++) {
 		list[i] = convertName(names[i]);
 	}
+
+	listV3->first += g_offsetAdjust;
 }
 
 static uint32_t convertName(uint32_t nameOffset) {
@@ -736,7 +755,7 @@ static uint32_t convertName(uint32_t nameOffset) {
 	stringCopy(nameV3, length, nameV2);
 	auto savedOffset = g_offsetV3;
 	ADD_V3_OFFSET(length);
-	return savedOffset;
+	return savedOffset + g_offsetAdjust;
 }
 
 ////////////////////////////////////////////////////////////////////////////////

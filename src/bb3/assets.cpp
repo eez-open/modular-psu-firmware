@@ -116,7 +116,9 @@ bool loadExternalAssets(const char *filePath, int *err) {
 	}
 
 	if (g_externalAssets->projectMajorVersion == PROJECT_VERSION_V2) {
-		auto externalAssetsV3 = (Assets *)alloc(externalAssetsSize + 10000, 302);
+		static const size_t MAX_SIZE_DIFF_BETWEEN_V2_AND_V3_ASSETS = 16 * 1000;
+
+		auto externalAssetsV3 = (Assets *)alloc(externalAssetsSize + MAX_SIZE_DIFF_BETWEEN_V2_AND_V3_ASSETS, 302);
 		if (!externalAssetsV3) {
 			free(g_externalAssets);
 			g_externalAssets = nullptr;

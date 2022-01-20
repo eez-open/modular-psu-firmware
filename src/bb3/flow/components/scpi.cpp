@@ -240,8 +240,7 @@ struct ScpiActionComponent : public Component {
 };
 
 void executeScpiComponent(FlowState *flowState, unsigned componentIndex) {
-    auto assets = flowState->assets;
-    auto component = (ScpiActionComponent *)flowState->flow->components.item(assets, componentIndex);
+    auto component = (ScpiActionComponent *)flowState->flow->components.item(componentIndex);
 
 	auto instructions = component->instructions;
 

@@ -2448,8 +2448,8 @@ void data_dlog_multiple_values_overlay(DataOperationEnum operation, const Widget
 
                 auto containerWidget = (ContainerWidget *)(widgetCursor.widget);
 
-                Widget *labelsContainerWidget = containerWidget->widgets.item(widgetCursor.assets, LABELS_CONTAINER_WIDGET);
-                Widget *dlogValuesListWidget = containerWidget->widgets.item(widgetCursor.assets, DLOG_VALUES_LIST_WIDGET);
+                Widget *labelsContainerWidget = containerWidget->widgets.item(LABELS_CONTAINER_WIDGET);
+                Widget *dlogValuesListWidget = containerWidget->widgets.item(DLOG_VALUES_LIST_WIDGET);
 
                 widgetOverrides[LABELS_CONTAINER_WIDGET].isVisible = true;
                 widgetOverrides[LABELS_CONTAINER_WIDGET].x = labelsContainerWidget->x;
