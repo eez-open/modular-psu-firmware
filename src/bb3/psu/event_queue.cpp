@@ -968,7 +968,7 @@ void data_event_queue_event_long_message_overlay(DataOperationEnum operation, co
 
                 auto containerWidget = (ContainerWidget *)widgetCursor.widget;
 
-                const Widget *multiLineTextWidget = containerWidget->widgets.item(MULTI_LINE_TEXT_WIDGET);
+                const Widget *multiLineTextWidget = containerWidget->widgets[MULTI_LINE_TEXT_WIDGET];
 
                 static const int CONF_EVENT_LINE_HEIGHT_PX = 30;
                 static const int CONF_EVENTS_LIST_HEIGHT_PX = 240;

@@ -92,7 +92,7 @@ void covertV2toV3(Assets *assetsV2, Assets *assetsV3) {
 	g_assetsV3 = assetsV3;
 	g_offsetV3 = sizeof(Assets) - 4;
 
-	g_offsetAdjust = (uint8_t *)assetsV3 + 4 - MEMORY_BEGIN;
+	g_offsetAdjust = (uint8_t *)assetsV3 + 4 - (uint8_t *)(sizeof(void*) == 4 ? 0 : MEMORY_BEGIN);
 
 	convertPages();
 	convertStyles();

@@ -114,7 +114,7 @@ char *getConfFilePath(const char *file_name) {
 
 #ifdef _WIN32
     if (SUCCEEDED(SHGetFolderPathA(NULL, CSIDL_PROFILE, NULL, 0, file_path))) {
-        stringAppendString(file_path, sizeof(file_path), "\\.eez_psu_sim");
+        stringAppendString(file_path, sizeof(file_path), sizeof(void*) == 4 ? "\\.eez_psu_sim" : "\\.eez_psu_sim_64bit");
         _mkdir(file_path);
         stringAppendString(file_path, sizeof(file_path), "\\");
     }
@@ -127,7 +127,7 @@ char *getConfFilePath(const char *file_name) {
     }
     if (home_dir) {
         stringAppendString(file_path, sizeof(file_path), home_dir);
-        stringAppendString(file_path, sizeof(file_path), "/.eez_psu_sim");
+        stringAppendString(file_path, sizeof(file_path), sizeof(void*) == 4 ? "/.eez_psu_sim" : "/.eez_psu_sim_64bit");
         mkdir(file_path, S_IRWXU | S_IRWXG | S_IROTH | S_IXOTH);
         stringAppendString(file_path, sizeof(file_path), "/");
     }

@@ -968,41 +968,77 @@ target_link_libraries(modular-psu-firmware ${SDL2_LIBRARIES} ${SDL2_IMAGE_LIBRAR
 if(WIN32)
     target_link_libraries(modular-psu-firmware wsock32 ws2_32)
 
-    add_custom_command(TARGET modular-psu-firmware POST_BUILD
-        COMMAND ${CMAKE_COMMAND} -E copy_if_different
-            "${PROJECT_SOURCE_DIR}/../SDL2-2.0.14/lib/x86/SDL2.dll"
-            $<TARGET_FILE_DIR:modular-psu-firmware>)
+    if(CMAKE_SIZEOF_VOID_P EQUAL 8)
+        add_custom_command(TARGET modular-psu-firmware POST_BUILD
+            COMMAND ${CMAKE_COMMAND} -E copy_if_different
+                "${PROJECT_SOURCE_DIR}/../SDL2-2.0.14/lib/x64/SDL2.dll"
+                $<TARGET_FILE_DIR:modular-psu-firmware>)
 
-    add_custom_command(TARGET modular-psu-firmware POST_BUILD
-        COMMAND ${CMAKE_COMMAND} -E copy_if_different
-            "${PROJECT_SOURCE_DIR}/../SDL2_image-2.0.4/lib/x86/libjpeg-9.dll"
-            $<TARGET_FILE_DIR:modular-psu-firmware>)
-    
-    add_custom_command(TARGET modular-psu-firmware POST_BUILD
-        COMMAND ${CMAKE_COMMAND} -E copy_if_different
-            "${PROJECT_SOURCE_DIR}/../SDL2_image-2.0.4/lib/x86/libpng16-16.dll"
-            $<TARGET_FILE_DIR:modular-psu-firmware>)
+        add_custom_command(TARGET modular-psu-firmware POST_BUILD
+            COMMAND ${CMAKE_COMMAND} -E copy_if_different
+                "${PROJECT_SOURCE_DIR}/../SDL2_image-2.0.4/lib/x64/libjpeg-9.dll"
+                $<TARGET_FILE_DIR:modular-psu-firmware>)
+        
+        add_custom_command(TARGET modular-psu-firmware POST_BUILD
+            COMMAND ${CMAKE_COMMAND} -E copy_if_different
+                "${PROJECT_SOURCE_DIR}/../SDL2_image-2.0.4/lib/x64/libpng16-16.dll"
+                $<TARGET_FILE_DIR:modular-psu-firmware>)
 
-    add_custom_command(TARGET modular-psu-firmware POST_BUILD
-        COMMAND ${CMAKE_COMMAND} -E copy_if_different
-            "${PROJECT_SOURCE_DIR}/../SDL2_image-2.0.4/lib/x86/libtiff-5.dll"
-            $<TARGET_FILE_DIR:modular-psu-firmware>)
+        add_custom_command(TARGET modular-psu-firmware POST_BUILD
+            COMMAND ${CMAKE_COMMAND} -E copy_if_different
+                "${PROJECT_SOURCE_DIR}/../SDL2_image-2.0.4/lib/x64/libtiff-5.dll"
+                $<TARGET_FILE_DIR:modular-psu-firmware>)
 
-    add_custom_command(TARGET modular-psu-firmware POST_BUILD
-        COMMAND ${CMAKE_COMMAND} -E copy_if_different
-            "${PROJECT_SOURCE_DIR}/../SDL2_image-2.0.4/lib/x86/libwebp-7.dll"
-            $<TARGET_FILE_DIR:modular-psu-firmware>)
+        add_custom_command(TARGET modular-psu-firmware POST_BUILD
+            COMMAND ${CMAKE_COMMAND} -E copy_if_different
+                "${PROJECT_SOURCE_DIR}/../SDL2_image-2.0.4/lib/x64/libwebp-7.dll"
+                $<TARGET_FILE_DIR:modular-psu-firmware>)
 
-    add_custom_command(TARGET modular-psu-firmware POST_BUILD
-        COMMAND ${CMAKE_COMMAND} -E copy_if_different
-            "${PROJECT_SOURCE_DIR}/../SDL2_image-2.0.4/lib/x86/SDL2_image.dll"
-            $<TARGET_FILE_DIR:modular-psu-firmware>)
+        add_custom_command(TARGET modular-psu-firmware POST_BUILD
+            COMMAND ${CMAKE_COMMAND} -E copy_if_different
+                "${PROJECT_SOURCE_DIR}/../SDL2_image-2.0.4/lib/x64/SDL2_image.dll"
+                $<TARGET_FILE_DIR:modular-psu-firmware>)
 
-    add_custom_command(TARGET modular-psu-firmware POST_BUILD
-        COMMAND ${CMAKE_COMMAND} -E copy_if_different
-            "${PROJECT_SOURCE_DIR}/../SDL2_image-2.0.4/lib/x86/zlib1.dll"
-            $<TARGET_FILE_DIR:modular-psu-firmware>)
+        add_custom_command(TARGET modular-psu-firmware POST_BUILD
+            COMMAND ${CMAKE_COMMAND} -E copy_if_different
+                "${PROJECT_SOURCE_DIR}/../SDL2_image-2.0.4/lib/x64/zlib1.dll"
+                $<TARGET_FILE_DIR:modular-psu-firmware>)
+    else()
+        add_custom_command(TARGET modular-psu-firmware POST_BUILD
+            COMMAND ${CMAKE_COMMAND} -E copy_if_different
+                "${PROJECT_SOURCE_DIR}/../SDL2-2.0.14/lib/x86/SDL2.dll"
+                $<TARGET_FILE_DIR:modular-psu-firmware>)
 
+        add_custom_command(TARGET modular-psu-firmware POST_BUILD
+            COMMAND ${CMAKE_COMMAND} -E copy_if_different
+                "${PROJECT_SOURCE_DIR}/../SDL2_image-2.0.4/lib/x86/libjpeg-9.dll"
+                $<TARGET_FILE_DIR:modular-psu-firmware>)
+        
+        add_custom_command(TARGET modular-psu-firmware POST_BUILD
+            COMMAND ${CMAKE_COMMAND} -E copy_if_different
+                "${PROJECT_SOURCE_DIR}/../SDL2_image-2.0.4/lib/x86/libpng16-16.dll"
+                $<TARGET_FILE_DIR:modular-psu-firmware>)
+
+        add_custom_command(TARGET modular-psu-firmware POST_BUILD
+            COMMAND ${CMAKE_COMMAND} -E copy_if_different
+                "${PROJECT_SOURCE_DIR}/../SDL2_image-2.0.4/lib/x86/libtiff-5.dll"
+                $<TARGET_FILE_DIR:modular-psu-firmware>)
+
+        add_custom_command(TARGET modular-psu-firmware POST_BUILD
+            COMMAND ${CMAKE_COMMAND} -E copy_if_different
+                "${PROJECT_SOURCE_DIR}/../SDL2_image-2.0.4/lib/x86/libwebp-7.dll"
+                $<TARGET_FILE_DIR:modular-psu-firmware>)
+
+        add_custom_command(TARGET modular-psu-firmware POST_BUILD
+            COMMAND ${CMAKE_COMMAND} -E copy_if_different
+                "${PROJECT_SOURCE_DIR}/../SDL2_image-2.0.4/lib/x86/SDL2_image.dll"
+                $<TARGET_FILE_DIR:modular-psu-firmware>)
+
+        add_custom_command(TARGET modular-psu-firmware POST_BUILD
+            COMMAND ${CMAKE_COMMAND} -E copy_if_different
+                "${PROJECT_SOURCE_DIR}/../SDL2_image-2.0.4/lib/x86/zlib1.dll"
+                $<TARGET_FILE_DIR:modular-psu-firmware>)
+    endif()
 endif()
 
 if(${CMAKE_SYSTEM_NAME} STREQUAL "Emscripten")

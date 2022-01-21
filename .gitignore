@@ -2,6 +2,7 @@
 build/emscripten
 build/linux
 build/win32
+build/win32-64bit
 build/CMakeFiles
 build/.cmake
 build/CMakeCache.txt
