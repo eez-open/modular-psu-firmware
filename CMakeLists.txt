@@ -77,7 +77,7 @@ include_directories(
     src/eez/libs/agg
     src/eez/libs/libscpi/inc
     src/bb3/libs/mqtt
-    src/bb3/platform/simulator
+    src/eez/platform/simulator
     src/bb3/scpi
     src/bb3/conf
 )
@@ -258,12 +258,14 @@ list (APPEND header_files ${header_bb3_libs_mqtt})
 source_group("bb3\\libs\\mqtt" FILES ${src_bb3_libs_mqtt} ${header_bb3_libs_mqtt})
 
 set(src_eez_platform_simulator
+    src/eez/platform/simulator/cmsis_os2.cpp
     src/eez/platform/simulator/display.cpp
     src/eez/platform/simulator/events.cpp
     src/eez/platform/simulator/touch.cpp
 ) 
 list (APPEND src_files ${src_eez_platform_simulator})
 set(header_eez_platform_simulator
+    src/eez/platform/simulator/cmsis_os2.h
     src/eez/platform/simulator/events.h
 )
 list (APPEND header_files ${header_eez_platform_simulator})
@@ -673,12 +675,10 @@ list (APPEND header_files ${header_bb3_dib_smx46})
 source_group("bb3\\dib-smx46" FILES ${src_bb3_dib_smx46} ${header_bb3_dib_smx46})
 
 set(src_bb3_platform_simulator
-    src/bb3/platform/simulator/cmsis_os2.cpp
     src/bb3/platform/simulator/front_panel.cpp
 ) 
 list (APPEND src_files ${src_bb3_platform_simulator})
 set(header_bb3_platform_simulator
-    src/bb3/platform/simulator/cmsis_os2.h
     src/bb3/platform/simulator/front_panel.h
 ) 
 list (APPEND header_files ${header_bb3_platform_simulator})
