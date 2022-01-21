@@ -36,36 +36,6 @@ namespace flow {
 
 uint32_t g_lastFlowStateIndex = 0;
 
-void fixValue(Value &value) {
-	if (value.getType() == VALUE_TYPE_STRING) {
-		value.strValue = ((AssetsPtr<const char> *)&value.uint32Value)->ptr();
-	} else if (value.getType() == VALUE_TYPE_ARRAY) {
-		value.arrayValue = ((AssetsPtr<ArrayValue> *)&value.uint32Value)->ptr();
-		for (uint32_t i = 0; i < value.arrayValue->arraySize; i++) {
-			fixValue(value.arrayValue->values[i]);
-		}
-	}
-}
-
-void fixValues(ListOfAssetsPtr<Value> &values) {
-	for (uint32_t i = 0; i < values.count; i++) {
-		auto value = values.item(i);
-		fixValue(*value);
-	}
-}
-
-void fixAssetValues(Assets *assets) {
-	auto flowDefinition = assets->flowDefinition.ptr();
-
-	fixValues(flowDefinition->constants);
-	fixValues(flowDefinition->globalVariables);
-
-	for (uint32_t i = 0; i < flowDefinition->flows.count; i++) {
-		auto flow = flowDefinition->flows.item(i);
-		fixValues(flow->localVariables);
-	}
-}
-
 bool isComponentReadyToRun(FlowState *flowState, unsigned componentIndex) {
 	auto component = flowState->flow->components.item(componentIndex);
 

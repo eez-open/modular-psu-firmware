@@ -63,9 +63,7 @@ void removeExternalPagesFromTheStack();
 
 inline int getWidgetAction(const WidgetCursor &widgetCursor) {
     if (widgetCursor.widget->type == WIDGET_TYPE_INPUT) {
-		if (widgetCursor.widget->action == ACTION_ID_NONE) {
-			return EEZ_CONF_ACTION_ID_EDIT;
-		}
+		return EEZ_CONF_ACTION_ID_EDIT;
     }
 	return widgetCursor.widget->action;
 }

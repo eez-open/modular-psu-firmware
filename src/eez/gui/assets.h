@@ -46,23 +46,32 @@ extern Assets *g_externalAssets;
 template<typename T>
 struct AssetsPtr {
     T* ptr() {
-        return (T *)(MEMORY_BEGIN + offset);
+        return offset ? (T *)(MEMORY_BEGIN + offset) : nullptr;
     }
 
 	const T* ptr() const {
-		return (const T *)(MEMORY_BEGIN + offset);
+		return offset ? (const T *)(MEMORY_BEGIN + offset) : nullptr;
 	}
 	
 	void operator=(T* ptr) {
-        offset = (uint8_t *)ptr - MEMORY_BEGIN;
+		if (ptr != nullptr) {
+            offset = (uint8_t *)ptr - MEMORY_BEGIN;
+		} else {
+			offset = 0;
+		}
     }
 
     explicit operator bool() const {
         return offset != 0;
     }
 
-private:
-    uint32_t offset;
+	void fixOffset(Assets *assets) {
+        if (offset) {
+            offset += (uint8_t *)assets + 4 - MEMORY_BEGIN;
+        }
+	}
+
+    uint32_t offset = 0;
 };
 
 template<typename T>
@@ -79,8 +88,14 @@ struct ListOfAssetsPtr {
 		return items.ptr();
 	}
 
-	uint32_t count;
-private:
+	void fixOffset(Assets *assets) {
+		items.fixOffset(assets);
+        for (uint32_t i = 0; i < count; i++) {
+            items.ptr()[i].fixOffset(assets);
+        }
+	}
+
+	uint32_t count = 0;
     AssetsPtr<AssetsPtr<T>> items;
 };
 
@@ -90,8 +105,11 @@ struct ListOfFundamentalType {
         return items.ptr();
     }
 
+	void fixOffset(Assets *assets) {
+		items.fixOffset(assets);
+	}
+
 	uint32_t count;
-private:
     AssetsPtr<T> items;
 };
 
@@ -310,8 +328,6 @@ struct Assets {
 	ListOfAssetsPtr<const char> actionNames;
 	ListOfAssetsPtr<const char> variableNames;
 	AssetsPtr<FlowDefinition> flowDefinition;
-
-	ListOfFundamentalType<uint32_t> reallocationTable;
 };
 
 ////////////////////////////////////////////////////////////////////////////////

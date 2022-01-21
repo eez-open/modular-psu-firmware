@@ -42,6 +42,8 @@ Assets *g_externalAssets;
 
 ////////////////////////////////////////////////////////////////////////////////
 
+void fixOffsets(Assets *assets);
+
 bool decompressAssetsData(const uint8_t *assetsData, uint32_t assetsDataSize, Assets *decompressedAssets, uint32_t maxDecompressedAssetsSize, int *err) {
 	uint32_t compressedDataOffset;
 	uint32_t decompressedSize;
@@ -98,16 +100,7 @@ bool decompressAssetsData(const uint8_t *assetsData, uint32_t assetsDataSize, As
 		return false;
 	}
 
-	if (decompressedAssets->projectMajorVersion == PROJECT_VERSION_V3) {
-		// adjust offsets which are relative to decompressedAssets + 4 to be realative to MEMORY_BEGIN
-		auto reallocationTablePtr = decompressedAssets->reallocationTable.ptr();
-		reallocationTablePtr = (uint32_t *)((uint8_t *)reallocationTablePtr - MEMORY_BEGIN + (uint8_t *)decompressedAssets + 4);
-		uint32_t offset = (uint8_t *)decompressedAssets + 4 - MEMORY_BEGIN;
-		for (uint32_t i = 0; i < decompressedAssets->reallocationTable.count; i++) {
-			uint32_t *addr = (uint32_t *)((uint8_t *)decompressedAssets + 4 + reallocationTablePtr[i]);
-			*addr += offset;
-		}
-	}
+	fixOffsets(decompressedAssets);
 
 	return true;
 }

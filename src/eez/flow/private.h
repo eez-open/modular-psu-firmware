@@ -62,8 +62,6 @@ extern FlowState *g_mainPageFlowState;
 
 extern uint32_t g_lastFlowStateIndex;
 
-void fixAssetValues(Assets *assets);
-
 FlowState *initActionFlowState(int flowIndex, FlowState *parentFlowState, int parentComponentIndex);
 FlowState *initPageFlowState(Assets *assets, int flowIndex, FlowState *parentFlowState, int parentComponentIndex);
 

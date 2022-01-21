@@ -27,7 +27,7 @@ bool SelectWidgetState::updateState() {
 
 	bool hasPreviousState = widgetCursor.hasPreviousState;
 	auto widget = (const SelectWidget *)widgetCursor.widget;
-	if (widget->widgets.count > 0) {
+   	if (widget->widgets.count > 0) {
 		Value indexValue = get(widgetCursor, widgetCursor.widget->data);
 		int err;
 		int index = indexValue.toInt32(&err);

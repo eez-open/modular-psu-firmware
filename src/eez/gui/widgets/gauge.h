@@ -35,6 +35,10 @@ struct GaugeWidget : public Widget {
 struct GaugeWidgetState : public WidgetState {
 	WidgetStateFlags flags;
 	Value data;
+	Value minValue;
+	Value maxValue;
+	Value thresholdValue;
+	Value unitValue;
 
     bool updateState() override;
 	void render() override;

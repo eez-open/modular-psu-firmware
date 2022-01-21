@@ -90,6 +90,10 @@ bool GaugeWidgetState::updateState() {
 	
 	WIDGET_STATE(flags.active, g_isActiveWidget);
 	WIDGET_STATE(data, get(widgetCursor, widget->data));
+	WIDGET_STATE(minValue, get(widgetCursor, widget->min));
+	WIDGET_STATE(maxValue, get(widgetCursor, widget->max));
+	WIDGET_STATE(thresholdValue, get(widgetCursor, widget->threshold));
+	WIDGET_STATE(unitValue, get(widgetCursor, widget->unit));
 
 	return !hasPreviousState;
 }
@@ -101,12 +105,12 @@ void GaugeWidgetState::render() {
 
 	using namespace display;
 
-	float min = get(widgetCursor, widget->min).toFloat();
-	float max = get(widgetCursor, widget->max).toFloat();
+	float min = minValue.toFloat();
+	float max = maxValue.toFloat();
 	float value = data.toFloat();
-	float threshold = get(widgetCursor, widget->threshold).toFloat();
+	float threshold = thresholdValue.toFloat();
 
-	auto unit = get(widgetCursor, widget->unit).toString(0xa9ddede3).getString();
+	auto unit = unitValue.toString(0xa9ddede3).getString();
 
 	if (isNaN(min) || isNaN(max) || isNaN(value) || isinf(min) || isinf(max) || isinf(value) || min >= max) {
 		min = 0.0;

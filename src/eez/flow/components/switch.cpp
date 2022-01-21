@@ -20,19 +20,10 @@
 #include <eez/flow/flow_defs_v3.h>
 #include <eez/flow/expression.h>
 
-using namespace eez::gui;
+#include <eez/flow/components/switch.h>
 
 namespace eez {
 namespace flow {
-
-struct SwitchTest {
-    uint8_t outputIndex;
-    uint8_t conditionInstructions[1];
-};
-
-struct SwitchActionComponent : public Component {
-    ListOfAssetsPtr<SwitchTest> tests;
-};
 
 void executeSwitchComponent(FlowState *flowState, unsigned componentIndex) {
     auto component = (SwitchActionComponent *)flowState->flow->components.item(componentIndex);

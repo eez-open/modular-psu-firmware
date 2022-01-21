@@ -58,8 +58,6 @@ unsigned start(Assets *assets) {
 
 	scpiComponentInitHook();
 
-	fixAssetValues(assets);
-
 	for (uint32_t i = 0; i < MAX_PAGES; i++) {
 		g_pagesFlowState[i] = nullptr;
 	}
