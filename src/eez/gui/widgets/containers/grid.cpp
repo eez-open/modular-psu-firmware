@@ -40,7 +40,7 @@ void GridWidgetState::enumChildren() {
     if (count > 0) {
         auto widget = (const GridWidget *)widgetCursor.widget;
 
-        const Widget *childWidget = widget->itemWidget.ptr();
+        const Widget *childWidget = static_cast<const Widget *>(widget->itemWidget);
 		auto savedWidget = widgetCursor.widget;
 		widgetCursor.widget = childWidget;
 

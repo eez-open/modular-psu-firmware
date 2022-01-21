@@ -37,13 +37,13 @@ struct LoopComponenentExecutionState : public ComponenentExecutionState {
 };
 
 void executeLoopComponent(FlowState *flowState, unsigned componentIndex) {
-    auto component = (LoopActionComponent *)flowState->flow->components.item(componentIndex);
+    auto component = (LoopActionComponent *)flowState->flow->components[componentIndex];
 
     auto loopComponentExecutionState = (LoopComponenentExecutionState *)flowState->componenentExecutionStates[componentIndex];
 
     // restart loop if entered through "start" input
     static const unsigned START_INPUT_INDEX = 0;
-    auto startInputIndex = component->inputs.ptr()[START_INPUT_INDEX];
+    auto startInputIndex = component->inputs[START_INPUT_INDEX];
     if (flowState->values[startInputIndex].type != VALUE_TYPE_UNDEFINED) {
         if (loopComponentExecutionState) {
             ObjectAllocator<LoopComponenentExecutionState>::deallocate(loopComponentExecutionState);
@@ -58,21 +58,21 @@ void executeLoopComponent(FlowState *flowState, unsigned componentIndex) {
             return;
         }
 
-        auto fromPropertyValue = component->propertyValues.item(defs_v3::LOOP_ACTION_COMPONENT_PROPERTY_FROM);
+        auto fromPropertyValue = component->propertyValues[defs_v3::LOOP_ACTION_COMPONENT_PROPERTY_FROM];
         Value fromValue;
         if (!evalExpression(flowState, componentIndex, fromPropertyValue->evalInstructions, fromValue)) {
             throwError(flowState, componentIndex, "Failed to evaluate From in Loop\n");
             return;
         }
 
-        auto toPropertyValue = component->propertyValues.item(defs_v3::LOOP_ACTION_COMPONENT_PROPERTY_TO);
+        auto toPropertyValue = component->propertyValues[defs_v3::LOOP_ACTION_COMPONENT_PROPERTY_TO];
         Value toValue;
         if (!evalExpression(flowState, componentIndex, toPropertyValue->evalInstructions, toValue)) {
             throwError(flowState, componentIndex, "Failed to evaluate To in Loop\n");
             return;
         }
 
-        auto stepPropertyValue = component->propertyValues.item(defs_v3::LOOP_ACTION_COMPONENT_PROPERTY_STEP);
+        auto stepPropertyValue = component->propertyValues[defs_v3::LOOP_ACTION_COMPONENT_PROPERTY_STEP];
         Value stepValue;
         if (!evalExpression(flowState, componentIndex, stepPropertyValue->evalInstructions, stepValue)) {
             throwError(flowState, componentIndex, "Failed to evaluate Step in Loop\n");

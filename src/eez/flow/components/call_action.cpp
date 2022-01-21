@@ -38,7 +38,7 @@ struct CallActionComponenentExecutionState : public ComponenentExecutionState {
 };
 
 void executeCallActionComponent(FlowState *flowState, unsigned componentIndex) {
-	auto component = (CallActionActionComponent *)flowState->flow->components.item(componentIndex);
+	auto component = (CallActionActionComponent *)flowState->flow->components[componentIndex];
 
 	auto flowIndex = component->flowIndex;
 	if (flowIndex < 0) {

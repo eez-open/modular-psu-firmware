@@ -99,9 +99,8 @@ void LayoutViewWidgetState::enumChildren() {
 		auto savedWidget = widgetCursor.widget;
         
         auto &widgets = layout->widgets;
-        auto widgetPtr = widgets.itemsPtr();
-        for (uint32_t index = 0; index < widgets.count; ++index, ++widgetPtr) {
-			widgetCursor.widget = (const Widget *)widgetPtr->ptr();
+        for (uint32_t index = 0; index < widgets.count; ++index) {
+			widgetCursor.widget = widgets[index];
 
             enumWidget();
         }

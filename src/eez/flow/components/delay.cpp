@@ -34,12 +34,12 @@ struct DelayComponenentExecutionState : public ComponenentExecutionState {
 };
 
 void executeDelayComponent(FlowState *flowState, unsigned componentIndex) {
-	auto component = flowState->flow->components.item(componentIndex);
+	auto component = flowState->flow->components[componentIndex];
 
 	auto delayComponentExecutionState = (DelayComponenentExecutionState *)flowState->componenentExecutionStates[componentIndex];
 
 	if (!delayComponentExecutionState) {
-		auto propertyValue = component->propertyValues.item(defs_v3::DELAY_ACTION_COMPONENT_PROPERTY_MILLISECONDS);
+		auto propertyValue = component->propertyValues[defs_v3::DELAY_ACTION_COMPONENT_PROPERTY_MILLISECONDS];
 
 		Value value;
 		if (!evalExpression(flowState, componentIndex, propertyValue->evalInstructions, value)) {

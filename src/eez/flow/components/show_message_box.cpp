@@ -34,9 +34,9 @@ struct ShowMessagePageActionComponent : public Component {
 };
 
 void executeShowMessageBoxComponent(FlowState *flowState, unsigned componentIndex) {
-	auto component = (ShowMessagePageActionComponent *)flowState->flow->components.item(componentIndex);
+	auto component = (ShowMessagePageActionComponent *)flowState->flow->components[componentIndex];
 
-    auto messagePropertyValue = component->propertyValues.item(defs_v3::SHOW_MESSAGE_BOX_ACTION_COMPONENT_PROPERTY_MESSAGE);
+    auto messagePropertyValue = component->propertyValues[defs_v3::SHOW_MESSAGE_BOX_ACTION_COMPONENT_PROPERTY_MESSAGE];
     Value messageValue;
     if (!evalExpression(flowState, componentIndex, messagePropertyValue->evalInstructions, messageValue)) {
         throwError(flowState, componentIndex, "Failed to evaluate Message in ShowMessageBox\n");

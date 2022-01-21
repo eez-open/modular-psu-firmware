@@ -38,7 +38,7 @@ static bool evalExpression(FlowState *flowState, const uint8_t *instructions, in
 		auto instructionType = instruction & EXPR_EVAL_INSTRUCTION_TYPE_MASK;
 		auto instructionArg = instruction & EXPR_EVAL_INSTRUCTION_PARAM_MASK;
 		if (instructionType == EXPR_EVAL_INSTRUCTION_TYPE_PUSH_CONSTANT) {
-			if (!g_stack.push(*flowDefinition->constants.item(instructionArg))) {
+			if (!g_stack.push(*flowDefinition->constants[instructionArg])) {
 				return false;
 			}
 		} else if (instructionType == EXPR_EVAL_INSTRUCTION_TYPE_PUSH_INPUT) {
@@ -51,7 +51,7 @@ static bool evalExpression(FlowState *flowState, const uint8_t *instructions, in
 			}
 		} else if (instructionType == EXPR_EVAL_INSTRUCTION_TYPE_PUSH_GLOBAL_VAR) {
 			if ((uint32_t)instructionArg < flowDefinition->globalVariables.count) {
-				if (!g_stack.push(flowDefinition->globalVariables.item(instructionArg))) {
+				if (!g_stack.push(flowDefinition->globalVariables[instructionArg])) {
 					return false;
 				}
 			} else {
@@ -171,10 +171,10 @@ int16_t getNativeVariableId(const WidgetCursor &widgetCursor) {
 		FlowState *flowState = widgetCursor.flowState;
 		auto flow = flowState->flow;
 
-		WidgetDataItem *widgetDataItem = flow->widgetDataItems.item(-(widgetCursor.widget->data + 1));
+		WidgetDataItem *widgetDataItem = flow->widgetDataItems[-(widgetCursor.widget->data + 1)];
 		if (widgetDataItem && widgetDataItem->componentIndex != -1 && widgetDataItem->propertyValueIndex != -1) {
-			auto component = flow->components.item(widgetDataItem->componentIndex);
-			auto propertyValue = component->propertyValues.item(widgetDataItem->propertyValueIndex);
+			auto component = flow->components[widgetDataItem->componentIndex];
+			auto propertyValue = component->propertyValues[widgetDataItem->propertyValueIndex];
 
 			g_stack.sp = 0;
 			g_stack.flowState = flowState;

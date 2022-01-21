@@ -37,7 +37,7 @@ namespace flow {
 uint32_t g_lastFlowStateIndex = 0;
 
 bool isComponentReadyToRun(FlowState *flowState, unsigned componentIndex) {
-	auto component = flowState->flow->components.item(componentIndex);
+	auto component = flowState->flow->components[componentIndex];
 
 	if (component->type == defs_v3::COMPONENT_TYPE_CATCH_ERROR_ACTION) {
 		return false;
@@ -49,9 +49,9 @@ bool isComponentReadyToRun(FlowState *flowState, unsigned componentIndex) {
 	int numSeqInputs = 0;
 	int numDefinedSeqInputs = 0;
 	for (unsigned inputIndex = 0; inputIndex < component->inputs.count; inputIndex++) {
-		auto inputValueIndex = component->inputs.ptr()[inputIndex];
+		auto inputValueIndex = component->inputs[inputIndex];
 
-		auto input = flowState->flow->componentInputs.ptr()[inputValueIndex];
+		auto input = flowState->flow->componentInputs[inputValueIndex];
 
 		if (input & COMPONENT_INPUT_FLAG_IS_SEQ_INPUT) {
 			numSeqInputs++;
@@ -91,8 +91,8 @@ static bool pingComponent(FlowState *flowState, unsigned componentIndex, int sou
 
 
 static FlowState *initFlowState(Assets *assets, int flowIndex, FlowState *parentFlowState, int parentComponentIndex) {
-	auto flowDefinition = assets->flowDefinition.ptr();
-	auto flow = flowDefinition->flows.item(flowIndex);
+	auto flowDefinition = static_cast<FlowDefinition *>(assets->flowDefinition);
+	auto flow = flowDefinition->flows[flowIndex];
 
 	auto nValues = flow->componentInputs.count + flow->localVariables.count;
 
@@ -103,15 +103,15 @@ static FlowState *initFlowState(Assets *assets, int flowIndex, FlowState *parent
 
 	flowState->flowStateIndex = ++g_lastFlowStateIndex;
 	flowState->assets = assets;
-	flowState->flowDefinition = assets->flowDefinition.ptr();
-	flowState->flow = flowDefinition->flows.item(flowIndex);
+	flowState->flowDefinition = static_cast<FlowDefinition *>(assets->flowDefinition);
+	flowState->flow = flowDefinition->flows[flowIndex];
 	flowState->flowIndex = flowIndex;
 	flowState->error = false;
 	flowState->numActiveComponents = 0;
 	flowState->parentFlowState = parentFlowState;
 	if (parentFlowState) {
 		flowState->parentComponentIndex = parentComponentIndex;
-		flowState->parentComponent = parentFlowState->flow->components.item(parentComponentIndex);
+		flowState->parentComponent = parentFlowState->flow->components[parentComponentIndex];
 	} else {
 		flowState->parentComponentIndex = -1;
 		flowState->parentComponent = nullptr;
@@ -123,13 +123,13 @@ static FlowState *initFlowState(Assets *assets, int flowIndex, FlowState *parent
 		new (flowState->values + i) Value();
 	}
 
-	auto &undefinedValue = *flowDefinition->constants.item(UNDEFINED_VALUE_INDEX);
+	auto &undefinedValue = *flowDefinition->constants[UNDEFINED_VALUE_INDEX];
 	for (unsigned i = 0; i < flow->componentInputs.count; i++) {
 		flowState->values[i] = undefinedValue;
 	}
 
 	for (unsigned i = 0; i < flow->localVariables.count; i++) {
-		auto value = flow->localVariables.item(i);
+		auto value = flow->localVariables[i];
 		flowState->values[flow->componentInputs.count + i] = *value;
 	}
 
@@ -185,18 +185,18 @@ void freeFlowState(FlowState *flowState) {
 }
 
 void propagateValue(FlowState *flowState, unsigned componentIndex, unsigned outputIndex, const gui::Value &value) {
-	auto component = flowState->flow->components.item(componentIndex);
-	auto componentOutput = component->outputs.item(outputIndex);
+	auto component = flowState->flow->components[componentIndex];
+	auto componentOutput = component->outputs[outputIndex];
 
 	for (unsigned connectionIndex = 0; connectionIndex < componentOutput->connections.count; connectionIndex++) {
-		auto connection = componentOutput->connections.item(connectionIndex);
+		auto connection = componentOutput->connections[connectionIndex];
 		
 		auto pValue = &flowState->values[connection->targetInputIndex];
 
 		if (*pValue != value) {
 			*pValue = value;
 
-			if (!(flowState->flow->componentInputs.ptr()[connection->targetInputIndex] & COMPONENT_INPUT_FLAG_IS_SEQ_INPUT)) {
+			if (!(flowState->flow->componentInputs[connection->targetInputIndex] & COMPONENT_INPUT_FLAG_IS_SEQ_INPUT)) {
 				onValueChanged(pValue);
 			}
 		}
@@ -206,16 +206,16 @@ void propagateValue(FlowState *flowState, unsigned componentIndex, unsigned outp
 }
 
 void propagateValue(FlowState *flowState, unsigned componentIndex, unsigned outputIndex) {
-	auto &nullValue = *flowState->flowDefinition->constants.item(NULL_VALUE_INDEX);
+	auto &nullValue = *flowState->flowDefinition->constants[NULL_VALUE_INDEX];
 	propagateValue(flowState, componentIndex, outputIndex, nullValue);
 }
 
 void propagateValueThroughSeqout(FlowState *flowState, unsigned componentIndex) {
 	// find @seqout output
 	// TODO optimization hint: always place @seqout at 0-th index
-	auto component = flowState->flow->components.item(componentIndex);
+	auto component = flowState->flow->components[componentIndex];
 	for (uint32_t i = 0; i < component->outputs.count; i++) {
-		if (component->outputs.item(i)->isSeqOut) {
+		if (component->outputs[i]->isSeqOut) {
 			propagateValue(flowState, componentIndex, i);
 			return;
 		}
@@ -229,10 +229,10 @@ void getValue(uint16_t dataId, DataOperationEnum operation, const WidgetCursor &
 		FlowState *flowState = widgetCursor.flowState;
 		auto flow = flowState->flow;
 
-		WidgetDataItem *widgetDataItem = flow->widgetDataItems.item(dataId);
+		WidgetDataItem *widgetDataItem = flow->widgetDataItems[dataId];
 		if (widgetDataItem && widgetDataItem->componentIndex != -1 && widgetDataItem->propertyValueIndex != -1) {
-			auto component = flow->components.item(widgetDataItem->componentIndex);
-			auto propertyValue = component->propertyValues.item(widgetDataItem->propertyValueIndex);
+			auto component = flow->components[widgetDataItem->componentIndex];
+			auto propertyValue = component->propertyValues[widgetDataItem->propertyValueIndex];
 
 			if (!evalExpression(flowState, widgetDataItem->componentIndex, propertyValue->evalInstructions, value, nullptr, widgetCursor.iterators, operation)) {
 				throwError(flowState, widgetDataItem->componentIndex, "doGetFlowValue failed\n");
@@ -246,10 +246,10 @@ void setValue(uint16_t dataId, const WidgetCursor &widgetCursor, const Value& va
 		FlowState *flowState = widgetCursor.flowState;
 		auto flow = flowState->flow;
 
-		WidgetDataItem *widgetDataItem = flow->widgetDataItems.item(dataId);
+		WidgetDataItem *widgetDataItem = flow->widgetDataItems[dataId];
 		if (widgetDataItem && widgetDataItem->componentIndex != -1 && widgetDataItem->propertyValueIndex != -1) {
-			auto component = flow->components.item(widgetDataItem->componentIndex);
-			auto propertyValue = component->propertyValues.item(widgetDataItem->propertyValueIndex);
+			auto component = flow->components[widgetDataItem->componentIndex];
+			auto propertyValue = component->propertyValues[widgetDataItem->propertyValueIndex];
 
 			Value dstValue;
 			if (evalAssignableExpression(flowState, widgetDataItem->componentIndex, propertyValue->evalInstructions, dstValue, nullptr, widgetCursor.iterators)) {
@@ -305,7 +305,7 @@ void endAsyncExecution(FlowState *flowState, int componentIndex) {
 
 bool findCatchErrorComponent(FlowState *flowState, FlowState *&catchErrorFlowState, int &catchErrorComponentIndex) {
 	for (unsigned componentIndex = 0; componentIndex < flowState->flow->components.count; componentIndex++) {
-		auto component = flowState->flow->components.item(componentIndex);
+		auto component = flowState->flow->components[componentIndex];
 		if (component->type == defs_v3::COMPONENT_TYPE_CATCH_ERROR_ACTION) {
 			catchErrorFlowState = flowState;
 			catchErrorComponentIndex = componentIndex;
@@ -321,7 +321,7 @@ bool findCatchErrorComponent(FlowState *flowState, FlowState *&catchErrorFlowSta
 }
 
 void throwError(FlowState *flowState, int componentIndex, const char *errorMessage) {
-    auto component = flowState->flow->components.item(componentIndex);
+    auto component = flowState->flow->components[componentIndex];
 
 	if (component->errorCatchOutput != -1) {
 		propagateValue(

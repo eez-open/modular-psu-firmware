@@ -28,7 +28,7 @@ struct OutputActionComponent : public Component {
 };
 
 void executeOutputComponent(FlowState *flowState, unsigned componentIndex) {
-    auto component = (OutputActionComponent *)flowState->flow->components.item(componentIndex);
+    auto component = (OutputActionComponent *)flowState->flow->components[componentIndex];
 
 	if (!flowState->parentFlowState) {
 		throwError(flowState, componentIndex, "No parentFlowState in Output\n");
@@ -40,7 +40,7 @@ void executeOutputComponent(FlowState *flowState, unsigned componentIndex) {
 		return;
 	}
 
-    auto inputIndex = component->inputs.ptr()[0];
+    auto inputIndex = component->inputs[0];
     if (inputIndex >= flowState->flow->componentInputs.count) {
         throwError(flowState, componentIndex, "Invalid input index in Output\n");
 		return;

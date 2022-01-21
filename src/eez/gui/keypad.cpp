@@ -157,13 +157,13 @@ void Keypad::key() {
 	if (widget->type == WIDGET_TYPE_TEXT) {
 		auto textWidget = (TextWidget *)widget;
 		if (textWidget->text) {
-			key(textWidget->text.ptr()[0]);
+			key(static_cast<const char *>(textWidget->text)[0]);
 			return;
 		}
 	} else if (widget->type == WIDGET_TYPE_BUTTON) {
 		auto buttonWidget = (ButtonWidget *)widget;
 		if (buttonWidget->text) {
-			key(buttonWidget->text.ptr()[0]);
+			key(static_cast<const char *>(buttonWidget->text)[0]);
 			return;
 		}
 	}

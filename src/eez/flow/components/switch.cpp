@@ -26,10 +26,10 @@ namespace eez {
 namespace flow {
 
 void executeSwitchComponent(FlowState *flowState, unsigned componentIndex) {
-    auto component = (SwitchActionComponent *)flowState->flow->components.item(componentIndex);
+    auto component = (SwitchActionComponent *)flowState->flow->components[componentIndex];
 
     for (uint32_t testIndex = 0; testIndex < component->tests.count; testIndex++) {
-        auto test = component->tests.item(testIndex);
+        auto test = component->tests[testIndex];
 
         Value conditionValue;
         if (!evalExpression(flowState, componentIndex, test->conditionInstructions, conditionValue)) {

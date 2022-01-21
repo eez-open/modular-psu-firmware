@@ -100,7 +100,9 @@ bool decompressAssetsData(const uint8_t *assetsData, uint32_t assetsDataSize, As
 		return false;
 	}
 
-	fixOffsets(decompressedAssets);
+    if (decompressedAssets->projectMajorVersion >= PROJECT_VERSION_V3) {
+        fixOffsets(decompressedAssets);
+    }
 
 	return true;
 }
@@ -125,12 +127,12 @@ void unloadExternalAssets() {
 
 const PageAsset* getPageAsset(int pageId) {
 	if (pageId > 0) {
-		return g_mainAssets->pages.item((pageId - 1));
+		return g_mainAssets->pages[pageId - 1];
 	} else if (pageId < 0) {
 		if (g_externalAssets == nullptr) {
 			return nullptr;
 		}
-		return g_externalAssets->pages.item((-pageId - 1));
+		return g_externalAssets->pages[-pageId - 1];
 	}
 	return nullptr;
 }
@@ -150,50 +152,50 @@ const PageAsset* getPageAsset(int pageId, WidgetCursor& widgetCursor) {
 
 const Style *getStyle(int styleID) {
 	if (styleID > 0) {
-		return g_mainAssets->styles.item(styleID - 1);
+		return g_mainAssets->styles[styleID - 1];
 	} else if (styleID < 0) {
 		if (g_externalAssets == nullptr) {
 			return getStyle(EEZ_CONF_STYLE_ID_DEFAULT);
 		}
-		return g_externalAssets->styles.item(-styleID - 1);
+		return g_externalAssets->styles[-styleID - 1];
 	}
 	return getStyle(EEZ_CONF_STYLE_ID_DEFAULT);
 }
 
 const FontData *getFontData(int fontID) {
 	if (fontID > 0) {
-		return g_mainAssets->fonts.item(fontID - 1);
+		return g_mainAssets->fonts[fontID - 1];
 	} else if (fontID < 0) {
 		if (g_externalAssets == nullptr) {
 			return nullptr;
 		}
-		return g_externalAssets->fonts.item(-fontID - 1);
+		return g_externalAssets->fonts[-fontID - 1];
 	}
 	return nullptr;
 }
 
 const Bitmap *getBitmap(int bitmapID) {
 	if (bitmapID > 0) {
-		return g_mainAssets->bitmaps.item(bitmapID - 1);
+		return g_mainAssets->bitmaps[bitmapID - 1];
 	} else if (bitmapID < 0) {
 		if (g_externalAssets == nullptr) {
 			return nullptr;
 		}
-		return g_externalAssets->bitmaps.item(-bitmapID - 1);
+		return g_externalAssets->bitmaps[-bitmapID - 1];
 	}
 	return nullptr;
 }
 
 int getThemesCount() {
-	return (int)g_mainAssets->colorsDefinition.ptr()->themes.count;
+	return (int)g_mainAssets->colorsDefinition->themes.count;
 }
 
 Theme *getTheme(int i) {
-	return g_mainAssets->colorsDefinition.ptr()->themes.item(i);
+	return g_mainAssets->colorsDefinition->themes[i];
 }
 
 const char *getThemeName(int i) {
-	return getTheme(i)->name.ptr();
+	return static_cast<const char *>(getTheme(i)->name);
 }
 
 const uint32_t getThemeColorsCount(int themeIndex) {
@@ -201,11 +203,11 @@ const uint32_t getThemeColorsCount(int themeIndex) {
 }
 
 const uint16_t *getThemeColors(int themeIndex) {
-	return getTheme(themeIndex)->colors.ptr();
+	return static_cast<uint16_t *>(getTheme(themeIndex)->colors.items);
 }
 
 const uint16_t *getColors() {
-	return g_mainAssets->colorsDefinition.ptr()->colors.ptr();
+	return static_cast<uint16_t *>(g_mainAssets->colorsDefinition->colors.items);
 }
 
 int getExternalAssetsMainPageId() {
@@ -226,7 +228,7 @@ const char *getActionName(const WidgetCursor &widgetCursor, int16_t actionId) {
 		return "";
 	}
 
-	return widgetCursor.assets->actionNames.item(actionId);
+	return widgetCursor.assets->actionNames[actionId];
 }
 
 int16_t getDataIdFromName(const WidgetCursor &widgetCursor, const char *name) {
@@ -235,7 +237,7 @@ int16_t getDataIdFromName(const WidgetCursor &widgetCursor, const char *name) {
 	}
 
 	for (uint32_t i = 0; i < widgetCursor.assets->variableNames.count; i++) {
-		if (strcmp(widgetCursor.assets->variableNames.item(i), name) == 0) {
+		if (strcmp(widgetCursor.assets->variableNames[i], name) == 0) {
 			return -((int16_t)i + 1);
 		}
 	}

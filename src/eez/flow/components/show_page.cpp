@@ -29,7 +29,7 @@ struct ShowPageActionComponent : public Component {
 };
 
 void executeShowPageComponent(FlowState *flowState, unsigned componentIndex) {
-	auto component = (ShowPageActionComponent *)flowState->flow->components.item(componentIndex);
+	auto component = (ShowPageActionComponent *)flowState->flow->components[componentIndex];
 
 	replacePageHook(component->page);
 	onPageChanged(component->page);

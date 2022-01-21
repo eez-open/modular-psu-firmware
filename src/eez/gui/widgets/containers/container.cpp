@@ -113,8 +113,7 @@ void ContainerWidgetState::enumChildren() {
 		auto &widgets = widget->widgets;
 
 		auto widgetOverrides = overlay->widgetOverrides;
-		auto widgetPtr = widgets.itemsPtr();
-		for (uint32_t index = 0; index < widgets.count; ++index, ++widgetPtr) {
+		for (uint32_t index = 0; index < widgets.count; ++index) {
 			if (widgetOverrides) {
 				if (!widgetOverrides->isVisible) {
 					widgetOverrides++;
@@ -122,7 +121,7 @@ void ContainerWidgetState::enumChildren() {
 				}
 			}
 
-			widgetCursor.widget = (const Widget *)widgetPtr->ptr();
+			widgetCursor.widget = widgets[index];
 
 			int16_t xSaved = 0;
 			int16_t ySaved = 0;
@@ -158,10 +157,8 @@ void ContainerWidgetState::enumChildren() {
     } else {
 		auto &widgets = widget->widgets;
 
-		auto widgetPtr = widgets.itemsPtr();
-		for (uint32_t index = 0; index < widgets.count; ++index, ++widgetPtr) {
-			widgetCursor.widget = (const Widget *)widgetPtr->ptr();
-
+		for (uint32_t index = 0; index < widgets.count; ++index) {
+			widgetCursor.widget = widgets[index];
 			enumWidget();
 		}
 	}

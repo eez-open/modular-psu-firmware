@@ -47,7 +47,7 @@ FlowState *g_pagesFlowState[MAX_PAGES];
 ////////////////////////////////////////////////////////////////////////////////
 
 unsigned start(Assets *assets) {
-	auto flowDefinition = assets->flowDefinition.ptr();
+	auto flowDefinition = static_cast<FlowDefinition *>(assets->flowDefinition);
 	if (flowDefinition->flows.count == 0) {
 		return 0;
 	}
@@ -89,11 +89,11 @@ void tick() {
 
 		executeComponent(flowState, componentIndex);
 
-		auto component = flowState->flow->components.item(componentIndex);
+		auto component = flowState->flow->components[componentIndex];
 
 		for (uint32_t i = 0; i < component->inputs.count; i++) {
-			auto inputIndex = component->inputs.ptr()[i];
-			if (flowState->flow->componentInputs.ptr()[inputIndex] & COMPONENT_INPUT_FLAG_IS_SEQ_INPUT) {
+			auto inputIndex = component->inputs[i];
+			if (flowState->flow->componentInputs[inputIndex] & COMPONENT_INPUT_FLAG_IS_SEQ_INPUT) {
 				flowState->values[inputIndex] = Value();
 			}
 		}
@@ -164,7 +164,7 @@ FlowState *getFlowState(Assets *assets, int16_t pageId, const WidgetCursor &widg
 		}
 	} else {
 		auto pageIndex = pageId;
-		auto page = assets->pages.item(pageIndex);
+		auto page = assets->pages[pageIndex];
 		if (!(page->flags & PAGE_IS_USED_AS_CUSTOM_WIDGET)) {
 			if (!g_pagesFlowState[pageIndex]) {
 				g_pagesFlowState[pageIndex] = initPageFlowState(assets, pageIndex, nullptr, 0);
@@ -199,7 +199,7 @@ void executeFlowAction(const gui::WidgetCursor &widgetCursor, int16_t actionId) 
 	auto flow = flowState->flow;
 
 	if (actionId >= 0 && actionId < (int16_t)flow->widgetActions.count) {
-		auto componentOutput = flow->widgetActions.item(actionId);
+		auto componentOutput = flow->widgetActions[actionId];
 		if (componentOutput->componentIndex != -1 && componentOutput->componentOutputIndex != -1) {
 			propagateValue(flowState, componentOutput->componentIndex, componentOutput->componentOutputIndex, widgetCursor.cursor);
 		}
@@ -222,8 +222,8 @@ void dataOperation(int16_t dataId, DataOperationEnum operation, const gui::Widge
 	auto flow = flowState->flow;
 
 	if (flowDataId >= 0 && flowDataId < (int16_t)flow->widgetDataItems.count) {
-		WidgetDataItem *widgetDataItem = flow->widgetDataItems.item(flowDataId);
-		auto component = flow->components.item(widgetDataItem->componentIndex);
+		WidgetDataItem *widgetDataItem = flow->widgetDataItems[flowDataId];
+		auto component = flow->components[widgetDataItem->componentIndex];
 
 		if (operation == DATA_OPERATION_GET) {
 			getValue(flowDataId, operation, widgetCursor, value);

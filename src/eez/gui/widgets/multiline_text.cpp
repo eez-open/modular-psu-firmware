@@ -60,7 +60,7 @@ void MultilineTextWidgetState::render() {
         }
     } else if (widget->text) {
         drawMultilineText(
-            widget->text.ptr(), 
+            static_cast<const char *>(widget->text), 
             widgetCursor.x, widgetCursor.y, (int)widget->w, (int)widget->h,
             style, flags.active, flags.blinking,
             widget->firstLineIndent, widget->hangingIndent);

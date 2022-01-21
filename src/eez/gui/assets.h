@@ -43,16 +43,26 @@ extern Assets *g_externalAssets;
 
 ////////////////////////////////////////////////////////////////////////////////
 
+/* This template is used (on 64-bit systems) to pack asset pointers into 32-bit values.
+ * All pointers are relative to MEMORY_BEGIN.
+ * This way, the assets created by Studio can be used without having to fix all
+ * the sizes - Studio creates 32-bit pointers that are relative to the
+ * beginning of the assets, which the firmware rewrites to global pointers
+ * during initialization. On a 32-bit system this works just fine, but for a
+ * 64-bit system the pointers have different sizes and this breaks. By
+ * inserting a 'middleman' structure that stores the pointers as a 32-bit
+ * offset to MEMORY_BEGIN, we can keep the pointer sizes and initialization
+ * code the same.
+ */
 template<typename T>
-struct AssetsPtr {
-    T* ptr() {
-        return offset ? (T *)(MEMORY_BEGIN + offset) : nullptr;
-    }
+struct AssetsPtrImpl {
+    /* Conversion to a T pointer */
+    operator T*() { return ptr(); }
+    operator const T*() const { return ptr(); }
+    /* Dereferencing operators */
+          T* operator->()       { return ptr(); }
+    const T* operator->() const { return ptr(); }
 
-	const T* ptr() const {
-		return offset ? (const T *)(MEMORY_BEGIN + offset) : nullptr;
-	}
-	
 	void operator=(T* ptr) {
 		if (ptr != nullptr) {
             offset = (uint8_t *)ptr - MEMORY_BEGIN;
@@ -61,56 +71,70 @@ struct AssetsPtr {
 		}
     }
 
-    explicit operator bool() const {
-        return offset != 0;
+    uint32_t offset = 0;
+
+private:
+    T* ptr() {
+        return offset ? (T *)(MEMORY_BEGIN + offset) : nullptr;
     }
 
-	void fixOffset(Assets *assets) {
-        if (offset) {
-            offset += (uint8_t *)assets + 4 - MEMORY_BEGIN;
-        }
+	const T* ptr() const {
+		return offset ? (const T *)(MEMORY_BEGIN + offset) : nullptr;
 	}
-
-    uint32_t offset = 0;
 };
+
+/* This struct chooses the type used for AssetsPtr<T> - by default it uses an AssetsPtrImpl<> */
+template<typename T, uint32_t ptrSize>
+struct AssetsPtrChooser
+{
+    using type = AssetsPtrImpl<T>;
+};
+
+/* On 32-bit systems, we can just use raw pointers */
+template<typename T>
+struct AssetsPtrChooser<T, 4>
+{
+    using type = T*;
+};
+
+/* Utility typedef that delegates to AssetsPtrChooser */
+template<typename T>
+using AssetsPtr = typename AssetsPtrChooser<T, sizeof(void*)>::type;
+
+////////////////////////////////////////////////////////////////////////////////
 
 template<typename T>
 struct ListOfAssetsPtr {
-    T* item(int i) {
-        return (T *)items.ptr()[i].ptr();
-    }
-
-	const T* item(int i) const {
-        return (const T *)items.ptr()[i].ptr();
-	}
-
-	auto itemsPtr() const {
-		return items.ptr();
-	}
-
-	void fixOffset(Assets *assets) {
-		items.fixOffset(assets);
-        for (uint32_t i = 0; i < count; i++) {
-            items.ptr()[i].fixOffset(assets);
-        }
-	}
+    /* Array access */
+    T*       operator[](uint32_t i)       { return item(i); }
+    const T* operator[](uint32_t i) const { return item(i); }
 
 	uint32_t count = 0;
     AssetsPtr<AssetsPtr<T>> items;
+
+private:
+    T* item(int i) {
+        return static_cast<T *>(static_cast<AssetsPtr<T> *>(items)[i]);
+    }
+
+    const T* item(int i) const {
+        return static_cast<const T *>(static_cast<const     AssetsPtr<T> *>(items)[i]);
+    }
 };
 
 template<typename T>
 struct ListOfFundamentalType {
-    T *ptr() {
-        return items.ptr();
-    }
-
-	void fixOffset(Assets *assets) {
-		items.fixOffset(assets);
-	}
+    /* Array access */
+    T&       operator[](uint32_t i)       { return ptr()[i]; }
+    const T& operator[](uint32_t i) const { return ptr()[i]; }
 
 	uint32_t count;
     AssetsPtr<T> items;
+
+private:
+    T *ptr() {
+        return static_cast<T *>(items);
+    }
 };
 
 ////////////////////////////////////////////////////////////////////////////////

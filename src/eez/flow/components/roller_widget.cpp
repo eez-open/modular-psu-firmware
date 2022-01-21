@@ -26,10 +26,10 @@ namespace eez {
 namespace flow {
 
 void executeRollerWidgetComponent(FlowState *flowState, unsigned componentIndex) {
-	auto component = flowState->flow->components.item(componentIndex);
+	auto component = flowState->flow->components[componentIndex];
 
 	static const unsigned START_INPUT_INDEX = 0;
-	auto startInputIndex = component->inputs.ptr()[START_INPUT_INDEX];
+	auto startInputIndex = component->inputs[START_INPUT_INDEX];
 	if (flowState->values[startInputIndex].type != VALUE_TYPE_UNDEFINED) {
         auto executionState = (RollerWidgetComponenentExecutionState *)flowState->componenentExecutionStates[componentIndex];
         if (!executionState) {

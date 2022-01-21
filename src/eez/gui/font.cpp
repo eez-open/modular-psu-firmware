@@ -54,7 +54,7 @@ const GlyphData *Font::getGlyph(uint8_t encoding) {
 	}
 
 	auto glyphIndex = encoding - start;
-	auto glyphData = fontData->glyphs[glyphIndex].ptr();
+	auto glyphData = static_cast<const GlyphData *>(fontData->glyphs[glyphIndex]);
 
 	if (glyphData->dx == -128) {
 		// empty glyph

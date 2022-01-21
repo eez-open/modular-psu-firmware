@@ -89,7 +89,7 @@ void registerComponent(ComponentTypes componentType, ExecuteComponentFunctionTyp
 }
 
 void executeComponent(FlowState *flowState, unsigned componentIndex) {
-	auto component = flowState->flow->components.item(componentIndex);
+	auto component = flowState->flow->components[componentIndex];
 
 	if (component->type >= defs_v3::COMPONENT_TYPE_START_ACTION) {
 		auto executeComponentFunction = g_executeComponentFunctions[component->type - defs_v3::COMPONENT_TYPE_START_ACTION];

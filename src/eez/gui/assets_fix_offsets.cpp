@@ -35,9 +35,36 @@
 #include <eez/flow/flow_defs_v3.h>
 #include <eez/flow/components/switch.h>
 
-
 namespace eez {
 namespace gui {
+
+template<typename T>
+void fixOffset(AssetsPtrImpl<T> &ptr, void *assets) {
+    if (ptr.offset) {
+        ptr.offset += (uint8_t *)assets + 4 - MEMORY_BEGIN;
+    }
+}
+
+template<typename T>
+void fixOffset(T *&ptr, Assets *assets) {
+    if (ptr) {
+        ptr = reinterpret_cast<T *>((uint8_t *)ptr + (uint32_t)assets + 4);
+    }
+}
+
+template<typename T>
+void fixOffset(ListOfAssetsPtr<T> &list, Assets *assets) {
+    fixOffset(list.items, assets);
+    AssetsPtr<T> *items = (AssetsPtr<T> *)list.items;
+    for (uint32_t i = 0; i < list.count; i++) {
+        fixOffset(items[i], assets);
+    }
+}
+
+template<typename T>
+void fixOffset(ListOfFundamentalType<T> &list, Assets *assets) {
+    fixOffset(list.items, assets);
+}
 
 void fixOffsets(Assets *assets, ListOfAssetsPtr<Widget> &widgets);
 void fixOffsets(Assets *assets, Widget *widget);
@@ -45,75 +72,75 @@ void fixOffsets(Assets *assets, ListOfAssetsPtr<Value> &values);
 void fixOffsets(Assets *assets, Value &value);
 
 void fixOffsets(Assets *assets) {
-	assets->pages.fixOffset(assets);
+	fixOffset(assets->pages, assets);
     for (uint32_t i = 0; i < assets->pages.count; i++) {
-        fixOffsets(assets, assets->pages.item(i)->widgets);
+        fixOffsets(assets, assets->pages[i]->widgets);
     }
 
-	assets->styles.fixOffset(assets);
+	fixOffset(assets->styles, assets);
 
-	assets->fonts.fixOffset(assets);
+	fixOffset(assets->fonts, assets);
     for (uint32_t i = 0; i < assets->fonts.count; i++) {
-        auto font = assets->fonts.item(i);
+        auto font = assets->fonts[i];
         for (uint32_t glyphIndex = font->encodingStart; glyphIndex <= font->encodingEnd; glyphIndex++) {
-            font->glyphs[glyphIndex - font->encodingStart].fixOffset(assets);
+            fixOffset(font->glyphs[glyphIndex - font->encodingStart], assets);
         }
     }
 
-    assets->bitmaps.fixOffset(assets);
+    fixOffset(assets->bitmaps, assets);
 
     if (assets->colorsDefinition) {
-        assets->colorsDefinition.fixOffset(assets);
-        auto colorsDefinition = assets->colorsDefinition.ptr();
+        fixOffset(assets->colorsDefinition, assets);
+        auto colorsDefinition = static_cast<Colors *>(assets->colorsDefinition);
         auto &themes = colorsDefinition->themes;
-        themes.fixOffset(assets);
+        fixOffset(themes, assets);
         for (uint32_t i = 0; i < themes.count; i++) {
-            auto theme = themes.item(i);
-            theme->name.fixOffset(assets);
-            theme->colors.fixOffset(assets);
+            auto theme = themes[i];
+            fixOffset(theme->name, assets);
+            fixOffset(theme->colors, assets);
         }
-        colorsDefinition->colors.fixOffset(assets);
+        fixOffset(colorsDefinition->colors, assets);
     }
 
-	assets->actionNames.fixOffset(assets);
+	fixOffset(assets->actionNames, assets);
 
-	assets->variableNames.fixOffset(assets);
+	fixOffset(assets->variableNames, assets);
 
     if (assets->flowDefinition) {
-        assets->flowDefinition.fixOffset(assets);
-        auto flowDefinition = assets->flowDefinition.ptr();
+        fixOffset(assets->flowDefinition, assets);
+        auto flowDefinition = static_cast<FlowDefinition *>(assets->flowDefinition);
         
-        flowDefinition->flows.fixOffset(assets);
+        fixOffset(flowDefinition->flows, assets);
         for (uint32_t i = 0; i < flowDefinition->flows.count; i++) {
-            auto flow = flowDefinition->flows.item(i);
+            auto flow = flowDefinition->flows[i];
 
-            flow->components.fixOffset(assets);
+            fixOffset(flow->components, assets);
             for (uint32_t i = 0; i < flow->components.count; i++) {
-                auto component = flow->components.item(i);
+                auto component = flow->components[i];
 
                 using namespace eez::flow;
                 using namespace eez::flow::defs_v3;
 
                 switch (component->type) {
                 case COMPONENT_TYPE_SWITCH_ACTION:
-                    ((SwitchActionComponent *)component)->tests.fixOffset(assets);
+                    fixOffset(((SwitchActionComponent *)component)->tests, assets);
                     break;
                 }
 
-                component->inputs.fixOffset(assets);
-                component->propertyValues.fixOffset(assets);
+                fixOffset(component->inputs, assets);
+                fixOffset(component->propertyValues, assets);
 
-                component->outputs.fixOffset(assets);
+                fixOffset(component->outputs, assets);
                 for (uint32_t i = 0; i < component->outputs.count; i++) {
-                    auto componentOutput = component->outputs.item(i);
-                    componentOutput->connections.fixOffset(assets);
+                    auto componentOutput = component->outputs[i];
+                    fixOffset(componentOutput->connections, assets);
                 }
             }
 
             fixOffsets(assets, flow->localVariables);
-            flow->componentInputs.fixOffset(assets);
-            flow->widgetDataItems.fixOffset(assets);
-            flow->widgetActions.fixOffset(assets);
+            fixOffset(flow->componentInputs, assets);
+            fixOffset(flow->widgetDataItems, assets);
+            fixOffset(flow->widgetActions, assets);
         }
 
         fixOffsets(assets, flowDefinition->constants);
@@ -122,9 +149,9 @@ void fixOffsets(Assets *assets) {
 }
 
 void fixOffsets(Assets *assets, ListOfAssetsPtr<Widget> &widgets) {
-    widgets.fixOffset(assets);
+    fixOffset(widgets, assets);
     for (uint32_t i = 0; i < widgets.count; i++) {
-        fixOffsets(assets, widgets.item(i));
+        fixOffsets(assets, widgets[i]);
     }
 }
 
@@ -137,8 +164,8 @@ void fixOffsets(Assets *assets, Widget *widget) {
         {
             auto gridWidget = (GridWidget *)widget;
             if (gridWidget->itemWidget) {
-                gridWidget->itemWidget.fixOffset(assets);
-                fixOffsets(assets, gridWidget->itemWidget.ptr());
+                fixOffset(gridWidget->itemWidget, assets);
+                fixOffsets(assets, static_cast<Widget *>(gridWidget->itemWidget));
             }
         }
         break;
@@ -146,8 +173,8 @@ void fixOffsets(Assets *assets, Widget *widget) {
         {
             auto listWidget = (ListWidget *)widget;
             if (listWidget->itemWidget) {
-                listWidget->itemWidget.fixOffset(assets);
-                fixOffsets(assets, listWidget->itemWidget.ptr());
+                fixOffset(listWidget->itemWidget, assets);
+                fixOffsets(assets, static_cast<Widget *>(listWidget->itemWidget));
             }
         }
         break;
@@ -155,47 +182,47 @@ void fixOffsets(Assets *assets, Widget *widget) {
         fixOffsets(assets, ((SelectWidget *)widget)->widgets);
         break;
     case WIDGET_TYPE_BUTTON:
-        ((ButtonWidget*)widget)->text.fixOffset(assets);
+        fixOffset(((ButtonWidget*)widget)->text, assets);
         break;
     case WIDGET_TYPE_MULTILINE_TEXT:
-        ((MultilineTextWidget*)widget)->text.fixOffset(assets);
+        fixOffset(((MultilineTextWidget*)widget)->text, assets);
         break;
     case WIDGET_TYPE_SCROLL_BAR:
-        ((ScrollBarWidget*)widget)->leftButtonText.fixOffset(assets);
-        ((ScrollBarWidget*)widget)->rightButtonText.fixOffset(assets);
+        fixOffset(((ScrollBarWidget*)widget)->leftButtonText, assets);
+        fixOffset(((ScrollBarWidget*)widget)->rightButtonText, assets);
         break;
     case WIDGET_TYPE_TEXT:
-        ((TextWidget*)widget)->text.fixOffset(assets);
+        fixOffset(((TextWidget*)widget)->text, assets);
         break;
     case WIDGET_TYPE_TOGGLE_BUTTON:
-        ((ToggleButtonWidget*)widget)->text1.fixOffset(assets);
-        ((ToggleButtonWidget*)widget)->text2.fixOffset(assets);
+        fixOffset(((ToggleButtonWidget*)widget)->text1, assets);
+        fixOffset(((ToggleButtonWidget*)widget)->text2, assets);
         break;
     case WIDGET_TYPE_UP_DOWN:
-        ((UpDownWidget*)widget)->downButtonText.fixOffset(assets);
-        ((UpDownWidget*)widget)->upButtonText.fixOffset(assets);
+        fixOffset(((UpDownWidget*)widget)->downButtonText, assets);
+        fixOffset(((UpDownWidget*)widget)->upButtonText, assets);
         break;
     }
 }
 
 void fixOffsets(Assets *assets, ListOfAssetsPtr<Value> &values) {
-    values.fixOffset(assets);
+    fixOffset(values, assets);
 
     for (uint32_t i = 0; i < values.count; i++) {
-        auto value = values.item(i);
+        auto value = values[i];
         fixOffsets(assets, *value);
     }
 }
 
 void fixOffsets(Assets *assets, Value &value) {
     if (value.getType() == VALUE_TYPE_STRING) {
-        auto assetsPtr = (AssetsPtr<const char> *)&value.uint32Value;
-        assetsPtr->fixOffset(assets);
-        value.strValue = assetsPtr->ptr();
+        auto assetsPtr = (AssetsPtr<const char> &)value.uint32Value;
+        fixOffset(assetsPtr, assets);
+        value.strValue = static_cast<const char *>(assetsPtr);
     } else if (value.getType() == VALUE_TYPE_ARRAY) {
-        auto assetsPtr = (AssetsPtr<ArrayValue> *)&value.uint32Value;
-        assetsPtr->fixOffset(assets);
-        value.arrayValue = assetsPtr->ptr();
+        auto assetsPtr = (AssetsPtr<ArrayValue> &)value.uint32Value;
+        fixOffset(assetsPtr, assets);
+        value.arrayValue = static_cast<eez::gui::ArrayValue *>(assetsPtr);
         for (uint32_t i = 0; i < value.arrayValue->arraySize; i++) {
             fixOffsets(assets, value.arrayValue->values[i]);
         }
