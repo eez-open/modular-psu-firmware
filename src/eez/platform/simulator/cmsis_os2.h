@@ -4,6 +4,7 @@
 
 #ifndef __EMSCRIPTEN__
 #include <mutex>
+#include <thread>
 #endif
 
 typedef enum {
@@ -24,47 +25,36 @@ typedef uint32_t TZ_ModuleId_t;
 
 /// Attributes structure for thread.
 typedef struct {
-	const char                   *name;   ///< name of the thread
-	uint32_t                 attr_bits;   ///< attribute bits
-	void                      *cb_mem;    ///< memory for control block
-	uint32_t                   cb_size;   ///< size of provided memory for control block
-	void                   *stack_mem;    ///< memory for stack
-	uint32_t                stack_size;   ///< size of stack
-	osPriority               priority;   ///< initial thread priority (default: osPriorityNormal)
-	TZ_ModuleId_t            tz_module;   ///< TrustZone module identifier
-	uint32_t                  reserved;   ///< reserved (must be 0)
+	const char    *name;       // name of the thread
+	uint32_t       attr_bits;  // attribute bits
+	void          *cb_mem;     // memory for control block
+	uint32_t       cb_size;    // size of provided memory for control block
+	void          *stack_mem;  // memory for stack
+	uint32_t       stack_size; // size of stack
+	osPriority     priority;   // initial thread priority (default: osPriorityNormal)
+	TZ_ModuleId_t  tz_module;  // TrustZone module identifier
+	uint32_t       reserved;   // reserved (must be 0)
 } osThreadAttr_t;
-
-#ifdef EEZ_PLATFORM_SIMULATOR_WIN32
-	typedef uint32_t osThreadId_t;
-#else
-	#ifdef __EMSCRIPTEN__
-		typedef void *osThreadId;
-	#else
-		typedef pthread_t osThreadId_t;
-	#endif
-#endif
 
 typedef void(*osThreadFunc_t) (void *argument);
 
+#ifdef __EMSCRIPTEN__
+typedef void *osThreadId;
+#else
+typedef std::thread::id osThreadId_t;
+#endif
+
 osThreadId_t osThreadNew(osThreadFunc_t func, void *argument, const osThreadAttr_t *attr);
 osStatus osThreadTerminate(osThreadId_t thread_id);
-
 osThreadId_t osThreadGetId();
 
 ////////////////////////////////////////////////////////////////////////////////
 
 osStatus osKernelInitialize(void);
-
 osStatus osKernelStart(void);
 
 osStatus osDelay(uint32_t millisec);
-
 uint32_t osKernelGetTickCount(void);
-
-extern uint32_t osKernelSysTickFrequency;
-
-//
 
 #define osWaitForever     0xFFFFFFFF
 

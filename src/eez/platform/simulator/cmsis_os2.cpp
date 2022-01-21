@@ -5,12 +5,9 @@
 
 #include <map>
 
-#ifdef EEZ_PLATFORM_SIMULATOR_WIN32
-#include <windows.h>
-std::map<DWORD, HANDLE> g_handles;
-#else
-#include <sys/time.h>
-#include <time.h>
+#ifndef __EMSCRIPTEN__
+#include <chrono>
+#include <thread>
 #endif
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -25,32 +22,8 @@ static Thread g_threads[MAX_THREADS];
 Thread *g_currentThread;
 #endif
 
-#ifdef EEZ_PLATFORM_SIMULATOR_WIN32
-
-DWORD __stdcall win32_thread_func(void *lpParam) {
-	auto thread_func = (osThreadFunc_t)lpParam;
-	thread_func(nullptr);
-    return 0;
-}
-
-#else
-
-void *posix_thread_func(void *lpParam) {
-	auto thread_func = (osThreadFunc_t)lpParam;
-	thread_func(nullptr);
-	return 0;
-}
-
-#endif
-
-
 osThreadId_t osThreadNew(osThreadFunc_t func, void *, const osThreadAttr_t *attr) {
-#ifdef EEZ_PLATFORM_SIMULATOR_WIN32
-    DWORD threadId;
-    HANDLE handle = CreateThread(NULL, attr->stack_size, win32_thread_func, func, 0, &threadId);
-	g_handles.insert(std::make_pair(threadId, handle));
-    return threadId;
-#elif defined(__EMSCRIPTEN__)
+#if defined(__EMSCRIPTEN__)
     for (int i = 0; i < MAX_THREADS; ++i) {
         if (!g_threads[i].func) {
             g_threads[i].func = func;
@@ -60,35 +33,25 @@ osThreadId_t osThreadNew(osThreadFunc_t func, void *, const osThreadAttr_t *attr
     assert(false);
     return nullptr;
 #else
-    pthread_t thread;
-    pthread_create(&thread, 0, posix_thread_func, func);
-    return thread;
+    auto t = new std::thread(func, nullptr);
+    return t->get_id();
 #endif    
 }
 
 osStatus osThreadTerminate(osThreadId_t thread_id) {
-#ifdef EEZ_PLATFORM_SIMULATOR_WIN32
-	HANDLE handle = g_handles.at(thread_id);
-	TerminateThread(handle, 1);
-	WaitForSingleObject(handle, INFINITE);
-	CloseHandle(handle);
-	return osOK;
-#elif defined(__EMSCRIPTEN__)
+#if defined(__EMSCRIPTEN__)
 	return osOK;
 #else
-	pthread_kill(thread_id, SIGKILL);
-	pthread_join(thread_id, 0);
+    // TODO
 	return osOK;
 #endif    
 }
 
 osThreadId_t osThreadGetId() {
-#ifdef EEZ_PLATFORM_SIMULATOR_WIN32
-    return GetCurrentThreadId();
-#elif defined(__EMSCRIPTEN__)
+#if defined(__EMSCRIPTEN__)
     return g_currentThread;
 #else
-    return pthread_self();
+    return std::this_thread::get_id();
 #endif    
 }
 
@@ -114,49 +77,13 @@ osStatus osKernelStart(void) {
 }
 
 osStatus osDelay(uint32_t millisec) {
-#ifdef EEZ_PLATFORM_SIMULATOR_WIN32
-    Sleep(millisec);
+    std::this_thread::sleep_for(std::chrono::milliseconds(millisec));
     return osOK;
-#else
-    timespec ts;
-    ts.tv_sec = millisec / 1000;
-    ts.tv_nsec = (millisec % 1000) * 1000000;
-    nanosleep(&ts, 0);
-    return osOK;
-#endif    
 }
 
-#ifdef EEZ_PLATFORM_SIMULATOR_WIN32
-uint32_t osKernelSysTickFrequency;
-#else
-uint32_t osKernelSysTickFrequency = 1000000;
-#endif
-
 uint32_t osKernelGetTickCount() {
-#ifdef EEZ_PLATFORM_SIMULATOR_WIN32
-    static bool isFirstTime = true;
-    static LARGE_INTEGER frequency;
-    static LARGE_INTEGER startTime;
-
-    if (isFirstTime) {
-        isFirstTime = false;
-        QueryPerformanceFrequency(&frequency);
-        QueryPerformanceCounter(&startTime);
-        return 0;
-    } else {
-        LARGE_INTEGER currentTime;
-        QueryPerformanceCounter(&currentTime);
-
-        auto diff = (currentTime.QuadPart - startTime.QuadPart) * 1000 / frequency.QuadPart;
-
-        return uint32_t(diff % 4294967296);
-    }
-#else
-    timeval tv;
-    gettimeofday(&tv, NULL);
-    uint64_t micros = tv.tv_sec * (uint64_t)1000000 + tv.tv_usec;
-    return uint32_t((micros / 1000) % 4294967296);
-#endif    
+    using namespace std::chrono;
+    return duration_cast<milliseconds>(steady_clock::now().time_since_epoch()).count();
 }
 
 ////////////////////////////////////////////////////////////////////////////////
