@@ -158,6 +158,7 @@ set(src_eez_gui
     src/eez/gui/animation.cpp
     src/eez/gui/app_context.cpp
     src/eez/gui/assets.cpp
+    src/eez/gui/assets_fix_offsets.cpp
     src/eez/gui/data.cpp
     src/eez/gui/display.cpp
     src/eez/gui/draw.cpp

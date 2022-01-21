@@ -93,10 +93,6 @@ void stopFlowScript() {
 	flow::stop();
 }
 
-void freeFlowMemory() {
-	flow::stop();
-}
-
 ////////////////////////////////////////////////////////////////////////////////
 
 void executeFlowAction(const WidgetCursor &widgetCursor, int16_t actionId) {

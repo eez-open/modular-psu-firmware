@@ -28,8 +28,6 @@ void flowTick();
 void startFlowScript();
 void stopFlowScript();
 
-void freeFlowMemory();
-
 void executeFlowAction(const gui::WidgetCursor &widgetCursor, int16_t actionId);
 void doExecuteFlowAction();
 

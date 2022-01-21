@@ -50,8 +50,6 @@ void setStateIdle() {
 
 	freeMpMemory();
 
-	freeFlowMemory();
-
 	sendMessageToGuiThread(GUI_QUEUE_MESSAGE_UNLOAD_EXTERNAL_ASSETS);
 }
 
