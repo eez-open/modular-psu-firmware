@@ -90,859 +90,174 @@ if(WIN32)
     include_directories(src/third_party/micropython/ports/bb3/win32)
 endif()
 
+
 set(src_files)
 set(header_files)
 
-set(src_eez_core
-    src/eez/core/alloc.cpp
-    src/eez/core/debug.cpp
-    src/eez/core/eeprom.cpp
-    src/eez/core/hmi.cpp
-    src/eez/core/memory.cpp
-    src/eez/core/os.cpp
-    src/eez/core/unit.cpp
-    src/eez/core/util.cpp
-)
-list (APPEND src_files ${src_eez_core})
-set(header_eez_core
-    src/eez/core/alloc.h
-    src/eez/core/debug.h
-    src/eez/core/eeprom.h
-    src/eez/core/encoder.h
-    src/eez/core/hmi.h
-    src/eez/core/keyboard.h
-    src/eez/core/memory.h
-    src/eez/core/mouse.h
-    src/eez/core/os.h
-    src/eez/core/sound.h
-    src/eez/core/step_values.h
-    src/eez/core/unit.h
-    src/eez/core/util.h
-    src/eez/core/value_types.h
-)
-list (APPEND header_files ${header_eez_core})
-source_group("eez\\core" FILES ${src_eez_core} ${header_eez_core})
 
-file(GLOB src_eez_flow
-    "src/eez/flow/*.cpp"
+################################################################################
+# EEZ Framework files
+file(GLOB_RECURSE src_eez
+    src/eez/*.cpp
+    src/eez/*.c
 )
-list (APPEND src_files ${src_eez_flow})
-file(GLOB header_eez_flow
-    "src/eez/flow/*.h"
+file(GLOB_RECURSE header_eez
+    src/eez/*.h
 )
-list (APPEND header_files ${header_eez_flow})
-source_group("eez\\flow" FILES ${src_eez_flow} ${header_eez_flow})
 
-file(GLOB src_eez_flow_components
-    "src/eez/flow/components/*.cpp"
-)
-list (APPEND src_files ${src_eez_flow_components})
-file(GLOB header_eez_flow_components
-    "src/eez/flow/components/*.h"
-)
-list (APPEND header_files ${header_eez_flow_components})
-source_group("eez\\flow\\components" FILES ${src_eez_flow_components} ${header_eez_flow_components})
+# exclude STM32 platform specific files
+set (EXCLUDE_DIR "src/eez/platform/stm32")
+foreach (TMP_PATH ${src_eez})
+    string (FIND ${TMP_PATH} ${EXCLUDE_DIR} EXCLUDE_DIR_FOUND)
+    if (NOT ${EXCLUDE_DIR_FOUND} EQUAL -1)
+        list (REMOVE_ITEM src_eez ${TMP_PATH})
+    endif ()
+endforeach(TMP_PATH)
+foreach (TMP_PATH ${header_eez})
+    string (FIND ${TMP_PATH} ${EXCLUDE_DIR} EXCLUDE_DIR_FOUND)
+    if (NOT ${EXCLUDE_DIR_FOUND} EQUAL -1)
+        list (REMOVE_ITEM header_eez ${TMP_PATH})
+    endif ()
+endforeach(TMP_PATH)
 
-set(src_eez_fs
-    src/eez/fs/simulator/fs.cpp
-)
-list (APPEND src_files ${src_eez_fs})
-set(header_eez_fs
-    src/eez/fs/fs.h
-)
-list (APPEND header_files ${header_eez_fs})
-source_group("eez\\fs" FILES ${src_eez_fs} ${header_eez_fs})
+list (APPEND src_files ${src_eez})
+list (APPEND header_files ${header_eez})
 
-set(src_eez_gui
-    src/eez/gui/action_impl.cpp
-    src/eez/gui/animation.cpp
-    src/eez/gui/app_context.cpp
-    src/eez/gui/assets.cpp
-    src/eez/gui/assets_fix_offsets.cpp
-    src/eez/gui/data.cpp
-    src/eez/gui/display.cpp
-    src/eez/gui/draw.cpp
-    src/eez/gui/event.cpp
-    src/eez/gui/font.cpp
-    src/eez/gui/geometry.cpp
-    src/eez/gui/gui.cpp
-    src/eez/gui/hooks.cpp
-    src/eez/gui/keypad.cpp
-    src/eez/gui/overlay.cpp
-    src/eez/gui/page.cpp
-    src/eez/gui/thread.cpp
-    src/eez/gui/touch.cpp
-    src/eez/gui/touch_calibration.h
-    src/eez/gui/touch_filter.cpp
-    src/eez/gui/update.cpp
-    src/eez/gui/widget.cpp
-)
-list (APPEND src_files ${src_eez_gui})
-set(header_eez_gui
-    src/eez/gui/animation.h
-    src/eez/gui/app_context.h
-    src/eez/gui/assets.h
-    src/eez/gui/data.h
-    src/eez/gui/display.h
-    src/eez/gui/display-private.h
-    src/eez/gui/draw.h
-    src/eez/gui/event.h
-    src/eez/gui/font.h
-    src/eez/gui/geometry.h
-    src/eez/gui/gui.h
-    src/eez/gui/hooks.h
-    src/eez/gui/image.h
-    src/eez/gui/keypad.h
-    src/eez/gui/overlay.h
-    src/eez/gui/page.h
-    src/eez/gui/thread.h
-    src/eez/gui/touch.h
-    src/eez/gui/touch_calibration.cpp
-    src/eez/gui/touch_filter.h
-    src/eez/gui/update.h
-    src/eez/gui/widget.h
-)
-list (APPEND header_files ${header_eez_gui})
-source_group("eez\\gui" FILES ${src_eez_gui} ${header_eez_gui})
+source_group(TREE "../../src/eez" PREFIX "eez" FILES ${src_eez} ${header_eez})
 
-file(GLOB src_eez_gui_widgets
-    "src/eez/gui/widgets/*.cpp"
-)
-list (APPEND src_files ${src_eez_gui_widgets})
-file(GLOB header_eez_gui_widgets
-    "src/eez/gui/widgets/*.h"
-)
-list (APPEND header_files ${header_eez_gui_widgets})
-source_group("eez\\gui\\widgets" FILES ${src_eez_gui_widgets} ${header_eez_gui_widgets})
+# TODO
+#if(MSVC)
+#    set_source_files_properties(${src_eez_libs_libscpi} PROPERTIES COMPILE_FLAGS /W0)
+#endif()
 
-file(GLOB src_eez_gui_widgets_containers
-    "src/eez/gui/widgets/containers/*.cpp"
-)
-list (APPEND src_files ${src_eez_gui_widgets_containers})
-file(GLOB header_eez_gui_widgets_containers
-    "src/eez/gui/widgets/containers/*.h"
-)
-list (APPEND header_files ${header_eez_gui_widgets_containers})
-source_group("eez\\gui\\widgets\\containers" FILES ${src_eez_gui_widgets_containers} ${header_eez_gui_widgets_containers})
+################################################################################
 
-file(GLOB src_eez_libs_agg
-    "src/eez/libs/agg/*.cpp"
-)
-list (APPEND src_files ${src_eez_libs_agg})
-file(GLOB header_eez_libs_agg
-    "src/eez/libs/agg/*.h"
-)
-list (APPEND header_files ${header_eez_libs_agg})
-source_group("eez\\libs\\agg" FILES ${src_eez_libs_agg} ${header_eez_libs_agg})
 
-set(src_eez_libs_lz4
-    src/eez/libs/lz4/lz4.c
+################################################################################
+# BB3 files
+file(GLOB_RECURSE src_bb3
+    src/bb3/*.cpp
+    src/bb3/*.c
 )
-list (APPEND src_files ${src_eez_libs_lz4})
-set(header_eez_libs_lz4
-    src/eez/libs/lz4/lz4.h
+file(GLOB_RECURSE header_bb3
+    src/bb3/*.h
 )
-list (APPEND header_files ${header_eez_libs_lz4})
-source_group("eez\\libs\\lz4" FILES ${src_eez_libs_lz4} ${header_eez_libs_lz4})
 
-set(src_bb3_libs_mqtt
-    src/bb3/libs/mqtt/mqtt.c
-    src/bb3/libs/mqtt/mqtt_pal.c
-)
-list (APPEND src_files ${src_bb3_libs_mqtt})
-set(header_bb3_libs_mqtt
-    src/bb3/libs/mqtt/mqtt.h
-    src/bb3/libs/mqtt/mqtt_pal.h
-)
-list (APPEND header_files ${header_bb3_libs_mqtt})
-source_group("bb3\\libs\\mqtt" FILES ${src_bb3_libs_mqtt} ${header_bb3_libs_mqtt})
+# exclude STM32 platform specific files
+set (EXCLUDE_DIR "src/bb3/platform/stm32")
+foreach (TMP_PATH ${src_bb3})
+    string (FIND ${TMP_PATH} ${EXCLUDE_DIR} EXCLUDE_DIR_FOUND)
+    if (NOT ${EXCLUDE_DIR_FOUND} EQUAL -1)
+        list (REMOVE_ITEM src_bb3 ${TMP_PATH})
+    endif ()
+endforeach(TMP_PATH)
+foreach (TMP_PATH ${header_bb3})
+    string (FIND ${TMP_PATH} ${EXCLUDE_DIR} EXCLUDE_DIR_FOUND)
+    if (NOT ${EXCLUDE_DIR_FOUND} EQUAL -1)
+        list (REMOVE_ITEM header_bb3 ${TMP_PATH})
+    endif ()
+endforeach(TMP_PATH)
 
-set(src_eez_platform_simulator
-    src/eez/platform/simulator/cmsis_os2.cpp
-    src/eez/platform/simulator/display.cpp
-    src/eez/platform/simulator/events.cpp
-    src/eez/platform/simulator/touch.cpp
-) 
-list (APPEND src_files ${src_eez_platform_simulator})
-set(header_eez_platform_simulator
-    src/eez/platform/simulator/cmsis_os2.h
-    src/eez/platform/simulator/events.h
-)
-list (APPEND header_files ${header_eez_platform_simulator})
-source_group("eez\\platform\\simulator" FILES ${src_eez_platform_simulator} ${header_eez_platform_simulator})
+# exclude nanojpeg.c
+get_filename_component(full_path_nanojpeg_c ${CMAKE_CURRENT_SOURCE_DIR}/src/bb3/libs/image/nanojpeg.c ABSOLUTE)
+list(REMOVE_ITEM src_bb3 "${full_path_nanojpeg_c}")
 
-set(header_eez_platform
-    src/eez/platform/touch.h
-)
-list (APPEND header_files ${header_eez_platform})
-source_group("eez\\platform" FILES ${src_eez_platform_simulator} ${header_eez_platform})
-
-set(src_eez_libs_libscpi
-    src/eez/libs/libscpi/src/error.c
-    src/eez/libs/libscpi/src/expression.c
-    src/eez/libs/libscpi/src/fifo.c
-    src/eez/libs/libscpi/src/ieee488.c
-    src/eez/libs/libscpi/src/lexer.c
-    src/eez/libs/libscpi/src/minimal.c
-    src/eez/libs/libscpi/src/parser.c
-    src/eez/libs/libscpi/src/units.c
-    src/eez/libs/libscpi/src/utils.c
-)
-list (APPEND src_files ${src_eez_libs_libscpi})
-set(header_third_party_scpi
-    src/eez/libs/libscpi/inc/scpi/cc.h
-    src/eez/libs/libscpi/inc/scpi/config.h
-    src/eez/libs/libscpi/inc/scpi/constants.h
-    src/eez/libs/libscpi/inc/scpi/error.h
-    src/eez/libs/libscpi/inc/scpi/expression.h
-    src/eez/libs/libscpi/inc/scpi/ieee488.h
-    src/eez/libs/libscpi/inc/scpi/minimal.h
-    src/eez/libs/libscpi/inc/scpi/parser.h
-    src/eez/libs/libscpi/inc/scpi/scpi.h
-    src/eez/libs/libscpi/inc/scpi/types.h
-    src/eez/libs/libscpi/inc/scpi/units.h
-    src/eez/libs/libscpi/inc/scpi/utils.h
-)
-list (APPEND header_files ${header_third_party_scpi})
-source_group("eez\\libs\\libscpi" FILES ${src_eez_libs_libscpi} ${header_third_party_scpi})
-if(MSVC)
-    set_source_files_properties(${src_eez_libs_libscpi} PROPERTIES COMPILE_FLAGS /W0)
-endif()
-
-set(src_bb3
-    src/bb3/action_impl.cpp
-    src/bb3/assets.cpp
-    src/bb3/assets_V2.cpp
-    src/bb3/dlog_file.cpp
-    src/bb3/file_type.cpp
-    src/bb3/firmware.cpp
-    src/bb3/fs_driver.cpp
-    src/bb3/function_generator.cpp
-    src/bb3/hmi.cpp
-    src/bb3/index.cpp
-    src/bb3/keyboard.cpp
-    src/bb3/main.cpp
-    src/bb3/mouse.cpp
-    src/bb3/mqtt.cpp
-    src/bb3/sound.cpp
-    src/bb3/system.cpp
-    src/bb3/tasks.cpp
-    src/bb3/uart.cpp
-    src/bb3/usb.cpp
-)
 list (APPEND src_files ${src_bb3})
-set(header_bb3
-    src/bb3/fs_driver.h
-    src/bb3/dlog_file.h
-    src/bb3/file_type.h
-    src/bb3/firmware.h
-    src/bb3/function_generator.h
-    src/bb3/hmi.h
-    src/bb3/index.h
-    src/bb3/keyboard.h
-    src/bb3/mouse.h
-    src/bb3/mqtt.h
-    src/bb3/system.h
-    src/bb3/tasks.h
-    src/bb3/uart.h
-    src/bb3/usb.h
-)
 list (APPEND header_files ${header_bb3})
-source_group("bb3" FILES ${src_bb3} ${header_bb3})
 
-set(header_bb3_conf_eez
-    src/bb3/conf/eez/conf.h
-    src/bb3/conf/eez/gui_conf.h
-)
-list (APPEND header_files ${header_bb3_conf_eez})
-source_group("bb3\\conf\\eez" FILES ${header_bb3_conf_eez})
+source_group(TREE "../../src/bb3" PREFIX "bb3" FILES ${src_bb3} ${header_bb3})
 
-set(src_bb3_gui
-    src/bb3/gui/display-hooks.cpp
-    src/bb3/gui/document.cpp
-)
-list (APPEND src_files ${src_bb3_gui})
-set(header_bb3_gui
-    src/bb3/gui/document.h
-    src/bb3/gui/display-hooks.h
-)
-list (APPEND header_files ${header_bb3_gui})
-source_group("bb3\\gui" FILES ${src_bb3_gui} ${header_bb3_gui})
+#TODO
+#if(MSVC)
+#    set_source_files_properties(src/bb3/libs/image/toojpeg.cpp PROPERTIES COMPILE_FLAGS /W0)
+#endif()
 
-set(src_bb3_psu
-    src/bb3/psu/board.cpp
-    src/bb3/psu/calibration.cpp
-    src/bb3/psu/channel.cpp
-    src/bb3/psu/channel_dispatcher.cpp
-    src/bb3/psu/datetime.cpp
-    src/bb3/psu/devices.cpp
-    src/bb3/psu/dlog_record.cpp
-    src/bb3/psu/dlog_view.cpp
-    src/bb3/psu/ethernet_scpi.cpp
-    src/bb3/psu/event_queue.cpp
-    src/bb3/psu/io_pins.cpp
-    src/bb3/psu/list_program.cpp
-    src/bb3/psu/ntp.cpp
-    src/bb3/psu/ontime.cpp
-    src/bb3/psu/persist_conf.cpp
-    src/bb3/psu/profile.cpp
-    src/bb3/psu/psu.cpp
-    src/bb3/psu/ramp.cpp
-    src/bb3/psu/rtc.cpp
-    src/bb3/psu/sd_card.cpp
-    src/bb3/psu/serial.cpp
-    src/bb3/psu/serial_psu.cpp
-    src/bb3/psu/temp_sensor.cpp
-    src/bb3/psu/temperature.cpp
-    src/bb3/psu/timer.cpp
-    src/bb3/psu/trigger.cpp
-)
-list (APPEND src_files ${src_bb3_psu})
-set(header_bb3_psu
-    src/bb3/psu/board.h
-    src/bb3/psu/calibration.h
-    src/bb3/psu/channel.h
-    src/bb3/psu/channel_dispatcher.h
-    src/bb3/psu/conf.h
-    src/bb3/psu/conf_advanced.h
-    src/bb3/psu/conf_user.h
-    src/bb3/psu/datetime.h
-    src/bb3/psu/devices.h
-    src/bb3/psu/dlog_record.h
-    src/bb3/psu/dlog_view.h
-    src/bb3/psu/ethernet_scpi.h
-    src/bb3/psu/event_queue.h
-    src/bb3/psu/io_pins.h
-    src/bb3/psu/list_program.h
-    src/bb3/psu/ntp.h
-    src/bb3/psu/ontime.h
-    src/bb3/psu/persist_conf.h
-    src/bb3/psu/profile.h
-    src/bb3/psu/psu.h
-    src/bb3/psu/ramp.h
-    src/bb3/psu/rtc.h
-    src/bb3/psu/sd_card.h
-    src/bb3/psu/serial_psu.h
-    src/bb3/psu/temp_sensor.h
-    src/bb3/psu/temperature.h
-    src/bb3/psu/timer.h
-    src/bb3/psu/trigger.h
-)
-list (APPEND header_files ${header_bb3_psu})
-source_group("bb3\\psu" FILES ${src_bb3_psu} ${header_bb3_psu})
+################################################################################
 
-set(src_bb3_psu_gui
-    src/bb3/psu/gui/animations.cpp
-    src/bb3/psu/gui/channel_calibration.cpp
-    src/bb3/psu/gui/data.cpp
-    src/bb3/psu/gui/edit_mode.cpp
-    src/bb3/psu/gui/file_manager.cpp
-    src/bb3/psu/gui/keypad.cpp
-    src/bb3/psu/gui/labels_and_colors.cpp
-    src/bb3/psu/gui/page_ch_settings.cpp
-    src/bb3/psu/gui/page_event_queue.cpp
-    src/bb3/psu/gui/page_sys_settings.cpp
-    src/bb3/psu/gui/page_user_profiles.cpp
-    src/bb3/psu/gui/password.cpp
-    src/bb3/psu/gui/psu.cpp
-)
-list (APPEND src_files ${src_bb3_psu_gui})
-set(header_bb3_psu_gui
-    src/bb3/psu/gui/animations.h
-    src/bb3/psu/gui/channel_calibration.h
-    src/bb3/psu/gui/data.h
-    src/bb3/psu/gui/edit_mode.h
-    src/bb3/psu/gui/file_manager.h
-    src/bb3/psu/gui/keypad.h
-    src/bb3/psu/gui/labels_and_colors.h
-    src/bb3/psu/gui/page_ch_settings.h
-    src/bb3/psu/gui/page_event_queue.h
-    src/bb3/psu/gui/page_sys_settings.h
-    src/bb3/psu/gui/page_user_profiles.h
-    src/bb3/psu/gui/password.h
-    src/bb3/psu/gui/psu.h
-)
-list (APPEND header_files ${header_bb3_psu_gui})
-source_group("bb3\\psu\\gui" FILES ${src_bb3_psu_gui} ${header_bb3_psu_gui})
 
-set(src_bb3_psu_scpi
-    src/bb3/psu/scpi/appl.cpp
-    src/bb3/psu/scpi/cal.cpp
-    src/bb3/psu/scpi/core.cpp
-    src/bb3/psu/scpi/debug.cpp
-    src/bb3/psu/scpi/diag.cpp
-    src/bb3/psu/scpi/display.cpp
-    src/bb3/psu/scpi/dlog.cpp
-    src/bb3/psu/scpi/inst.cpp
-    src/bb3/psu/scpi/meas.cpp
-    src/bb3/psu/scpi/mem.cpp
-    src/bb3/psu/scpi/mmem.cpp
-    src/bb3/psu/scpi/outp.cpp
-    src/bb3/psu/scpi/params.cpp
-    src/bb3/psu/scpi/psu.cpp
-    src/bb3/psu/scpi/route.cpp
-    src/bb3/psu/scpi/sense.cpp
-    src/bb3/psu/scpi/simu.cpp
-    src/bb3/psu/scpi/sour.cpp
-    src/bb3/psu/scpi/stat.cpp
-    src/bb3/psu/scpi/syst.cpp
-    src/bb3/psu/scpi/trigger.cpp
-)
-list (APPEND src_files ${src_bb3_psu_scpi})
-set(header_bb3_psu_scpi
-    src/bb3/psu/scpi/params.h
-    src/bb3/psu/scpi/psu.h
-)
-list (APPEND header_files ${header_bb3_psu_scpi})
-source_group("bb3\\psu\\scpi" FILES ${src_bb3_psu_scpi} ${header_bb3_psu_scpi})
+################################################################################
+# MicroPython files
 
-file(GLOB src_bb3_flow
-    "src/bb3/flow/*.cpp"
-)
-list (APPEND src_files ${src_bb3_flow})
-file(GLOB header_bb3_flow
-    "src/bb3/flow/*.h"
-)
-list (APPEND header_files ${header_bb3_flow})
-source_group("bb3\\flow" FILES ${src_bb3_flow} ${header_bb3_flow})
-
-file(GLOB src_bb3_flow_components
-    "src/bb3/flow/components/*.cpp"
-)
-list (APPEND src_files ${src_bb3_flow_components})
-file(GLOB header_bb3_flow_components
-    "src/bb3/flow/components/*.h"
-)
-list (APPEND header_files ${header_bb3_flow_components})
-source_group("bb3\\flow\\components" FILES ${src_bb3_flow_components} ${header_bb3_flow_components})
-
-file(GLOB src_bb3_scripting
-    "src/bb3/scripting/*.cpp"
-)
-list (APPEND src_files ${src_bb3_scripting})
-file(GLOB header_bb3_scripting
-    "src/bb3/scripting/*.h"
-)
-list (APPEND header_files ${header_bb3_scripting})
-source_group("bb3\\scripting" FILES ${src_bb3_scripting} ${header_bb3_scripting})
-
-set(src_bb3_libs_image
-    src/bb3/libs/image/bitmap.cpp
-    src/bb3/libs/image/image.cpp
-    src/bb3/libs/image/jpeg.cpp
-    src/bb3/libs/image/toojpeg.cpp
-)
-list (APPEND src_files ${src_bb3_libs_image})
-set(header_bb3_libs_image
-    src/bb3/libs/image/bitmap.h
-    src/bb3/libs/image/jpeg.h
-    src/bb3/libs/image/toojpeg.h
-)
-list (APPEND header_files ${src_bb3_libs_image})
-source_group("bb3\\libs\\image" FILES ${src_bb3_libs_image} ${header_bb3_libs_image})
-if(MSVC)
-    set_source_files_properties(src/bb3/libs/image/toojpeg.cpp PROPERTIES COMPILE_FLAGS /W0)
-endif()
-
-set(src_bb3_aux_ps
-    src/bb3/aux_ps/fan.cpp
-    src/bb3/aux_ps/pid.cpp
-) 
-list (APPEND src_files ${src_bb3_aux_ps})
-set(header_bb3_aux_ps
-    src/bb3/aux_ps/fan.h
-    src/bb3/aux_ps/pid.h
-) 
-list (APPEND header_files ${header_bb3_aux_ps})
-source_group("bb3\\aux_ps" FILES ${src_bb3_aux_ps} ${header_bb3_aux_ps})
-
-set(src_bb3_bp3c
-    src/bb3/bp3c/comm.cpp
-    src/bb3/bp3c/eeprom.cpp
-    src/bb3/bp3c/io_exp.cpp
-    src/bb3/bp3c/flash_slave.cpp
-) 
-list (APPEND src_files ${src_bb3_bp3c})
-set(header_bb3_bp3c
-    src/bb3/bp3c/comm.h
-    src/bb3/bp3c/eeprom.h
-    src/bb3/bp3c/io_exp.h
-    src/bb3/bp3c/flash_slave.h
-) 
-list (APPEND header_files ${header_bb3_bp3c})
-source_group("bb3\\bp3c" FILES ${src_bb3_bp3c} ${header_bb3_bp3c})
-
-set(src_bb3_fpga
-    src/bb3/fpga/prog.cpp
-) 
-list (APPEND src_files ${src_bb3_fpga})
-set(header_bb3_fpga
-    src/bb3/fpga/prog.h
-) 
-list (APPEND header_files ${header_bb3_fpga})
-source_group("bb3\\fpga" FILES ${src_bb3_fpga} ${header_bb3_fpga})
-
-set(src_bb3_mcu
-    src/bb3/mcu/battery.cpp
-    src/bb3/mcu/ethernet.cpp
-    src/bb3/mcu/encoder.cpp
-    src/bb3/mcu/sdram.cpp) 
-list (APPEND src_files ${src_bb3_mcu})
-set(header_bb3_mcu
-    src/bb3/mcu/battery.h
-    src/bb3/mcu/encoder.h
-    src/bb3/mcu/ethernet.h
-    src/bb3/mcu/sdram.h) 
-list (APPEND header_files ${header_bb3_mcu})
-source_group("bb3\\mcu" FILES ${src_bb3_mcu} ${header_bb3_mcu})
-
-set(src_bb3_dib_dcp405
-    src/bb3/dib-dcp405/adc.cpp
-    src/bb3/dib-dcp405/dib-dcp405.cpp
-    src/bb3/dib-dcp405/dac.cpp
-    src/bb3/dib-dcp405/ioexp.cpp
-) 
-list (APPEND src_files ${src_bb3_dib_dcp405})
-set(header_bb3_dib_dcp405
-    src/bb3/dib-dcp405/adc.h
-    src/bb3/dib-dcp405/dib-dcp405.h
-    src/bb3/dib-dcp405/dac.h
-    src/bb3/dib-dcp405/ioexp.h
-) 
-list (APPEND header_files ${header_bb3_dib_dcp405})
-source_group("bb3\\dib-dcp405" FILES ${src_bb3_dib_dcp405} ${header_bb3_dib_dcp405})
-
-set(src_bb3_dib_dcm220
-    src/bb3/dib-dcm220/dib-dcm220.cpp
-) 
-list (APPEND src_files ${src_bb3_dib_dcm220})
-set(header_bb3_dib_dcm220
-    src/bb3/dib-dcm220/dib-dcm220.h
-) 
-list (APPEND header_files ${header_bb3_dib_dcm220})
-source_group("bb3\\dib-dcm220" FILES ${src_bb3_dib_dcm220} ${header_bb3_dib_dcm220})
-
-set(src_bb3_dib_dcm224
-    src/bb3/dib-dcm224/dib-dcm224.cpp
-) 
-list (APPEND src_files ${src_bb3_dib_dcm224})
-set(header_bb3_dib_dcm224
-    src/bb3/dib-dcm224/dib-dcm224.h
-) 
-list (APPEND header_files ${header_bb3_dib_dcm224})
-source_group("bb3\\dib-dcm224" FILES ${src_bb3_dib_dcm224} ${header_bb3_dib_dcm224})
-
-set(src_bb3_dib_mio168
-    src/bb3/dib-mio168/dib-mio168.cpp
-) 
-list (APPEND src_files ${src_bb3_dib_mio168})
-set(header_bb3_dib_mio168
-    src/bb3/dib-mio168/dib-mio168.h
-) 
-list (APPEND header_files ${header_bb3_dib_mio168})
-source_group("bb3\\dib-mio168" FILES ${src_bb3_dib_mio168} ${header_bb3_dib_mio168})
-
-set(src_bb3_dib_prel6
-    src/bb3/dib-prel6/dib-prel6.cpp
-) 
-list (APPEND src_files ${src_bb3_dib_prel6})
-set(header_bb3_dib_prel6
-    src/bb3/dib-prel6/dib-prel6.h
-) 
-list (APPEND header_files ${header_bb3_dib_prel6})
-source_group("bb3\\dib-prel6" FILES ${src_bb3_dib_prel6} ${header_bb3_dib_prel6})
-
-set(src_bb3_dib_mux14d
-    src/bb3/dib-mux14d/dib-mux14d.cpp
-) 
-list (APPEND src_files ${src_bb3_dib_mux14d})
-set(header_bb3_dib_mux14d
-    src/bb3/dib-mux14d/dib-mux14d.h
-) 
-list (APPEND header_files ${header_bb3_dib_mux14d})
-source_group("bb3\\dib-mux14d" FILES ${src_bb3_dib_mux14d} ${header_bb3_dib_mux14d})
-
-set(src_bb3_dib_smx46
-    src/bb3/dib-smx46/dib-smx46.cpp
-) 
-list (APPEND src_files ${src_bb3_dib_smx46})
-set(header_bb3_dib_smx46
-    src/bb3/dib-smx46/dib-smx46.h
-) 
-list (APPEND header_files ${header_bb3_dib_smx46})
-source_group("bb3\\dib-smx46" FILES ${src_bb3_dib_smx46} ${header_bb3_dib_smx46})
-
-set(src_bb3_platform_simulator
-    src/bb3/platform/simulator/front_panel.cpp
-) 
-list (APPEND src_files ${src_bb3_platform_simulator})
-set(header_bb3_platform_simulator
-    src/bb3/platform/simulator/front_panel.h
-) 
-list (APPEND header_files ${header_bb3_platform_simulator})
-source_group("bb3\\platform\\simulator" FILES ${src_bb3_platform_simulator} ${header_bb3_platform_simulator})
-
-set(src_bb3_scpi
-    src/bb3/scpi/regs.cpp
-    src/bb3/scpi/scpi.cpp
-) 
-list (APPEND src_files ${src_bb3_scpi})
-set(header_bb3_scpi
-    src/bb3/scpi/commands.h
-    src/bb3/scpi/regs.h
-    src/bb3/scpi/scpi.h
-    src/bb3/scpi/scpi_user_config.h
-) 
-list (APPEND header_files ${header_bb3_scpi})
-source_group("bb3\\scpi" FILES ${src_bb3_scpi} ${header_bb3_scpi})
+set(micropython_src_files)
+set(micropython_header_files)
 
 set(src_third_party_micropython_extmod
     src/third_party/micropython/extmod/virtpin.c
     src/third_party/micropython/extmod/utime_mphal.c
 )
-list (APPEND src_files ${src_third_party_micropython_extmod})
+list (APPEND micropython_src_files ${src_third_party_micropython_extmod})
 set(header_third_party_micropython_extmod
     src/third_party/micropython/extmod/virtpin.h
     src/third_party/micropython/extmod/utime_mphal.h
 )
-list (APPEND header_files ${header_third_party_micropython_extmod})
-source_group("third_party\\micropython\\extmod" FILES ${src_third_party_micropython_extmod} ${header_third_party_micropython_extmod})
+list (APPEND micropython_header_files ${header_third_party_micropython_extmod})
 
 set(src_third_party_micropython_ports_bb3
     src/third_party/micropython/ports/bb3/main.c
     src/third_party/micropython/ports/bb3/gccollect.cpp
     src/third_party/micropython/ports/bb3/mphalport.cpp
 )
-if (UNIX)
-    set_source_files_properties(${src_third_party_micropython_ports_bb3} PROPERTIES COMPILE_FLAGS -fpermissive)
-endif()
-list (APPEND src_files ${src_third_party_micropython_ports_bb3})
+list (APPEND micropython_src_files ${src_third_party_micropython_ports_bb3})
 set(header_third_party_micropython_ports_bb3
     src/third_party/micropython/ports/bb3/mpconfigport.h
     src/third_party/micropython/ports/bb3/mphalport.h
     src/third_party/micropython/ports/bb3/qstrdefsport.h
 )
-list (APPEND header_files ${header_third_party_micropython_ports_bb3})
-source_group("third_party\\micropython\\ports\\bb3" FILES ${src_third_party_micropython_ports_bb3} ${header_third_party_micropython_ports_bb3})
+list (APPEND micropython_header_files ${header_third_party_micropython_ports_bb3})
 
 set(header_third_party_micropython_ports_bb3_genhdr
     src/third_party/micropython/ports/bb3/genhdr/moduledefs.h
     src/third_party/micropython/ports/bb3/genhdr/mpversion.h
     src/third_party/micropython/ports/bb3/genhdr/qstrdefs.generated.h
 )
-list (APPEND header_files ${header_third_party_micropython_ports_bb3_genhdr})
-source_group("third_party\\micropython\\ports\\bb3\\genhdr" FILES ${header_third_party_micropython_ports_bb3_genhdr})
+list (APPEND micropython_header_files ${header_third_party_micropython_ports_bb3_genhdr})
 
 set(src_third_party_micropython_ports_bb3_mod_eez
     src/third_party/micropython/ports/bb3/mod/eez/modeez_table.c
     src/third_party/micropython/ports/bb3/mod/eez/modeez.cpp
 )
-list (APPEND src_files ${src_third_party_micropython_ports_bb3_mod_eez})
+list (APPEND micropython_src_files ${src_third_party_micropython_ports_bb3_mod_eez})
 set(header_third_party_micropython_ports_bb3_mod_eez
     src/third_party/micropython/ports/bb3/mod/eez/modeez.h
 )
-list (APPEND header_files ${header_third_party_micropython_ports_bb3_mod_eez})
-source_group("third_party\\micropython\\ports\\bb3\\modeez" FILES ${src_third_party_micropython_ports_bb3_mod_eez} ${header_third_party_micropython_ports_bb3_mod_eez})
+list (APPEND micropython_header_files ${header_third_party_micropython_ports_bb3_mod_eez})
 
 set(src_third_party_micropython_ports_bb3_mod_utime
     src/third_party/micropython/ports/bb3/mod/utime/modutime.c
 )
-list (APPEND src_files ${src_third_party_micropython_ports_bb3_mod_utime})
-source_group("third_party\\micropython\\ports\\bb3\\utime" FILES ${src_third_party_micropython_ports_bb3_mod_utime})
+list (APPEND micropython_src_files ${src_third_party_micropython_ports_bb3_mod_utime})
 
-set(src_third_party_micropython_py
-    src/third_party/micropython/py/argcheck.c
-    src/third_party/micropython/py/asmarm.c
-    src/third_party/micropython/py/asmbase.c
-    src/third_party/micropython/py/asmthumb.c
-    src/third_party/micropython/py/asmx64.c
-    src/third_party/micropython/py/asmx86.c
-    src/third_party/micropython/py/asmxtensa.c
-    src/third_party/micropython/py/bc.c
-    src/third_party/micropython/py/binary.c
-    src/third_party/micropython/py/builtinevex.c
-    src/third_party/micropython/py/builtinhelp.c
-    src/third_party/micropython/py/builtinimport.c
-    src/third_party/micropython/py/compile.c
-    src/third_party/micropython/py/emitbc.c
-    src/third_party/micropython/py/emitcommon.c
-    src/third_party/micropython/py/emitglue.c
-    src/third_party/micropython/py/emitinlinethumb.c
-    src/third_party/micropython/py/emitinlinextensa.c
-    src/third_party/micropython/py/emitnarm.c
-    src/third_party/micropython/py/emitnative.c
-    src/third_party/micropython/py/emitnthumb.c
-    src/third_party/micropython/py/emitnx64.c
-    src/third_party/micropython/py/emitnx86.c
-    src/third_party/micropython/py/emitnxtensa.c
-    src/third_party/micropython/py/formatfloat.c
-    src/third_party/micropython/py/frozenmod.c
-    src/third_party/micropython/py/gc.c
-    src/third_party/micropython/py/lexer.c
-    src/third_party/micropython/py/malloc.c
-    src/third_party/micropython/py/map.c
-    src/third_party/micropython/py/modarray.c
-    src/third_party/micropython/py/modbuiltins.c
-    src/third_party/micropython/py/modcmath.c
-    src/third_party/micropython/py/modcollections.c
-    src/third_party/micropython/py/modgc.c
-    src/third_party/micropython/py/modio.c
-    src/third_party/micropython/py/modmath.c
-    src/third_party/micropython/py/modmicropython.c
-    src/third_party/micropython/py/modstruct.c
-    src/third_party/micropython/py/modsys.c
-    src/third_party/micropython/py/modthread.c
-    src/third_party/micropython/py/moduerrno.c
-    src/third_party/micropython/py/mpprint.c
-    src/third_party/micropython/py/mpstate.c
-    src/third_party/micropython/py/mpz.c
-    src/third_party/micropython/py/nativeglue.c
-    src/third_party/micropython/py/nlr.c
-    src/third_party/micropython/py/nlrsetjmp.c
-    src/third_party/micropython/py/nlrthumb.c
-    src/third_party/micropython/py/nlrx64.c
-    src/third_party/micropython/py/nlrx86.c
-    src/third_party/micropython/py/nlrxtensa.c
-    src/third_party/micropython/py/objarray.c
-    src/third_party/micropython/py/objattrtuple.c
-    src/third_party/micropython/py/objbool.c
-    src/third_party/micropython/py/objboundmeth.c
-    src/third_party/micropython/py/obj.c
-    src/third_party/micropython/py/objcell.c
-    src/third_party/micropython/py/objclosure.c
-    src/third_party/micropython/py/objcomplex.c
-    src/third_party/micropython/py/objdeque.c
-    src/third_party/micropython/py/objdict.c
-    src/third_party/micropython/py/objenumerate.c
-    src/third_party/micropython/py/objexcept.c
-    src/third_party/micropython/py/objfilter.c
-    src/third_party/micropython/py/objfloat.c
-    src/third_party/micropython/py/objfun.c
-    src/third_party/micropython/py/objgenerator.c
-    src/third_party/micropython/py/objgetitemiter.c
-    src/third_party/micropython/py/objint.c
-    src/third_party/micropython/py/objint_longlong.c
-    src/third_party/micropython/py/objint_mpz.c
-    src/third_party/micropython/py/objlist.c
-    src/third_party/micropython/py/objmap.c
-    src/third_party/micropython/py/objmodule.c
-    src/third_party/micropython/py/objnamedtuple.c
-    src/third_party/micropython/py/objnone.c
-    src/third_party/micropython/py/objobject.c
-    src/third_party/micropython/py/objpolyiter.c
-    src/third_party/micropython/py/objproperty.c
-    src/third_party/micropython/py/objrange.c
-    src/third_party/micropython/py/objreversed.c
-    src/third_party/micropython/py/objset.c
-    src/third_party/micropython/py/objsingleton.c
-    src/third_party/micropython/py/objslice.c
-    src/third_party/micropython/py/objstr.c
-    src/third_party/micropython/py/objstringio.c
-    src/third_party/micropython/py/objstrunicode.c
-    src/third_party/micropython/py/objtuple.c
-    src/third_party/micropython/py/objtype.c
-    src/third_party/micropython/py/objzip.c
-    src/third_party/micropython/py/opmethods.c
-    src/third_party/micropython/py/parse.c
-    src/third_party/micropython/py/parsenumbase.c
-    src/third_party/micropython/py/parsenum.c
-    src/third_party/micropython/py/persistentcode.c
-    src/third_party/micropython/py/pystack.c
-    src/third_party/micropython/py/qstr.c
-    src/third_party/micropython/py/reader.c
-    src/third_party/micropython/py/repl.c
-    src/third_party/micropython/py/runtime.c
-    src/third_party/micropython/py/runtime_utils.c
-    src/third_party/micropython/py/scheduler.c
-    src/third_party/micropython/py/scope.c
-    src/third_party/micropython/py/sequence.c
-    src/third_party/micropython/py/showbc.c
-    src/third_party/micropython/py/smallint.c
-    src/third_party/micropython/py/stackctrl.c
-    src/third_party/micropython/py/stream.c
-    src/third_party/micropython/py/unicode.c
-    src/third_party/micropython/py/vm.c
-    src/third_party/micropython/py/vstr.c
-    src/third_party/micropython/py/warning.c
+file(GLOB src_third_party_micropython_py
+    src/third_party/micropython/py/*.c
 )
+list (APPEND micropython_src_files ${src_third_party_micropython_py})
+file(GLOB header_third_party_micropython_py
+    *.h
+)
+list (APPEND micropython_header_files ${header_third_party_micropython_py})
+
 if (UNIX)
-    set_source_files_properties(${src_third_party_micropython_py} PROPERTIES COMPILE_FLAGS -fpermissive)
-    set_source_files_properties(${src_third_party_micropython_py} PROPERTIES COMPILE_FLAGS -Wpointer-to-int-cast)
-    set_source_files_properties(${src_third_party_micropython_py} PROPERTIES COMPILE_FLAGS -Wint-to-pointer-cast)
+    set_source_files_properties(${micropython_src_files} PROPERTIES COMPILE_FLAGS -fpermissive)
+    set_source_files_properties(${micropython_src_files} PROPERTIES COMPILE_FLAGS -Wpointer-to-int-cast)
+    set_source_files_properties(${micropython_src_files} PROPERTIES COMPILE_FLAGS -Wint-to-pointer-cast)
 endif()
-list (APPEND src_files ${src_third_party_micropython_py})
-set(header_third_party_micropython_py
-    src/third_party/micropython/py/asmarm.h
-    src/third_party/micropython/py/asmbase.h
-    src/third_party/micropython/py/asmthumb.h
-    src/third_party/micropython/py/asmx64.h
-    src/third_party/micropython/py/asmx86.h
-    src/third_party/micropython/py/asmxtensa.h
-    src/third_party/micropython/py/bc0.h
-    src/third_party/micropython/py/bc.h
-    src/third_party/micropython/py/binary.h
-    src/third_party/micropython/py/builtin.h
-    src/third_party/micropython/py/compile.h
-    src/third_party/micropython/py/emitglue.h
-    src/third_party/micropython/py/emit.h
-    src/third_party/micropython/py/formatfloat.h
-    src/third_party/micropython/py/frozenmod.h
-    src/third_party/micropython/py/gc.h
-    src/third_party/micropython/py/grammar.h
-    src/third_party/micropython/py/lexer.h
-    src/third_party/micropython/py/misc.h
-    src/third_party/micropython/py/mpconfig.h
-    src/third_party/micropython/py/mperrno.h
-    src/third_party/micropython/py/mphal.h
-    src/third_party/micropython/py/mpprint.h
-    src/third_party/micropython/py/mpstate.h
-    src/third_party/micropython/py/mpthread.h
-    src/third_party/micropython/py/mpz.h
-    src/third_party/micropython/py/nlr.h
-    src/third_party/micropython/py/objarray.h
-    src/third_party/micropython/py/objexcept.h
-    src/third_party/micropython/py/objfun.h
-    src/third_party/micropython/py/objgenerator.h
-    src/third_party/micropython/py/obj.h
-    src/third_party/micropython/py/objint.h
-    src/third_party/micropython/py/objlist.h
-    src/third_party/micropython/py/objmodule.h
-    src/third_party/micropython/py/objnamedtuple.h
-    src/third_party/micropython/py/objstr.h
-    src/third_party/micropython/py/objstringio.h
-    src/third_party/micropython/py/objtuple.h
-    src/third_party/micropython/py/objtype.h
-    src/third_party/micropython/py/parse.h
-    src/third_party/micropython/py/parsenumbase.h
-    src/third_party/micropython/py/parsenum.h
-    src/third_party/micropython/py/persistentcode.h
-    src/third_party/micropython/py/pystack.h
-    src/third_party/micropython/py/qstrdefs.h
-    src/third_party/micropython/py/qstr.h
-    src/third_party/micropython/py/reader.h
-    src/third_party/micropython/py/repl.h
-    src/third_party/micropython/py/ringbuf.h
-    src/third_party/micropython/py/runtime0.h
-    src/third_party/micropython/py/runtime.h
-    src/third_party/micropython/py/scope.h
-    src/third_party/micropython/py/smallint.h
-    src/third_party/micropython/py/stackctrl.h
-    src/third_party/micropython/py/stream.h
-    src/third_party/micropython/py/unicode.h
-    src/third_party/micropython/py/vmentrytable.h
-)
-list (APPEND header_files ${header_third_party_micropython_py})
-source_group("third_party\\micropython\\py" FILES ${src_third_party_micropython_py} ${header_third_party_micropython_py})
 if(MSVC)
-    set_source_files_properties(${src_third_party_micropython_py} PROPERTIES COMPILE_FLAGS /W0)
+    set_source_files_properties(${micropython_src_files} PROPERTIES COMPILE_FLAGS /W0)
 endif()
+
+list (APPEND src_files ${micropython_src_files})
+list (APPEND header_files ${micropython_header_files})
+
+source_group(TREE "../../src/third_party/micropython" PREFIX "third_party/micropython" FILES ${micropython_src_files} ${micropython_header_files})
+
+################################################################################
 
 if(WIN32)
     set(src_win32_specific
         src/bb3/platform/simulator/win32/icon.rc
     ) 
     list (APPEND src_files ${src_win32_specific})
-    source_group("bb3\\win32" FILES ${src_win32_specific})
+    source_group("win32" FILES ${src_win32_specific})
 
     set(SOURCES src/bb3/platform/simulator/win32/icon.rc ${src_files})
 endif()
