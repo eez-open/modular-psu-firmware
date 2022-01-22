@@ -364,8 +364,6 @@ set(src_bb3_gui
 list (APPEND src_files ${src_bb3_gui})
 set(header_bb3_gui
     src/bb3/gui/document.h
-    src/bb3/gui/document_simulator.h
-    src/bb3/gui/document_stm32.h
     src/bb3/gui/display-hooks.h
 )
 list (APPEND header_files ${header_bb3_gui})
@@ -691,8 +689,6 @@ set(src_bb3_scpi
 list (APPEND src_files ${src_bb3_scpi})
 set(header_bb3_scpi
     src/bb3/scpi/commands.h
-    src/bb3/scpi/commands_simulator.h
-    src/bb3/scpi/commands_stm32.h
     src/bb3/scpi/regs.h
     src/bb3/scpi/scpi.h
     src/bb3/scpi/scpi_user_config.h

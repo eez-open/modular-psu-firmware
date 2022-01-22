@@ -49,16 +49,16 @@
       ],
       "files": [
         {
-          "fileName": "gui/document_<configuration>.h",
-          "template": "//${eez-studio DATA_ENUM}\n\n//${eez-studio DATA_FUNCS_DECL}\n\n//${eez-studio DATA_ARRAY_DECL}\n\n//${eez-studio ACTIONS_ENUM}\n\n//${eez-studio ACTIONS_FUNCS_DECL}\n\n//${eez-studio ACTIONS_ARRAY_DECL}\n\n//${eez-studio GUI_FONTS_ENUM}\n\n//${eez-studio GUI_BITMAPS_ENUM}\n\n//${eez-studio GUI_STYLES_ENUM}\n\n//${eez-studio GUI_THEMES_ENUM}\n\n//${eez-studio GUI_COLORS_ENUM}\n\n//${eez-studio GUI_PAGES_ENUM}\n\n//${eez-studio GUI_ASSETS_DECL_COMPRESSED}\n"
+          "fileName": "gui/document.h",
+          "template": "/*\n* EEZ Generic Firmware\n* Copyright (C) 2018-present, Envox d.o.o.\n*\n* This program is free software: you can redistribute it and/or modify\n* it under the terms of the GNU General Public License as published by\n* the Free Software Foundation, either version 3 of the License, or\n* (at your option) any later version.\n\n* This program is distributed in the hope that it will be useful,\n* but WITHOUT ANY WARRANTY; without even the implied warranty of\n* MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the\n* GNU General Public License for more details.\n\n* You should have received a copy of the GNU General Public License\n* along with this program.  If not, see http://www.gnu.org/licenses.\n*/\n\n#pragma once\n\n#include <eez/gui/data.h>\n#include <eez/gui/widget.h>\n\nnamespace eez {\nnamespace gui {\n\n#if defined(EEZ_PLATFORM_STM32)\n\n//${eez-studio DATA_ENUM stm32}\n\n//${eez-studio DATA_FUNCS_DECL stm32}\n\n//${eez-studio DATA_ARRAY_DECL stm32}\n\n//${eez-studio ACTIONS_ENUM stm32}\n\n//${eez-studio ACTIONS_FUNCS_DECL stm32}\n\n//${eez-studio ACTIONS_ARRAY_DECL stm32}\n\n//${eez-studio GUI_FONTS_ENUM stm32}\n\n//${eez-studio GUI_BITMAPS_ENUM stm32}\n\n//${eez-studio GUI_STYLES_ENUM stm32}\n\n//${eez-studio GUI_THEMES_ENUM stm32}\n\n//${eez-studio GUI_COLORS_ENUM stm32}\n\n//${eez-studio GUI_PAGES_ENUM stm32}\n\n//${eez-studio GUI_ASSETS_DECL_COMPRESSED stm32}\n\n#elif defined(EEZ_PLATFORM_SIMULATOR)\n\n//${eez-studio DATA_ENUM simulator}\n\n//${eez-studio DATA_FUNCS_DECL simulator}\n\n//${eez-studio DATA_ARRAY_DECL simulator}\n\n//${eez-studio ACTIONS_ENUM simulator}\n\n//${eez-studio ACTIONS_FUNCS_DECL simulator}\n\n//${eez-studio ACTIONS_ARRAY_DECL simulator}\n\n//${eez-studio GUI_FONTS_ENUM simulator}\n\n//${eez-studio GUI_BITMAPS_ENUM simulator}\n\n//${eez-studio GUI_STYLES_ENUM simulator}\n\n//${eez-studio GUI_THEMES_ENUM simulator}\n\n//${eez-studio GUI_COLORS_ENUM simulator}\n\n//${eez-studio GUI_PAGES_ENUM simulator}\n\n//${eez-studio GUI_ASSETS_DECL_COMPRESSED simulator}\n\n#endif\n\n} // namespace gui\n} // namespace eez\n"
         },
         {
-          "fileName": "gui/document_<configuration>.cpp",
-          "template": "//${eez-studio DATA_ARRAY_DEF}\n\n//${eez-studio ACTIONS_ARRAY_DEF}\n\n//${eez-studio GUI_ASSETS_DEF_COMPRESSED}\n"
+          "fileName": "gui/document.cpp",
+          "template": "/*\n* EEZ Generic Firmware\n* Copyright (C) 2018-present, Envox d.o.o.\n*\n* This program is free software: you can redistribute it and/or modify\n* it under the terms of the GNU General Public License as published by\n* the Free Software Foundation, either version 3 of the License, or\n* (at your option) any later version.\n\n* This program is distributed in the hope that it will be useful,\n* but WITHOUT ANY WARRANTY; without even the implied warranty of\n* MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the\n* GNU General Public License for more details.\n\n* You should have received a copy of the GNU General Public License\n* along with this program.  If not, see http://www.gnu.org/licenses.\n*/\n\n#if OPTION_DISPLAY\n\n#include <bb3/gui/document.h>\n\n#include <bb3/system.h>\n\nnamespace eez {\nnamespace gui {\n    \n#if defined(EEZ_PLATFORM_STM32)\n\n//${eez-studio DATA_ARRAY_DEF stm32}\n\n//${eez-studio ACTIONS_ARRAY_DEF stm32}\n\n//${eez-studio GUI_ASSETS_DEF_COMPRESSED stm32}\n\n#elif defined(EEZ_PLATFORM_SIMULATOR)\n\n//${eez-studio DATA_ARRAY_DEF simulator}\n\n//${eez-studio ACTIONS_ARRAY_DEF simulator}\n\n//${eez-studio GUI_ASSETS_DEF_COMPRESSED simulator}\n\n#endif\n\n} // namespace gui\n} // namespace eez\n\n#endif\n"
         },
         {
-          "fileName": "scpi/commands_<configuration>.h",
-          "template": "//${eez-studio SCPI_COMMANDS_DECL}\n"
+          "fileName": "scpi/commands.h",
+          "template": "/*\n* EEZ Generic Firmware\n* Copyright (C) 2018-present, Envox d.o.o.\n*\n* This program is free software: you can redistribute it and/or modify\n* it under the terms of the GNU General Public License as published by\n* the Free Software Foundation, either version 3 of the License, or\n* (at your option) any later version.\n\n* This program is distributed in the hope that it will be useful,\n* but WITHOUT ANY WARRANTY; without even the implied warranty of\n* MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the\n* GNU General Public License for more details.\n\n* You should have received a copy of the GNU General Public License\n* along with this program.  If not, see http://www.gnu.org/licenses.\n*/\n\n#pragma once\n\n#if defined(EEZ_PLATFORM_STM32)\n\n//${eez-studio SCPI_COMMANDS_DECL stm32}\n\n#elif defined(EEZ_PLATFORM_SIMULATOR)\n\n//${eez-studio SCPI_COMMANDS_DECL simulator}\n\n#endif\n\n"
         }
       ],
       "destinationFolder": "src\\bb3"
@@ -18277,7 +18277,7 @@
           "style": {
             "inheritFrom": "default",
             "borderSize": "0",
-            "borderRadius": 0
+            "borderRadius": "0"
           },
           "name": "Body",
           "widgets": [
@@ -26702,7 +26702,7 @@
             "alignHorizontal": "center",
             "alignVertical": "center",
             "borderSize": "0",
-            "borderRadius": 0,
+            "borderRadius": "0",
             "padding": "3"
           },
           "text": "\\u00be Pinout",
@@ -31148,7 +31148,7 @@
                 "inheritFrom": "default",
                 "font": "Oswald14",
                 "borderSize": "2",
-                "borderRadius": 0,
+                "borderRadius": "0",
                 "padding": "4"
               },
               "text": "Select user switch action at any time by pressing user switch button for more than 1 second.",
@@ -54425,7 +54425,7 @@
       "backgroundColor": "status_line_background",
       "activeColor": "status_line_background",
       "activeBackgroundColor": "status_line_text",
-      "borderRadius": 4,
+      "borderRadius": "4",
       "padding": "10"
     },
     {
