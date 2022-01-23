@@ -39,7 +39,7 @@ typedef struct {
 typedef void(*osThreadFunc_t) (void *argument);
 
 #ifdef __EMSCRIPTEN__
-typedef void *osThreadId;
+typedef void *osThreadId_t;
 #else
 typedef std::thread::id osThreadId_t;
 #endif
