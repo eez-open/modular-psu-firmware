@@ -100,7 +100,9 @@ struct MessageQueue {
     uint8_t *data;
     uint8_t numElements;
 	uint32_t elementSize;
+#ifndef __EMSCRIPTEN__
 	std::mutex mutex;
+#endif
     volatile uint16_t tail;
     volatile uint16_t head;
     volatile uint8_t overflow;

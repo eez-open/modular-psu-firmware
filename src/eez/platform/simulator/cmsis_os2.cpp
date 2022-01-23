@@ -122,14 +122,14 @@ osMessageQueueId_t osMessageQueueNew(uint32_t msg_count, uint32_t msg_size, cons
 osStatus osMessageQueueGet(osMessageQueueId_t queue, void *msg_ptr, uint8_t *, uint32_t timeout) {
     if (timeout == 0) timeout = 1;
 
+#ifndef __EMSCRIPTEN__
     queue->mutex.lock();
+#endif
 
     while (queue->tail == queue->head) {
         if (queue->overflow) {
             break;
         }
-
-        queue->mutex.unlock();
 
 #ifdef __EMSCRIPTEN__
         return {
@@ -137,6 +137,7 @@ osStatus osMessageQueueGet(osMessageQueueId_t queue, void *msg_ptr, uint8_t *, u
             0
         };
 #else
+        queue->mutex.unlock();
         
         osDelay(1);
 		timeout -= 1;
@@ -144,9 +145,9 @@ osStatus osMessageQueueGet(osMessageQueueId_t queue, void *msg_ptr, uint8_t *, u
         if (timeout == 0) {
             return osError;
         }
-#endif
 
         queue->mutex.lock();
+#endif
     }
 
     uint16_t tail = queue->tail + 1;
@@ -161,21 +162,27 @@ osStatus osMessageQueueGet(osMessageQueueId_t queue, void *msg_ptr, uint8_t *, u
         queue->overflow = 0;
     }
 
+#ifndef __EMSCRIPTEN__
     queue->mutex.unlock();
+#endif
 
     return osOK;
 }
 
 osStatus osMessageQueuePut(osMessageQueueId_t queue, const void *msg_ptr, uint8_t, uint32_t timeout) {
+#ifndef __EMSCRIPTEN__    
     queue->mutex.lock();
     for (uint32_t i = 0; queue->overflow && i < timeout; i++) {
         queue->mutex.unlock();
         osDelay(1);
         queue->mutex.lock();
     }
+#endif
     
     if (queue->overflow) {
+#ifndef __EMSCRIPTEN__    
         queue->mutex.unlock();
+#endif
 		printf("overflow\n");
         return osError;
     }
@@ -192,7 +199,9 @@ osStatus osMessageQueuePut(osMessageQueueId_t queue, const void *msg_ptr, uint8_
         queue->overflow = 1;
     }
 
+#ifndef __EMSCRIPTEN__    
     queue->mutex.unlock();
+#endif
 
     return osOK;
 }
