@@ -35,6 +35,7 @@ endif (UNIX)
 
 add_definitions(-DDEBUG)
 
+add_definitions(-DOPTION_SCPI=1)
 add_definitions(-DHAVE_STRTOLL)
 add_definitions(-DHAVE_STDBOOL)
 add_definitions(-DSCPI_USER_CONFIG)
