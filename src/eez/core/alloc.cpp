@@ -19,6 +19,7 @@
 #include <stdio.h>
 #include <math.h>
 #include <assert.h>
+#include <memory.h>
 
 #include <eez/core/alloc.h>
 #include <eez/core/os.h>
