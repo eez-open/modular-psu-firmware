@@ -1066,7 +1066,7 @@ bool do_OPERATION_TYPE_STRING_FIND(EvalStack &stack) {
 	} else {
 		const char *pos = strstr(aStr.getString(), bStr.getString());
 		if (!pos) {
-			if (!stack.push(Value(pos - aStr.getString(), VALUE_TYPE_INT32))) {
+			if (!stack.push(Value((int)(pos - aStr.getString()), VALUE_TYPE_INT32))) {
 				return false;
 			}
 		} else {
