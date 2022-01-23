@@ -18,6 +18,8 @@
 
 #pragma once
 
+#ifdef DEBUG
+
 #include <stdlib.h>
 #include <stdint.h>
 
@@ -41,13 +43,12 @@ void Trace(TraceType traceType, const char *format, ...);
 
 #define InfoTrace(...) ::eez::debug::Trace(::eez::debug::TRACE_TYPE_INFO, __VA_ARGS__)
 #define ErrorTrace(...) ::eez::debug::Trace(::eez::debug::TRACE_TYPE_ERROR, __VA_ARGS__)
-
-#ifdef DEBUG
-
 #define DebugTrace(...) ::eez::debug::Trace(::eez::debug::TRACE_TYPE_DEBUG, __VA_ARGS__)
 
 #else // NO DEBUG
 
+#define InfoTrace(...) 0
+#define ErrorTrace(...) 0
 #define DebugTrace(...) 0
 
 #endif
