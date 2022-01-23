@@ -143,7 +143,7 @@ scpi_result_t scpi_cmd_debug(scpi_t *context) {
 		else if (cmd == 34) {
 			g_startTime = millis();
 		} 
-#if defined(EEZ_CONF_GUI_CALC_FPS) && defined(EEZ_CONF_STYLE_ID_FPS_GRAPH)
+#if defined(GUI_CALC_FPS) && defined(STYLE_ID_FPS_GRAPH)
         else if (cmd == 35) {
 			using namespace eez::gui;
 			using namespace eez::gui::display;
