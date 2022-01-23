@@ -126,10 +126,11 @@ list (APPEND header_files ${header_eez})
 
 source_group(TREE "../../src/eez" PREFIX "eez" FILES ${src_eez} ${header_eez})
 
-# TODO
-#if(MSVC)
-#    set_source_files_properties(${src_eez_libs_libscpi} PROPERTIES COMPILE_FLAGS /W0)
-#endif()
+if(MSVC)
+    set(libscpi_src_files ${src_files})
+    list(FILTER libscpi_src_files INCLUDE REGEX "${CMAKE_CURRENT_SOURCE_DIR}/src/eez/libs/libscpi")
+    set_source_files_properties(${libscpi_src_files} PROPERTIES COMPILE_FLAGS /W0)
+endif()
 
 ################################################################################
 
@@ -168,10 +169,9 @@ list (APPEND header_files ${header_bb3})
 
 source_group(TREE "../../src/bb3" PREFIX "bb3" FILES ${src_bb3} ${header_bb3})
 
-#TODO
-#if(MSVC)
-#    set_source_files_properties(src/bb3/libs/image/toojpeg.cpp PROPERTIES COMPILE_FLAGS /W0)
-#endif()
+if(MSVC)
+    set_source_files_properties(${CMAKE_CURRENT_SOURCE_DIR}/src/bb3/libs/image/toojpeg.cpp PROPERTIES COMPILE_FLAGS /W0)
+endif()
 
 ################################################################################
 
