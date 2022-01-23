@@ -307,18 +307,19 @@ void update() {
 }
 
 const uint8_t *takeScreenshot() {
+#ifdef __EMSCRIPTEN__
+    copySyncedBufferToScreenshotBuffer();
+#else
     while (g_screenshotAllocated) {
     }
 
 	g_takeScreenshot = true;
 
-#ifdef __EMSCRIPTEN__
-    doTakeScreenshot();
-#endif
-
 	do {
 		osDelay(0);
 	} while (g_takeScreenshot);
+
+#endif
 
     return SCREENSHOOT_BUFFER_START_ADDRESS;
 }

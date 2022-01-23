@@ -77,7 +77,9 @@ osStatus osKernelStart(void) {
 }
 
 osStatus osDelay(uint32_t millisec) {
+#ifndef __EMSCRIPTEN__
     std::this_thread::sleep_for(std::chrono::milliseconds(millisec));
+#endif
     return osOK;
 }
 
@@ -89,7 +91,11 @@ uint32_t osKernelGetTickCount() {
 ////////////////////////////////////////////////////////////////////////////////
 
 osMutexId_t osMutexNew(const osMutexAttr_t *) {
+#ifdef __EMSCRIPTEN__
+    return true;
+#else
     return new std::mutex;
+#endif
 }
 
 osStatus osMutexAcquire(osMutexId_t mutex, unsigned int timeout) {
@@ -132,10 +138,7 @@ osStatus osMessageQueueGet(osMessageQueueId_t queue, void *msg_ptr, uint8_t *, u
         }
 
 #ifdef __EMSCRIPTEN__
-        return {
-            osOK,
-            0
-        };
+        return osOK;
 #else
         queue->mutex.unlock();
         
