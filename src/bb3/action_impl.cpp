@@ -1132,7 +1132,7 @@ void onSetModuleType(uint16_t moduleType) {
     bp3c::eeprom::writeModuleType(hmi::g_selectedSlotIndex, moduleType);
 
 #ifdef __EMSCRIPTEN__
-    infoMessage("Reload page to apply change!");
+    g_psuAppContext.infoMessage("Reload page to apply change!");
 #else
 	g_psuAppContext.infoMessage("Restart program to apply change!");
 #endif

@@ -19,6 +19,7 @@
 #pragma once
 
 #include <stdint.h>
+#include <stdlib.h>
 
 #ifdef EEZ_PLATFORM_STM32
 #include "main.h"

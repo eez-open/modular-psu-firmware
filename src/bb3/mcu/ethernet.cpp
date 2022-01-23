@@ -16,10 +16,11 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
+#include <stdint.h>
+
 #if OPTION_ETHERNET
 
 #include <assert.h>
-#include <stdint.h>
 #include <stdlib.h>
 #include <memory.h>
 
@@ -1107,4 +1108,26 @@ void ntpStateTransition(int transition) {
 } // namespace mcu
 } // namespace eez
 
-#endif // EEZ_PLATFORM_SIMULATOR
+#else
+
+namespace eez {
+namespace mcu {
+namespace ethernet {
+
+void getDebuggerInputBuffer(char **buffer, uint32_t *length) {
+    *buffer = nullptr;
+    *length = 0;
+}
+
+void releaseDebuggerInputBuffer() {
+}
+
+int writeDebuggerBuffer(const char *buffer, uint32_t length) {
+    return 0;
+}
+
+} // namespace ethernet
+} // namespace mcu
+} // namespace eez
+
+#endif // OPTION_ETHERNET

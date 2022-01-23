@@ -1506,7 +1506,7 @@ unsigned Parameters::setPeriod(float value) {
 class DlogParamsPage : public SetPage {
 public:
     static Parameters g_parameters;
-    static const int PAGE_SIZE = 6;
+    static const int ITEMS_PER_PAGE = 6;
     static int g_scrollPosition;
 	static float g_minPeriod;
 
@@ -1636,14 +1636,14 @@ public:
     }
 
     static void setScrollPosition(int scrollPosition) {
-        if (g_numDlogResources <= PAGE_SIZE) {
+        if (g_numDlogResources <= ITEMS_PER_PAGE) {
             return;
         }
 
         if (scrollPosition < 0) {
             scrollPosition = 0;
-        } else if (scrollPosition > g_numDlogResources - PAGE_SIZE) {
-            scrollPosition = g_numDlogResources - PAGE_SIZE;
+        } else if (scrollPosition > g_numDlogResources - ITEMS_PER_PAGE) {
+            scrollPosition = g_numDlogResources - ITEMS_PER_PAGE;
         }
         
         if (scrollPosition != DlogParamsPage::g_scrollPosition) {
@@ -1911,7 +1911,7 @@ void data_recording_ready(DataOperationEnum operation, const WidgetCursor &widge
 
 void data_dlog_items_scrollbar_enabled(DataOperationEnum operation, const WidgetCursor &widgetCursor, Value &value) {
     if (operation == DATA_OPERATION_GET) {
-        value = DlogParamsPage::getNumDlogResources() > DlogParamsPage::PAGE_SIZE;
+        value = DlogParamsPage::getNumDlogResources() > DlogParamsPage::ITEMS_PER_PAGE;
     }
 }
 
@@ -1953,7 +1953,7 @@ void data_dlog_items(DataOperationEnum operation, const WidgetCursor &widgetCurs
     } else if (operation == DATA_OPERATION_YT_DATA_GET_POSITION_INCREMENT) {
         value = 1;
     } else if (operation == DATA_OPERATION_YT_DATA_GET_PAGE_SIZE) {
-        value = DlogParamsPage::PAGE_SIZE;
+        value = DlogParamsPage::ITEMS_PER_PAGE;
     }
 }
 

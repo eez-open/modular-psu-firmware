@@ -47,7 +47,9 @@ extern "C" {
 
 typedef jmp_buf regs_t;
 static void gc_helper_get_regs(regs_t arr) {
+#ifndef __EMSCRIPTEN__
     setjmp(arr);
+#endif
 }
 
 extern "C" void gc_collect(void) {
