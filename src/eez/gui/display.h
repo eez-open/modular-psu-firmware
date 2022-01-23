@@ -82,9 +82,9 @@ VideoBuffer getBufferPointer();
 const uint8_t *takeScreenshot();
 void releaseScreenshot();
 
-#ifdef EEZ_CONF_GUI_CALC_FPS
+#ifdef GUI_CALC_FPS
 extern bool g_calcFpsEnabled;
-#if defined(EEZ_CONF_STYLE_ID_FPS_GRAPH)
+#if defined(STYLE_ID_FPS_GRAPH)
 extern bool g_drawFpsGraphEnabled;
 #endif
 extern uint32_t g_fpsAvg;

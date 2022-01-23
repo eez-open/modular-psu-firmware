@@ -339,7 +339,7 @@ static void findWidgetStep() {
         int distance = dx * dx + dy * dy;
 
         auto action = getWidgetAction(widgetCursor);        
-        if (action == EEZ_CONF_ACTION_ID_DRAG_OVERLAY) {
+        if (action == ACTION_ID_DRAG_OVERLAY) {
             if (overlay && !overlay->state) {
                 return;
             }

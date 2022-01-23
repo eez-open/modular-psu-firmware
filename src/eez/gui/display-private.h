@@ -83,7 +83,7 @@ inline bool isDirty() { return g_dirty; }
 
 extern bool g_screenshotAllocated;
 
-#ifdef EEZ_CONF_GUI_CALC_FPS
+#ifdef GUI_CALC_FPS
 static const size_t NUM_FPS_VALUES = 60;
 extern uint32_t g_fpsValues[NUM_FPS_VALUES];
 void calcFPS();

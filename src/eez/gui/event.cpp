@@ -203,7 +203,7 @@ static void onWidgetDefaultTouch(const WidgetCursor &widgetCursor, Event &touchE
         g_touchActionExecuted = false;
         g_touchActionExecutedAtDown = false;
 
-        if (action == EEZ_CONF_ACTION_ID_DRAG_OVERLAY) {
+        if (action == ACTION_ID_DRAG_OVERLAY) {
             dragOverlay(touchEvent);
             g_activeWidget = widgetCursor;
         } else if (widgetCursor.appContext->testExecuteActionOnTouchDown(action)) {
@@ -216,7 +216,7 @@ static void onWidgetDefaultTouch(const WidgetCursor &widgetCursor, Event &touchE
             g_activeWidget = widgetCursor;
         }
     } else if (touchEvent.type == EVENT_TYPE_TOUCH_MOVE) {
-        if (action == EEZ_CONF_ACTION_ID_DRAG_OVERLAY) {
+        if (action == ACTION_ID_DRAG_OVERLAY) {
             dragOverlay(touchEvent);
         }
     } else if (touchEvent.type == EVENT_TYPE_AUTO_REPEAT) {
@@ -235,7 +235,7 @@ static void onWidgetDefaultTouch(const WidgetCursor &widgetCursor, Event &touchE
     } else if (touchEvent.type == EVENT_TYPE_TOUCH_UP) {
         if (!g_touchActionExecutedAtDown) {
             if (!g_touchActionExecuted) {
-                if (action == EEZ_CONF_ACTION_ID_DRAG_OVERLAY) {
+                if (action == ACTION_ID_DRAG_OVERLAY) {
                     dragOverlay(touchEvent);
                 } else {
                     executeAction(widgetCursor, action);

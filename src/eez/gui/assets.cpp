@@ -160,11 +160,11 @@ const Style *getStyle(int styleID) {
 		return g_mainAssets->styles[styleID - 1];
 	} else if (styleID < 0) {
 		if (g_externalAssets == nullptr) {
-			return getStyle(EEZ_CONF_STYLE_ID_DEFAULT);
+			return getStyle(STYLE_ID_DEFAULT);
 		}
 		return g_externalAssets->styles[-styleID - 1];
 	}
-	return getStyle(EEZ_CONF_STYLE_ID_DEFAULT);
+	return getStyle(STYLE_ID_DEFAULT);
 }
 
 const FontData *getFontData(int fontID) {

@@ -751,7 +751,7 @@ static const int W = 20;
 static const int H = 20;
 
 void drawShadowGlyph(ShadowGlpyh shadowGlyph, int x, int y, int xClip = -1, int yClip = -1) {
-	font::Font font(getFontData(EEZ_CONF_FONT_ID_SHADOW));
+	font::Font font(getFontData(FONT_ID_SHADOW));
 
 	if (xClip == -1) {
 		xClip = x + W - 1;

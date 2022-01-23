@@ -133,9 +133,9 @@ void turnOff() {
 
 ////////////////////////////////////////////////////////////////////////////////
 
-#ifdef EEZ_CONF_GUI_CALC_FPS
+#ifdef GUI_CALC_FPS
 bool g_calcFpsEnabled;
-#if defined(EEZ_CONF_STYLE_ID_FPS_GRAPH)
+#if defined(STYLE_ID_FPS_GRAPH)
 bool g_drawFpsGraphEnabled;
 #endif
 uint32_t g_fpsValues[NUM_FPS_VALUES];
@@ -277,13 +277,15 @@ void update() {
         return;
     }
 
+#ifdef GUI_CALC_FPS
 	g_lastTimeFPS = millis();
+#endif
 
     display::beginRendering();
     updateScreen();
     display::endRendering();
 
-#ifdef EEZ_CONF_GUI_CALC_FPS
+#ifdef GUI_CALC_FPS
     if (g_calcFpsEnabled) {
         calcFPS();
     }
@@ -386,7 +388,7 @@ void endRendering() {
     }
 #endif
 
-#if defined(EEZ_CONF_GUI_CALC_FPS) && defined(EEZ_CONF_STYLE_ID_FPS_GRAPH)
+#if defined(GUI_CALC_FPS) && defined(STYLE_ID_FPS_GRAPH)
     if (g_drawFpsGraphEnabled) {
 	    setDirty();
     }
@@ -407,7 +409,7 @@ void endRendering() {
             if (renderBuffer.backdrop) {
                 // opacity backdrop
                 auto savedOpacity = setOpacity(CONF_BACKDROP_OPACITY);
-                setColor(EEZ_CONF_COLOR_ID_BACKDROP);
+                setColor(COLOR_ID_BACKDROP);
                 fillRect(renderBuffer.backdrop->x, renderBuffer.backdrop->y, renderBuffer.backdrop->x + renderBuffer.backdrop->w - 1, renderBuffer.backdrop->y + renderBuffer.backdrop->h - 1);
                 setOpacity(savedOpacity);
             }
@@ -419,9 +421,9 @@ void endRendering() {
             bitBlt(g_renderBuffers[bufferIndex].bufferPointer, nullptr, sx, sy, x2 - x1 + 1, y2 - y1 + 1, x1, y1, renderBuffer.opacity);
         }
 
-#if defined(EEZ_CONF_GUI_CALC_FPS) && defined(EEZ_CONF_STYLE_ID_FPS_GRAPH)
+#if defined(GUI_CALC_FPS) && defined(STYLE_ID_FPS_GRAPH)
         if (g_drawFpsGraphEnabled) {
-            drawFpsGraph(getDisplayWidth() - 64 - 4, 4, 64, 32, getStyle(EEZ_CONF_STYLE_ID_FPS_GRAPH));
+            drawFpsGraph(getDisplayWidth() - 64 - 4, 4, 64, 32, getStyle(STYLE_ID_FPS_GRAPH));
         }
 #endif
 

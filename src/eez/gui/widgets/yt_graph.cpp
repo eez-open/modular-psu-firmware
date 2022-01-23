@@ -428,7 +428,7 @@ struct YTGraphStaticDrawHelper {
 		if (widgetState->bookmarks) {
 			for (int x = 0; x < widget->w; x++) {
 				if (widgetState->bookmarks[x]) {
-					display::setColor(EEZ_CONF_COLOR_ID_BOOKMARK);
+					display::setColor(COLOR_ID_BOOKMARK);
 					display::drawVLine(startX + x, widgetCursor.y, widget->h - 1);
 				}
 			}

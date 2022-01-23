@@ -149,7 +149,7 @@ void ScrollBarWidgetState::render() {
         }
 
         auto action = getWidgetAction(widgetCursor);        
-        if (flags.focused && action == EEZ_CONF_ACTION_ID_SCROLL) {
+        if (flags.focused && action == ACTION_ID_SCROLL) {
             const Style *style = getStyle(widgetCursor.widget->style);
             display::setColor(style->focusColor);
             display::drawRect(widgetCursor.x, widgetCursor.y, widgetCursor.x + widget->w - 1, widgetCursor.y + widget->h - 1);
@@ -249,7 +249,7 @@ void ScrollBarWidgetState::onTouch(const WidgetCursor &widgetCursor, Event &touc
         }
 
         auto action = getWidgetAction(widgetCursor);        
-		if (action == EEZ_CONF_ACTION_ID_SCROLL) {
+		if (action == ACTION_ID_SCROLL) {
 			g_hooks.setFocusCursor(widgetCursor, widget->data);
 		}
     }
