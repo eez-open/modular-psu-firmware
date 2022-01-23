@@ -41,7 +41,14 @@
 #endif
 
 #include <eez/core/util.h>
+
+#if OPTION_SCPI
 #include <scpi/scpi.h>
+#else
+#define SCPI_ERROR_MASS_STORAGE_ERROR -321
+#define SCPI_RES_OK -161
+#endif
+
 
 namespace eez {
 

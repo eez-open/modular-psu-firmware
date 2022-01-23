@@ -20,8 +20,11 @@
 
 #include <stdint.h>
 #include <math.h>
-#include <scpi/scpi.h>
 #include <new>
+
+#if OPTION_SCPI
+#include <scpi/scpi.h>
+#endif
 
 namespace eez {
 
@@ -41,7 +44,9 @@ template<class T> struct ObjectAllocator {
 	}
 };
 
+#if OPTION_SCPI
 void dumpAlloc(scpi_t *context);
+#endif
 
 void getAllocInfo(uint32_t &free, uint32_t &alloc);
 

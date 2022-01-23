@@ -20,10 +20,11 @@
 
 #include <eez/core/unit.h>
 
+#if OPTION_SCPI
 #include <scpi/types.h>
+#endif
 
 namespace eez {
-
 
 const char *g_unitNames[] = {
     "", // UNIT_NONE
@@ -139,6 +140,7 @@ const float g_unitFactor[] = {
 	1E-6f, // UNIT_MICRO_AMPER_PP
 };
 
+#if OPTION_SCPI
 static const int g_scpiUnits[] = {
     SCPI_UNIT_NONE, // UNIT_NONE
     SCPI_UNIT_VOLT, // UNIT_VOLT
@@ -176,6 +178,7 @@ static const int g_scpiUnits[] = {
 	SCPI_UNIT_AMPER, // UNIT_MILLI_AMPER_PP
 	SCPI_UNIT_AMPER, // UNIT_MICRO_AMPER_PP
 };
+#endif
 
 Unit getUnitFromName(const char *unitName) {
 	if (unitName) {
@@ -188,12 +191,14 @@ Unit getUnitFromName(const char *unitName) {
 	return UNIT_NONE;
 }
 
+#if OPTION_SCPI
 int getScpiUnit(Unit unit) {
     if (unit == UNIT_UNKNOWN) {
         return SCPI_UNIT_NONE;
     }
     return g_scpiUnits[unit];
 }
+#endif
 
 Unit getBaseUnit(Unit unit) {
     if (unit == UNIT_UNKNOWN) {

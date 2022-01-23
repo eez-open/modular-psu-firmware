@@ -39,7 +39,9 @@
 #include <eez/fs/fs.h>
 #endif
 
+#if OPTION_SCPI
 #include <scpi/scpi.h>
+#endif
 
 namespace eez {
 namespace eeprom {

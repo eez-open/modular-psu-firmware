@@ -162,6 +162,7 @@ template<typename T> void freeObject(T *ptr) {
 	free(ptr);
 }
 
+#if OPTION_SCPI
 void dumpAlloc(scpi_t *context) {
 	AllocBlock *first = (AllocBlock *)g_heap;
 	AllocBlock *block = first;
@@ -176,6 +177,7 @@ void dumpAlloc(scpi_t *context) {
 		block = block->next;
 	}
 }
+#endif
 
 void getAllocInfo(uint32_t &free, uint32_t &alloc) {
 	free = 0;

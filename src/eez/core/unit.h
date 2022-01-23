@@ -74,7 +74,9 @@ inline const char *getUnitName(Unit unit) {
 
 Unit getUnitFromName(const char *unitName);
 
+#if OPTION_SCPI
 int getScpiUnit(Unit unit);
+#endif
 
 // for UNIT_MILLI_VOLT returns UNIT_VOLT, etc...
 Unit getBaseUnit(Unit unit);

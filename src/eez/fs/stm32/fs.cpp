@@ -21,7 +21,13 @@
 #include <stdio.h>
 #include <string.h>
 
+#if OPTION_SCPI
 #include <scpi/scpi.h>
+#else
+#define SCPI_ERROR_MASS_MEDIA_NO_FILESYSTEM 410
+#define SCPI_ERROR_MASS_STORAGE_ERROR -250
+#define SCPI_RES_OK 1
+#endif
 
 #include <eez/core/debug.h>
 #include <eez/core/memory.h>

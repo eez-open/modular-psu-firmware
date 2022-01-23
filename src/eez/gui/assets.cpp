@@ -31,7 +31,12 @@
 #include <eez/gui/gui.h>
 #include <eez/gui/widget.h>
 
+#if OPTION_SCPI
 #include <scpi/scpi.h>
+#else
+#define SCPI_ERROR_OUT_OF_DEVICE_MEMORY -321
+#define SCPI_ERROR_INVALID_BLOCK_DATA -161
+#endif
 
 namespace eez {
 namespace gui {
