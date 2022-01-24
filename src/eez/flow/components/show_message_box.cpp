@@ -45,7 +45,7 @@ void executeShowMessageBoxComponent(FlowState *flowState, unsigned componentInde
 
 	if (component->type == MESSAGE_BOX_TYPE_INFO) {
 		getAppContextFromId(APP_CONTEXT_ID_DEVICE)->infoMessage(messageValue);
-	} else {
+	} else if (component->type == MESSAGE_BOX_TYPE_ERROR) {
 		getAppContextFromId(APP_CONTEXT_ID_DEVICE)->errorMessage(messageValue);
 	}
 }

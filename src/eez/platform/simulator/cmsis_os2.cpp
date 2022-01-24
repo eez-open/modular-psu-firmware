@@ -138,7 +138,7 @@ osStatus osMessageQueueGet(osMessageQueueId_t queue, void *msg_ptr, uint8_t *, u
         }
 
 #ifdef __EMSCRIPTEN__
-        return osOK;
+        return osError;
 #else
         queue->mutex.unlock();
         

@@ -46,6 +46,7 @@
 namespace eez {
 namespace eeprom {
 
+#if defined(EEZ_PLATFORM_STM32)
 // opcodes
 static const uint8_t WREN = 6;
 static const uint8_t WRDI = 4;
@@ -54,7 +55,6 @@ static const uint8_t WRSR = 1;
 static const uint8_t READ = 3;
 static const uint8_t WRITE = 2;
 
-#if defined(EEZ_PLATFORM_STM32)
 // EEPROM AT24C256C
 // I2C-Compatible (2-Wire) Serial EEPROM
 // 256-Kbit (32,768 x 8)

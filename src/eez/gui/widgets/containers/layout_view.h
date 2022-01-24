@@ -39,8 +39,6 @@ struct LayoutViewWidgetState : public WidgetState {
     const PageAsset* layout;
     flow::FlowState *flowState;
 
-    Value oldContext;
-
     bool updateState() override;
     void render() override;
 	void enumChildren() override;

@@ -170,7 +170,7 @@ void dumpAlloc(scpi_t *context) {
 	while (block) {
 		char buffer[100];
 		if (block->free) {
-			snprintf(buffer, sizeof(buffer), "FREE: %d", block->size);
+			snprintf(buffer, sizeof(buffer), "FREE: %d", (int)block->size);
 		} else {
 			snprintf(buffer, sizeof(buffer), "ALOC (0x%08x): %d", (unsigned int)block->id, (int)block->size);
 		}

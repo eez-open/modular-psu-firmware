@@ -22,7 +22,6 @@
 #include <eez/gui/gui.h>
 #include <eez/gui/widgets/switch.h>
 
-static const size_t MAX_TEXT_LEN = 128;
 static const uint32_t ANIMATION_DURATION = 150;
 
 namespace eez {

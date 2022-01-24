@@ -39,8 +39,12 @@ bool LayoutViewWidgetState::updateState() {
     bool hasPreviousState = widgetCursor.hasPreviousState;
     auto widget = (const LayoutViewWidget *)widgetCursor.widget;
 
+    auto savedCursor = widgetCursor.cursor;
+
+    Value oldContext;
+    Value newContext;
+
     if (widget->context) {
-        Value newContext;
         setContext((WidgetCursor &)widgetCursor, widget->context, oldContext, newContext);
         WIDGET_STATE(context, newContext);
     } else {
@@ -53,6 +57,12 @@ bool LayoutViewWidgetState::updateState() {
     WIDGET_STATE(layout, getPageAsset(getLayoutId(widgetCursor), widgetCursor));
     flowState = widgetCursor.flowState;
     widgetCursor.flowState = savedFlowState;
+
+    if (widget->context) {
+        restoreContext(widgetCursor, widget->context, oldContext);
+    }
+
+    widgetCursor.cursor = savedCursor;
 
     return !hasPreviousState;
 }
@@ -79,12 +89,16 @@ void LayoutViewWidgetState::enumChildren() {
 
 	bool savedRefreshed = false;
 
-	if (g_findCallback != nullptr) {
-		if (widget->context) {
-			Value newContext;
-			setContext((WidgetCursor &)widgetCursor, widget->context, oldContext, newContext);
-		}
-	} else {
+    auto savedCursor = widgetCursor.cursor;
+
+    Value oldContext;
+    Value newContext;
+
+    if (widget->context) {
+        setContext((WidgetCursor &)widgetCursor, widget->context, oldContext, newContext);
+    }
+
+	if (g_findCallback == nullptr) {
         savedRefreshed = widgetCursor.refreshed;
         if (repainted) {
             repainted = false;
@@ -111,6 +125,8 @@ void LayoutViewWidgetState::enumChildren() {
     if (widget->context) {
         restoreContext(widgetCursor, widget->context, oldContext);
     }
+
+    widgetCursor.cursor = savedCursor;
 
     widgetCursor.flowState = savedFlowState;
 

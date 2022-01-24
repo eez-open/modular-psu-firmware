@@ -47,7 +47,7 @@
     struct NAME##MessageQueueObject OBJECT_DEF; \
     osMessageQueueId_t g_##NAME##MessageQueueId;
 #define EEZ_MESSAGE_QUEUE_CREATE(NAME, QUEUE_SIZE) g_##NAME##MessageQueueId = osMessageQueueNew(QUEUE_SIZE, sizeof(NAME##MessageQueueObject), nullptr)
-#define EEZ_MESSAGE_QUEUE_GET(NAME, OBJ, TIMEOUT) osMessageQueueGet(g_##NAME##MessageQueueId, &OBJ, nullptr, TIMEOUT) == osOK
+#define EEZ_MESSAGE_QUEUE_GET(NAME, OBJ, TIMEOUT) (osMessageQueueGet(g_##NAME##MessageQueueId, &OBJ, nullptr, TIMEOUT) == osOK)
 #define EEZ_MESSAGE_QUEUE_PUT(NAME, OBJ, TIMEOUT) osMessageQueuePut(g_##NAME##MessageQueueId, &OBJ, 0, TIMEOUT)
 
 #define EEZ_MUTEX_DECLARE(NAME) \
