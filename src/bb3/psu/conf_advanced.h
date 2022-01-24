@@ -113,7 +113,11 @@
 /// depends on ADC_SPS value). You can use the following value, which
 /// will be subtracted from the OVP and OCP delay, to correct this error.
 /// Value is given in seconds.
+#if defined(EEZ_PLATFORM_STM32)
 #define PROT_DELAY_CORRECTION 0.002f
+#else
+#define PROT_DELAY_CORRECTION -0.002f
+#endif
 
 /// This is the delay period, after the channel output went OFF,
 /// after which we shall turn DP off.

@@ -73,13 +73,17 @@ namespace eez {
 
 namespace dcm224 {
 
+#if defined(EEZ_PLATFORM_STM32)
 static const uint16_t MODULE_REVISION_DCM224_R3B1 = 0x0301;
+#endif
 static const uint16_t MODULE_REVISION_DCM224_R3B2 = 0x0302;
 
 static const uint16_t DAC_MIN = 0;
 static const uint16_t DAC_MAX = 4095;
 
+#if defined(EEZ_PLATFORM_STM32)
 static const uint16_t ADC_MIN = 0;
+#endif
 static const uint16_t ADC_MAX = 65535;
 
 #define REG0_OE1_MASK     (1 << 0)
@@ -91,7 +95,9 @@ static const uint16_t ADC_MAX = 65535;
 
 static const float PTOT = 155.0f;
 
+#if defined(EEZ_PLATFORM_STM32)
 static const float I_MON_RESOLUTION = 0.02f;
+#endif
 
 #define REG0_CC1_MASK     (1 << 1)
 #define REG0_CC2_MASK     (1 << 3)

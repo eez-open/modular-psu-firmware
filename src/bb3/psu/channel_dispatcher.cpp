@@ -144,6 +144,7 @@ bool additionalCheckForCouplingType(CouplingType couplingType, int *err) {
     Channel &ch1 = Channel::get(0);
     Channel &ch2 = Channel::get(1);
 
+#if defined(EEZ_PLATFORM_STM32)
     if (!ch1.isVoltageCalibrationExists() || !ch1.isCurrentCalibrationExists(0) || !ch1.isCurrentCalibrationExists(1)) {
         if (err) {
             *err = SCPI_ERROR_CH1_NOT_CALIBRATED;
@@ -157,6 +158,7 @@ bool additionalCheckForCouplingType(CouplingType couplingType, int *err) {
         }
         return false;
     }
+#endif // EEZ_PLATFORM_STM32
 
     ch1.calibrationEnableNoEvent(true);
     ch2.calibrationEnableNoEvent(true);

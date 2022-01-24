@@ -5171,7 +5171,7 @@ public:
 		return Module::isMicroAmperAllowed(subchannelIndex);
 	}
 
-    float getMaxTemperature() {
+    float getMaxTemperature() override {
         if (afeVersion != 4) {
             float maxCurrent = FLT_MIN;
             for (int i = 0; i < 4; i++) {
@@ -7521,7 +7521,6 @@ void action_dib_mio168_show_channel_labels() {
 static int g_slotIndex;
 
 static const int NUM_PAGES_IN_MAX_VIEW = 7;
-static const int NUM_PAGES_IN_DEFAULT_VIEW = 7;
 
 void data_dib_mio168_pager_list(DataOperationEnum operation, const WidgetCursor &widgetCursor, Value &value) {
     if (operation == DATA_OPERATION_COUNT) {

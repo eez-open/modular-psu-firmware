@@ -225,12 +225,14 @@ void PsuAppContext::stateManagment() {
 
     // select page to go after transitional page
     if (activePageId == PAGE_ID_WELCOME || activePageId == PAGE_ID_STANDBY || activePageId == PAGE_ID_ENTERING_STANDBY) {
+#if defined(EEZ_PLATFORM_STM32)
         if (!isTouchCalibrated()) {
             // touch screen is not calibrated
             sound::playBeep(true);
             showPage(PAGE_ID_TOUCH_CALIBRATION_INTRO);
 			return;
 		}
+#endif
 
 		if (!scripting::isAutoStartEnabled()) {
             showPage(getMainPageId());
@@ -1203,6 +1205,8 @@ bool showSetupWizardQuestion() {
     }
 
 
+#if defined(EEZ_PLATFORM_STM32)
+
 #if OPTION_ETHERNET
     if (!g_skipEthernetSetup) {
         g_skipEthernetSetup = 1;
@@ -1211,7 +1215,7 @@ bool showSetupWizardQuestion() {
             return true;
         }
     }
-#endif
+#endif // OPTION_ETHERNET
 
     if (!g_skipDateTimeSetup) {
         g_skipDateTimeSetup = 1;
@@ -1220,6 +1224,8 @@ bool showSetupWizardQuestion() {
             return true;
         }
     }
+
+#endif // EEZ_PLATFORM_STM32
 
     return false;
 }
@@ -1958,6 +1964,7 @@ void channelToggleOutput() {
 			g_psuAppContext.errorMessage("Channel is tripped!");
         }
     } else {
+#if defined(EEZ_PLATFORM_STM32)
         if (!channel.isOutputEnabled() && !channel.isCalibrationExists()) {
             if (!(g_skipChannelCalibrations & (1 << channel.channelIndex))) {
                 g_skipChannelCalibrations |= 1 << channel.channelIndex;
@@ -1965,7 +1972,7 @@ void channelToggleOutput() {
                 return;
             }
         }
-
+#endif // EEZ_PLATFORM_STM32
         doChannelToggleOutput();
     }
 }
