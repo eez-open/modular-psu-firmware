@@ -19,16 +19,18 @@
 #include <eez/fs/fs.h>
 
 #include <stdio.h>
-#include <time.h>
-
+#include <chrono>
+#include <ctime>
+ 
 #ifdef EEZ_PLATFORM_SIMULATOR_WIN32
 
 #undef INPUT
 #undef OUTPUT
-
 #include <direct.h>
 #include <io.h>
 #include <sys/stat.h>
+#define WIN32_LEAN_AND_MEAN
+#include <Windows.h>
 
 #else
 
@@ -49,23 +51,7 @@
 #define SCPI_RES_OK -161
 #endif
 
-
 namespace eez {
-
-////////////////////////////////////////////////////////////////////////////////
-
-FileInfo::FileInfo() {
-#if defined(EEZ_PLATFORM_SIMULATOR_WIN32)
-    memset(&m_ffd, 0, sizeof(WIN32_FIND_DATAA));
-#else
-    m_dirent = 0;
-#endif
-}
-
-SdFatResult FileInfo::fstat(const char *filePath) {
-    Directory dir;
-    return dir.findFirst(filePath, *this);
-}
 
 std::string getRealPath(const char *path) {
     std::string realPath;
@@ -97,201 +83,144 @@ std::string getRealPath(const char *path) {
 }
 
 bool pathExists(const char *path) {
-    std::string realPath = getRealPath(path);
-    struct stat path_stat;
-    int result = stat(realPath.c_str(), &path_stat);
-    return result == 0;
+    try {
+        std::string realPath = getRealPath(path);
+        return std::filesystem::exists(realPath);
+    } catch (...) {
+        return false;
+    }
+}
+    
+////////////////////////////////////////////////////////////////////////////////
+
+FileInfo::FileInfo() {
+}
+
+SdFatResult FileInfo::fstat(const char *filePath) {
+    try {
+        std::string realPath = getRealPath(filePath);
+        m_entry = std::filesystem::directory_entry(realPath);
+        return SD_FAT_RESULT_OK;
+    } catch (...) {
+        return SD_FAT_RESULT_DISK_ERR;
+    }
 }
 
 ////////////////////////////////////////////////////////////////////////////////
 
 FileInfo::operator bool() {
-#ifdef EEZ_PLATFORM_SIMULATOR_WIN32
-    return m_ffd.cFileName[0] != 0;
-#else
-    return m_dirent->d_name[0] != 0;
-#endif
+    try {
+        return m_entry.exists();
+    } catch (...) {
+        return false;
+    }
 }
 
 bool FileInfo::isDirectory() {
-#ifdef EEZ_PLATFORM_SIMULATOR_WIN32
-    return m_ffd.dwFileAttributes == FILE_ATTRIBUTE_DIRECTORY;
-#else
-    struct stat stbuf;
-    stat((m_parentPath + "/" + m_dirent->d_name).c_str(), &stbuf);
-    return S_ISDIR(stbuf.st_mode);
-#endif
+    try {
+        return m_entry.is_directory();
+    } catch (...) {
+        return false;
+    }
 }
 
 void FileInfo::getName(char *name, size_t size) {
-    const char *str;
-#ifdef EEZ_PLATFORM_SIMULATOR_WIN32
-    str = strrchr(m_ffd.cFileName, '\\');
-    if (!str) {
-        str = m_ffd.cFileName;
+    try {
+        stringCopy(name, size, m_entry.path().filename().generic_string().c_str());
+    } catch (...) {
+        *name = 0;
     }
-#else
-    str = strrchr(m_dirent->d_name, '/');
-    if (!str) {
-        str = m_dirent->d_name;
-    }
-#endif
-    stringCopy(name, size, str);
 }
 
 size_t FileInfo::getSize() {
-#ifdef EEZ_PLATFORM_SIMULATOR_WIN32
-    return (size_t)((m_ffd.nFileSizeHigh * ((uint64_t)MAXDWORD + 1)) + m_ffd.nFileSizeLow);
-#else
-    struct stat stbuf;
-    stat((m_parentPath + "/" + m_dirent->d_name).c_str(), &stbuf);
-    return stbuf.st_size;
-#endif
+    try {
+        if (m_entry.is_directory()) {
+            return 0;
+        }
+        return m_entry.file_size();
+    } catch (...) {
+        return 0;
+    }
 }
 
 bool FileInfo::isHiddenOrSystemFile() {
     return false;
 }
 
-struct tm *getGmTime(FileInfo &fileInfo) {
-    time_t mtime;
-
-#ifdef EEZ_PLATFORM_SIMULATOR_WIN32
-    ULARGE_INTEGER ull;
-
-    ull.LowPart = fileInfo.m_ffd.ftLastWriteTime.dwLowDateTime;
-    ull.HighPart = fileInfo.m_ffd.ftLastWriteTime.dwHighDateTime;
-
-    mtime = ull.QuadPart / 10000000ULL - 11644473600ULL;
-#else
-    struct stat stbuf;
-    stat((fileInfo.m_parentPath + "/" + fileInfo.m_dirent->d_name).c_str(), &stbuf);
-    mtime = stbuf.st_mtime;
-#endif
-
-    return gmtime(&mtime);
+static tm *getGmTime(FileInfo *fileInfo) {
+    try {
+        using namespace std::chrono;
+        time_t t = duration_cast<seconds>(fileInfo->m_entry.last_write_time().time_since_epoch() - 11644473600s).count();
+        return gmtime(&t);
+    } catch (...) {
+        return nullptr;
+    }
 }
 
 int FileInfo::getModifiedYear() {
-    struct tm *tmmtime = getGmTime(*this);
-    return tmmtime->tm_year + 1900;
+    tm *tm = getGmTime(this);
+    return tm ? tm->tm_year + 1900 : 0;
 }
 
 int FileInfo::getModifiedMonth() {
-    struct tm *tmmtime = getGmTime(*this);
-    return tmmtime->tm_mon + 1;
+    struct tm *tm = getGmTime(this);
+    return tm ? tm->tm_mon + 1 : 0;
 }
 
 int FileInfo::getModifiedDay() {
-    struct tm *tmmtime = getGmTime(*this);
-    return tmmtime->tm_mday;
+    struct tm *tm = getGmTime(this);
+    return tm ? tm->tm_mday : 0;
 }
 
 int FileInfo::getModifiedHour() {
-    struct tm *tmmtime = getGmTime(*this);
-    return tmmtime->tm_hour;
+    struct tm *tm = getGmTime(this);
+    return tm ? tm->tm_hour : 0;
 }
 
 int FileInfo::getModifiedMinute() {
-    struct tm *tmmtime = getGmTime(*this);
-    return tmmtime->tm_min;
+    struct tm *tm = getGmTime(this);
+    return tm ? tm->tm_min : 0;
 }
 
 int FileInfo::getModifiedSecond() {
-    struct tm *tmmtime = getGmTime(*this);
-    return tmmtime->tm_sec;
+    struct tm *tm = getGmTime(this);
+    return tm ? tm->tm_sec : 0;
 }
 
 ////////////////////////////////////////////////////////////////////////////////
 
-Directory::Directory()
-#ifdef EEZ_PLATFORM_SIMULATOR_WIN32
-    : m_handle(INVALID_HANDLE_VALUE)
-#else
-    : m_handle(0)
-#endif
-{
+Directory::Directory() {
 }
 
 Directory::~Directory() {
-    close();
 }
 
 void Directory::close() {
-#ifdef EEZ_PLATFORM_SIMULATOR_WIN32
-    if (m_handle != INVALID_HANDLE_VALUE) {
-        FindClose(m_handle);
-        m_handle = INVALID_HANDLE_VALUE;
-    }
-#else
-    if (m_handle) {
-        closedir((DIR *)m_handle);
-        m_handle = 0;
-    }
-#endif
-}
-
-SdFatResult Directory::findFirst(const char *path, const char *pattern, FileInfo &fileInfo) {
-    std::string temp = path;
-
-    if (pattern) {
-        temp += "/";
-        temp += pattern;
-    }
-#ifdef EEZ_PLATFORM_SIMULATOR_WIN32
-    else {
-        temp += "/*.*";
-    }   
-#endif 
-
-    temp = getRealPath(temp.c_str());
-
-#ifdef EEZ_PLATFORM_SIMULATOR_WIN32
-    m_handle = FindFirstFileA(temp.c_str(), &fileInfo.m_ffd);
-    if (m_handle == INVALID_HANDLE_VALUE) {
-        temp = getRealPath(path);
-        m_handle = FindFirstFileA(temp.c_str(), &fileInfo.m_ffd);
-        if (m_handle == INVALID_HANDLE_VALUE) {
-            // TODO check FatFs what he returns
-            return SD_FAT_RESULT_NO_PATH;
-        }
-    }
-#else
-    m_handle = opendir(temp.c_str());
-    if (!m_handle) {
-        // TODO check FatFs what he returns
-        return SD_FAT_RESULT_NO_PATH;
-    }
-    struct dirent *ep = readdir((DIR *)m_handle);
-    if (!ep) {
-        // TODO check FatFs what he returns
-        return SD_FAT_RESULT_NO_PATH;
-    }
-    fileInfo.m_parentPath = temp;
-    fileInfo.m_dirent = ep;
-#endif
-    return SD_FAT_RESULT_OK;
 }
 
 SdFatResult Directory::findFirst(const char *path, FileInfo &fileInfo) {
-    return findFirst(path, nullptr, fileInfo);
+    try {
+        std::string realPath = getRealPath(path);
+        m_it = std::filesystem::directory_iterator(std::filesystem::path(realPath));
+        if (m_it != std::filesystem::directory_iterator()) {
+            fileInfo.m_entry = *m_it;
+            return SD_FAT_RESULT_OK;
+        }
+    } catch (...) {
+    }
+    return SD_FAT_RESULT_DISK_ERR;
 }
 
 SdFatResult Directory::findNext(FileInfo &fileInfo) {
-#ifdef EEZ_PLATFORM_SIMULATOR_WIN32
-    if (!FindNextFileA(m_handle, &fileInfo.m_ffd)) {
-        // TODO check FatFs what he returns
-        return SD_FAT_RESULT_NO_FILE;
+    try {
+        m_it++;
+        if (m_it != std::filesystem::directory_iterator()) {
+            fileInfo.m_entry = *m_it;
+            return SD_FAT_RESULT_OK;
+        }
+    } catch (...) {
     }
-#else
-    struct dirent *ep = readdir((DIR *)m_handle);
-    if (!ep) {
-        // TODO check FatFs what he returns
-        return SD_FAT_RESULT_NO_FILE;
-    }
-    fileInfo.m_dirent = ep;
-#endif
-    return SD_FAT_RESULT_OK;
+    return SD_FAT_RESULT_DISK_ERR;
 }
 
 ////////////////////////////////////////////////////////////////////////////////

@@ -128,14 +128,10 @@ void Directory::close() {
     CHECK_ERROR("Directory::close", result);
 }
 
-SdFatResult Directory::findFirst(const char *path, const char *pattern, FileInfo &fileInfo) {
-    auto result = f_findfirst(&m_dj, &fileInfo.m_fno, path, pattern ? pattern : "*");
+SdFatResult Directory::findFirst(const char *path, FileInfo &fileInfo) {
+    auto result = f_findfirst(&m_dj, &fileInfo.m_fno, path, "*");
     CHECK_ERROR("Directory::findFirst", result);
     return (SdFatResult)result;
-}
-
-SdFatResult Directory::findFirst(const char *path, FileInfo &fileInfo) {
-    return findFirst(path, nullptr, fileInfo);
 }
 
 SdFatResult Directory::findNext(FileInfo &fileInfo) {

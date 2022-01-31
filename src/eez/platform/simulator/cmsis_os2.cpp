@@ -116,12 +116,7 @@ osStatus osMutexRelease(osMutexId_t mutex) {
 
 osMessageQueueId_t osMessageQueueNew(uint32_t msg_count, uint32_t msg_size, const void *) {
 	auto queue = new MessageQueue();
-	queue->data = new uint8_t[msg_count * msg_size];
-	queue->numElements = msg_count;
 	queue->elementSize = msg_size;
-    queue->tail = 0;
-    queue->head = 0;
-    queue->overflow = 0;
     return queue;
 }
 
@@ -132,19 +127,15 @@ osStatus osMessageQueueGet(osMessageQueueId_t queue, void *msg_ptr, uint8_t *, u
     queue->mutex.lock();
 #endif
 
-    while (queue->tail == queue->head) {
-        if (queue->overflow) {
-            break;
-        }
-
+    while (queue->elements.empty()) {
 #ifdef __EMSCRIPTEN__
         return osError;
 #else
         queue->mutex.unlock();
         
         osDelay(1);
-		timeout -= 1;
 
+		timeout -= 1;
         if (timeout == 0) {
             return osError;
         }
@@ -153,17 +144,10 @@ osStatus osMessageQueueGet(osMessageQueueId_t queue, void *msg_ptr, uint8_t *, u
 #endif
     }
 
-    uint16_t tail = queue->tail + 1;
-    if (tail >= queue->numElements) {
-        tail = 0;
-    }
-    queue->tail = tail;
-    
-	memcpy(msg_ptr, queue->data + tail * queue->elementSize, queue->elementSize);
-
-	if (queue->overflow) {
-        queue->overflow = 0;
-    }
+    auto data = queue->elements.front();
+    queue->elements.pop();
+    memcpy(msg_ptr, data, queue->elementSize);
+    delete [] data;
 
 #ifndef __EMSCRIPTEN__
     queue->mutex.unlock();
@@ -175,32 +159,11 @@ osStatus osMessageQueueGet(osMessageQueueId_t queue, void *msg_ptr, uint8_t *, u
 osStatus osMessageQueuePut(osMessageQueueId_t queue, const void *msg_ptr, uint8_t, uint32_t timeout) {
 #ifndef __EMSCRIPTEN__    
     queue->mutex.lock();
-    for (uint32_t i = 0; queue->overflow && i < timeout; i++) {
-        queue->mutex.unlock();
-        osDelay(1);
-        queue->mutex.lock();
-    }
 #endif
-    
-    if (queue->overflow) {
-#ifndef __EMSCRIPTEN__    
-        queue->mutex.unlock();
-#endif
-		printf("overflow\n");
-        return osError;
-    }
 
-    uint16_t head = queue->head + 1;
-    if (head >= queue->numElements) {
-        head = 0;
-    }
-
-	memcpy(queue->data + head * queue->elementSize, msg_ptr, queue->elementSize);
-    
-	queue->head = head;
-    if (queue->head == queue->tail) {
-        queue->overflow = 1;
-    }
+    uint8_t *data = new uint8_t[queue->elementSize];
+	memcpy(data, msg_ptr, queue->elementSize);
+	queue->elements.push(data);
 
 #ifndef __EMSCRIPTEN__    
     queue->mutex.unlock();

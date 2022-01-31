@@ -21,19 +21,12 @@
 #include <stdint.h>
 #include <stdlib.h>
 
-#ifdef EEZ_PLATFORM_SIMULATOR
-#include <stdio.h>
-#include <string>
-#ifdef EEZ_PLATFORM_SIMULATOR_WIN32
-#define WIN32_LEAN_AND_MEAN
-#include <Windows.h>
-#else
-#include <dirent.h>
-#endif
-#endif
-
 #ifdef EEZ_PLATFORM_STM32
 #include <fatfs.h>
+#endif
+
+#ifdef EEZ_PLATFORM_SIMULATOR
+#include <filesystem>
 #endif
 
 #define FILE_READ 0x01
@@ -92,11 +85,8 @@ struct FileInfo {
 
 #if defined(EEZ_PLATFORM_STM32)
     FILINFO m_fno;
-#elif defined(EEZ_PLATFORM_SIMULATOR_WIN32)
-    WIN32_FIND_DATAA m_ffd;
 #else
-    std::string m_parentPath;
-    struct dirent *m_dirent;
+    std::filesystem::directory_entry m_entry;
 #endif
 };
 
@@ -106,14 +96,13 @@ struct Directory {
 
     void close();
 
-    SdFatResult findFirst(const char *path, const char *pattern, FileInfo &fileInfo);
     SdFatResult findFirst(const char *path, FileInfo &fileInfo);
     SdFatResult findNext(FileInfo &fileInfo);
 
 #if defined(EEZ_PLATFORM_STM32)
     DIR m_dj;
 #else
-    void *m_handle;
+    std::filesystem::directory_iterator m_it;
 #endif
 };
 

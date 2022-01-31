@@ -16,6 +16,8 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
+#include <stdio.h>
+
 #include <eez/core/util.h>
 
 #include <eez/core/os.h>
@@ -74,7 +76,8 @@ void tick() {
 
 	uint32_t startTickCount = millis();
 
-	while (true) {
+    const size_t queueSize = getQueueSize();
+    for (size_t i = 0; i < queueSize; i++) {
 		FlowState *flowState;
 		unsigned componentIndex;
 		if (!peekNextTaskFromQueue(flowState, componentIndex)) {
@@ -117,6 +120,8 @@ void tick() {
 			break;
 		}
 	}
+
+	finishToDebuggerMessageHook();
 }
 
 void stop() {
