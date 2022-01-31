@@ -2,7 +2,7 @@ cmake_minimum_required(VERSION 3.10)
 
 project(modular-psu-firmware)
 
-set (CMAKE_CXX_STANDARD 14)
+set (CMAKE_CXX_STANDARD 17)
 
 if(MSVC)
   set(CMAKE_CXX_FLAGS  "${CMAKE_CXX_FLAGS} /W4 /wd4100 /wd4214 /wd4200 /wd4244 /wd4456 /wd4457 /wd4458 /wd4459 /wd4245 /wd4389 /wd4706 /wd4611 /wd4310")
@@ -11,9 +11,10 @@ endif()
 set(CMAKE_MODULE_PATH ${CMAKE_MODULE_PATH} "${CMAKE_SOURCE_DIR}/cmake/")
 
 if(${CMAKE_SYSTEM_NAME} STREQUAL "Emscripten")
-    set(CMAKE_CXX_FLAGS  "${CMAKE_CXX_FLAGS} -Wunused-const-variable -Wno-nested-anon-types -O2")
-    set(CMAKE_EXE_LINKER_FLAGS  "${CMAKE_CXX_FLAGS} -s DEMANGLE_SUPPORT=1 -s FORCE_FILESYSTEM=1 -s ALLOW_MEMORY_GROWTH=1 -s INITIAL_MEMORY=83886080 -lidbfs.js")
+    set(CMAKE_CXX_FLAGS  "${CMAKE_CXX_FLAGS} -Wunused-const-variable -Wno-nested-anon-types -Wno-dollar-in-identifier-extension -O2")
+    set(CMAKE_EXE_LINKER_FLAGS  "${CMAKE_CXX_FLAGS} -s DEMANGLE_SUPPORT=1 -s FORCE_FILESYSTEM=1 -s ALLOW_MEMORY_GROWTH=1 -s INITIAL_MEMORY=83886080 -s LLD_REPORT_UNDEFINED --bind -lidbfs.js")
     #set(CMAKE_EXE_LINKER_FLAGS  "${CMAKE_EXE_LINKER_FLAGS} --preload-file ../../images/eez.png")
+    add_definitions(-DEMCC_DEBUG)
 endif()
 
 add_definitions(-DFIRMWARE_VERSION_MAJOR=1)
@@ -27,7 +28,6 @@ else()
     find_package(SDL2_image REQUIRED)
     include_directories(SYSTEM ${SDL2_INCLUDE_DIRS})
     include_directories(SYSTEM ${SDL2IMAGE_INCLUDE_DIR})
-    add_definitions(-DOPTION_ETHERNET=1)
 endif()
 
 if (UNIX)
@@ -49,12 +49,7 @@ add_definitions(-DOPTION_ENCODER=1)
 add_definitions(-DOPTION_EXT_EEPROM=1)
 add_definitions(-DOPTION_SDRAM=1)
 add_definitions(-DEEZ_MCU_REVISION_R1B5=1)
-
-if(${CMAKE_SYSTEM_NAME} STREQUAL "Emscripten")
-    add_definitions(-DOPTION_ETHERNET=0)
-else()
-    add_definitions(-DOPTION_ETHERNET=1)
-endif()
+add_definitions(-DOPTION_ETHERNET=1)
 
 add_definitions(-DOPTION_SD_CARD=1)
 

@@ -39,7 +39,7 @@ extern ip4_addr_t netmask;
 extern ip4_addr_t gw;
 #endif // EEZ_PLATFORM_STM32
 
-#if defined(EEZ_PLATFORM_SIMULATOR)
+#if defined(EEZ_PLATFORM_SIMULATOR) && !defined(__EMSCRIPTEN__)
 #ifdef EEZ_PLATFORM_SIMULATOR_WIN32
 #undef INPUT
 #undef OUTPUT
@@ -61,7 +61,12 @@ extern ip4_addr_t gw;
 #include <sys/types.h>
 #include <unistd.h>
 #endif
-#endif // EEZ_PLATFORM_SIMULATOR
+#endif // EEZ_PLATFORM_SIMULATOR && !__EMSCRIPTEN__
+
+#ifdef __EMSCRIPTEN__
+#include <emscripten.h>
+#include <emscripten/bind.h>
+#endif
 
 #include <eez/core/os.h>
 
@@ -420,7 +425,7 @@ void onIdle() {
 }
 #endif // EEZ_PLATFORM_STM32
 
-#if defined(EEZ_PLATFORM_SIMULATOR)
+#if defined(EEZ_PLATFORM_SIMULATOR) && !defined(__EMSCRIPTEN__)
 #define INPUT_BUFFER_SIZE 1024
 
 static uint16_t g_scpiPort;
@@ -835,25 +840,127 @@ void onIdle() {
         }
     }
 }
-#endif
+#endif // EEZ_PLATFORM_SIMULATOR && !__EMSCRIPTEN__
 
-void mainLoop(void *) {
-    while (1) {
-        ethernetMessageQueueObject obj;
-		if (EEZ_MESSAGE_QUEUE_GET(ethernet, obj, 10)) {
-            if (obj.type == QUEUE_MESSAGE_PUSH_EVENT) {
-                mqtt::pushEvent(obj.pushEvent.eventId, obj.pushEvent.channelIndex);
-            } else if (obj.type == QUEUE_MESSAGE_NTP_STATE_TRANSITION) {
-                ntp::stateTransition(obj.transition);
-            } else {
-                onEvent(obj.type);
+#if defined(__EMSCRIPTEN__)
+
+static uint16_t g_scpiPort;
+static char *g_scpiInputBuffer;
+static uint32_t g_scpiInputBufferLength;
+
+static char *g_debuggerInputBuffer;
+static uint32_t g_debuggerInputBufferLength;
+
+void onEvent(uint8_t eventType) {
+    switch (eventType) {
+    case QUEUE_MESSAGE_CONNECT:
+        sendMessageToLowPriorityThread(ETHERNET_CONNECTED, 1);
+        break;
+
+    case QUEUE_MESSAGE_CREATE_TCP_SERVER:
+        sendMessageToLowPriorityThread(ETHERNET_CLIENT_CONNECTED);
+        break;
+
+    case QUEUE_MESSAGE_DESTROY_TCP_SERVER:
+        break;
+    }
+}
+
+void onIdle() {
+    if (!g_scpiInputBuffer) {
+        char *scpiInputBuffer = (char *)EM_ASM_INT({
+            let jsArray = readScpiInputBuffer();
+            if (!jsArray) {
+                return null;
             }
-        } else {
-            onIdle();
-            mqtt::tick();
-            ntp::tick();
+            let cppBuffer = _malloc(jsArray.length);
+            writeArrayToMemory(jsArray, cppBuffer);
+            return cppBuffer;
+        }, 0);
+
+        if (scpiInputBuffer) {
+            g_scpiInputBuffer = scpiInputBuffer + 4;
+            
+            auto x = (uint8_t *)scpiInputBuffer;
+            g_scpiInputBufferLength = (x[0] << 24) | (x[1] << 16) | (x[2] << 8) | x[3];
+            
+            sendMessageToLowPriorityThread(ETHERNET_INPUT_AVAILABLE);
         }
     }
+
+    if (!g_debuggerInputBuffer) {
+        char *debuggerInputBuffer = (char *)EM_ASM_INT({
+            let jsArray = readDebuggerInputBuffer();
+            if (!jsArray) {
+                return null;
+            }
+            let cppBuffer = _malloc(jsArray.length);
+            writeArrayToMemory(jsArray, cppBuffer);
+            return cppBuffer;
+        }, 0);
+
+        if (debuggerInputBuffer) {
+            g_debuggerInputBuffer = debuggerInputBuffer + 4;
+            
+            auto x = (uint8_t *)debuggerInputBuffer;
+            g_debuggerInputBufferLength = (x[0] << 24) | (x[1] << 16) | (x[2] << 8) | x[3];
+            
+            sendMessageToGuiThread(GUI_QUEUE_MESSAGE_DEBUGGER_INPUT_AVAILABLE);
+        }
+    }    
+}
+
+void doRelaseInputBuffer(char *inputBuffer) {
+    if (inputBuffer == g_scpiInputBuffer) {
+        free(g_scpiInputBuffer - 4);
+        g_scpiInputBuffer = nullptr;
+        g_scpiInputBufferLength = 0;
+    } else if (inputBuffer == g_debuggerInputBuffer) {
+        free(g_debuggerInputBuffer - 4);
+        g_debuggerInputBuffer = nullptr;
+        g_debuggerInputBufferLength = 0;
+    }
+}
+
+void doWriteScpiBuffer(const char *buffer, uint32_t length) {
+    EM_ASM({
+        writeScpiOutputBuffer(new Uint8Array(Module.HEAPU8.buffer, $0, $1));
+    }, buffer, length);
+}
+
+void doWriteDebuggerBuffer(const char *buffer, uint32_t length) {
+    EM_ASM({
+        writeDebuggerOutputBuffer(new Uint8Array(Module.HEAPU8.buffer, $0, $1));
+    }, buffer, length);
+}
+
+#endif // __EMSCRIPTEN__
+
+void oneIter() {
+    ethernetMessageQueueObject obj;
+    if (EEZ_MESSAGE_QUEUE_GET(ethernet, obj, 10)) {
+        if (obj.type == QUEUE_MESSAGE_PUSH_EVENT) {
+            mqtt::pushEvent(obj.pushEvent.eventId, obj.pushEvent.channelIndex);
+        } else if (obj.type == QUEUE_MESSAGE_NTP_STATE_TRANSITION) {
+            ntp::stateTransition(obj.transition);
+        } else {
+            onEvent(obj.type);
+        }
+    } else {
+        onIdle();
+        mqtt::tick();
+        ntp::tick();
+    }
+}
+
+void mainLoop(void *) {
+#ifdef __EMSCRIPTEN__
+	oneIter();
+#else
+    while (1) {
+        oneIter();
+    }
+#endif
 }
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -997,8 +1104,12 @@ void releaseInputBuffer(
 	inbuf = nullptr;
 #endif
 
-#if defined(EEZ_PLATFORM_SIMULATOR)
+#if defined(EEZ_PLATFORM_SIMULATOR) && !defined(__EMSCRIPTEN__)
     inputBufferLength = 0;
+#endif
+
+#if defined(__EMSCRIPTEN__)
+    doRelaseInputBuffer(inputBuffer);
 #endif
 }
 
@@ -1029,10 +1140,15 @@ int writeScpiBuffer(const char *buffer, uint32_t length) {
     return length;
 #endif
 
-#if defined(EEZ_PLATFORM_SIMULATOR)
+#if defined(EEZ_PLATFORM_SIMULATOR) && !defined(__EMSCRIPTEN__)
     int numWritten = write(g_scpiClientSocket, buffer, length);
     osDelay(1);
     return numWritten;
+#endif
+
+#if defined(__EMSCRIPTEN__)
+    doWriteScpiBuffer(buffer, length);
+    return length;
 #endif
 }
 
@@ -1063,10 +1179,15 @@ int writeDebuggerBuffer(const char *buffer, uint32_t length) {
     return length;
 #endif
 
-#if defined(EEZ_PLATFORM_SIMULATOR)
+#if defined(EEZ_PLATFORM_SIMULATOR) && !defined(__EMSCRIPTEN__)
     int numWritten = write(g_debuggerClientSocket, buffer, length);
     osDelay(1);
     return numWritten;
+#endif
+
+#if defined(__EMSCRIPTEN__)
+    doWriteDebuggerBuffer(buffer, length);
+    return length;
 #endif
 }
 
@@ -1079,7 +1200,7 @@ void disconnectClients() {
 	g_debuggerClientConnection = nullptr;
 #endif
 
-#if defined(EEZ_PLATFORM_SIMULATOR)
+#if defined(EEZ_PLATFORM_SIMULATOR) && !defined(__EMSCRIPTEN__)
     stop(g_scpiClientSocket);
     stop(g_debuggerClientSocket);
 #endif    

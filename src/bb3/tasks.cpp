@@ -253,7 +253,7 @@ void lowPriorityThreadOneIter() {
     static uint32_t g_lastTickCountMs;
 
     lowPriorityMessageQueueObject obj;
-	if (EEZ_MESSAGE_QUEUE_GET(lowPriority, obj, INTERVAL)) {
+	while (EEZ_MESSAGE_QUEUE_GET(lowPriority, obj, INTERVAL)) {
         auto type = obj.type;
         auto param = obj.param;
 

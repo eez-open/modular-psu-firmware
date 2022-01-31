@@ -5865,7 +5865,7 @@ void data_ramp_and_delay_list(DataOperationEnum operation, const WidgetCursor &w
         return;
     }
 
-    static const int PAGE_SIZE = 4;
+    static const int LIST_PAGE_SIZE = 4;
 
     if (operation == DATA_OPERATION_COUNT) {
         value = CH_NUM;
@@ -5877,15 +5877,15 @@ void data_ramp_and_delay_list(DataOperationEnum operation, const WidgetCursor &w
         int32_t newPosition = value.getUInt32();
         if (newPosition < 0) {
             page->startChannel = 0;
-        } else if (newPosition + PAGE_SIZE > CH_NUM) {
-            page->startChannel = CH_NUM - PAGE_SIZE;
+        } else if (newPosition + LIST_PAGE_SIZE > CH_NUM) {
+            page->startChannel = CH_NUM - LIST_PAGE_SIZE;
         } else {
             page->startChannel = newPosition;
         }
     } else if (operation == DATA_OPERATION_YT_DATA_GET_POSITION_INCREMENT) {
         value = Value(1, VALUE_TYPE_UINT32);
     } else if (operation == DATA_OPERATION_YT_DATA_GET_PAGE_SIZE) {
-        value = Value(PAGE_SIZE, VALUE_TYPE_UINT32);
+        value = Value(LIST_PAGE_SIZE, VALUE_TYPE_UINT32);
     } else if (operation == DATA_OPERATION_SELECT) {
         value = Value(g_channel, VALUE_TYPE_POINTER);
         selectChannel(&Channel::get(page->startChannel + cursor));

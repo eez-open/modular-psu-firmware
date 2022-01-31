@@ -44,7 +44,9 @@ void startToDebuggerMessage() {
 
 void flushToDebuggerMessage() {
 	auto toDebuggerMessagePosition = g_toDebuggerMessagePosition;
-	
+    if (!toDebuggerMessagePosition) {
+        return;
+    }
 	eez::mcu::ethernet::writeDebuggerBuffer(g_toDebuggerMessage, toDebuggerMessagePosition);
 
 	if (EEZ_MUTEX_WAIT(flowDebugger, 0)) {
