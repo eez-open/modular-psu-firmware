@@ -102,8 +102,6 @@ static void setDebuggerState(DebuggerState newState) {
 				g_debuggerState
 			);
 			writeDebuggerBufferHook(buffer, strlen(buffer));
-
-			finishToDebuggerMessageHook();
 		}
 	}
 }
@@ -380,8 +378,6 @@ void onStarted(Assets *assets) {
 
 			writeValue(*pValue);
         }
-
-		finishToDebuggerMessageHook();
     }
 }
 
@@ -399,8 +395,6 @@ void onAddToQueue(FlowState *flowState, int sourceComponentIndex, int sourceOutp
 			targetInputIndex
 		);
         writeDebuggerBufferHook(buffer, strlen(buffer));
-
-		finishToDebuggerMessageHook();
     }
 }
 
@@ -413,8 +407,6 @@ void onRemoveFromQueue() {
 			MESSAGE_TO_DEBUGGER_REMOVE_FROM_QUEUE
 		);
         writeDebuggerBufferHook(buffer, strlen(buffer));
-
-		finishToDebuggerMessageHook();
     }
 }
 
@@ -430,8 +422,6 @@ void onValueChanged(const Value *pValue) {
         writeDebuggerBufferHook(buffer, strlen(buffer));
         
 		writeValue(*pValue);
-
-		finishToDebuggerMessageHook();
     }
 }
 
@@ -483,8 +473,6 @@ void onFlowStateCreated(FlowState *flowState) {
 				writeValue(*pValue);
 			}
         }
-
-		finishToDebuggerMessageHook();
 	}
 }
 
@@ -498,8 +486,6 @@ void onFlowStateDestroyed(FlowState *flowState) {
 			(int)flowState->flowStateIndex
 		);
 		writeDebuggerBufferHook(buffer, strlen(buffer));
-
-		finishToDebuggerMessageHook();
 	}
 }
 
@@ -515,8 +501,6 @@ void onFlowError(FlowState *flowState, int componentIndex, const char *errorMess
 		);
 		writeDebuggerBufferHook(buffer, strlen(buffer));
 		writeString(errorMessage);
-
-		finishToDebuggerMessageHook();
 	}
 }
 
@@ -567,8 +551,6 @@ void logInfo(FlowState *flowState, unsigned componentIndex, const char *message)
 		);
 		writeDebuggerBufferHook(buffer, strlen(buffer));
 		writeLogMessage(message);
-
-		finishToDebuggerMessageHook();
     }
 }
 
@@ -585,8 +567,6 @@ void logScpiCommand(FlowState *flowState, unsigned componentIndex, const char *c
 		);
 		writeDebuggerBufferHook(buffer, strlen(buffer));
 		writeLogMessage(cmd);
-
-		finishToDebuggerMessageHook();
     }
 }
 
@@ -603,8 +583,6 @@ void logScpiQuery(FlowState *flowState, unsigned componentIndex, const char *que
 		);
 		writeDebuggerBufferHook(buffer, strlen(buffer));
 		writeLogMessage(query);
-
-		finishToDebuggerMessageHook();
     }
 }
 
@@ -621,8 +599,6 @@ void logScpiQueryResult(FlowState *flowState, unsigned componentIndex, const cha
 		);
 		writeDebuggerBufferHook(buffer, strlen(buffer));
 		writeLogMessage(resultText, resultTextLen);
-
-		finishToDebuggerMessageHook();
     }
 }
 
@@ -636,8 +612,6 @@ void onPageChanged(int pageId) {
 			-pageId - 1
 		);
 		writeDebuggerBufferHook(buffer, strlen(buffer));
-
-		finishToDebuggerMessageHook();
 	}
 }
 

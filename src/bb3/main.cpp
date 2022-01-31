@@ -283,7 +283,14 @@ void consoleInputTask(void *) {
 
 #ifdef __EMSCRIPTEN__
 #include <stdio.h>
+#include <string>
+
 #include <emscripten.h>
+#include <emscripten/bind.h>
+
+#include <eez/gui/gui.h>
+#include <eez/gui/thread.h>
+
 #include <bb3/psu/psu.h>
 #include <bb3/psu/serial_psu.h>
 
@@ -311,7 +318,7 @@ void mountFileSystem() {
             //Module.print("end file sync..");
             Module.syncdone = 1;
         });
-    );
+    , 0);
 }
 // clang-format on
 
@@ -343,7 +350,7 @@ void mainLoop() {
                         Module.syncdone = 1;
                     });
                 }
-            );
+            , 0);
             // clang-format on
         }
     }
@@ -353,4 +360,24 @@ void startEmscripten() {
     mountFileSystem();
     emscripten_set_main_loop(mainLoop, 4, true);
 }
+
+std::string getExceptionMessage(intptr_t exceptionPtr) {
+    return std::string(reinterpret_cast<std::exception *>(exceptionPtr)->what());
+}
+
+void onDebuggerClientConnected() {
+    using namespace eez::gui;
+    sendMessageToGuiThread(GUI_QUEUE_MESSAGE_DEBUGGER_CLIENT_CONNECTED);
+}
+
+void onDebuggerClientDisconnected() {
+    using namespace eez::gui;
+    sendMessageToGuiThread(GUI_QUEUE_MESSAGE_DEBUGGER_CLIENT_DISCONNECTED);
+}
+
+EMSCRIPTEN_BINDINGS(Bindings) {
+    emscripten::function("getExceptionMessage", &getExceptionMessage);
+    emscripten::function("onDebuggerClientConnected", &onDebuggerClientConnected);
+    emscripten::function("onDebuggerClientDisconnected", &onDebuggerClientDisconnected);
+};
 #endif

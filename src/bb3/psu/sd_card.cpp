@@ -225,7 +225,7 @@ bool catalog(const char *dirPath, void *param,
 
     Directory dir;
     FileInfo fileInfo;
-    if (dir.findFirst(dirPath, nullptr, fileInfo) != SD_FAT_RESULT_OK) {
+    if (dir.findFirst(dirPath, fileInfo) != SD_FAT_RESULT_OK) {
         // TODO better error handling
         if (err)
             *err = SCPI_ERROR_FILE_NAME_NOT_FOUND;
@@ -266,7 +266,7 @@ bool catalogLength(const char *dirPath, size_t *length, int *err) {
 
     Directory dir;
     FileInfo fileInfo;
-    if (dir.findFirst(dirPath, nullptr, fileInfo) != SD_FAT_RESULT_OK) {
+    if (dir.findFirst(dirPath, fileInfo) != SD_FAT_RESULT_OK) {
         // TODO better error handling
         if (err)
             *err = SCPI_ERROR_FILE_NAME_NOT_FOUND;

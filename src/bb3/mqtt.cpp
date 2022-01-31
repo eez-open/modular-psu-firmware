@@ -70,7 +70,9 @@ using namespace psu;
 namespace mqtt {
 
 static const uint32_t RECONNECT_AFTER_ERROR_MS = 10000;
+#if defined(EEZ_PLATFORM_STM32)
 static const uint32_t CONF_DNS_TIMEOUT_MS = 10000;
+#endif
 static const uint32_t CONF_STARTING_TIMEOUT_MS = 2000; // wait a acouple of seconds, after ethernet is ready, before starting MQTT connect 
 
 static const size_t MAX_PUB_TOPIC_LENGTH = 128;

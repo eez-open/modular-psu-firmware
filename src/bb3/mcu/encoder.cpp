@@ -256,8 +256,6 @@ static int getAcceleratedCounter(int increment) {
         velocity = 1.0f;
     }
 
-    //printf("inc=%d, dt=%f, sign=%d, v=%f\n", increment, dt, sign, adjustedVelocity);
-
     return (int)(increment * velocity);
 }
 

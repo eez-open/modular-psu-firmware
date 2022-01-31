@@ -1,19 +1,25 @@
 .history
-build/emscripten
+
+build/emscripten/*
+
+!build/emscripten/modular-psu-firmware.js
+!build/emscripten/modular-psu-firmware.wasm
+
 build/linux
 build/win32
 build/win32-64bit
 build/CMakeFiles
 build/.cmake
 build/CMakeCache.txt
+
 src/third_party/micropython/ports/bare-arm/build
 src/third_party/stm32_cubeide/Debug
 src/third_party/stm32_cubeide/Debug (FPGA)
 src/third_party/stm32_cubeide/Release
 src/third_party/stm32_cubeide/.settings/language.settings.xml
+
 scripts/Hello world - EEZ Flow
 
 **/*.eez-project-ui-state
 **/*.eez-project-runtime-settings
 **/*.map
-

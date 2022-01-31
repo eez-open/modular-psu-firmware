@@ -21,7 +21,7 @@ body {
   flex-grow: 0;
   flex-shrink: 0;
 
-  display: flex;
+  display: none;
   flex-direction: row;
   align-items: center;
   padding: 10px;
@@ -121,6 +121,7 @@ body {
   flex-grow: 1;
   flex-shrink: 1;
   margin-top: 10px;
+  display: none;
 }
 
 #footer {
@@ -130,7 +131,7 @@ body {
   background: #eee;
   border-top: 1px solid #ddd;
   padding: 10px;
-  display: flex;
+  display: none;
   justify-content: space-between;
 }
 

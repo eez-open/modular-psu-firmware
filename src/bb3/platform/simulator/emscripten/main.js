@@ -1,3 +1,121 @@
+////////////////////////////////////////////////////////////////////////////////
+var headerElement = document.getElementById("header");
+var outputElement = document.getElementById("output");
+var footerElement = document.getElementById("footer");
+var canvasContainerElement = document.getElementById("canvas-container");
+var canvasElement = document.getElementById("canvas");
+const urlParams = new URLSearchParams(window.location.search);
+const simulatorID = urlParams.get("id");
+let resizeCanvas;
+let scpiInputBuffer = [];
+let debuggerInputBuffer = [];
+if (!simulatorID) {
+  headerElement.style.display = "flex";
+  outputElement.style.display = "block";
+  footerElement.style.display = "flex";
+} else {
+  canvasContainerElement.style.marginTop = "0";
+  canvasContainerElement.style.height = "100%";
+  canvasContainerElement.style.display = "flex";
+  canvasContainerElement.style.alignItems = "center";
+  canvasContainerElement.style.justifyContent = "center";
+  canvasElement.style.maxWidth = "100vw";
+  canvasElement.style.maxHeight = "100vh";
+  canvasElement.style.objectFit = "contain";
+
+  window.onmessage = function (e) {
+    if (e.data.msgId == "web-simulator-connection-scpi-write") {
+      scpiInputBuffer.push(e.data.data);
+    } else if (e.data.msgId == "web-simulator-connection-debugger-write") {
+      debuggerInputBuffer.push(e.data.data);
+    } else if (e.data.msgId == "web-simulator-connection-debugger-client-connected") {
+      Module.onDebuggerClientConnected();
+    } else if (e.data.msgId == "web-simulator-connection-debugger-client-disconnected") {
+      Module.onDebuggerClientDisconnected();
+    }
+  };
+
+  window.top.postMessage(
+    {
+      msgId: "web-simulator-loaded",
+      simulatorID,
+    },
+    "*"
+  );
+}
+
+function stringToBinary(str) {
+  const length = str.length / 2;
+  const result = new Uint8Array(4 + length);
+
+  result[0] = (length & 0xff000000) >> 24;
+  result[1] = (length & 0xff0000) >> 16;
+  result[2] = (length & 0xff00) >> 8;
+  result[3] = length & 0xff;
+
+  for (let i = 0; i < str.length; i += 2) {
+    result[4 + i / 2] = parseInt(str.substring(i, i + 2), 16);
+  }
+
+  return result;
+}
+
+function binaryToString(arr) {
+  let str = "";
+  for (let i = 0; i < arr.length; i++) {
+    let x = arr[i].toString(16);
+    if (x.length == 1) {
+      x = "0" + x;
+    }
+    str += x;
+  }
+  return str;
+}
+
+function readScpiInputBuffer() {
+  if (scpiInputBuffer.length == 0) {
+    return null;
+  }
+
+  return stringToBinary(scpiInputBuffer.shift());
+}
+
+function writeScpiOutputBuffer(arr) {
+  const scpiOutputBuffer = binaryToString(arr);
+
+  window.top.postMessage(
+    {
+      msgId: "web-simulator-write-scpi-buffer",
+      simulatorID,
+      scpiOutputBuffer
+    },
+    "*"
+  );
+}
+
+function readDebuggerInputBuffer() {
+  if (debuggerInputBuffer.length == 0) {
+    return null;
+  }
+
+  return stringToBinary(debuggerInputBuffer.shift());
+}
+
+function writeDebuggerOutputBuffer(arr) {
+  const debuggerOutputBuffer = binaryToString(arr);
+
+  window.top.postMessage(
+    {
+      msgId: "web-simulator-write-debugger-buffer",
+      simulatorID,
+      debuggerOutputBuffer
+    },
+    "*"
+  );
+}
+
+////////////////////////////////////////////////////////////////////////////////
+
 var statusElement = document.getElementById("status");
 var progressElement = document.getElementById("progress");
 var spinnerElement = document.getElementById("spinner");
@@ -5,7 +123,7 @@ var spinnerElement = document.getElementById("spinner");
 var stdinBuffer = [];
 
 var terminal = $("#output").terminal(
-  function(command) {
+  function (command) {
     // send command characters one by one, with 10ms interval, otherwise it will block for unknown reason
     const sendChar = () => {
       if (i < command.length) {
@@ -15,20 +133,20 @@ var terminal = $("#output").terminal(
       } else {
         stdinBuffer.push(13);
       }
-    }
+    };
     let i = 0;
     sendChar();
   },
   {
     greetings: "",
     name: "js_demo",
-    prompt: "[[;yellow;]scpi> ]"
+    prompt: "[[;yellow;]scpi> ]",
   }
 );
 
 var Module = {
   preRun: [
-    function() {
+    function () {
       ENV.SDL_EMSCRIPTEN_KEYBOARD_ELEMENT = "#canvas";
 
       var lastCh = null;
@@ -46,12 +164,12 @@ var Module = {
       }
 
       FS.init(stdin);
-    }
+    },
   ],
 
   postRun: [],
 
-  print: function(text) {
+  print: function (text) {
     if (arguments.length > 1) {
       text = Array.prototype.slice.call(arguments).join(" ");
     }
@@ -65,21 +183,21 @@ var Module = {
     }
   },
 
-  printErr: function(text) {
+  printErr: function (text) {
     if (arguments.length > 1) {
       text = Array.prototype.slice.call(arguments).join(" ");
     }
     console.error(text);
   },
 
-  canvas: (function() {
+  canvas: (function () {
     var canvas = document.getElementById("canvas");
     // As a default initial behavior, pop up an alert when webgl context is lost. To make your
     // application robust, you may want to override this behavior before shipping!
     // See http://www.khronos.org/registry/webgl/specs/latest/1.0/#5.15.2
     canvas.addEventListener(
       "webglcontextlost",
-      function(e) {
+      function (e) {
         alert("WebGL context lost. You will need to reload the page.");
         e.preventDefault();
       },
@@ -88,7 +206,7 @@ var Module = {
     return canvas;
   })(),
 
-  setStatus: function(text) {
+  setStatus: function (text) {
     if (!Module.setStatus.last)
       Module.setStatus.last = { time: Date.now(), text: "" };
     if (text === Module.setStatus.last.text) return;
@@ -114,27 +232,27 @@ var Module = {
 
   totalDependencies: 0,
 
-  monitorRunDependencies: function(left) {
+  monitorRunDependencies: function (left) {
     this.totalDependencies = Math.max(this.totalDependencies, left);
     Module.setStatus(
       left
         ? "Preparing... (" +
-          (this.totalDependencies - left) +
-          "/" +
-          this.totalDependencies +
-          ")"
+            (this.totalDependencies - left) +
+            "/" +
+            this.totalDependencies +
+            ")"
         : "All downloads complete."
     );
-  }
+  },
 };
 
 Module.setStatus("Downloading...");
 
-window.onerror = function(event) {
+window.onerror = function (event) {
   // TODO: do not warn on ok events like simulating an infinite loop or exitStatus
   Module.setStatus("Exception thrown, see JavaScript console");
   spinnerElement.style.display = "none";
-  Module.setStatus = function(text) {
+  Module.setStatus = function (text) {
     if (text) Module.printErr("[post-exception status] " + text);
   };
 };

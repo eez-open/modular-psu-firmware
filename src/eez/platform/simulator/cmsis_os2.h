@@ -1,6 +1,7 @@
 #pragma once
 
 #include <stdint.h>
+#include <queue>
 
 #ifndef __EMSCRIPTEN__
 #include <mutex>
@@ -97,15 +98,11 @@ osStatus osMutexRelease(osMutexId_t mutex);
 // Message Queue
 
 struct MessageQueue {
-    uint8_t *data;
-    uint8_t numElements;
+    std::queue<uint8_t *> elements;
 	uint32_t elementSize;
 #ifndef __EMSCRIPTEN__
 	std::mutex mutex;
 #endif
-    volatile uint16_t tail;
-    volatile uint16_t head;
-    volatile uint8_t overflow;
 };
 
 typedef MessageQueue *osMessageQueueId_t;

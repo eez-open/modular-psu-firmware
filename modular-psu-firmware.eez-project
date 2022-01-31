@@ -44,7 +44,7 @@
         {
           "name": "simulator",
           "description": "Cross-platfrom simulator for EEZ PSU",
-          "properties": "{\n  \"connection\": {\n    \"ethernet\": {\n      \"port\": 5025\n    },\n    \"serial\": {\n      \"baudRates\": [9600, 19200, 38400, 57600, 74880, 115200, 230400, 250000],\n      \"defaultBaudRate\": 115200\n    }\n  },\n  \"channels\": [\n    {\n      \"maxVoltage\": 40,\n      \"maxCurrent\": 5,\n      \"maxPower\": 155\n    },\n    {\n      \"maxVoltage\": 40,\n      \"maxCurrent\": 5,\n      \"maxPower\": 155\n    }\n  ],\n  \"lists\": {\n    \"maxPoints\": 256,\n    \"minDwell\": 0.0001,\n    \"maxDwell\": 65535,\n    \"dwellDigits\": 4,\n    \"voltageDigits\": 3,\n    \"currentDigits\": 3\n  },\n  \"fileDownload\": {\n    \"shortFileName\": false,\n    \"startCommand\": \"MMEM:DOWN:FNAMe <file>\",\n    \"fileSizeCommand\": \"MMEM:DOWN:SIZE <filesize>\",\n    \"sendChunkCommand\": \"MMEM:DOWN:DATA <chunk>\",\n    \"finishCommand\": \"MMEM:DOWN:FNAMe \\\"\\\"\",\n    \"abortCommand\": \"MMEM:DOWN:ABORt\",\n    \"chunkSize\": 1024,\n    \"favoriteDestinationPaths\": [\n        { \"path\": \"/\"},\n        { \"ext\": \".list\", \"path\": \"/Lists\"},\n        { \"ext\": \".profile\", \"path\": \"/Profiles\" },\n        { \"ext\": \"py\", \"path\": \"/Scripts\" },\n        { \"ext\": \"res\", \"path\": \"/Scripts\" },\n        { \"ext\": \"app\", \"path\": \"/Scripts\" },\n        { \"ext\": \"hex\", \"path\": \"/Updates\" },\n        { \"ext\": \"dlog\", \"path\": \"/Recordings\" }\n    ]\n  }\n}"
+          "properties": "{\n  \"connection\": {\n    \"ethernet\": {\n      \"port\": 5025\n    },\n    \"serial\": {\n      \"baudRates\": [9600, 19200, 38400, 57600, 74880, 115200, 230400, 250000],\n      \"defaultBaudRate\": 115200\n    },\n    \"webSimulator\": {\n        \"files\": [\n            [\"src/bb3/platform/simulator/emscripten/index.html\", \"web-simulator/index.html\"],\n            [\"src/bb3/platform/simulator/emscripten/main.js\", \"web-simulator/main.js\"],\n            [\"src/bb3/platform/simulator/emscripten/main.css\", \"web-simulator/main.css\"],\n            [\"build/emscripten/modular-psu-firmware.js\", \"web-simulator/modular-psu-firmware.js\"],\n            [\"build/emscripten/modular-psu-firmware.wasm\", \"web-simulator/modular-psu-firmware.wasm\"]\n        ],\n        \"src\": \"web-simulator/index.html\",\n        \"width\": 1396,\n        \"height\": 563\n    }\n  },\n  \"channels\": [\n    {\n      \"maxVoltage\": 40,\n      \"maxCurrent\": 5,\n      \"maxPower\": 155\n    },\n    {\n      \"maxVoltage\": 40,\n      \"maxCurrent\": 5,\n      \"maxPower\": 155\n    }\n  ],\n  \"lists\": {\n    \"maxPoints\": 256,\n    \"minDwell\": 0.0001,\n    \"maxDwell\": 65535,\n    \"dwellDigits\": 4,\n    \"voltageDigits\": 3,\n    \"currentDigits\": 3\n  },\n  \"fileDownload\": {\n    \"shortFileName\": false,\n    \"startCommand\": \"MMEM:DOWN:FNAMe <file>\",\n    \"fileSizeCommand\": \"MMEM:DOWN:SIZE <filesize>\",\n    \"sendChunkCommand\": \"MMEM:DOWN:DATA <chunk>\",\n    \"finishCommand\": \"MMEM:DOWN:FNAMe \\\"\\\"\",\n    \"abortCommand\": \"MMEM:DOWN:ABORt\",\n    \"chunkSize\": 1024,\n    \"favoriteDestinationPaths\": [\n        { \"path\": \"/\"},\n        { \"ext\": \".list\", \"path\": \"/Lists\"},\n        { \"ext\": \".profile\", \"path\": \"/Profiles\" },\n        { \"ext\": \"py\", \"path\": \"/Scripts\" },\n        { \"ext\": \"res\", \"path\": \"/Scripts\" },\n        { \"ext\": \"app\", \"path\": \"/Scripts\" },\n        { \"ext\": \"hex\", \"path\": \"/Updates\" },\n        { \"ext\": \"dlog\", \"path\": \"/Recordings\" }\n    ]\n  }\n}"
         }
       ],
       "files": [
@@ -89811,9 +89811,9 @@
       "idn": "Envox,EEZ BB3 (STM32)",
       "idfName": "EEZ BB3 STM32",
       "idfShortName": "EEZ-BB3-STM32",
-      "idfFirmwareVersion": "1.7.3",
+      "idfFirmwareVersion": "1.8",
       "idfGuid": "687b6dee-2093-4c36-afb7-cfc7ea2bf262",
-      "idfRevisionNumber": "1.7.3",
+      "idfRevisionNumber": "1.8",
       "idfDescription": "EEZ Bench box 3-module T&M chassis",
       "idfSupportedModels": "EEZ-BB3-STM32",
       "idfRevisionComments": "Initial version",
@@ -89831,9 +89831,9 @@
       "idn": "Envox,EEZ BB3 (Simulator)",
       "idfName": "EEZ BB3 Simulator",
       "idfShortName": "EEZ-BB3-SIM",
-      "idfFirmwareVersion": "1.7.3",
+      "idfFirmwareVersion": "1.8",
       "idfGuid": "7cab6860-e593-4ba2-ee68-57fe84460fa4",
-      "idfRevisionNumber": "1.7.3",
+      "idfRevisionNumber": "1.8",
       "idfDescription": "EEZ Bench box 3-module T&M chassis firmware simulator",
       "idfSupportedModels": "EEZ-BB3-SIM",
       "idfRevisionComments": "Initial version",
