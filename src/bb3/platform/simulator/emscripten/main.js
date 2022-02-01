@@ -44,8 +44,9 @@ if (!simulatorID) {
   );
 }
 
-function stringToBinary(str) {
-  const length = str.length / 2;
+function arrayBufferToArrayBufferWithSize(arrayBuffer) {
+  var view = new Uint8Array(arrayBuffer);
+  const length = view.length;
   const result = new Uint8Array(4 + length);
 
   result[0] = (length & 0xff000000) >> 24;
@@ -53,23 +54,9 @@ function stringToBinary(str) {
   result[2] = (length & 0xff00) >> 8;
   result[3] = length & 0xff;
 
-  for (let i = 0; i < str.length; i += 2) {
-    result[4 + i / 2] = parseInt(str.substring(i, i + 2), 16);
-  }
+  result.set(view, 4);
 
   return result;
-}
-
-function binaryToString(arr) {
-  let str = "";
-  for (let i = 0; i < arr.length; i++) {
-    let x = arr[i].toString(16);
-    if (x.length == 1) {
-      x = "0" + x;
-    }
-    str += x;
-  }
-  return str;
 }
 
 function readScpiInputBuffer() {
@@ -77,11 +64,11 @@ function readScpiInputBuffer() {
     return null;
   }
 
-  return stringToBinary(scpiInputBuffer.shift());
+  return arrayBufferToArrayBufferWithSize(scpiInputBuffer.shift());
 }
 
 function writeScpiOutputBuffer(arr) {
-  const scpiOutputBuffer = binaryToString(arr);
+  const scpiOutputBuffer = (new Uint8Array(arr)).buffer;
 
   window.top.postMessage(
     {
@@ -98,11 +85,11 @@ function readDebuggerInputBuffer() {
     return null;
   }
 
-  return stringToBinary(debuggerInputBuffer.shift());
+  return arrayBufferToArrayBufferWithSize(debuggerInputBuffer.shift());
 }
 
 function writeDebuggerOutputBuffer(arr) {
-  const debuggerOutputBuffer = binaryToString(arr);
+  const debuggerOutputBuffer = (new Uint8Array(arr)).buffer;
 
   window.top.postMessage(
     {
