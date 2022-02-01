@@ -358,7 +358,7 @@ void mainLoop() {
 
 void startEmscripten() {
     mountFileSystem();
-    emscripten_set_main_loop(mainLoop, 4, true);
+    emscripten_set_main_loop(mainLoop, 0, true);
 }
 
 std::string getExceptionMessage(intptr_t exceptionPtr) {
