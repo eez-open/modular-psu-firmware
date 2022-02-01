@@ -3,8 +3,6 @@
 #include <assert.h>
 #include <stdio.h>
 
-#include <map>
-
 #ifndef __EMSCRIPTEN__
 #include <chrono>
 #include <thread>
