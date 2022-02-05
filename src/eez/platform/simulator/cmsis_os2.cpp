@@ -56,11 +56,27 @@ osThreadId_t osThreadGetId() {
 }
 
 #ifdef __EMSCRIPTEN__
-void eez_system_tick() {
+extern bool g_enabledDisplayUpdate;
+
+static void oneIter() {
     for(Thread *thread: g_threads) {
         g_currentThread = thread;
         thread->func(nullptr);
     }
+}
+
+void eez_system_tick() {
+    uint32_t startTime = osKernelGetTickCount();
+
+    oneIter();
+
+    g_enabledDisplayUpdate = false;
+
+    while (osKernelGetTickCount() - startTime < 5) {
+        oneIter();
+    }
+    
+    g_enabledDisplayUpdate = true;
 }
 #endif
 
