@@ -2,6 +2,7 @@
 
 #include <assert.h>
 #include <stdio.h>
+#include <memory.h>
 
 #ifndef __EMSCRIPTEN__
 #include <chrono>

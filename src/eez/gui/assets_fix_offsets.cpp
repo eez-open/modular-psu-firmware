@@ -216,13 +216,27 @@ void fixOffsets(Assets *assets, ListOfAssetsPtr<Value> &values) {
 
 void fixOffsets(Assets *assets, Value &value) {
     if (value.getType() == VALUE_TYPE_STRING) {
-    	AssetsPtr<const char> assetsPtr = (const char *)value.uint32Value;
+    	AssetsPtr<const char> assetsPtr;
+
+#if _WIN64 || __x86_64__ || __ppc64__
+        assetsPtr.offset = value.uint32Value;
+#else
+        assetsPtr = (const char *)value.uint32Value;
+#endif
+
         fixOffset(assetsPtr, assets);
-        value.strValue = static_cast<const char *>(assetsPtr);
+        value.strValue = (const char *)assetsPtr;
     } else if (value.getType() == VALUE_TYPE_ARRAY) {
-    	AssetsPtr<ArrayValue> assetsPtr = (ArrayValue *)value.uint32Value;
+    	AssetsPtr<ArrayValue> assetsPtr;
+        
+#if _WIN64 || __x86_64__ || __ppc64__
+        assetsPtr.offset = value.uint32Value;
+#else
+        assetsPtr = (ArrayValue *)value.uint32Value;
+#endif
+        
         fixOffset(assetsPtr, assets);
-        value.arrayValue = static_cast<eez::gui::ArrayValue *>(assetsPtr);
+        value.arrayValue = (eez::gui::ArrayValue *)(assetsPtr);
         for (uint32_t i = 0; i < value.arrayValue->arraySize; i++) {
             fixOffsets(assets, value.arrayValue->values[i]);
         }
