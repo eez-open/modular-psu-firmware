@@ -96,7 +96,7 @@ void processGuiQueue(uint32_t timeout) {
             sendMessageToGuiThread(GUI_QUEUE_MESSAGE_TYPE_DISPLAY_VSYNC);
         }
 #else
-            display::update();
+        display::update();
 #endif
     } else if (type == GUI_QUEUE_MESSAGE_TYPE_TOUCH_EVENT) {
         processTouchEvent(obj.touchEvent);
