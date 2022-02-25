@@ -224,7 +224,7 @@ int outputBufferPosition = 0;
 
 void writeValueAddr(const void *pValue) {
 	char tmpStr[32];
-	snprintf(tmpStr, sizeof(tmpStr), "%d", (int)pValue);
+	snprintf(tmpStr, sizeof(tmpStr), "%p", pValue);
 	auto len = strlen(tmpStr);
 	for (size_t i = 0; i < len; i++) {
 		WRITE_TO_OUTPUT_BUFFER(tmpStr[i]);
@@ -369,10 +369,10 @@ void onStarted(Assets *assets) {
 			auto pValue = flowDefinition->globalVariables[i];
 
             char buffer[100];
-            snprintf(buffer, sizeof(buffer), "%d\t%d\t%d\t",
+            snprintf(buffer, sizeof(buffer), "%d\t%d\t%p\t",
                 MESSAGE_TO_DEBUGGER_GLOBAL_VARIABLE_INIT,
 				(int)i,
-                (int)pValue
+                (const void *)pValue
             );
             writeDebuggerBufferHook(buffer, strlen(buffer));
 
@@ -415,9 +415,9 @@ void onValueChanged(const Value *pValue) {
 		startToDebuggerMessageHook();
 
         char buffer[100];
-		snprintf(buffer, sizeof(buffer), "%d\t%d\t",
+		snprintf(buffer, sizeof(buffer), "%d\t%p\t",
 			MESSAGE_TO_DEBUGGER_VALUE_CHANGED,
-            (int)pValue
+            (const void *)pValue
 		);
         writeDebuggerBufferHook(buffer, strlen(buffer));
         
@@ -445,11 +445,11 @@ void onFlowStateCreated(FlowState *flowState) {
 			auto pValue = &flowState->values[flow->componentInputs.count + i];
 
             char buffer[100];
-            snprintf(buffer, sizeof(buffer), "%d\t%d\t%d\t%d\t",
+            snprintf(buffer, sizeof(buffer), "%d\t%d\t%d\t%p\t",
                 MESSAGE_TO_DEBUGGER_LOCAL_VARIABLE_INIT,
 				(int)flowState->flowStateIndex,
 				(int)i,
-                (int)pValue
+                (const void *)pValue
             );
             writeDebuggerBufferHook(buffer, strlen(buffer));
 
@@ -462,11 +462,11 @@ void onFlowStateCreated(FlowState *flowState) {
 				auto pValue = &flowState->values[i];
 
 				char buffer[100];
-				snprintf(buffer, sizeof(buffer), "%d\t%d\t%d\t%d\t",
+				snprintf(buffer, sizeof(buffer), "%d\t%d\t%d\t%p\t",
 					MESSAGE_TO_DEBUGGER_COMPONENT_INPUT_INIT,
 					(int)flowState->flowStateIndex,
 					(int)i,
-					(int)pValue
+					(const void *)pValue
 				);
 				writeDebuggerBufferHook(buffer, strlen(buffer));
 
