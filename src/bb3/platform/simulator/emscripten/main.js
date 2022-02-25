@@ -134,8 +134,6 @@ var terminal = $("#output").terminal(
 var Module = {
   preRun: [
     function () {
-      ENV.SDL_EMSCRIPTEN_KEYBOARD_ELEMENT = "#canvas";
-
       var lastCh = null;
 
       function stdin() {
@@ -177,22 +175,6 @@ var Module = {
     console.error(text);
   },
 
-  canvas: (function () {
-    var canvas = document.getElementById("canvas");
-    // As a default initial behavior, pop up an alert when webgl context is lost. To make your
-    // application robust, you may want to override this behavior before shipping!
-    // See http://www.khronos.org/registry/webgl/specs/latest/1.0/#5.15.2
-    canvas.addEventListener(
-      "webglcontextlost",
-      function (e) {
-        alert("WebGL context lost. You will need to reload the page.");
-        e.preventDefault();
-      },
-      false
-    );
-    return canvas;
-  })(),
-
   setStatus: function (text) {
     if (!Module.setStatus.last)
       Module.setStatus.last = { time: Date.now(), text: "" };
@@ -230,6 +212,73 @@ var Module = {
             ")"
         : "All downloads complete."
     );
+  },
+
+  onRuntimeInitialized: function () {
+    canvasElement.width = 1396;
+    canvasElement.height = 563;
+    var ctx = canvas.getContext('2d');
+
+    var wheelDeltaY = 0
+    var wheelClicked = 0;
+
+    function update() {
+      Module._onMouseWheelEvent(wheelDeltaY, wheelClicked);
+      wheelDeltaY = 0;
+      wheelClicked = 0;
+
+      Module._mainLoop();
+
+      var buf_addr = Module._getSyncedBuffer();
+
+      if (buf_addr != 0) {
+        var uint8ClampedArray = new Uint8ClampedArray(Module.HEAPU8.subarray(buf_addr, buf_addr + canvasElement.width * canvasElement.height * 4));
+        var imgData = new ImageData(uint8ClampedArray, canvasElement.width, canvasElement.height);
+
+        ctx.putImageData(imgData, 0, 0);
+      }
+    
+      window.requestAnimationFrame(update);
+    }
+
+    window.requestAnimationFrame(update);
+
+    function sendPointerEvent(event) {
+      var bbox = canvasElement.getBoundingClientRect();
+      Module._onPointerEvent(
+        (event.clientX - bbox.left) * (canvasElement.width / bbox.width),
+        (event.clientY - bbox.top) * (canvasElement.height / bbox.height),
+        event.buttons == 1 ? 1 : 0
+      );
+      event.preventDefault();
+      event.stopPropagation();
+    }
+
+    canvas.addEventListener("pointerdown", event => {
+      if (event.buttons == 4) {
+        wheelClicked = 1;
+      }
+      canvasElement.setPointerCapture(event.pointerId);
+      sendPointerEvent(event);
+    }, true);    
+
+    canvas.addEventListener("pointermove", event => {
+      sendPointerEvent(event);
+    }, true);    
+
+    canvas.addEventListener("pointerup", event => {
+      canvasElement.releasePointerCapture(event.pointerId);
+      sendPointerEvent(event);
+    }, true);    
+
+    canvas.addEventListener("pointercancel", event => {
+      canvasElement.releasePointerCapture(event.pointerId);
+      sendPointerEvent(event);
+    }, true);       
+
+    document.addEventListener("wheel", event => {
+      wheelDeltaY += -event.deltaY;
+    }, true);       
   },
 };
 

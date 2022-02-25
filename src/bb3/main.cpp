@@ -322,7 +322,7 @@ void mountFileSystem() {
 }
 // clang-format on
 
-void mainLoop() {
+EM_PORT_API(void) mainLoop() {
     if (emscripten_run_script_int("Module.syncdone") == 1) {
         if (!g_initialized) {
             g_initialized = true;
@@ -358,7 +358,6 @@ void mainLoop() {
 
 void startEmscripten() {
     mountFileSystem();
-    emscripten_set_main_loop(mainLoop, 0, true);
 }
 
 std::string getExceptionMessage(intptr_t exceptionPtr) {
@@ -380,4 +379,5 @@ EMSCRIPTEN_BINDINGS(Bindings) {
     emscripten::function("onDebuggerClientConnected", &onDebuggerClientConnected);
     emscripten::function("onDebuggerClientDisconnected", &onDebuggerClientDisconnected);
 };
+
 #endif

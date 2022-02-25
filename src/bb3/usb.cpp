@@ -229,7 +229,7 @@ void selectUsbMode(int usbMode, int otgMode) {
     }
 #endif
 
-#if defined(EEZ_PLATFORM_SIMULATOR)
+#if defined(EEZ_PLATFORM_SIMULATOR) && !defined(__EMSCRIPTEN__)
     if (g_usbMode == USB_MODE_HOST || g_usbMode == USB_MODE_OTG) {
         SDL_ShowCursor(SDL_ENABLE);
         SDL_CaptureMouse(SDL_FALSE);
@@ -252,7 +252,7 @@ void selectUsbMode(int usbMode, int otgMode) {
 
 #endif
 
-#if defined(EEZ_PLATFORM_SIMULATOR)
+#if defined(EEZ_PLATFORM_SIMULATOR) && !defined(__EMSCRIPTEN__)
     if (g_usbMode == USB_MODE_HOST || g_usbMode == USB_MODE_OTG) {
         SDL_ShowCursor(SDL_DISABLE);
         SDL_CaptureMouse(SDL_TRUE);

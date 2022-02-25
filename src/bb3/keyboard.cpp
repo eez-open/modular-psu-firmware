@@ -160,7 +160,7 @@ void onKeyboardEvent(USBH_HandleTypeDef *phost) {
 }
 #endif
 
-#if defined(EEZ_PLATFORM_SIMULATOR)
+#if defined(EEZ_PLATFORM_SIMULATOR) && !defined(__EMSCRIPTEN__)
 void onKeyboardEvent(SDL_KeyboardEvent *key) {
     uint8_t mod = 
         (key->keysym.mod & KMOD_LCTRL ? KEY_MOD_LCTRL : 0) |
