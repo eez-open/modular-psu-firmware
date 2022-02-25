@@ -16,7 +16,11 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
+#include <math.h>
+
+#if !defined(__EMSCRIPTEN__)
 #include <SDL.h>
+#endif
 
 #include <eez/core/encoder.h>
 #include <eez/core/keyboard.h>
@@ -33,11 +37,10 @@ namespace simulator {
 
 int g_mouseX;
 int g_mouseY;
-int g_mouseButton1DownX;
-int g_mouseButton1DownY;
 bool g_mouseButton1IsPressed;
 
 void readEvents() {
+#if !defined(__EMSCRIPTEN__)    
     int yMouseWheel = 0;
     bool mouseButton2IsUp = false;
 
@@ -46,8 +49,6 @@ void readEvents() {
         if (event.type == SDL_MOUSEMOTION || event.type == SDL_MOUSEBUTTONDOWN || event.type == SDL_MOUSEBUTTONUP) {
             if (event.button.button == 1) {
                 if (event.type == SDL_MOUSEBUTTONDOWN) {
-                    g_mouseButton1DownX = g_mouseX;
-                    g_mouseButton1DownY = g_mouseY;
                     g_mouseButton1IsPressed = true;
                 } else if (event.type == SDL_MOUSEBUTTONUP) {
                     g_mouseButton1IsPressed = false;
@@ -83,16 +84,42 @@ void readEvents() {
 #if OPTION_ENCODER
     mcu::encoder::write(yMouseWheel, mouseButton2IsUp);
 #endif
+#endif
 }
 
 bool isMiddleButtonPressed() {
+#if !defined(__EMSCRIPTEN__)
     int x;
     int y;
 	osDelay(1000);
     auto buttons = SDL_GetMouseState(&x, &y);
     return buttons & SDL_BUTTON(2) ? true : false;
+#else
+    return false;
+#endif
 }
 
 } // namespace simulator
 } // namespace platform
 } // namespace eez
+
+#if defined(__EMSCRIPTEN__)
+
+EM_PORT_API(void) onPointerEvent(int x, int y, int pressed) {
+    using namespace eez::platform::simulator;
+
+    g_mouseX = x;
+    g_mouseY = y;
+    g_mouseButton1IsPressed = pressed;
+}
+
+EM_PORT_API(void) onMouseWheelEvent(double yMouseWheel, int clicked) {
+#if OPTION_ENCODER
+    if (yMouseWheel >= 100 || yMouseWheel <= -100) {
+        yMouseWheel /= 100;
+    }
+    eez::mcu::encoder::write(round(yMouseWheel), clicked);
+#endif
+}
+
+#endif

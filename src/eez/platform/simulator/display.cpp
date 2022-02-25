@@ -22,8 +22,10 @@
 #include <string.h>
 #include <string>
 
+#if !defined(__EMSCRIPTEN__)
 #include <SDL.h>
 #include <SDL_image.h>
+#endif
 
 #include <eez/conf.h>
 #include <eez/core/debug.h>
@@ -47,8 +49,10 @@ namespace display {
 
 ////////////////////////////////////////////////////////////////////////////////
 
+#if !defined(__EMSCRIPTEN__)
 static SDL_Window *g_mainWindow;
 static SDL_Renderer *g_renderer;
+#endif
 
 ////////////////////////////////////////////////////////////////////////////////
 
@@ -67,6 +71,7 @@ std::string getFullPath(std::string category, std::string path) {
 }
 
 void initDriver() {
+#if !defined(__EMSCRIPTEN__)
     // Set texture filtering to linear
     if (!SDL_SetHint(SDL_HINT_RENDER_SCALE_QUALITY, "1")) {
         printf("Warning: Linear texture filtering not enabled!");
@@ -115,15 +120,17 @@ void initDriver() {
         SDL_CaptureMouse(SDL_TRUE);
     }
 #endif
+#endif
 }
 
 void syncBuffer() {
+#if !defined(__EMSCRIPTEN__)    
     if (!g_mainWindow) {
 		return;
     }
 
     SDL_Surface *rgbSurface = SDL_CreateRGBSurfaceFrom(
-        (uint32_t *)g_syncedBuffer, DISPLAY_WIDTH, DISPLAY_HEIGHT, 32, 4 * DISPLAY_WIDTH, 0, 0, 0, 0);
+        (uint32_t *)g_syncedBuffer, DISPLAY_WIDTH, DISPLAY_HEIGHT, 32, 4 * DISPLAY_WIDTH, 0x000000FF, 0x0000FF00, 0x00FF0000, 0xFF000000);
     if (rgbSurface != NULL) {
         SDL_Texture *texture = SDL_CreateTextureFromSurface(g_renderer, rgbSurface);
         if (texture != NULL) {
@@ -143,6 +150,7 @@ void syncBuffer() {
     SDL_RenderPresent(g_renderer);
 
     sendMessageToGuiThread(GUI_QUEUE_MESSAGE_TYPE_DISPLAY_VSYNC, 0, 0);
+#endif
 
     touch::tick();
 }
@@ -156,9 +164,9 @@ void copySyncedBufferToScreenshotBuffer() {
 
     for (int y = 0; y < 272; y++) {
         for (int x = 0; x < 480; x++) {
-            uint8_t b = *src++;
-            uint8_t g = *src++;
             uint8_t r = *src++;
+            uint8_t g = *src++;
+            uint8_t b = *src++;
             src++;
 
             *dst++ = r;
@@ -238,7 +246,7 @@ void bitBlt(int x1, int y1, int x2, int y2, int dstx, int dsty) {
     for (int y = y1; y <= y2; y++, src += nl, dst += nl) {
         for (uint32_t *lineEnd = dst + width; dst != lineEnd; dst++, src++) {
             uint8_t *src8 = (uint8_t *)src;
-            *dst = color16to32(RGB_TO_COLOR(src8[2], src8[1], src8[0]));
+            *dst = color16to32(RGB_TO_COLOR(src8[0], src8[1], src8[2]));
         }
     }
 
@@ -310,9 +318,9 @@ void drawBitmap(Image *image, int x, int y) {
 
         for (uint8_t *srcEnd = src + 3 * (image->width + nlSrc) * image->height; src != srcEnd; src += nlSrc, dst += nlDst) {
             for (uint32_t *lineEnd = dst + image->width; dst != lineEnd; src += 3, dst++) {
-                ((uint8_t *)dst)[0] = ((uint8_t *)src)[2];
+                ((uint8_t *)dst)[0] = ((uint8_t *)src)[0];
                 ((uint8_t *)dst)[1] = ((uint8_t *)src)[1];
-                ((uint8_t *)dst)[2] = ((uint8_t *)src)[0];
+                ((uint8_t *)dst)[2] = ((uint8_t *)src)[2];
                 ((uint8_t *)dst)[3] = 255;
             }
         }
@@ -338,9 +346,9 @@ void drawGlyph(const uint8_t *src, uint32_t srcLineOffset, int x_glyph, int y_gl
     // const gui::GlyphData &glyph, int x_glyph, int y_glyph, int width, int height, int offset, int iStartByte
 
     uint32_t pixel;
-    ((uint8_t *)&pixel)[0] = COLOR_TO_B(g_fc);
+    ((uint8_t *)&pixel)[0] = COLOR_TO_R(g_fc);
     ((uint8_t *)&pixel)[1] = COLOR_TO_G(g_fc);
-    ((uint8_t *)&pixel)[2] = COLOR_TO_R(g_fc);
+    ((uint8_t *)&pixel)[2] = COLOR_TO_B(g_fc);
     uint8_t *pixelAlpha = ((uint8_t *)&pixel) + 3;
 
     uint32_t *dst = g_renderBuffer + y_glyph * DISPLAY_WIDTH + x_glyph;
@@ -361,3 +369,13 @@ void drawGlyph(const uint8_t *src, uint32_t srcLineOffset, int x_glyph, int y_gl
 } // namespace display
 } // namespace gui
 } // namespace eez
+
+#if defined(__EMSCRIPTEN__)
+
+EM_PORT_API(uint8_t*) getSyncedBuffer() {
+    using namespace eez::gui;
+    sendMessageToGuiThread(GUI_QUEUE_MESSAGE_TYPE_DISPLAY_VSYNC, 0, 0);
+	return (uint8_t*)display::g_syncedBuffer;
+}
+
+#endif

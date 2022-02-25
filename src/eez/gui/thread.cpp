@@ -21,10 +21,6 @@
 #include <eez/gui/gui.h>
 #include <eez/gui/thread.h>
 
-#ifdef __EMSCRIPTEN__
-bool g_enabledDisplayUpdate = true;
-#endif
-
 #include <eez/flow/flow.h>
 #include <eez/flow/hooks.h>
 
@@ -89,15 +85,7 @@ void processGuiQueue(uint32_t timeout) {
     uint8_t type = obj.type;
 
     if (type == GUI_QUEUE_MESSAGE_TYPE_DISPLAY_VSYNC) {
-#ifdef __EMSCRIPTEN__        
-        if (g_enabledDisplayUpdate) {
-            display::update();
-        } else {
-            sendMessageToGuiThread(GUI_QUEUE_MESSAGE_TYPE_DISPLAY_VSYNC);
-        }
-#else
         display::update();
-#endif
     } else if (type == GUI_QUEUE_MESSAGE_TYPE_TOUCH_EVENT) {
         processTouchEvent(obj.touchEvent);
     } else if (type == GUI_QUEUE_MESSAGE_TYPE_SHOW_PAGE) {

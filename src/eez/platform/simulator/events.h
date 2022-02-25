@@ -24,8 +24,6 @@ namespace simulator {
 
 extern int g_mouseX;
 extern int g_mouseY;
-extern int g_mouseButton1DownX;
-extern int g_mouseButton1DownY;
 extern bool g_mouseButton1IsPressed;
 
 void readEvents();
