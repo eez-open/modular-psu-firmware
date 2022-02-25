@@ -88,7 +88,7 @@ static uint8_t g_writeQueueHead = 0;
 static uint8_t g_writeQueueTail = 0;
 static bool g_writeQueueFull;
 
-EEZ_MUTEX_DECLARE(eventQueue)
+EEZ_MUTEX_DECLARE(eventQueue);
 
 ////////////////////////////////////////////////////////////////////////////////
 
