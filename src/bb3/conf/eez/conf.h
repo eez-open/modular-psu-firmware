@@ -36,7 +36,7 @@ static const uint32_t DISPLAY_WIDTH = 1396;
 static const uint32_t DISPLAY_HEIGHT = 563;
 static const uint32_t DISPLAY_BPP = 32;  // RGBA8888
 
-static const char *TITLE = "EEZ Modular Firmware Simulator";
+static const char *TITLE = "BB3 Firmware Simulator";
 static const char *ICON = "eez.png";
 #endif
 
