@@ -65,7 +65,7 @@ void MultilineTextWidgetState::render() {
             style, flags.active, flags.blinking,
             widget->firstLineIndent, widget->hangingIndent);
     }
-};
+}
 
 } // namespace gui
 } // namespace eez

@@ -39,13 +39,13 @@
         osPriority##PRIORITY, \
 		0, \
 		0, \
-    };
+    }
 #define EEZ_THREAD_CREATE(NAME, THREAD_FUNC) g_##NAME##TaskHandle = osThreadNew(THREAD_FUNC, nullptr, &g_##NAME##TaskAttributes);
 #define EEZ_THREAD_TERMINATE(NAME) osThreadTerminate(g_##NAME##TaskHandle)
 
 #define EEZ_MESSAGE_QUEUE_DECLARE(NAME, OBJECT_DEF) \
     struct NAME##MessageQueueObject OBJECT_DEF; \
-    osMessageQueueId_t g_##NAME##MessageQueueId;
+    osMessageQueueId_t g_##NAME##MessageQueueId
 #define EEZ_MESSAGE_QUEUE_CREATE(NAME, QUEUE_SIZE) g_##NAME##MessageQueueId = osMessageQueueNew(QUEUE_SIZE, sizeof(NAME##MessageQueueObject), nullptr)
 #define EEZ_MESSAGE_QUEUE_GET(NAME, OBJ, TIMEOUT) (osMessageQueueGet(g_##NAME##MessageQueueId, &OBJ, nullptr, TIMEOUT) == osOK)
 #define EEZ_MESSAGE_QUEUE_PUT(NAME, OBJ, TIMEOUT) osMessageQueuePut(g_##NAME##MessageQueueId, &OBJ, 0, TIMEOUT)
@@ -57,7 +57,7 @@
         osMutexRecursive | osMutexPrioInherit, \
         NULL, \
         0U \
-    };
+    }
 #define EEZ_MUTEX_CREATE(NAME) g_##NAME##mutexId = osMutexNew(&g_##NAME##mutexAttr)
 #define EEZ_MUTEX_WAIT(NAME, TIMEOUT) osMutexAcquire(g_##NAME##mutexId, TIMEOUT) == osOK
 #define EEZ_MUTEX_RELEASE(NAME) osMutexRelease(g_##NAME##mutexId)
