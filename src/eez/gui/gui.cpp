@@ -46,13 +46,9 @@ static bool g_wasBlinkTime;
 ////////////////////////////////////////////////////////////////////////////////
 
 void guiInit() {
-    loadMainAssets(assets, sizeof(assets));
+    loadMainAssets();
 
     display::init();
-
-    if (g_mainAssets->flowDefinition) {
-        flow::start(g_mainAssets);
-    }
 }
 
 void guiTick() {
