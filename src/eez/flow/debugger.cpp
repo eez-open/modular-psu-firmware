@@ -128,7 +128,7 @@ void processDebuggerInput(char *buffer, uint32_t length) {
 	for (uint32_t i = 0; i < length; i++) {
 		if (buffer[i] == '\n') {
 			int messageFromDebugger = g_inputFromDebugger[0] - '0';
-			
+
 			if (messageFromDebugger == MESSAGE_FROM_DEBUGGER_RESUME) {
 				setDebuggerState(DEBUGGER_STATE_RESUMED);
 			} else if (messageFromDebugger == MESSAGE_FROM_DEBUGGER_PAUSE) {
@@ -149,7 +149,7 @@ void processDebuggerInput(char *buffer, uint32_t length) {
 					auto flow = flowDefinition->flows[flowIndex];
 					if (componentIndex >= 0 && componentIndex < flow->components.count) {
 						auto component = flow->components[componentIndex];
-						
+
 						component->breakpoint = messageFromDebugger == MESSAGE_FROM_DEBUGGER_ADD_BREAKPOINT ||
 							messageFromDebugger == MESSAGE_FROM_DEBUGGER_ENABLE_BREAKPOINT ? 1 : 0;
 					} else {
@@ -420,7 +420,7 @@ void onValueChanged(const Value *pValue) {
             (const void *)pValue
 		);
         writeDebuggerBufferHook(buffer, strlen(buffer));
-        
+
 		writeValue(*pValue);
     }
 }
@@ -438,7 +438,7 @@ void onFlowStateCreated(FlowState *flowState) {
 			flowState->parentComponentIndex
 		);
         writeDebuggerBufferHook(buffer, strlen(buffer));
-		
+
 		auto flow = flowState->flow;
 
 		for (uint32_t i = 0; i < flow->localVariables.count; i++) {
@@ -492,7 +492,7 @@ void onFlowStateDestroyed(FlowState *flowState) {
 void onFlowError(FlowState *flowState, int componentIndex, const char *errorMessage) {
 	if (g_debuggerIsConnected) {
 		startToDebuggerMessageHook();
-		
+
 		char buffer[100];
 		snprintf(buffer, sizeof(buffer), "%d\t%d\t%d\t",
 			MESSAGE_TO_DEBUGGER_FLOW_STATE_ERROR,
@@ -541,7 +541,7 @@ void writeLogMessage(const char *str, size_t len) {
 void logInfo(FlowState *flowState, unsigned componentIndex, const char *message) {
 	if (g_debuggerIsConnected) {
 		startToDebuggerMessageHook();
-				
+
 		char buffer[256];
 		snprintf(buffer, sizeof(buffer), "%d\t%d\t%d\t%d\t",
 			MESSAGE_TO_DEBUGGER_LOG,
@@ -609,7 +609,7 @@ void onPageChanged(int pageId) {
 		char buffer[100];
 		snprintf(buffer, sizeof(buffer), "%d\t%d\n",
 			MESSAGE_TO_DEBUGGER_PAGE_CHANGED,
-			-pageId - 1
+			pageId
 		);
 		writeDebuggerBufferHook(buffer, strlen(buffer));
 	}

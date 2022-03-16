@@ -26,6 +26,7 @@ static const unsigned QUEUE_SIZE = 200;
 static struct {
 	FlowState *flowState;
 	unsigned componentIndex;
+    bool continuousTask;
 } g_queue[QUEUE_SIZE];
 static unsigned g_queueHead;
 static unsigned g_queueTail;
@@ -44,7 +45,7 @@ size_t getQueueSize() {
 		}
 		return 0;
 	}
-	
+
 	if (g_queueHead < g_queueTail) {
 		return g_queueTail - g_queueHead;
 	}
@@ -52,13 +53,14 @@ size_t getQueueSize() {
 	return QUEUE_SIZE - g_queueHead + g_queueTail;
 }
 
-bool addToQueue(FlowState *flowState, unsigned componentIndex, int sourceComponentIndex, int sourceOutputIndex, int targetInputIndex) {
+bool addToQueue(FlowState *flowState, unsigned componentIndex, int sourceComponentIndex, int sourceOutputIndex, int targetInputIndex, bool continuousTask) {
 	if (g_queueIsFull) {
 		return false;
 	}
 
 	g_queue[g_queueTail].flowState = flowState;
 	g_queue[g_queueTail].componentIndex = componentIndex;
+    g_queue[g_queueTail].continuousTask = continuousTask;
 
 	g_queueTail = (g_queueTail + 1) % QUEUE_SIZE;
 
@@ -68,27 +70,34 @@ bool addToQueue(FlowState *flowState, unsigned componentIndex, int sourceCompone
 
 	flowState->numActiveComponents++;
 
-	onAddToQueue(flowState, sourceComponentIndex, sourceOutputIndex, componentIndex, targetInputIndex);
+    if (!continuousTask) {
+	    onAddToQueue(flowState, sourceComponentIndex, sourceOutputIndex, componentIndex, targetInputIndex);
+    }
 
 	return true;
 }
 
-bool peekNextTaskFromQueue(FlowState *&flowState, unsigned &componentIndex) {
+bool peekNextTaskFromQueue(FlowState *&flowState, unsigned &componentIndex, bool &continuousTask) {
 	if (g_queueHead == g_queueTail && !g_queueIsFull) {
 		return false;
 	}
 
 	flowState = g_queue[g_queueHead].flowState;
 	componentIndex = g_queue[g_queueHead].componentIndex;
+    continuousTask = g_queue[g_queueHead].continuousTask;
 
 	return true;
 }
 
 void removeNextTaskFromQueue() {
+    auto continuousTask = g_queue[g_queueHead].continuousTask;
+
 	g_queueHead = (g_queueHead + 1) % QUEUE_SIZE;
 	g_queueIsFull = false;
 
-	onRemoveFromQueue();
+    if (!continuousTask) {
+	    onRemoveFromQueue();
+    }
 }
 
 void removeQueueTasksForFlowState(FlowState *flowState) {

@@ -25,8 +25,10 @@ namespace flow {
 
 void queueReset();
 size_t getQueueSize();
-bool addToQueue(FlowState *flowState, unsigned componentIndex, int sourceComponentIndex = -1, int sourceOutputIndex = -1, int targetInputIndex = -1);
-bool peekNextTaskFromQueue(FlowState *&flowState, unsigned &componentIndex);
+bool addToQueue(FlowState *flowState, unsigned componentIndex,
+    int sourceComponentIndex = -1, int sourceOutputIndex = -1, int targetInputIndex = -1,
+    bool continuousTask = false);
+bool peekNextTaskFromQueue(FlowState *&flowState, unsigned &componentIndex, bool &continuousTask);
 void removeNextTaskFromQueue();
 void removeQueueTasksForFlowState(FlowState *flowState);
 

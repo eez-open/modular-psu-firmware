@@ -90,7 +90,7 @@ void executeLoopComponent(FlowState *flowState, unsigned componentIndex) {
 		propagateValueThroughSeqout(flowState, componentIndex);
     } else {
         auto value = op_add(loopComponentExecutionState->dstValue, loopComponentExecutionState->stepValue);
-        if (op_great_eq(value, loopComponentExecutionState->toValue).toBool()) {
+        if (op_great(value, loopComponentExecutionState->toValue).toBool()) {
 			ObjectAllocator<LoopComponenentExecutionState>::deallocate(loopComponentExecutionState);
 			flowState->componenentExecutionStates[componentIndex] = nullptr;
 

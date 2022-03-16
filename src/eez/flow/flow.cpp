@@ -80,11 +80,12 @@ void tick() {
     for (size_t i = 0; i < queueSize; i++) {
 		FlowState *flowState;
 		unsigned componentIndex;
-		if (!peekNextTaskFromQueue(flowState, componentIndex)) {
+        bool continuousTask;
+		if (!peekNextTaskFromQueue(flowState, componentIndex, continuousTask)) {
 			break;
 		}
 
-		if (!canExecuteStep(flowState, componentIndex)) {
+		if (!continuousTask && !canExecuteStep(flowState, componentIndex)) {
 			break;
 		}
 
@@ -110,10 +111,6 @@ void tick() {
 				throwError(flowState, componentIndex, "Unexpected: no CallAction component state\n");
 				return;
 			}
-		}
-
-		if (component->type == defs_v3::COMPONENT_TYPE_DELAY_ACTION) {
-			break;
 		}
 
 		if (millis() - startTickCount >= FLOW_TICK_MAX_DURATION_MS) {

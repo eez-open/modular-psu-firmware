@@ -39,7 +39,8 @@ void executeLogComponent(FlowState *flowState, unsigned componentIndex) {
         return;
     }
 
-    const char *valueStr = value.toString(0x0f9812ee).getString();
+    Value strValue = value.toString(0x0f9812ee);
+    const char *valueStr = strValue.getString();
     if (valueStr && *valueStr) {
       logInfo(flowState, componentIndex, valueStr);
     }
