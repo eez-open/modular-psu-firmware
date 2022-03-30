@@ -254,10 +254,22 @@ void writeString(const char *str) {
 	FLUSH_OUTPUT_BUFFER();
 }
 
-void writeArray(ArrayValue *arrayValue) {
+void writeArrayType(uint32_t arrayType) {
+	char tmpStr[32];
+	snprintf(tmpStr, sizeof(tmpStr), "%x", (int)arrayType);
+	auto len = strlen(tmpStr);
+	for (size_t i = 0; i < len; i++) {
+		WRITE_TO_OUTPUT_BUFFER(tmpStr[i]);
+	}
+}
+
+void writeArray(const ArrayValue *arrayValue) {
 	WRITE_TO_OUTPUT_BUFFER('{');
 
 	writeValueAddr(arrayValue);
+
+    WRITE_TO_OUTPUT_BUFFER(',');
+    writeArrayType(arrayValue->arrayType);
 
 	for (uint32_t i = 0; i < arrayValue->arraySize; i++) {
 		WRITE_TO_OUTPUT_BUFFER(',');
@@ -268,9 +280,9 @@ void writeArray(ArrayValue *arrayValue) {
 	WRITE_TO_OUTPUT_BUFFER('\n');
 	FLUSH_OUTPUT_BUFFER();
 
-	for (uint32_t i = 0; i < arrayValue->arraySize; i++) {
-		onValueChanged(&arrayValue->values[i]);
-	}
+    for (uint32_t i = 0; i < arrayValue->arraySize; i++) {
+        onValueChanged(&arrayValue->values[i]);
+    }
 }
 
 void writeValue(const Value &value) {
@@ -340,7 +352,8 @@ void writeValue(const Value &value) {
 		return;
 
 	case VALUE_TYPE_ARRAY:
-		writeArray(value.arrayValue);
+	case VALUE_TYPE_ARRAY_REF:
+		writeArray(value.getArray());
 		return;
 
 	default:

@@ -100,6 +100,7 @@ struct PairOfInt16Value {
 
 struct Ref {
 	uint32_t refCounter;
+    virtual ~Ref() {}
 };
 
 struct ArrayValue;
@@ -200,7 +201,7 @@ struct Value {
 	Value(double value, ValueType type)
 		: type(type), unit(UNIT_UNKNOWN), options(0), doubleValue(value) {
 	}
-	
+
 	Value(const char *value, ValueType type, uint16_t options)
         : type(type), unit(UNIT_UNKNOWN), options(options), strValue(value)
     {
@@ -292,7 +293,7 @@ struct Value {
 	bool isFloat() const {
         return type == VALUE_TYPE_FLOAT;
     }
-    
+
 	bool isDouble() const {
 		return type == VALUE_TYPE_DOUBLE;
 	}
@@ -332,11 +333,11 @@ struct Value {
 	uint16_t getUInt16() const {
         return uint16Value;
     }
-	
+
 	int32_t getInt32() const {
 		return int32Value;
 	}
-	
+
 	uint32_t getUInt32() const {
         return uint32Value;
     }
@@ -359,6 +360,9 @@ struct Value {
 
 	const char *getString() const;
 
+    const ArrayValue *getArray() const;
+    ArrayValue *getArray();
+
     //////////
 
 	int getInt() const {
@@ -379,7 +383,7 @@ struct Value {
     uint8_t *getPUint8() const {
         return puint8Value;
     }
-    
+
     StepValues *getStepValues() const {
         return (StepValues *)pVoidValue;
     }
@@ -449,6 +453,8 @@ struct Value {
 	static Value makeStringRef(const char *str, int len, uint32_t id);
 	static Value concatenateString(const Value &str1, const Value &str2);
 
+    static Value makeArrayRef(int arraySize, int arrayType, uint32_t id);
+
 	//////////
 
   public:
@@ -487,14 +493,28 @@ struct Value {
 	};
 };
 
+struct StringRef : public Ref {
+    ~StringRef() {
+        if (str) {
+            free(str);
+        }
+    }
+	char *str;
+};
+
 struct ArrayValue {
 	uint32_t arraySize;
-    uint32_t reserved;
+    uint32_t arrayType;
 	Value values[1];
 };
 
-struct StringRef : public Ref {
-	char str[4];
+struct ArrayValueRef : public Ref {
+    ~ArrayValueRef() {
+        for (uint32_t i = 1; i < arrayValue.arraySize; i++) {
+            (arrayValue.values + i)->~Value();
+        }
+    }
+	ArrayValue arrayValue;
 };
 
 ////////////////////////////////////////////////////////////////////////////////

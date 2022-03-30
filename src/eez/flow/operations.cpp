@@ -156,21 +156,21 @@ Value op_binary_and(const Value& a1, const Value& b1) {
 	const Value &a = a1.getType() == VALUE_TYPE_VALUE_PTR ? *a1.pValueValue : a1.getType() == VALUE_TYPE_NATIVE_VARIABLE ? get(g_widgetCursor, a1.getInt()) : a1;
 	const Value &b = b1.getType() == VALUE_TYPE_VALUE_PTR ? *b1.pValueValue : b1.getType() == VALUE_TYPE_NATIVE_VARIABLE ? get(g_widgetCursor, b1.getInt()) : b1;
 
-	return Value((int)(a.toInt32() & b.toInt32()), VALUE_TYPE_INT32);
+	return Value((int)(a.toBool() & b.toBool()), VALUE_TYPE_INT32);
 }
 
 Value op_binary_or(const Value& a1, const Value& b1) {
 	const Value &a = a1.getType() == VALUE_TYPE_VALUE_PTR ? *a1.pValueValue : a1.getType() == VALUE_TYPE_NATIVE_VARIABLE ? get(g_widgetCursor, a1.getInt()) : a1;
 	const Value &b = b1.getType() == VALUE_TYPE_VALUE_PTR ? *b1.pValueValue : b1.getType() == VALUE_TYPE_NATIVE_VARIABLE ? get(g_widgetCursor, b1.getInt()) : b1;
 
-	return Value((int)(a.toInt32() | b.toInt32()), VALUE_TYPE_INT32);
+	return Value((int)(a.toBool() | b.toBool()), VALUE_TYPE_INT32);
 }
 
 Value op_binary_xor(const Value& a1, const Value& b1) {
 	const Value &a = a1.getType() == VALUE_TYPE_VALUE_PTR ? *a1.pValueValue : a1.getType() == VALUE_TYPE_NATIVE_VARIABLE ? get(g_widgetCursor, a1.getInt()) : a1;
 	const Value &b = b1.getType() == VALUE_TYPE_VALUE_PTR ? *b1.pValueValue : b1.getType() == VALUE_TYPE_NATIVE_VARIABLE ? get(g_widgetCursor, b1.getInt()) : b1;
 
-	return Value((int)(a.toInt32() ^ b.toInt32()), VALUE_TYPE_INT32);
+	return Value((int)(a.toBool() ^ b.toBool()), VALUE_TYPE_INT32);
 }
 
 bool is_equal(const Value& a1, const Value& b1) {
@@ -697,7 +697,7 @@ bool do_OPERATION_TYPE_FLOW_INDEX(EvalStack &stack) {
 	}
 
 	auto a = stack.pop();
-	
+
 	int err;
 	auto iteratorIndex = a.toInt32(&err);
 	if (err != 0) {
@@ -714,7 +714,7 @@ bool do_OPERATION_TYPE_FLOW_INDEX(EvalStack &stack) {
 	if (!stack.push(stack.iterators[iteratorIndex])) {
 		return false;
 	}
-	
+
 	return true;
 }
 
@@ -744,7 +744,7 @@ bool do_OPERATION_TYPE_FLOW_IS_PAGE_ACTIVE(EvalStack &stack) {
 	if (!stack.push(Value(isActive, VALUE_TYPE_BOOLEAN))) {
 		return false;
 	}
-	
+
 	return true;
 }
 

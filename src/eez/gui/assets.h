@@ -272,7 +272,7 @@ static const uint16_t EXPR_EVAL_INSTRUCTION_ARRAY_ELEMENT        = (5 << 13);
 static const uint16_t EXPR_EVAL_INSTRUCTION_TYPE_OPERATION       = (6 << 13);
 static const uint16_t EXPR_EVAL_INSTRUCTION_TYPE_END             = (7 << 13);
 
-struct PropertyValue {
+struct Property {
 	uint8_t evalInstructions[1];
 };
 
@@ -297,7 +297,7 @@ struct Component {
 	// We use this to check if component is ready to run (i.e. all mandatory inputs have a value).
 	ListOfFundamentalType<uint16_t> inputs;
 
-	ListOfAssetsPtr<PropertyValue> propertyValues;
+	ListOfAssetsPtr<Property> properties;
 	ListOfAssetsPtr<ComponentOutput> outputs;
 	int16_t errorCatchOutput;
 	uint16_t reserved;
@@ -360,8 +360,7 @@ bool decompressAssetsData(const uint8_t *assetsData, uint32_t assetsDataSize, As
 
 ////////////////////////////////////////////////////////////////////////////////
 
-void setCompressedMainAssets(const uint8_t *assets, uint32_t assetsSize);
-void loadMainAssets();
+void loadMainAssets(const uint8_t *assets, uint32_t assetsSize);
 bool loadExternalAssets(const char *filePath, int *err);
 void unloadExternalAssets();
 

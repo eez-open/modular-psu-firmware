@@ -30,8 +30,8 @@ void executeCatchErrorComponent(FlowState *flowState, unsigned componentIndex) {
 
 	propagateValue(flowState, componentIndex, 1, catchErrorComponentExecutionState->message);
 
-    ObjectAllocator<CatchErrorComponenentExecutionState>::deallocate(catchErrorComponentExecutionState);
     flowState->componenentExecutionStates[componentIndex] = nullptr;
+    ObjectAllocator<CatchErrorComponenentExecutionState>::deallocate(catchErrorComponentExecutionState);
 
 	propagateValueThroughSeqout(flowState, componentIndex);
 }

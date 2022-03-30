@@ -38,10 +38,17 @@ void executeCompareComponent(FlowState *flowState, unsigned componentIndex) {
         return;
     }
 
-    if (conditionValue.getBoolean()) {
-        propagateValue(flowState, componentIndex, 1, Value(true, VALUE_TYPE_BOOLEAN));
+    int err;
+    bool result = conditionValue.toBool(&err);
+    if (err == 0) {
+        if (result) {
+            propagateValue(flowState, componentIndex, 1, Value(true, VALUE_TYPE_BOOLEAN));
+        } else {
+            propagateValue(flowState, componentIndex, 2, Value(false, VALUE_TYPE_BOOLEAN));
+        }
     } else {
-        propagateValue(flowState, componentIndex, 2, Value(false, VALUE_TYPE_BOOLEAN));
+        throwError(flowState, componentIndex, "Failed to convert Value to boolean in IsTrue\n");
+        return;
     }
 
 	propagateValueThroughSeqout(flowState, componentIndex);

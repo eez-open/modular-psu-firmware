@@ -31,7 +31,7 @@ osThreadId_t osThreadNew(osThreadFunc_t func, void *, const osThreadAttr_t *attr
 #else
     auto t = new std::thread(func, nullptr);
     return t->get_id();
-#endif    
+#endif
 }
 
 osStatus osThreadTerminate(osThreadId_t thread_id) {
@@ -45,7 +45,7 @@ osStatus osThreadTerminate(osThreadId_t thread_id) {
 #else
     // TODO
 	return osOK;
-#endif    
+#endif
 }
 
 osThreadId_t osThreadGetId() {
@@ -53,7 +53,7 @@ osThreadId_t osThreadGetId() {
     return g_currentThread;
 #else
     return std::this_thread::get_id();
-#endif    
+#endif
 }
 
 #ifdef __EMSCRIPTEN__
@@ -65,10 +65,9 @@ static void oneIter() {
 }
 
 void eez_system_tick() {
-    uint32_t startTime = osKernelGetTickCount();
-    do {
+    for (int i = 0; i < 2; i++) {
         oneIter();
-    } while (osKernelGetTickCount() - startTime < 5);
+    }
 }
 #endif
 
@@ -137,7 +136,7 @@ osStatus osMessageQueueGet(osMessageQueueId_t queue, void *msg_ptr, uint8_t *, u
         return osError;
 #else
         queue->mutex.unlock();
-        
+
         osDelay(1);
 
 		timeout -= 1;
@@ -162,7 +161,7 @@ osStatus osMessageQueueGet(osMessageQueueId_t queue, void *msg_ptr, uint8_t *, u
 }
 
 osStatus osMessageQueuePut(osMessageQueueId_t queue, const void *msg_ptr, uint8_t, uint32_t timeout) {
-#ifndef __EMSCRIPTEN__    
+#ifndef __EMSCRIPTEN__
     queue->mutex.lock();
 #endif
 
@@ -170,7 +169,7 @@ osStatus osMessageQueuePut(osMessageQueueId_t queue, const void *msg_ptr, uint8_
 	memcpy(data, msg_ptr, queue->elementSize);
 	queue->elements.push(data);
 
-#ifndef __EMSCRIPTEN__    
+#ifndef __EMSCRIPTEN__
     queue->mutex.unlock();
 #endif
 

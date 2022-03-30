@@ -37,9 +37,16 @@ void executeSwitchComponent(FlowState *flowState, unsigned componentIndex) {
             return;
         }
 
-        if (conditionValue.getBoolean()) {
-            propagateValue(flowState, componentIndex, test->outputIndex);
-			break;
+        int err;
+        bool result = conditionValue.toBool(&err);
+        if (err == 0) {
+            if (result) {
+                propagateValue(flowState, componentIndex, test->outputIndex);
+                break;
+            }
+        } else {
+            throwError(flowState, componentIndex, "Failed to convert Value to boolean in IsTrue\n");
+            return;
         }
     }
 

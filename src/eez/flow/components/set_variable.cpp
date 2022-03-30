@@ -38,15 +38,14 @@ void executeSetVariableComponent(FlowState *flowState, unsigned componentIndex) 
 		return;
 	}
 
-	auto propertyValue = component->propertyValues[defs_v3::SET_VARIABLE_ACTION_COMPONENT_PROPERTY_VALUE];
 	Value srcValue;
-	if (!evalExpression(flowState, componentIndex, propertyValue->evalInstructions, srcValue)) {
+	if (!evalProperty(flowState, componentIndex, defs_v3::SET_VARIABLE_ACTION_COMPONENT_PROPERTY_VALUE, srcValue)) {
 		throwError(flowState, componentIndex, "Failed to evaluate Value in SetVariable\n");
 		return;
 	}
 
 	assignValue(flowState, componentIndex, dstValue, srcValue);
-	
+
 	propagateValueThroughSeqout(flowState, componentIndex);
 }
 

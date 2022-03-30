@@ -18,11 +18,12 @@
 
 #include <eez/flow/queue.h>
 #include <eez/flow/debugger.h>
+#include <eez/flow/flow_defs_v3.h>
 
 namespace eez {
 namespace flow {
 
-static const unsigned QUEUE_SIZE = 200;
+static const unsigned QUEUE_SIZE = 1000;
 static struct {
 	FlowState *flowState;
 	unsigned componentIndex;
@@ -68,8 +69,6 @@ bool addToQueue(FlowState *flowState, unsigned componentIndex, int sourceCompone
 		g_queueIsFull = true;
 	}
 
-	flowState->numActiveComponents++;
-
     if (!continuousTask) {
 	    onAddToQueue(flowState, sourceComponentIndex, sourceOutputIndex, componentIndex, targetInputIndex);
     }
@@ -100,32 +99,27 @@ void removeNextTaskFromQueue() {
     }
 }
 
-void removeQueueTasksForFlowState(FlowState *flowState) {
+bool isThereAnyTaskInQueueForFlowState(FlowState *flowState, bool includingWatchVariable) {
 	if (g_queueHead == g_queueTail && !g_queueIsFull) {
-		return;
+		return false;
 	}
 
-	unsigned int it = g_queueHead;
-	while (it < g_queueTail) {
-		auto itNext = (it + 1) % QUEUE_SIZE;
-
+    unsigned int it = g_queueHead;
+    while (true) {
 		if (g_queue[it].flowState == flowState) {
-			if (it == g_queueHead) {
-				g_queueHead = (g_queueHead + 1) % QUEUE_SIZE;
-			} else {
-				unsigned int itMovePrev = it;
-				unsigned int itMove = itNext;
-				while (itMove < g_queueTail) {
-					g_queue[itMovePrev] = g_queue[itMove];
-					itMovePrev = itMove;
-					itMove = (itMove + 1) % QUEUE_SIZE;
-				}
-				g_queueTail = itMovePrev;
-			}
+            auto component = flowState->flow->components[g_queue[it].componentIndex];
+            if (includingWatchVariable || component->type != defs_v3::COMPONENT_TYPE_WATCH_VARIABLE_ACTION) {
+			    return true;
+            }
 		}
 
-		it = itNext;
+        it = (it + 1) % QUEUE_SIZE;
+        if (it == g_queueTail) {
+            break;
+        }
 	}
+
+    return false;
 }
 
 } // namespace flow

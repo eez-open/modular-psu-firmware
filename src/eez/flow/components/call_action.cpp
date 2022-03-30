@@ -29,13 +29,38 @@ using namespace eez::gui;
 namespace eez {
 namespace flow {
 
-struct CallActionComponenentExecutionState : public ComponenentExecutionState {
-	FlowState *flowState;
+CallActionComponenentExecutionState::~CallActionComponenentExecutionState() {
+    freeFlowState(flowState);
+}
 
-	~CallActionComponenentExecutionState() {
-		freeFlowState(flowState);
+void executeCallAction(FlowState *flowState, unsigned componentIndex, int flowIndex) {
+	if (flowIndex >= (int)flowState->flowDefinition->flows.count) {
+		executeActionFunction(flowIndex - flowState->flowDefinition->flows.count);
+		propagateValueThroughSeqout(flowState, componentIndex);
+		return;
 	}
-};
+
+	auto callActionComponenentExecutionState = (CallActionComponenentExecutionState *)flowState->componenentExecutionStates[componentIndex];
+	if (callActionComponenentExecutionState) {
+        if (canFreeFlowState(callActionComponenentExecutionState->flowState)) {
+            freeFlowState(callActionComponenentExecutionState->flowState);
+        } else {
+		    throwError(flowState, componentIndex, "CallAction is already running\n");
+		    return;
+        }
+	}
+
+	FlowState *actionFlowState = initActionFlowState(flowIndex, flowState, componentIndex);
+
+	if (canFreeFlowState(actionFlowState)) {
+		freeFlowState(actionFlowState);
+		propagateValueThroughSeqout(flowState, componentIndex);
+	} else {
+		callActionComponenentExecutionState = ObjectAllocator<CallActionComponenentExecutionState>::allocate(0x4c669d4b);
+		callActionComponenentExecutionState->flowState = actionFlowState;
+		flowState->componenentExecutionStates[componentIndex] = callActionComponenentExecutionState;
+	}
+}
 
 void executeCallActionComponent(FlowState *flowState, unsigned componentIndex) {
 	auto component = (CallActionActionComponent *)flowState->flow->components[componentIndex];
@@ -46,30 +71,7 @@ void executeCallActionComponent(FlowState *flowState, unsigned componentIndex) {
 		return;
 	}
 
-	if (flowIndex >= (int)flowState->flowDefinition->flows.count) {
-		executeActionFunction(flowIndex - flowState->flowDefinition->flows.count);
-		propagateValueThroughSeqout(flowState, componentIndex);
-		return;
-	}
-
-	auto callActionComponenentExecutionState = (CallActionComponenentExecutionState *)flowState->componenentExecutionStates[componentIndex];
-	if (callActionComponenentExecutionState) {
-		throwError(flowState, componentIndex, "CallAction is already running\n");
-		return;
-	}
-
-	FlowState *actionFlowState = initActionFlowState(flowIndex, flowState, componentIndex);
-
-	if (actionFlowState->numActiveComponents == 0) {
-		freeFlowState(actionFlowState);
-		propagateValueThroughSeqout(flowState, componentIndex);
-	} else {
-		flowState->numActiveComponents++;
-
-		callActionComponenentExecutionState = ObjectAllocator<CallActionComponenentExecutionState>::allocate(0x4c669d4b);
-		callActionComponenentExecutionState->flowState = actionFlowState;
-		flowState->componenentExecutionStates[componentIndex] = callActionComponenentExecutionState;
-	}
+    executeCallAction(flowState, componentIndex, flowIndex);
 }
 
 } // namespace flow

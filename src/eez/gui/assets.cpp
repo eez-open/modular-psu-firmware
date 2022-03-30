@@ -112,34 +112,11 @@ bool decompressAssetsData(const uint8_t *assetsData, uint32_t assetsDataSize, As
 	return true;
 }
 
-const uint8_t *g_compressedMainAssets;
-uint32_t g_compressedMainAssetsSize;
-
-void setCompressedMainAssets(const uint8_t *assets, uint32_t assetsSize) {
-    g_compressedMainAssets = assets;
-    g_compressedMainAssetsSize = assetsSize;
-}
-
-void loadMainAssets() {
-    const uint8_t *compressedMainAssets;
-    uint32_t compressedMainAssetsSize;
-
-    if (g_compressedMainAssets) {
-        compressedMainAssets = g_compressedMainAssets;
-        compressedMainAssetsSize = g_compressedMainAssetsSize;
-    } else {
-        compressedMainAssets = assets;
-        compressedMainAssetsSize = sizeof(assets);
-    }
-
+void loadMainAssets(const uint8_t *assets, uint32_t assetsSize) {
     g_mainAssets->external = false;
-    auto decompressedSize = decompressAssetsData(compressedMainAssets, compressedMainAssetsSize, g_mainAssets, MAX_DECOMPRESSED_ASSETS_SIZE, nullptr);
+    auto decompressedSize = decompressAssetsData(assets, assetsSize, g_mainAssets, MAX_DECOMPRESSED_ASSETS_SIZE, nullptr);
     assert(decompressedSize);
     g_isMainAssetsLoaded = true;
-
-    if (g_mainAssets->flowDefinition) {
-        flow::start(g_mainAssets);
-    }
 }
 
 void unloadExternalAssets() {

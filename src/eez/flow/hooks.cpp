@@ -55,7 +55,7 @@ static void finishToDebuggerMessage() {
 }
 
 static void onDebuggerInputAvailable() {
-}    
+}
 
 bool (*isFlowRunningHook)() = isFlowRunning;
 void (*replacePageHook)(int16_t pageId) = replacePage;
@@ -69,6 +69,8 @@ void (*startToDebuggerMessageHook)() = startToDebuggerMessage;
 void (*writeDebuggerBufferHook)(const char *buffer, uint32_t length) = writeDebuggerBuffer;
 void (*finishToDebuggerMessageHook)() = finishToDebuggerMessage;
 void (*onDebuggerInputAvailableHook)() = onDebuggerInputAvailable;
+
+void (*executeDashboardComponentHook)(uint16_t componentType, void *context) = nullptr;
 
 } // namespace flow
 } // namespace eez

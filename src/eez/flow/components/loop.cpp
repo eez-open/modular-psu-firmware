@@ -46,6 +46,7 @@ void executeLoopComponent(FlowState *flowState, unsigned componentIndex) {
     auto startInputIndex = component->inputs[START_INPUT_INDEX];
     if (flowState->values[startInputIndex].type != VALUE_TYPE_UNDEFINED) {
         if (loopComponentExecutionState) {
+            flowState->componenentExecutionStates[componentIndex] = nullptr;
             ObjectAllocator<LoopComponenentExecutionState>::deallocate(loopComponentExecutionState);
             loopComponentExecutionState = nullptr;
         }
@@ -58,23 +59,20 @@ void executeLoopComponent(FlowState *flowState, unsigned componentIndex) {
             return;
         }
 
-        auto fromPropertyValue = component->propertyValues[defs_v3::LOOP_ACTION_COMPONENT_PROPERTY_FROM];
         Value fromValue;
-        if (!evalExpression(flowState, componentIndex, fromPropertyValue->evalInstructions, fromValue)) {
+        if (!evalProperty(flowState, componentIndex, defs_v3::LOOP_ACTION_COMPONENT_PROPERTY_FROM, fromValue)) {
             throwError(flowState, componentIndex, "Failed to evaluate From in Loop\n");
             return;
         }
 
-        auto toPropertyValue = component->propertyValues[defs_v3::LOOP_ACTION_COMPONENT_PROPERTY_TO];
         Value toValue;
-        if (!evalExpression(flowState, componentIndex, toPropertyValue->evalInstructions, toValue)) {
+        if (!evalProperty(flowState, componentIndex, defs_v3::LOOP_ACTION_COMPONENT_PROPERTY_TO, toValue)) {
             throwError(flowState, componentIndex, "Failed to evaluate To in Loop\n");
             return;
         }
 
-        auto stepPropertyValue = component->propertyValues[defs_v3::LOOP_ACTION_COMPONENT_PROPERTY_STEP];
         Value stepValue;
-        if (!evalExpression(flowState, componentIndex, stepPropertyValue->evalInstructions, stepValue)) {
+        if (!evalProperty(flowState, componentIndex, defs_v3::LOOP_ACTION_COMPONENT_PROPERTY_STEP, stepValue)) {
             throwError(flowState, componentIndex, "Failed to evaluate Step in Loop\n");
             return;
         }
@@ -91,8 +89,8 @@ void executeLoopComponent(FlowState *flowState, unsigned componentIndex) {
     } else {
         auto value = op_add(loopComponentExecutionState->dstValue, loopComponentExecutionState->stepValue);
         if (op_great(value, loopComponentExecutionState->toValue).toBool()) {
-			ObjectAllocator<LoopComponenentExecutionState>::deallocate(loopComponentExecutionState);
 			flowState->componenentExecutionStates[componentIndex] = nullptr;
+			ObjectAllocator<LoopComponenentExecutionState>::deallocate(loopComponentExecutionState);
 
 		    propagateValue(flowState, componentIndex, 1);
 		} else {

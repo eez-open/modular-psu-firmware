@@ -79,6 +79,8 @@
 #		endif
 #	endif
 #endif
+#else
+#    define EM_PORT_API(rettype) rettype
 #endif
 
 namespace eez {

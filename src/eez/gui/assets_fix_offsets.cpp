@@ -109,7 +109,7 @@ void fixOffsets(Assets *assets) {
     if (assets->flowDefinition) {
         fixOffset(assets->flowDefinition, assets);
         auto flowDefinition = static_cast<FlowDefinition *>(assets->flowDefinition);
-        
+
         fixOffset(flowDefinition->flows, assets);
         for (uint32_t i = 0; i < flowDefinition->flows.count; i++) {
             auto flow = flowDefinition->flows[i];
@@ -128,7 +128,7 @@ void fixOffsets(Assets *assets) {
                 }
 
                 fixOffset(component->inputs, assets);
-                fixOffset(component->propertyValues, assets);
+                fixOffset(component->properties, assets);
 
                 fixOffset(component->outputs, assets);
                 for (uint32_t i = 0; i < component->outputs.count; i++) {
@@ -228,13 +228,13 @@ void fixOffsets(Assets *assets, Value &value) {
         value.strValue = (const char *)assetsPtr;
     } else if (value.getType() == VALUE_TYPE_ARRAY) {
     	AssetsPtr<ArrayValue> assetsPtr;
-        
+
 #if _WIN64 || __x86_64__ || __ppc64__
         assetsPtr.offset = value.uint32Value;
 #else
         assetsPtr = (ArrayValue *)value.uint32Value;
 #endif
-        
+
         fixOffset(assetsPtr, assets);
         value.arrayValue = (eez::gui::ArrayValue *)(assetsPtr);
         for (uint32_t i = 0; i < value.arrayValue->arraySize; i++) {

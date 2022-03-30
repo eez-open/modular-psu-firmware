@@ -28,13 +28,12 @@
 #include <eez/flow/debugger.h>
 #include <eez/flow/flow_defs_v3.h>
 #include <eez/flow/hooks.h>
+#include <eez/flow/components/call_action.h>
 
 using namespace eez::gui;
 
 namespace eez {
 namespace flow {
-
-uint32_t g_lastFlowStateIndex = 0;
 
 bool isComponentReadyToRun(FlowState *flowState, unsigned componentIndex) {
 	auto component = flowState->flow->components[componentIndex];
@@ -42,6 +41,22 @@ bool isComponentReadyToRun(FlowState *flowState, unsigned componentIndex) {
 	if (component->type == defs_v3::COMPONENT_TYPE_CATCH_ERROR_ACTION) {
 		return false;
 	}
+
+    if (component->type < defs_v3::COMPONENT_TYPE_START_ACTION) {
+        // always execute widget
+        return true;
+    }
+
+    if (component->type == defs_v3::COMPONENT_TYPE_START_ACTION) {
+        auto parentComponent = flowState->parentComponent;
+        if (parentComponent) {
+            auto flowInputIndex = parentComponent->inputs[0];
+            auto value = flowState->parentFlowState->values[flowInputIndex];
+            return value.getType() != VALUE_TYPE_UNDEFINED;
+        } else {
+            return true;
+        }
+    }
 
 	// check if required inputs are defined:
 	//   - at least 1 seq input must be defined
@@ -101,13 +116,13 @@ static FlowState *initFlowState(Assets *assets, int flowIndex, FlowState *parent
 		0x4c3b6ef5
 	);
 
-	flowState->flowStateIndex = ++g_lastFlowStateIndex;
+	flowState->flowStateIndex = (int)((uint8_t *)flowState - ALLOC_BUFFER);
 	flowState->assets = assets;
 	flowState->flowDefinition = static_cast<FlowDefinition *>(assets->flowDefinition);
 	flowState->flow = flowDefinition->flows[flowIndex];
 	flowState->flowIndex = flowIndex;
 	flowState->error = false;
-	flowState->numActiveComponents = 0;
+	flowState->numAsyncComponents = 0;
 	flowState->parentFlowState = parentFlowState;
 	if (parentFlowState) {
 		flowState->parentComponentIndex = parentComponentIndex;
@@ -162,7 +177,44 @@ FlowState *initPageFlowState(Assets *assets, int flowIndex, FlowState *parentFlo
 	return flowState;
 }
 
+bool canFreeFlowState(FlowState *flowState, bool includingWatchVariable) {
+    if (!flowState->isAction) {
+        return false;
+    }
+
+    if (flowState->numAsyncComponents > 0) {
+        return false;
+    }
+
+    if (isThereAnyTaskInQueueForFlowState(flowState, includingWatchVariable)) {
+        return false;
+    }
+
+    for (uint32_t componentIndex = 0; componentIndex < flowState->flow->components.count; componentIndex++) {
+        auto component = flowState->flow->components[componentIndex];
+        if (
+            component->type != defs_v3::COMPONENT_TYPE_INPUT_ACTION &&
+            (includingWatchVariable || component->type != defs_v3::COMPONENT_TYPE_WATCH_VARIABLE_ACTION) &&
+            flowState->componenentExecutionStates[componentIndex]
+        ) {
+            return false;
+        }
+    }
+
+    return true;
+}
+
 void freeFlowState(FlowState *flowState) {
+    auto parentFlowState = flowState->parentFlowState;
+    if (flowState->parentFlowState) {
+        auto componentExecutionState = flowState->parentFlowState->componenentExecutionStates[flowState->parentComponentIndex];
+        if (componentExecutionState) {
+            flowState->parentFlowState->componenentExecutionStates[flowState->parentComponentIndex] = nullptr;
+            ObjectAllocator<ComponenentExecutionState>::deallocate(componentExecutionState);
+            return;
+        }
+    }
+
 	auto flow = flowState->flow;
 
 	auto valuesCount = flow->componentInputs.count + flow->localVariables.count;
@@ -174,14 +226,20 @@ void freeFlowState(FlowState *flowState) {
 	for (unsigned i = 0; i < flow->components.count; i++) {
 		auto componentExecutionState = flowState->componenentExecutionStates[i];
 		if (componentExecutionState) {
-			ObjectAllocator<ComponenentExecutionState>::deallocate(componentExecutionState);
 			flowState->componenentExecutionStates[i] = nullptr;
+			ObjectAllocator<ComponenentExecutionState>::deallocate(componentExecutionState);
 		}
 	}
 
 	onFlowStateDestroyed(flowState);
 
 	free(flowState);
+
+    if (parentFlowState) {
+        if (canFreeFlowState(parentFlowState)) {
+            freeFlowState(parentFlowState);
+        }
+    }
 }
 
 void propagateValue(FlowState *flowState, unsigned componentIndex, unsigned outputIndex, const gui::Value &value) {
@@ -190,7 +248,7 @@ void propagateValue(FlowState *flowState, unsigned componentIndex, unsigned outp
 
 	for (unsigned connectionIndex = 0; connectionIndex < componentOutput->connections.count; connectionIndex++) {
 		auto connection = componentOutput->connections[connectionIndex];
-		
+
 		auto pValue = &flowState->values[connection->targetInputIndex];
 
 		if (*pValue != value) {
@@ -200,7 +258,7 @@ void propagateValue(FlowState *flowState, unsigned componentIndex, unsigned outp
 				onValueChanged(pValue);
 			}
 		}
-		
+
 		pingComponent(flowState, connection->targetComponentIndex, componentIndex, outputIndex, connection->targetInputIndex);
 	}
 }
@@ -231,10 +289,7 @@ void getValue(uint16_t dataId, DataOperationEnum operation, const WidgetCursor &
 
 		WidgetDataItem *widgetDataItem = flow->widgetDataItems[dataId];
 		if (widgetDataItem && widgetDataItem->componentIndex != -1 && widgetDataItem->propertyValueIndex != -1) {
-			auto component = flow->components[widgetDataItem->componentIndex];
-			auto propertyValue = component->propertyValues[widgetDataItem->propertyValueIndex];
-
-			if (!evalExpression(flowState, widgetDataItem->componentIndex, propertyValue->evalInstructions, value, nullptr, widgetCursor.iterators, operation)) {
+			if (!evalProperty(flowState, widgetDataItem->componentIndex, widgetDataItem->propertyValueIndex, value, nullptr, widgetCursor.iterators, operation)) {
 				throwError(flowState, widgetDataItem->componentIndex, "doGetFlowValue failed\n");
 			}
 		}
@@ -249,10 +304,9 @@ void setValue(uint16_t dataId, const WidgetCursor &widgetCursor, const Value& va
 		WidgetDataItem *widgetDataItem = flow->widgetDataItems[dataId];
 		if (widgetDataItem && widgetDataItem->componentIndex != -1 && widgetDataItem->propertyValueIndex != -1) {
 			auto component = flow->components[widgetDataItem->componentIndex];
-			auto propertyValue = component->propertyValues[widgetDataItem->propertyValueIndex];
-
+			auto property = component->properties[widgetDataItem->propertyValueIndex];
 			Value dstValue;
-			if (evalAssignableExpression(flowState, widgetDataItem->componentIndex, propertyValue->evalInstructions, dstValue, nullptr, widgetCursor.iterators)) {
+			if (evalAssignableExpression(flowState, widgetDataItem->componentIndex, property->evalInstructions, dstValue, nullptr, widgetCursor.iterators)) {
 				assignValue(flowState, widgetDataItem->componentIndex, dstValue, value);
 			} else {
 				throwError(flowState, widgetDataItem->componentIndex, "doSetFlowValue failed\n");
@@ -275,7 +329,7 @@ void assignValue(FlowState *flowState, int componentIndex, Value &dstValue, cons
 		} else {
 			char errorMessage[100];
 			snprintf(errorMessage, sizeof(errorMessage), "Can not assign %s to %s\n",
-				g_valueTypeNames[pDstValue->type](*pDstValue), g_valueTypeNames[srcValue.type](srcValue)
+				g_valueTypeNames[pDstValue->type](srcValue), g_valueTypeNames[srcValue.type](*pDstValue)
 			);
 			throwError(flowState, componentIndex, errorMessage);
 		}
@@ -285,25 +339,23 @@ void assignValue(FlowState *flowState, int componentIndex, Value &dstValue, cons
 ////////////////////////////////////////////////////////////////////////////////
 
 void startAsyncExecution(FlowState *flowState, int componentIndex) {
-	flowState->numActiveComponents++;
+	flowState->numAsyncComponents++;
 }
 
 void endAsyncExecution(FlowState *flowState, int componentIndex) {
-	if (--flowState->numActiveComponents == 0 && flowState->isAction) {
-		auto componentExecutionState = flowState->parentFlowState->componenentExecutionStates[flowState->parentComponentIndex];
-		if (componentExecutionState) {
-			flowState->parentFlowState->componenentExecutionStates[flowState->parentComponentIndex] = nullptr;
-			ObjectAllocator<ComponenentExecutionState>::deallocate(componentExecutionState);
-		} else {
-			throwError(flowState, componentIndex, "Unexpected: no CallAction component state\n");
-			return;
-		}
-	}
+    flowState->numAsyncComponents--;
+    if (canFreeFlowState(flowState)) {
+        freeFlowState(flowState);
+    }
 }
 
 ////////////////////////////////////////////////////////////////////////////////
 
 bool findCatchErrorComponent(FlowState *flowState, FlowState *&catchErrorFlowState, int &catchErrorComponentIndex) {
+    if (!flowState) {
+        return false;
+    }
+
 	for (unsigned componentIndex = 0; componentIndex < flowState->flow->components.count; componentIndex++) {
 		auto component = flowState->flow->components[componentIndex];
 		if (component->type == defs_v3::COMPONENT_TYPE_CATCH_ERROR_ACTION) {
@@ -313,15 +365,15 @@ bool findCatchErrorComponent(FlowState *flowState, FlowState *&catchErrorFlowSta
 		}
 	}
 
-	if (flowState->parentFlowState) {
-		return findCatchErrorComponent(flowState->parentFlowState, catchErrorFlowState, catchErrorComponentIndex);
-	}
-
-	return false;
+    return findCatchErrorComponent(flowState->parentFlowState, catchErrorFlowState, catchErrorComponentIndex);
 }
 
 void throwError(FlowState *flowState, int componentIndex, const char *errorMessage) {
     auto component = flowState->flow->components[componentIndex];
+
+#if defined(__EMSCRIPTEN__)
+    printf("throwError: %s\n", errorMessage);
+#endif
 
 	if (component->errorCatchOutput != -1) {
 		propagateValue(
@@ -333,9 +385,13 @@ void throwError(FlowState *flowState, int componentIndex, const char *errorMessa
 	} else {
 		FlowState *catchErrorFlowState;
 		int catchErrorComponentIndex;
-		if (findCatchErrorComponent(flowState, catchErrorFlowState, catchErrorComponentIndex)) {
-			removeQueueTasksForFlowState(flowState);
-
+		if (
+            findCatchErrorComponent(
+                component->type == defs_v3::COMPONENT_TYPE_ERROR_ACTION ? flowState->parentFlowState : flowState,
+                catchErrorFlowState,
+                catchErrorComponentIndex
+            )
+        ) {
 			auto catchErrorComponentExecutionState = ObjectAllocator<CatchErrorComponenentExecutionState>::allocate(0xe744a4ec);
 			catchErrorComponentExecutionState->message = Value::makeStringRef(errorMessage, strlen(errorMessage), 0x9473eef2);
 			catchErrorFlowState->componenentExecutionStates[catchErrorComponentIndex] = catchErrorComponentExecutionState;

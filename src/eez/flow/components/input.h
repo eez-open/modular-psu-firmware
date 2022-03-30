@@ -23,19 +23,16 @@
 namespace eez {
 namespace flow {
 
-struct CallActionActionComponent : public Component {
-	int16_t flowIndex;
-	uint8_t inputsStartIndex;
-	uint8_t outputsStartIndex;
+struct InputActionComponent : public Component {
+	uint8_t inputIndex;
 };
 
-typedef CallActionActionComponent LayoutViewWidgetComponent;
-
-struct CallActionComponenentExecutionState : public ComponenentExecutionState {
-	FlowState *flowState;
-
-	~CallActionComponenentExecutionState();
+struct InputActionComponentExecutionState : public ComponenentExecutionState {
+	Value value;
 };
+
+
+bool getCallActionValue(FlowState *flowState, unsigned componentIndex, Value &value);
 
 } // flow
 } // eez

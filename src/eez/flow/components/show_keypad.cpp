@@ -34,39 +34,32 @@ struct ShowKeyboardActionComponent : public Component {
 };
 
 void executeShowKeypadComponent(FlowState *flowState, unsigned componentIndex) {
-	auto component = (ShowKeyboardActionComponent *)flowState->flow->components[componentIndex];
-
-    auto labelPropertyValue = component->propertyValues[defs_v3::SHOW_KEYBOARD_ACTION_COMPONENT_PROPERTY_LABEL];
     Value labelValue;
-    if (!evalExpression(flowState, componentIndex, labelPropertyValue->evalInstructions, labelValue)) {
+    if (!evalProperty(flowState, componentIndex, defs_v3::SHOW_KEYBOARD_ACTION_COMPONENT_PROPERTY_LABEL, labelValue)) {
         throwError(flowState, componentIndex, "Failed to evaluate Label in ShowKeypad\n");
         return;
     }
 
-    auto initialValuePropertyValue = component->propertyValues[defs_v3::SHOW_KEYPAD_ACTION_COMPONENT_PROPERTY_INITAL_VALUE];
     Value initialValue;
-    if (!evalExpression(flowState, componentIndex, initialValuePropertyValue->evalInstructions, initialValue)) {
+    if (!evalProperty(flowState, componentIndex, defs_v3::SHOW_KEYPAD_ACTION_COMPONENT_PROPERTY_INITAL_VALUE, initialValue)) {
         throwError(flowState, componentIndex, "Failed to evaluate InitialValue in ShowKeypad\n");
         return;
     }
 
-    auto minPropertyValue = component->propertyValues[defs_v3::SHOW_KEYPAD_ACTION_COMPONENT_PROPERTY_MIN];
     Value minValue;
-    if (!evalExpression(flowState, componentIndex, minPropertyValue->evalInstructions, minValue)) {
+    if (!evalProperty(flowState, componentIndex, defs_v3::SHOW_KEYPAD_ACTION_COMPONENT_PROPERTY_MIN, minValue)) {
         throwError(flowState, componentIndex, "Failed to evaluate Min in ShowKeypad\n");
         return;
     }
 
-    auto maxPropertyValue = component->propertyValues[defs_v3::SHOW_KEYPAD_ACTION_COMPONENT_PROPERTY_MAX];
     Value maxValue;
-    if (!evalExpression(flowState, componentIndex, maxPropertyValue->evalInstructions, maxValue)) {
+    if (!evalProperty(flowState, componentIndex, defs_v3::SHOW_KEYPAD_ACTION_COMPONENT_PROPERTY_MAX, maxValue)) {
         throwError(flowState, componentIndex, "Failed to evaluate Max in ShowKeypad\n");
         return;
     }
 
-    auto unitPropertyValue = component->propertyValues[defs_v3::SHOW_KEYPAD_ACTION_COMPONENT_PROPERTY_UNIT];
     Value unitValue;
-    if (!evalExpression(flowState, componentIndex, unitPropertyValue->evalInstructions, unitValue)) {
+    if (!evalProperty(flowState, componentIndex, defs_v3::SHOW_KEYPAD_ACTION_COMPONENT_PROPERTY_UNIT, unitValue)) {
         throwError(flowState, componentIndex, "Failed to evaluate Unit in ShowKeypad\n");
         return;
     }
@@ -80,20 +73,16 @@ void executeShowKeypadComponent(FlowState *flowState, unsigned componentIndex) {
 	startAsyncExecution(flowState, componentIndex);
 
 	auto onOk = [](float value) {
-        auto component = (ShowKeyboardActionComponent *)g_showKeyboardFlowState->flow->components[g_showKeyboardComponentIndex];
-
-		auto precisionPropertyValue = component->propertyValues[defs_v3::SHOW_KEYPAD_ACTION_COMPONENT_PROPERTY_PRECISION];
         Value precisionValue;
-        if (!evalExpression(g_showKeyboardFlowState, g_showKeyboardComponentIndex, precisionPropertyValue->evalInstructions, precisionValue)) {
+        if (!evalProperty(g_showKeyboardFlowState, g_showKeyboardComponentIndex, defs_v3::SHOW_KEYPAD_ACTION_COMPONENT_PROPERTY_PRECISION, precisionValue)) {
             throwError(g_showKeyboardFlowState, g_showKeyboardComponentIndex, "Failed to evaluate Precision in ShowKeypad\n");
             return;
         }
 
         float precision = precisionValue.toFloat();
-        
-        auto unitPropertyValue = component->propertyValues[defs_v3::SHOW_KEYPAD_ACTION_COMPONENT_PROPERTY_UNIT];
+
         Value unitValue;
-        if (!evalExpression(g_showKeyboardFlowState, g_showKeyboardComponentIndex, unitPropertyValue->evalInstructions, unitValue)) {
+        if (!evalProperty(g_showKeyboardFlowState, g_showKeyboardComponentIndex, defs_v3::SHOW_KEYPAD_ACTION_COMPONENT_PROPERTY_UNIT, unitValue)) {
             throwError(g_showKeyboardFlowState, g_showKeyboardComponentIndex, "Failed to evaluate Unit in ShowKeypad\n");
             return;
         }

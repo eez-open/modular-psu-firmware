@@ -26,17 +26,14 @@ namespace eez {
 namespace flow {
 
 void executeEvalExprComponent(FlowState *flowState, unsigned componentIndex) {
-    auto component = (Component *)flowState->flow->components[componentIndex];
-
-	auto propertyValue = component->propertyValues[defs_v3::EVAL_EXPR_ACTION_COMPONENT_PROPERTY_EXPRESSION];
 	Value expressionValue;
-	if (!evalExpression(flowState, componentIndex, propertyValue->evalInstructions, expressionValue)) {
+	if (!evalProperty(flowState, componentIndex, defs_v3::EVAL_EXPR_ACTION_COMPONENT_PROPERTY_EXPRESSION, expressionValue)) {
 		throwError(flowState, componentIndex, "Failed to evaluate Expression in EvalExpr\n");
 		return;
 	}
 
 	propagateValue(flowState, componentIndex, 1, expressionValue);
-	
+
 	propagateValueThroughSeqout(flowState, componentIndex);
 }
 

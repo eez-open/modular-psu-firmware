@@ -34,15 +34,11 @@ struct DelayComponenentExecutionState : public ComponenentExecutionState {
 };
 
 void executeDelayComponent(FlowState *flowState, unsigned componentIndex) {
-	auto component = flowState->flow->components[componentIndex];
-
 	auto delayComponentExecutionState = (DelayComponenentExecutionState *)flowState->componenentExecutionStates[componentIndex];
 
 	if (!delayComponentExecutionState) {
-		auto propertyValue = component->propertyValues[defs_v3::DELAY_ACTION_COMPONENT_PROPERTY_MILLISECONDS];
-
 		Value value;
-		if (!evalExpression(flowState, componentIndex, propertyValue->evalInstructions, value)) {
+		if (!evalProperty(flowState, componentIndex, defs_v3::DELAY_ACTION_COMPONENT_PROPERTY_MILLISECONDS, value)) {
 			throwError(flowState, componentIndex, "Failed to evaluate Milliseconds in Delay\n");
 			return;
 		}
@@ -63,8 +59,8 @@ void executeDelayComponent(FlowState *flowState, unsigned componentIndex) {
 		}
 	} else {
 		if (millis() >= delayComponentExecutionState->waitUntil) {
-			ObjectAllocator<DelayComponenentExecutionState>::deallocate(delayComponentExecutionState);
 			flowState->componenentExecutionStates[componentIndex] = nullptr;
+			ObjectAllocator<DelayComponenentExecutionState>::deallocate(delayComponentExecutionState);
 			propagateValueThroughSeqout(flowState, componentIndex);
 		} else {
 			if (!addToQueue(flowState, componentIndex, -1, -1, -1, true)) {
