@@ -69,7 +69,7 @@
       {
         "name": "channels",
         "description": "list of installed channels",
-        "type": "array",
+        "type": "array:any",
         "defaultValue": "[{}, {}, {}, {}, {}, {}]"
       },
       {
@@ -598,7 +598,7 @@
       {
         "name": "event_queue_events",
         "description": "list of events in event queue",
-        "type": "array",
+        "type": "array:any",
         "defaultValue": "[{}, {}, {}, {}, {}, {}, {}, {}]"
       },
       {
@@ -806,7 +806,7 @@
       },
       {
         "name": "profiles_list",
-        "type": "array",
+        "type": "array:any",
         "defaultValue": "[{}, {}, {}, {}, {}, {}, {}, {}, {}, {}]"
       },
       {
@@ -982,7 +982,7 @@
       },
       {
         "name": "channel_display_view_settings_display_values",
-        "type": "array",
+        "type": "array:any",
         "defaultValue": "[{}, {}]"
       },
       {
@@ -1081,12 +1081,12 @@
       },
       {
         "name": "channel_lists",
-        "type": "array",
+        "type": "array:any",
         "defaultValue": "[{}, {}, {}, {}, {}]"
       },
       {
         "name": "ramp_and_delay_list",
-        "type": "array",
+        "type": "array:any",
         "defaultValue": "[{}, {}, {}, {}]"
       },
       {
@@ -1258,7 +1258,7 @@
       {
         "name": "io_pins",
         "description": "",
-        "type": "array",
+        "type": "array:any",
         "defaultValue": "[\n    {\"io_pin_label\": \"#1 Din1\"}, \n    {\"io_pin_label\": \"#2 Din2\"}, \n    {\"io_pin_label\": \"#3 Dout1\"}, \n    {\"io_pin_label\": \"#4 Dout2\"}\n]"
       },
       {
@@ -1519,13 +1519,13 @@
       {
         "name": "channels_with_list_counter_visible",
         "description": "",
-        "type": "array",
+        "type": "array:any",
         "defaultValue": "[{}, {}]"
       },
       {
         "name": "channels_with_ramp_counter_visible",
         "description": "",
-        "type": "array",
+        "type": "array:any",
         "defaultValue": "[{}, {}]"
       },
       {
@@ -1540,7 +1540,7 @@
       },
       {
         "name": "recording",
-        "type": "array",
+        "type": "array:any",
         "defaultValue": "[100, 25, 20]"
       },
       {
@@ -1570,7 +1570,7 @@
       },
       {
         "name": "dlog_visible_values",
-        "type": "array",
+        "type": "array:any",
         "defaultValue": "[{}, {}]"
       },
       {
@@ -1666,7 +1666,7 @@
       },
       {
         "name": "file_manager_files",
-        "type": "array",
+        "type": "array:any",
         "defaultValue": "[{}, {}, {}, {}, {}, {}]"
       },
       {
@@ -2107,7 +2107,7 @@
       },
       {
         "name": "channel_calibration_chart",
-        "type": "array",
+        "type": "array:any",
         "defaultValue": "[]"
       },
       {
@@ -2122,7 +2122,7 @@
       },
       {
         "name": "slots",
-        "type": "array",
+        "type": "array:any",
         "defaultValue": "[{}, {}, {}]"
       },
       {
@@ -2267,7 +2267,7 @@
       },
       {
         "name": "colors",
-        "type": "array",
+        "type": "array:any",
         "defaultValue": "[\n  {}, {}, {}, {}, {}, {},\n  {}, {}, {}, {}, {}, {},\n  {}, {}, {}, {}, {}, {},\n  {}, {}, {}, {}, {}, {}\n]"
       },
       {
@@ -2292,7 +2292,7 @@
       },
       {
         "name": "dlog_items",
-        "type": "array",
+        "type": "array:any",
         "defaultValue": "[]"
       },
       {
@@ -2412,7 +2412,7 @@
       },
       {
         "name": "dlog_bookmarks",
-        "type": "array",
+        "type": "array:any",
         "defaultValue": "[\n  { \"dlog_bookmark_x_value\": \"1 s\", \"dlog_bookmark_text\": \"Bookmark 1\" },\n  { \"dlog_bookmark_x_value\": \"2 s\", \"dlog_bookmark_text\": \"Bookmark 2\" },\n  { \"dlog_bookmark_x_value\": \"3 s\", \"dlog_bookmark_text\": \"Bookmark 3\" },\n  { \"dlog_bookmark_x_value\": \"4 s\", \"dlog_bookmark_text\": \"Bookmark 4\" },\n  { \"dlog_bookmark_x_value\": \"5 s\", \"dlog_bookmark_text\": \"Bookmark 5\" },\n  { \"dlog_bookmark_x_value\": \"6 s\", \"dlog_bookmark_text\": \"Bookmark 6\" },\n  { \"dlog_bookmark_x_value\": \"7 s\", \"dlog_bookmark_text\": \"Bookmark 7\" },\n  { \"dlog_bookmark_x_value\": \"8 s\", \"dlog_bookmark_text\": \"Bookmark 8\" }\n]"
       },
       {
@@ -2457,7 +2457,7 @@
       },
       {
         "name": "dlog_y_values",
-        "type": "array",
+        "type": "array:any",
         "defaultValue": "[\n  { \"dlog_y_value_label\": \"DCP405 #1 U\", \"dlog_y_value_is_checked\": 1 },\n  { \"dlog_y_value_label\": \"DCP405 #1 I\", \"dlog_y_value_is_checked\": 1 },\n  { \"dlog_y_value_label\": \"DCP405 #2 U\", \"dlog_y_value_is_checked\": 0 },\n  { \"dlog_y_value_label\": \"DCP405 #2 I\", \"dlog_y_value_is_checked\": 0 },\n  { \"dlog_y_value_label\": \"DCP224 #3 U\", \"dlog_y_value_is_checked\": 1 }\n]"
       },
       {
@@ -2497,7 +2497,7 @@
       },
       {
         "name": "function_generator_channels",
-        "type": "array",
+        "type": "array:any",
         "defaultValue": "[{}, {}, {}, {}]"
       },
       {
