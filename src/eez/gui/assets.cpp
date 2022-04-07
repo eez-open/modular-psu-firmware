@@ -42,7 +42,7 @@ namespace eez {
 namespace gui {
 
 bool g_isMainAssetsLoaded;
-Assets *g_mainAssets = (Assets *)DECOMPRESSED_ASSETS_START_ADDRESS;
+Assets *g_mainAssets;
 Assets *g_externalAssets;
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -113,6 +113,7 @@ bool decompressAssetsData(const uint8_t *assetsData, uint32_t assetsDataSize, As
 }
 
 void loadMainAssets(const uint8_t *assets, uint32_t assetsSize) {
+    g_mainAssets = (Assets *)DECOMPRESSED_ASSETS_START_ADDRESS;
     g_mainAssets->external = false;
     auto decompressedSize = decompressAssetsData(assets, assetsSize, g_mainAssets, MAX_DECOMPRESSED_ASSETS_SIZE, nullptr);
     assert(decompressedSize);

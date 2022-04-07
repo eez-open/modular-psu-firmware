@@ -30,7 +30,6 @@
 #endif
 
 #include <eez/core/debug.h>
-#include <eez/core/memory.h>
 #include <eez/core/util.h>
 #include <eez/fs/fs.h>
 
