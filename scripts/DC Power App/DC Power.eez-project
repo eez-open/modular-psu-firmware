@@ -149,7 +149,8 @@
           "customInputs": [],
           "customOutputs": [
             {
-              "name": "channel_options"
+              "name": "channel_options",
+              "type": "string"
             }
           ],
           "catchError": true,
@@ -1170,20 +1171,20 @@
         },
         {
           "type": "SetVariableActionComponent",
-          "left": -580,
+          "left": -623,
           "top": 154,
-          "width": 104,
+          "width": 140,
           "height": 58,
           "wireID": "3d6870b3-5e3a-481c-c2b8-f52c23a527bc",
           "customInputs": [
             {
               "name": "it",
-              "type": "integer"
+              "type": "struct:$ActionParams"
             }
           ],
           "customOutputs": [],
           "variable": "idx",
-          "value": "it"
+          "value": "it.index"
         },
         {
           "type": "SetVariableActionComponent",
