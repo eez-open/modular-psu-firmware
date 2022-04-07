@@ -37,7 +37,8 @@
 
 #include <eez/core/sound.h>
 #include <eez/core/os.h>
-#include <eez/core/memory.h>
+
+#include <bb3/memory.h>
 #include <bb3/psu/psu.h>
 #include <bb3/psu/persist_conf.h>
 
@@ -1487,7 +1488,7 @@ int16_t g_memoryForTuneSamples[g_memoryForTuneSamplesSize];
 SDL_AudioDeviceID g_audioDevice;
 #elif defined(EEZ_PLATFORM_STM32)
 static const uint32_t g_memoryForTuneSamplesSize = SOUND_TUNES_MEMORY_SIZE;
-uint8_t *g_memoryForTuneSamples = SOUND_TUNES_MEMORY;
+uint8_t *g_memoryForTuneSamples;
 #endif
 
 #if !defined(__EMSCRIPTEN__)
@@ -1548,6 +1549,10 @@ void initTune(Tune &tuneDef) {
 #endif
 
 void init() {
+#if defined(EEZ_PLATFORM_STM32)
+	g_memoryForTuneSamples = SOUND_TUNES_MEMORY;
+#endif
+
 #if !defined(__EMSCRIPTEN__)
 	initTune(g_tunes[POWER_UP_TUNE]);
 #endif

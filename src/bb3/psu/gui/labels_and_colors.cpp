@@ -21,7 +21,7 @@
 #include <string.h>
 
 #include <bb3/hmi.h>
-#include <eez/core/memory.h>
+#include <bb3/memory.h>
 #include <bb3/psu/psu.h>
 #include <bb3/psu/gui/psu.h>
 #include <bb3/psu/gui/labels_and_colors.h>
@@ -43,10 +43,10 @@ struct SlotLabelAndColor {
     ChannelLabelAndColor* first;
 };
 
-SlotLabelAndColor *g_slotLabelAndColors = (SlotLabelAndColor *)FILE_VIEW_BUFFER;
+#define SLOT_LABEL_AND_COLORS_BUFFER ((SlotLabelAndColor *)FILE_VIEW_BUFFER)
 
 SlotLabelAndColor *getSlotLabelAndColor(int slotIndex) {
-    return g_slotLabelAndColors + slotIndex;
+    return SLOT_LABEL_AND_COLORS_BUFFER + slotIndex;
 }
 
 ChannelLabelAndColor *getChannelLabelAndColor(int slotIndex, int subchannelIndex) {
@@ -150,13 +150,13 @@ void LabelsAndColorsPage::pageAlloc() {
     ChannelLabelAndColor *channelLabelAndColors = (ChannelLabelAndColor *)(FILE_VIEW_BUFFER + NUM_SLOTS * sizeof(SlotLabelAndColor));
 
     for (int slotIndex = 0; slotIndex < NUM_SLOTS; slotIndex++) {
-        stringCopy(g_slotLabelAndColors[slotIndex].label, SLOT_LABEL_MAX_LENGTH + 1, g_slots[slotIndex]->getLabel());
-        g_slotLabelAndColors[slotIndex].color = g_slots[slotIndex]->getColor();
-        g_slotLabelAndColors[slotIndex].first = channelLabelAndColors;
+        stringCopy(SLOT_LABEL_AND_COLORS_BUFFER[slotIndex].label, SLOT_LABEL_MAX_LENGTH + 1, g_slots[slotIndex]->getLabel());
+        SLOT_LABEL_AND_COLORS_BUFFER[slotIndex].color = g_slots[slotIndex]->getColor();
+        SLOT_LABEL_AND_COLORS_BUFFER[slotIndex].first = channelLabelAndColors;
 
         auto numChannels = g_slots[slotIndex]->getNumSubchannels();
         if (numChannels > 0) {
-            g_slotLabelAndColors[slotIndex].first = channelLabelAndColors;
+            SLOT_LABEL_AND_COLORS_BUFFER[slotIndex].first = channelLabelAndColors;
 
             for (int relativeChannelIndex = 0; relativeChannelIndex < numChannels; relativeChannelIndex++) {
                 int subchannelIndex = g_slots[slotIndex]->getSubchannelIndexFromRelativeChannelIndex(relativeChannelIndex);
@@ -179,22 +179,22 @@ void LabelsAndColorsPage::pageAlloc() {
                 channelLabelAndColors = next;
             }
         } else {
-            g_slotLabelAndColors[slotIndex].first = 0;
+            SLOT_LABEL_AND_COLORS_BUFFER[slotIndex].first = 0;
         }
     }
 }
 
 int LabelsAndColorsPage::getDirty() {
     for (int slotIndex = 0; slotIndex < NUM_SLOTS; slotIndex++) {
-        if (strcmp(g_slotLabelAndColors[slotIndex].label, g_slots[slotIndex]->getLabel()) != 0) {
+        if (strcmp(SLOT_LABEL_AND_COLORS_BUFFER[slotIndex].label, g_slots[slotIndex]->getLabel()) != 0) {
             return 1;
         }
 
-        if (g_slotLabelAndColors[slotIndex].color != g_slots[slotIndex]->getColor()) {
+        if (SLOT_LABEL_AND_COLORS_BUFFER[slotIndex].color != g_slots[slotIndex]->getColor()) {
             return 1;
         }
 
-        for (ChannelLabelAndColor *p = g_slotLabelAndColors[slotIndex].first; p; p = p->next) {
+        for (ChannelLabelAndColor *p = SLOT_LABEL_AND_COLORS_BUFFER[slotIndex].first; p; p = p->next) {
             ChannelLabelAndColor &channelLabelAndColors = *p;
 
             auto labelMaxLength = g_slots[slotIndex]->getChannelLabelMaxLength(channelLabelAndColors.subchannelIndex);
@@ -214,15 +214,15 @@ int LabelsAndColorsPage::getDirty() {
 
 void LabelsAndColorsPage::set() {
     for (int slotIndex = 0; slotIndex < NUM_SLOTS; slotIndex++) {
-        if (strcmp(g_slotLabelAndColors[slotIndex].label, g_slots[slotIndex]->getLabel()) != 0) {
-            g_slots[slotIndex]->setLabel(g_slotLabelAndColors[slotIndex].label);
+        if (strcmp(SLOT_LABEL_AND_COLORS_BUFFER[slotIndex].label, g_slots[slotIndex]->getLabel()) != 0) {
+            g_slots[slotIndex]->setLabel(SLOT_LABEL_AND_COLORS_BUFFER[slotIndex].label);
         }
         
-        if (g_slotLabelAndColors[slotIndex].color != g_slots[slotIndex]->getColor()) {
-            g_slots[slotIndex]->setColor(g_slotLabelAndColors[slotIndex].color);
+        if (SLOT_LABEL_AND_COLORS_BUFFER[slotIndex].color != g_slots[slotIndex]->getColor()) {
+            g_slots[slotIndex]->setColor(SLOT_LABEL_AND_COLORS_BUFFER[slotIndex].color);
         }
 
-        for (ChannelLabelAndColor *p = g_slotLabelAndColors[slotIndex].first; p; p = p->next) {
+        for (ChannelLabelAndColor *p = SLOT_LABEL_AND_COLORS_BUFFER[slotIndex].first; p; p = p->next) {
             ChannelLabelAndColor &channelLabelAndColors = *p;
 
             auto labelMaxLength = g_slots[slotIndex]->getChannelLabelMaxLength(channelLabelAndColors.subchannelIndex);

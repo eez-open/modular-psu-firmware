@@ -28,10 +28,10 @@
 #include <eez/core/alloc.h>
 #include <eez/core/eeprom.h>
 #include <eez/core/sound.h>
-#include <eez/core/memory.h>
 
 #include <eez/gui/gui.h>
 
+#include <bb3/memory.h>
 #include <bb3/firmware.h>
 #include <bb3/system.h>
 #include <bb3/tasks.h>
@@ -96,7 +96,7 @@ bool g_shutdownInProgress;
 bool g_shutdown;
 
 void boot() {
-    assert((uint32_t)(MEMORY_END - MEMORY_BEGIN) <= MEMORY_SIZE);
+    eez::bb3::initMemory();
 
     eez::flow::init();
 

@@ -35,21 +35,22 @@ extern "C" {
 
 #include <bb3/system.h>
 #include <eez/core/debug.h>
-#include <eez/core/memory.h>
 #include <eez/core/util.h>
 #include <eez/fs/fs.h>
+
+#include <bb3/memory.h>
 #include <bb3/libs/image/jpeg.h>
 
 static size_t g_imageDataSize;
 
 void WRITE_ONE_BYTE(unsigned char byte) {
-	VRAM_SCREENSHOOT_JPEG_OUT_BUFFER[g_imageDataSize++] = byte;
+	eez::VRAM_SCREENSHOOT_JPEG_OUT_BUFFER[g_imageDataSize++] = byte;
 }
 
 int jpegEncode(const uint8_t *screenshotPixels, unsigned char **imageData, size_t *imageDataSize) {
 	g_imageDataSize = 0;
 	TooJpeg::writeJpeg(WRITE_ONE_BYTE, screenshotPixels, 480, 272);
-    *imageData = VRAM_SCREENSHOOT_JPEG_OUT_BUFFER;
+    *imageData = eez::VRAM_SCREENSHOOT_JPEG_OUT_BUFFER;
     *imageDataSize = g_imageDataSize;
     return 0;
 }
@@ -62,15 +63,11 @@ static bool g_jpegInitialized;
 
 #else
 
-extern "C" void * const g_jpegDecodeContext = (void *)FILE_VIEW_BUFFER;
-
 #define NJ_USE_LIBC 0
 #define NJ_USE_WIN32 0
 extern "C" {
 #include "nanojpeg.c"
 }
-
-static uint8_t *g_decodeBuffer = FILE_VIEW_BUFFER + sizeof(nj_context_t);
 
 uint8_t *g_decodeDynamicMemory;
 
@@ -113,12 +110,12 @@ ImageDecodeResult jpegDecode(const char *filePath, Image *image) {
         return IMAGE_DECODE_ERR_FILE_READ;
     }
 
-    if (fileSize > FILE_VIEW_BUFFER_SIZE) {
+    if (fileSize > eez::FILE_VIEW_BUFFER_SIZE) {
         file.close();
         return IMAGE_DECODE_ERR_NOT_ENOUGH_MEMORY;
     }    
 
-    g_fileData = FILE_VIEW_BUFFER + FILE_VIEW_BUFFER_SIZE - ((fileSize + 3) / 4) * 4;
+    g_fileData = eez::FILE_VIEW_BUFFER + eez::FILE_VIEW_BUFFER_SIZE - ((fileSize + 3) / 4) * 4;
     uint32_t bytesRead = file.read(g_fileData, fileSize);
     file.close();
 
@@ -136,9 +133,9 @@ ImageDecodeResult jpegDecode(const char *filePath, Image *image) {
     	g_jpegInitialized = true;
     }
 
-    uint32_t availableMemoryForDecode = g_fileData - FILE_VIEW_BUFFER;
+    uint32_t availableMemoryForDecode = g_fileData - eez::FILE_VIEW_BUFFER;
 
-    if (HAL_JPEG_Decode(&hjpeg, g_fileData, fileSize, FILE_VIEW_BUFFER, availableMemoryForDecode, 5000) != HAL_OK) {
+    if (HAL_JPEG_Decode(&hjpeg, g_fileData, fileSize, eez::FILE_VIEW_BUFFER, availableMemoryForDecode, 5000) != HAL_OK) {
         return IMAGE_DECODE_ERR_DECODE;
     }
 
@@ -192,7 +189,7 @@ ImageDecodeResult jpegDecode(const char *filePath, Image *image) {
     }
 
     uint32_t inputBufferSize = numMCUs * blockSize;
-    uint8_t *outputBuffer = FILE_VIEW_BUFFER + inputBufferSize;
+    uint8_t *outputBuffer = eez::FILE_VIEW_BUFFER + inputBufferSize;
 
     if (inputBufferSize + width * height * 2 > availableMemoryForDecode) {
         // not enough memory to decode JPEG
@@ -200,7 +197,7 @@ ImageDecodeResult jpegDecode(const char *filePath, Image *image) {
     }
 
     uint32_t convertedDataCount;
-    convertFunction(FILE_VIEW_BUFFER, outputBuffer, 0, inputBufferSize, &convertedDataCount);
+    convertFunction(eez::FILE_VIEW_BUFFER, outputBuffer, 0, inputBufferSize, &convertedDataCount);
 
     image->width = width;
     image->height = height;
@@ -211,8 +208,7 @@ ImageDecodeResult jpegDecode(const char *filePath, Image *image) {
     return IMAGE_DECODE_OK;
 
 #else
-
-    g_decodeDynamicMemory = g_decodeBuffer;
+    g_decodeDynamicMemory = eez::FILE_VIEW_BUFFER;
 
     njInit();
 

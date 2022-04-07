@@ -19,6 +19,7 @@
 #include <stdio.h>
 
 #include <bb3/firmware.h>
+#include <bb3/memory.h>
 #include <bb3/tasks.h>
 #include <bb3/uart.h>
 
@@ -59,9 +60,15 @@ static bool g_abortReceiveCplt;
 
 class CircularBuffer {
 public:
-	explicit CircularBuffer(uint8_t *buffer, size_t bufferSize)
-		: m_buffer(buffer), m_bufferSize(bufferSize)
+	explicit CircularBuffer()
+		: m_buffer(0), m_bufferSize(0)
 	{
+	}
+
+	void setBuffer(uint8_t *buffer, size_t bufferSize)
+	{
+		m_buffer = buffer;
+		m_bufferSize = bufferSize;
 	}
 
 	void reset() {
@@ -130,13 +137,13 @@ public:
 
 private:
 	uint8_t *m_buffer;
-	const size_t m_bufferSize;
+	size_t m_bufferSize;
 	size_t m_head = 0;
 	size_t m_tail = 0;
 	bool m_full = false;
 };
 
-CircularBuffer g_inputBuffer(UART_BUFFER_MEMORY, UART_BUFFER_MEMORY_SIZE);
+CircularBuffer g_inputBuffer;
 
 ////////////////////////////////////////////////////////////////////////////////
 
@@ -227,6 +234,10 @@ static void flushRxBuffer(uint16_t RxXferCount) {
 			g_RxXferCount = sizeof(g_buffer);
 		}
 	}
+}
+
+void init() {
+    g_inputBuffer.setBuffer(UART_BUFFER_MEMORY, UART_BUFFER_MEMORY_SIZE);
 }
 
 void tick() {

@@ -23,7 +23,7 @@
 
 #include <bb3/system.h>
 #include <bb3/scripting/scripting.h>
-#include <eez/core/memory.h>
+#include <bb3/memory.h>
 #include <bb3/fs_driver.h>
 
 #include <eez/gui/gui.h>

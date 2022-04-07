@@ -194,7 +194,9 @@ struct Parameters {
 
 struct Writer {
 public:
-    Writer(uint8_t *buffer, uint32_t bufferSize);
+    Writer();
+
+    void setBuffer(uint8_t *buffer, uint32_t bufferSize);
 
     void reset();
 

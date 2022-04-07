@@ -44,7 +44,7 @@
 
 #include <eez/fs/fs.h>
 
-#include <eez/core/memory.h>
+#include <bb3/memory.h>
 
 namespace eez {
 
@@ -69,30 +69,30 @@ static Recording g_dlogFile;
 static Recording g_previousDlogFile;
 static uint32_t g_refreshCounter;
 
-static uint8_t *g_rowDataStart = FILE_VIEW_BUFFER;
+static uint8_t *g_rowDataStart;
 static const uint32_t ROW_DATA_BUFFER_SIZE = 65536;
 
-static uint8_t *g_bookmarksDataStart = g_rowDataStart + ROW_DATA_BUFFER_SIZE;
+static uint8_t *g_bookmarksDataStart;
 struct Bookmark {
 	uint32_t position;
 	const char *text;
 };
-static Bookmark *g_bookmarks = (Bookmark *)g_bookmarksDataStart;
+static Bookmark *g_bookmarks;
 static const uint32_t BOOKMARKS_PER_PAGE = 8;
 static const uint32_t BOOKMARKS_DATA_SIZE = 2 * (BOOKMARKS_PER_PAGE * (sizeof(Bookmark) + dlog_file::MAX_BOOKMARK_TEXT_LEN + 1));
 static uint32_t g_selectedBookmarkIndex = -1;
 static uint32_t g_bookmarksScrollPosition = 0;
 static uint32_t g_loadedBookmarksScrollPosition = 0;
-uint8_t *g_visibleBookmarksBuffer = g_bookmarksDataStart + BOOKMARKS_DATA_SIZE;
+uint8_t *g_visibleBookmarksBuffer;
 uint8_t *g_visibleBookmarks;
-uint32_t *g_visibleBookmarkIndexesBuffer = (uint32_t *)(g_visibleBookmarksBuffer + 2 * 480);
+uint32_t *g_visibleBookmarkIndexesBuffer;
 uint32_t *g_visibleBookmarkIndexes;
 
 struct BlockElement {
     float min;
     float max;
 };
-static BlockElement *g_blockElements = (BlockElement *)(g_visibleBookmarkIndexesBuffer + 2 * 480);
+static BlockElement *g_blockElements;
 static uint32_t g_rowIndexStart;
 static uint32_t g_rowIndexEnd;
 static double g_loadScale;
@@ -133,6 +133,15 @@ static void loadVisibleBookmarks(uint32_t positionStart, uint32_t positionEnd);
 static void changeXAxisDiv(Recording &recording, double xAxisDiv);
 
 ////////////////////////////////////////////////////////////////////////////////
+
+void init() {
+    g_rowDataStart = FILE_VIEW_BUFFER;
+    g_bookmarksDataStart = g_rowDataStart + ROW_DATA_BUFFER_SIZE;
+    g_bookmarks = (Bookmark *)g_bookmarksDataStart;
+    g_visibleBookmarksBuffer = g_bookmarksDataStart + BOOKMARKS_DATA_SIZE;
+    g_visibleBookmarkIndexesBuffer = (uint32_t *)(g_visibleBookmarksBuffer + 2 * 480);
+    g_blockElements = (BlockElement *)(g_visibleBookmarkIndexesBuffer + 2 * 480);
+}
 
 void tick() {
 	if (psu::gui::isPageOnStack(PAGE_ID_DLOG_VIEW) && &getRecording() == &g_dlogFile && g_state == STATE_READY) {

@@ -69,6 +69,7 @@ void abortAfterBufferOverflowError(int detectionSource);
 void abortAfterMassStorageError();
 void reset();
 
+void init();
 void tick();
 void log(float *values);
 void log(uint32_t bits);

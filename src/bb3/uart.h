@@ -39,6 +39,7 @@ typedef enum
 } HAL_StatusTypeDef;
 #endif
 
+void init();
 void tick();
 
 void refresh();

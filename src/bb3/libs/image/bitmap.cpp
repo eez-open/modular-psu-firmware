@@ -18,8 +18,9 @@
 
 #include <stdint.h>
 
-#include <eez/core/memory.h>
 #include <eez/fs/fs.h>
+
+#include <bb3/memory.h>
 #include <bb3/libs/image/bitmap.h>
 
     // const uint8_t buffer[] = {
@@ -124,7 +125,7 @@ ImageDecodeResult bitmapDecode(const char *filePath, Image *image) {
 
     offset += height * lineBytes;
 
-    auto lineBuffer = FILE_VIEW_BUFFER;
+    auto lineBuffer = eez::FILE_VIEW_BUFFER;
 
     for (uint32_t line = 0; line < height; line++) {
         offset -= lineBytes;
@@ -154,7 +155,7 @@ ImageDecodeResult bitmapDecode(const char *filePath, Image *image) {
     image->height = height;
     image->bpp = 24;
     image->lineOffset = 0;
-    image->pixels = FILE_VIEW_BUFFER;
+    image->pixels = eez::FILE_VIEW_BUFFER;
 
     return IMAGE_DECODE_OK;
 }

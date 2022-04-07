@@ -164,6 +164,8 @@ float getSample(Recording &recording, uint8_t *rowData, unsigned columnIndex);
 // this is called from the thread that owns SD card
 void loadBookmarks();
 
+void init();
+
 // this is called from the thread that owns SD card
 void tick();
 

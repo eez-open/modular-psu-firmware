@@ -39,15 +39,20 @@ void Parameters::initYAxis(int yAxisIndex) {
 
 ////////////////////////////////////////////////////////////////////////////////
 
-Writer::Writer(uint8_t *buffer, uint32_t bufferSize)
-    : m_buffer(buffer)
-    , m_bufferSize(bufferSize)
+Writer::Writer()
+    : m_buffer(0)
+    , m_bufferSize(0)
 	, m_bufferIndex(0)
 	, m_fileLength(0)
 	, m_bitMask(0)
 	, m_bits(0)
 	, m_dataOffset(0)
 {
+}
+
+void Writer::setBuffer(uint8_t *buffer, uint32_t bufferSize) {
+	m_buffer = buffer;
+	m_bufferSize = bufferSize;
 }
 
 void Writer::reset() {

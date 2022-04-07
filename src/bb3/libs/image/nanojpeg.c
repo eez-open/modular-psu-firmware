@@ -329,9 +329,7 @@ typedef struct _nj_ctx {
     unsigned char *rgb;
 } nj_context_t;
 
-extern "C" void * const g_jpegDecodeContext;
-
-static nj_context_t &nj = *(nj_context_t *)g_jpegDecodeContext;
+static nj_context_t nj;
 
 static const char njZZ[64] = { 0, 1, 8, 16, 9, 2, 3, 10, 17, 24, 32, 25, 18,
 11, 4, 5, 12, 19, 26, 33, 40, 48, 41, 34, 27, 20, 13, 6, 7, 14, 21, 28, 35,

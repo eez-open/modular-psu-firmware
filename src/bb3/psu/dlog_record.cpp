@@ -38,7 +38,7 @@
 
 #include <eez/fs/fs.h>
 
-#include <eez/core/memory.h>
+#include <bb3/memory.h>
 
 //uint32_t g_debugVar1;
 //uint32_t g_debugVar2;
@@ -96,12 +96,12 @@ static double g_nextTime;
 static unsigned int g_lastSavedBufferIndex;
 static uint32_t g_lastSavedBufferTickCount;
 
-static dlog_file::Writer g_writer(DLOG_RECORD_BUFFER, DLOG_RECORD_BUFFER_SIZE);
+dlog_file::Writer g_writer;
 
 static uint32_t g_fileLength;
 static uint32_t g_numSamples;
 
-static uint8_t *g_saveBuffer = DLOG_RECORD_SAVE_BUFFER;
+static uint8_t *g_saveBuffer;
 
 ////////////////////////////////////////////////////////////////////////////////
 
@@ -841,6 +841,11 @@ void reset() {
 }
 
 ////////////////////////////////////////////////////////////////////////////////
+
+void init() {
+    g_writer.setBuffer(DLOG_RECORD_BUFFER, DLOG_RECORD_BUFFER_SIZE);    
+    g_saveBuffer = DLOG_RECORD_SAVE_BUFFER;
+}
 
 void tick() {
 	//g_debugVar1 = g_writer.getBufferIndex();
