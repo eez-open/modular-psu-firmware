@@ -1593,7 +1593,7 @@ public:
     }
 
     bool writeProfileProperties(psu::profile::WriteContext &ctx, int i, ProfileParameters &parameters) {
-        char propName[32];
+        char propName[64];
 
         snprintf(propName, sizeof(propName), "aout_dac7760_%d_outputEnabled", i+1);
         WRITE_PROPERTY(propName, parameters.outputEnabled);
@@ -1623,7 +1623,7 @@ public:
     }
 
     bool readProfileProperties(psu::profile::ReadContext &ctx, int i, ProfileParameters &parameters) {
-        char propName[32];
+        char propName[64];
 
         snprintf(propName, sizeof(propName), "aout_dac7760_%d_outputEnabled", i+1);
         READ_PROPERTY(propName, parameters.outputEnabled);
@@ -5001,7 +5001,7 @@ public:
 
     const char *getFunctionGeneratorResourceLabel(int subchannelIndex, int resourceIndex) override {
         if (subchannelIndex == DOUT_SUBCHANNEL_INDEX) {
-			const char *label;
+			const char *label = nullptr;
 			getChannelPinLabel(subchannelIndex, resourceIndex + 1, label);
 			if (*label) {
 				return label;
