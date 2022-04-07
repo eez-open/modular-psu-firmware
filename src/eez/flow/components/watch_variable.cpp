@@ -45,9 +45,8 @@ void executeWatchVariableComponent(FlowState *flowState, unsigned componentIndex
     }
 
 	if (!watchVariableComponentExecutionState) {
-        watchVariableComponentExecutionState = ObjectAllocator<WatchVariableComponenentExecutionState>::allocate(0xe28eea0a);
+        watchVariableComponentExecutionState = allocateComponentExecutionState<WatchVariableComponenentExecutionState>(flowState, componentIndex);
         watchVariableComponentExecutionState->value = value;
-        flowState->componenentExecutionStates[componentIndex] = watchVariableComponentExecutionState;
 
         propagateValue(flowState, componentIndex, 1, value);
 
@@ -62,8 +61,7 @@ void executeWatchVariableComponent(FlowState *flowState, unsigned componentIndex
 		}
 
         if (canFreeFlowState(flowState, false)) {
-            flowState->componenentExecutionStates[componentIndex] = nullptr;
-            ObjectAllocator<WatchVariableComponenentExecutionState>::deallocate(watchVariableComponentExecutionState);
+            deallocateComponentExecutionState(flowState, componentIndex);
         } else {
             if (!addToQueue(flowState, componentIndex, -1, -1, -1, true)) {
                 throwError(flowState, componentIndex, "Execution queue is full\n");

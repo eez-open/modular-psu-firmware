@@ -70,7 +70,7 @@ void (*writeDebuggerBufferHook)(const char *buffer, uint32_t length) = writeDebu
 void (*finishToDebuggerMessageHook)() = finishToDebuggerMessage;
 void (*onDebuggerInputAvailableHook)() = onDebuggerInputAvailable;
 
-void (*executeDashboardComponentHook)(uint16_t componentType, void *context) = nullptr;
+void (*executeDashboardComponentHook)(uint16_t componentType, int flowStateIndex, int componentIndex) = nullptr;
 
 } // namespace flow
 } // namespace eez

@@ -27,6 +27,10 @@
 #include <eez/flow/queue.h>
 #include <eez/flow/hooks.h>
 
+#if defined(__EMSCRIPTEN__)
+#include <eez/flow/dashboard_api.h>
+#endif
+
 using namespace eez::gui;
 
 namespace eez {
@@ -48,11 +52,15 @@ void executeCallActionComponent(FlowState *flowState, unsigned componentIndex);
 void executeDelayComponent(FlowState *flowState, unsigned componentIndex);
 void executeErrorComponent(FlowState *flowState, unsigned componentIndex);
 void executeCatchErrorComponent(FlowState *flowState, unsigned componentIndex);
+void executeCounterComponent(FlowState *flowState, unsigned componentIndex);
 void executeLoopComponent(FlowState *flowState, unsigned componentIndex);
 void executeShowPageComponent(FlowState *flowState, unsigned componentIndex);
 void executeShowMessageBoxComponent(FlowState *flowState, unsigned componentIndex);
 void executeShowKeyboardComponent(FlowState *flowState, unsigned componentIndex);
 void executeShowKeypadComponent(FlowState *flowState, unsigned componentIndex);
+
+void executeNoopComponent(FlowState *flowState, unsigned componentIndex) {
+}
 
 void executeLayoutViewWidgetComponent(FlowState *flowState, unsigned componentIndex);
 void executeRollerWidgetComponent(FlowState *flowState, unsigned componentIndex);
@@ -76,14 +84,14 @@ static ExecuteComponentFunctionType g_executeComponentFunctions[] = {
 	executeDelayComponent,
 	executeErrorComponent,
 	executeCatchErrorComponent,
-	nullptr, // COMPONENT_TYPE_COUNTER_ACTION
+	executeCounterComponent, // COMPONENT_TYPE_COUNTER_ACTION
 	executeLoopComponent,
 	executeShowPageComponent,
 	nullptr, // COMPONENT_TYPE_SCPIACTION
 	executeShowMessageBoxComponent,
 	executeShowKeyboardComponent,
 	executeShowKeypadComponent,
-	nullptr, // COMPONENT_TYPE_NOOP_ACTION
+	executeNoopComponent, // COMPONENT_TYPE_NOOP_ACTION
 	nullptr, // COMPONENT_TYPE_COMMENT_ACTION
 };
 
@@ -99,11 +107,7 @@ void executeComponent(FlowState *flowState, unsigned componentIndex) {
 #if defined(__EMSCRIPTEN__)
 	if (component->type >= defs_v3::FIRST_DASHBOARD_COMPONENT_TYPE) {
         if (executeDashboardComponentHook) {
-            DashboardComponentContext context = {
-                flowState,
-                componentIndex
-            };
-            executeDashboardComponentHook(component->type, &context);
+            executeDashboardComponentHook(component->type, getFlowStateIndex(flowState), componentIndex);
             return;
         }
     } else

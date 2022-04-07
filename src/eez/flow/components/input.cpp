@@ -72,8 +72,7 @@ void executeInputComponent(FlowState *flowState, unsigned componentIndex) {
     if (getCallActionValue(flowState, componentIndex, value)) {
         auto inputActionComponentExecutionState = (InputActionComponentExecutionState *)flowState->componenentExecutionStates[componentIndex];
         if (!inputActionComponentExecutionState) {
-            inputActionComponentExecutionState = ObjectAllocator<InputActionComponentExecutionState>::allocate(0x22ed4499);
-            flowState->componenentExecutionStates[componentIndex] = inputActionComponentExecutionState;
+            inputActionComponentExecutionState = allocateComponentExecutionState<InputActionComponentExecutionState>(flowState, componentIndex);
         }
 
         propagateValue(flowState, componentIndex, 0, value);

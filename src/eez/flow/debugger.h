@@ -25,17 +25,20 @@ extern bool g_debuggerIsConnected;
 
 bool canExecuteStep(FlowState *&flowState, unsigned &componentIndex);
 
-void onStarted(Assets *assets);
+void onStarted(gui::Assets *assets);
 
 void onAddToQueue(FlowState *flowState, int sourceComponentIndex, int sourceOutputIndex, unsigned targetComponentIndex, int targetInputIndex);
 void onRemoveFromQueue();
 
-void onValueChanged(const Value *pValue);
+void onValueChanged(const gui::Value *pValue);
 
 void onFlowStateCreated(FlowState *flowState);
 void onFlowStateDestroyed(FlowState *flowState);
 
 void onFlowError(FlowState *flowState, int componentIndex, const char *errorMessage);
+
+void onComponentExecutionStateChanged(FlowState *flowState, int componentIndex);
+void onComponentAsyncStateChanged(FlowState *flowState, int componentIndex);
 
 void logInfo(FlowState *flowState, unsigned componentIndex, const char *message);
 

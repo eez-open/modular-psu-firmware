@@ -56,9 +56,8 @@ void executeCallAction(FlowState *flowState, unsigned componentIndex, int flowIn
 		freeFlowState(actionFlowState);
 		propagateValueThroughSeqout(flowState, componentIndex);
 	} else {
-		callActionComponenentExecutionState = ObjectAllocator<CallActionComponenentExecutionState>::allocate(0x4c669d4b);
+		callActionComponenentExecutionState = allocateComponentExecutionState<CallActionComponenentExecutionState>(flowState, componentIndex);
 		callActionComponenentExecutionState->flowState = actionFlowState;
-		flowState->componenentExecutionStates[componentIndex] = callActionComponenentExecutionState;
 	}
 }
 

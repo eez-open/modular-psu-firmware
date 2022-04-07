@@ -26,6 +26,8 @@
 
 #include <eez/gui/widgets/input.h>
 
+#include <eez/flow/private.h>
+
 namespace eez {
 namespace gui {
 
@@ -164,8 +166,7 @@ void InputWidgetState::render() {
 	if (widgetCursor.flowState) {
 		auto inputWidgetExecutionState = (InputWidgetExecutionState *)widgetCursor.flowState->componenentExecutionStates[widget->componentIndex];
 		if (!inputWidgetExecutionState) {
-			inputWidgetExecutionState = ObjectAllocator<InputWidgetExecutionState>::allocate(0xa570ccad);
-			widgetCursor.flowState->componenentExecutionStates[widget->componentIndex] = inputWidgetExecutionState;
+			inputWidgetExecutionState = eez::flow::allocateComponentExecutionState<InputWidgetExecutionState>(widgetCursor.flowState, widget->componentIndex);
 		}
 
 		getInputWidgetParams(

@@ -16,6 +16,7 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
+#include <stdio.h>
 #include <math.h>
 
 #include <eez/gui/gui.h>
@@ -176,6 +177,16 @@ Value op_binary_xor(const Value& a1, const Value& b1) {
 bool is_equal(const Value& a1, const Value& b1) {
 	const Value &a = a1.getType() == VALUE_TYPE_VALUE_PTR ? *a1.pValueValue : a1.getType() == VALUE_TYPE_NATIVE_VARIABLE ? get(g_widgetCursor, a1.getInt()) : a1;
 	const Value &b = b1.getType() == VALUE_TYPE_VALUE_PTR ? *b1.pValueValue : b1.getType() == VALUE_TYPE_NATIVE_VARIABLE ? get(g_widgetCursor, b1.getInt()) : b1;
+
+    auto aIsUndefinedOrNull = a.getType() == VALUE_TYPE_UNDEFINED || a.getType() == VALUE_TYPE_NULL;
+    auto bIsUndefinedOrNull = b.getType() == VALUE_TYPE_UNDEFINED || b.getType() == VALUE_TYPE_NULL;
+
+
+    if (aIsUndefinedOrNull) {
+        return bIsUndefinedOrNull;
+    } else if (bIsUndefinedOrNull) {
+        return false;
+    }
 
 	if (a.isAnyStringType() && b.isAnyStringType()) {
 		const char *aStr = a.getString();
@@ -669,7 +680,7 @@ bool do_OPERATION_TYPE_NOT(EvalStack &stack) {
 }
 
 bool do_OPERATION_TYPE_CONDITIONAL(EvalStack &stack) {
-	auto alternate = stack.pop();
+    auto alternate = stack.pop();
 	auto consequent = stack.pop();
 	auto conditionValue = stack.pop();
 
@@ -687,8 +698,10 @@ bool do_OPERATION_TYPE_CONDITIONAL(EvalStack &stack) {
 }
 
 bool do_OPERATION_TYPE_SYSTEM_GET_TICK(EvalStack &stack) {
-	// TODO
-	return false;
+	if (!stack.push(Value(millis(), VALUE_TYPE_UINT32))) {
+		return false;
+	}
+	return true;
 }
 
 bool do_OPERATION_TYPE_FLOW_INDEX(EvalStack &stack) {
@@ -746,6 +759,29 @@ bool do_OPERATION_TYPE_FLOW_IS_PAGE_ACTIVE(EvalStack &stack) {
 	}
 
 	return true;
+}
+
+bool do_OPERATION_TYPE_FLOW_MAKE_ARRAY_VALUE(EvalStack &stack) {
+    auto arrayTypeValue = stack.pop();
+    auto arraySizeValue = stack.pop();
+
+    int arrayType = arrayTypeValue.getInt();
+    int arraySize = arraySizeValue.getInt();
+
+    auto arrayValue = Value::makeArrayRef(arraySize, arrayType, 0x837260d4);
+
+    auto array = arrayValue.getArray();
+
+    for (int i = 0; i < arraySize; i++) {
+        auto value = stack.pop();
+        array->values[i] = value.getType() == VALUE_TYPE_VALUE_PTR ? *value.pValueValue : value.getType() == VALUE_TYPE_NATIVE_VARIABLE ? get(g_widgetCursor, value.getInt()) : value;
+    }
+
+    if (!stack.push(arrayValue)) {
+        return false;
+    }
+
+    return true;
 }
 
 bool do_OPERATION_TYPE_MATH_SIN(EvalStack &stack) {
@@ -1149,7 +1185,24 @@ bool do_OPERATION_TYPE_STRING_SPLIT(EvalStack &stack) {
 }
 
 bool do_OPERATION_TYPE_ARRAY_LENGTH(EvalStack &stack) {
-	// TODO
+    auto a = stack.pop();
+
+	if (a.getType() == VALUE_TYPE_VALUE_PTR) {
+		a = *a.pValueValue;
+	} else if (a.getType() == VALUE_TYPE_NATIVE_VARIABLE) {
+		a = get(g_widgetCursor, a.getInt());
+	}
+
+    if (a.getType() == VALUE_TYPE_ARRAY || a.getType() == VALUE_TYPE_ARRAY_REF) {
+        auto array = a.getArray();
+
+        if (!stack.push(Value(array->arraySize, VALUE_TYPE_UINT32))) {
+		    return false;
+	    }
+
+        return true;
+    }
+
 	return false;
 }
 
@@ -1185,6 +1238,8 @@ EvalOperation g_evalOperations[] = {
 	do_OPERATION_TYPE_SYSTEM_GET_TICK,
 	do_OPERATION_TYPE_FLOW_INDEX,
 	do_OPERATION_TYPE_FLOW_IS_PAGE_ACTIVE,
+    do_OPERATION_TYPE_FLOW_MAKE_ARRAY_VALUE,
+    do_OPERATION_TYPE_FLOW_MAKE_ARRAY_VALUE,
 	do_OPERATION_TYPE_MATH_SIN,
 	do_OPERATION_TYPE_MATH_COS,
 	do_OPERATION_TYPE_MATH_LOG,

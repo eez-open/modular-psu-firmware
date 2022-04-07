@@ -41,7 +41,7 @@ extern void (*writeDebuggerBufferHook)(const char *buffer, uint32_t length);
 extern void (*finishToDebuggerMessageHook)();
 extern void (*onDebuggerInputAvailableHook)();
 
-extern void (*executeDashboardComponentHook)(uint16_t componentType, void *context);
+extern void (*executeDashboardComponentHook)(uint16_t componentType, int flowStateIndex, int componentIndex);
 
 } // flow
 } // eez

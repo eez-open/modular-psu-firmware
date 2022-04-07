@@ -27,12 +27,8 @@ namespace flow {
 
 void executeCatchErrorComponent(FlowState *flowState, unsigned componentIndex) {
 	auto catchErrorComponentExecutionState = (CatchErrorComponenentExecutionState *)flowState->componenentExecutionStates[componentIndex];
-
 	propagateValue(flowState, componentIndex, 1, catchErrorComponentExecutionState->message);
-
-    flowState->componenentExecutionStates[componentIndex] = nullptr;
-    ObjectAllocator<CatchErrorComponenentExecutionState>::deallocate(catchErrorComponentExecutionState);
-
+    deallocateComponentExecutionState(flowState, componentIndex);
 	propagateValueThroughSeqout(flowState, componentIndex);
 }
 

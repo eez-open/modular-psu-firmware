@@ -112,7 +112,10 @@ static FlowState *initFlowState(Assets *assets, int flowIndex, FlowState *parent
 	auto nValues = flow->componentInputs.count + flow->localVariables.count;
 
 	FlowState *flowState = (FlowState *)alloc(
-		sizeof(FlowState) + nValues * sizeof(Value) + flow->components.count * sizeof(ComponenentExecutionState *),
+		sizeof(FlowState) +
+        nValues * sizeof(Value) +
+        flow->components.count * sizeof(ComponenentExecutionState *) +
+        flow->components.count * sizeof(bool),
 		0x4c3b6ef5
 	);
 
@@ -133,6 +136,7 @@ static FlowState *initFlowState(Assets *assets, int flowIndex, FlowState *parent
 	}
 	flowState->values = (Value *)(flowState + 1);
 	flowState->componenentExecutionStates = (ComponenentExecutionState **)(flowState->values + nValues);
+    flowState->componenentAsyncStates = (bool *)(flowState->componenentExecutionStates + flow->components.count);
 
 	for (unsigned i = 0; i < nValues; i++) {
 		new (flowState->values + i) Value();
@@ -150,6 +154,7 @@ static FlowState *initFlowState(Assets *assets, int flowIndex, FlowState *parent
 
 	for (unsigned i = 0; i < flow->components.count; i++) {
 		flowState->componenentExecutionStates[i] = nullptr;
+		flowState->componenentAsyncStates[i] = false;
 	}
 
 	onFlowStateCreated(flowState);
@@ -194,6 +199,8 @@ bool canFreeFlowState(FlowState *flowState, bool includingWatchVariable) {
         auto component = flowState->flow->components[componentIndex];
         if (
             component->type != defs_v3::COMPONENT_TYPE_INPUT_ACTION &&
+            component->type != defs_v3::COMPONENT_TYPE_LOOP_ACTION &&
+            component->type != defs_v3::COMPONENT_TYPE_COUNTER_ACTION &&
             (includingWatchVariable || component->type != defs_v3::COMPONENT_TYPE_WATCH_VARIABLE_ACTION) &&
             flowState->componenentExecutionStates[componentIndex]
         ) {
@@ -209,8 +216,7 @@ void freeFlowState(FlowState *flowState) {
     if (flowState->parentFlowState) {
         auto componentExecutionState = flowState->parentFlowState->componenentExecutionStates[flowState->parentComponentIndex];
         if (componentExecutionState) {
-            flowState->parentFlowState->componenentExecutionStates[flowState->parentComponentIndex] = nullptr;
-            ObjectAllocator<ComponenentExecutionState>::deallocate(componentExecutionState);
+            deallocateComponentExecutionState(flowState->parentFlowState, flowState->parentComponentIndex);
             return;
         }
     }
@@ -224,11 +230,7 @@ void freeFlowState(FlowState *flowState) {
 	}
 
 	for (unsigned i = 0; i < flow->components.count; i++) {
-		auto componentExecutionState = flowState->componenentExecutionStates[i];
-		if (componentExecutionState) {
-			flowState->componenentExecutionStates[i] = nullptr;
-			ObjectAllocator<ComponenentExecutionState>::deallocate(componentExecutionState);
-		}
+        deallocateComponentExecutionState(flowState, i);
 	}
 
 	onFlowStateDestroyed(flowState);
@@ -242,21 +244,32 @@ void freeFlowState(FlowState *flowState) {
     }
 }
 
+void deallocateComponentExecutionState(FlowState *flowState, unsigned componentIndex) {
+    auto executionState = flowState->componenentExecutionStates[componentIndex];
+    if (executionState) {
+        flowState->componenentExecutionStates[componentIndex] = nullptr;
+        onComponentExecutionStateChanged(flowState, componentIndex);
+        ObjectAllocator<ComponenentExecutionState>::deallocate(executionState);
+    }
+}
+
 void propagateValue(FlowState *flowState, unsigned componentIndex, unsigned outputIndex, const gui::Value &value) {
 	auto component = flowState->flow->components[componentIndex];
 	auto componentOutput = component->outputs[outputIndex];
+
+    auto value2 = value.getType() == VALUE_TYPE_VALUE_PTR ? *value.pValueValue : value.getType() == VALUE_TYPE_NATIVE_VARIABLE ? get(g_widgetCursor, value.getInt()) : value;
 
 	for (unsigned connectionIndex = 0; connectionIndex < componentOutput->connections.count; connectionIndex++) {
 		auto connection = componentOutput->connections[connectionIndex];
 
 		auto pValue = &flowState->values[connection->targetInputIndex];
 
-		if (*pValue != value) {
-			*pValue = value;
+		if (*pValue != value2) {
+			*pValue = value2;
 
-			if (!(flowState->flow->componentInputs[connection->targetInputIndex] & COMPONENT_INPUT_FLAG_IS_SEQ_INPUT)) {
+			//if (!(flowState->flow->componentInputs[connection->targetInputIndex] & COMPONENT_INPUT_FLAG_IS_SEQ_INPUT)) {
 				onValueChanged(pValue);
-			}
+			//}
 		}
 
 		pingComponent(flowState, connection->targetComponentIndex, componentIndex, outputIndex, connection->targetInputIndex);
@@ -339,13 +352,24 @@ void assignValue(FlowState *flowState, int componentIndex, Value &dstValue, cons
 ////////////////////////////////////////////////////////////////////////////////
 
 void startAsyncExecution(FlowState *flowState, int componentIndex) {
-	flowState->numAsyncComponents++;
+    if (!flowState->componenentAsyncStates[componentIndex]) {
+        flowState->componenentAsyncStates[componentIndex] = true;
+        onComponentAsyncStateChanged(flowState, componentIndex);
+
+	    flowState->numAsyncComponents++;
+    }
 }
 
 void endAsyncExecution(FlowState *flowState, int componentIndex) {
-    flowState->numAsyncComponents--;
-    if (canFreeFlowState(flowState)) {
-        freeFlowState(flowState);
+    if (flowState->componenentAsyncStates[componentIndex]) {
+        flowState->componenentAsyncStates[componentIndex] = false;
+        onComponentAsyncStateChanged(flowState, componentIndex);
+
+        flowState->numAsyncComponents--;
+
+        if (canFreeFlowState(flowState)) {
+            freeFlowState(flowState);
+        }
     }
 }
 
@@ -392,9 +416,8 @@ void throwError(FlowState *flowState, int componentIndex, const char *errorMessa
                 catchErrorComponentIndex
             )
         ) {
-			auto catchErrorComponentExecutionState = ObjectAllocator<CatchErrorComponenentExecutionState>::allocate(0xe744a4ec);
+			auto catchErrorComponentExecutionState = allocateComponentExecutionState<CatchErrorComponenentExecutionState>(catchErrorFlowState, catchErrorComponentIndex);
 			catchErrorComponentExecutionState->message = Value::makeStringRef(errorMessage, strlen(errorMessage), 0x9473eef2);
-			catchErrorFlowState->componenentExecutionStates[catchErrorComponentIndex] = catchErrorComponentExecutionState;
 
 			if (!addToQueue(catchErrorFlowState, catchErrorComponentIndex, -1, -1, -1)) {
 				catchErrorFlowState->error = true;

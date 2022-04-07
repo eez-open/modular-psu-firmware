@@ -71,7 +71,11 @@ bool compare_BOOLEAN_value(const Value &a, const Value &b) {
 }
 
 void BOOLEAN_value_to_text(const Value &value, char *text, int count) {
-    stringAppendInt(text, count, value.getInt());
+    if (value.getInt()) {
+        stringCopy(text, count, "true");
+    } else {
+        stringCopy(text, count, "false");
+    }
 }
 
 const char *BOOLEAN_value_type_name(const Value &value) {
@@ -419,6 +423,30 @@ void STRING_REF_value_to_text(const Value &value, char *text, int count) {
 
 const char *STRING_REF_value_type_name(const Value &value) {
     return "string";
+}
+
+bool compare_BLOB_REF_value(const Value &a, const Value &b) {
+    return a.refValue == b.refValue;
+}
+
+void BLOB_REF_value_to_text(const Value &value, char *text, int count) {
+    text[0] = 0;
+}
+
+const char *BLOB_REF_value_type_name(const Value &value) {
+    return "blob";
+}
+
+bool compare_STREAM_value(const Value &a, const Value &b) {
+    return a.int32Value == b.int32Value;
+}
+
+void STREAM_value_to_text(const Value &value, char *text, int count) {
+    text[0] = 0;
+}
+
+const char *STREAM_value_type_name(const Value &value) {
+    return "stream";
 }
 
 bool compare_VERSIONED_STRING_value(const Value &a, const Value &b) {
@@ -1028,7 +1056,7 @@ Value Value::toString(uint32_t id) const {
         snprintf(tempStr, sizeof(tempStr), "%" PRId16 "", int16Value);
     } else if (type == VALUE_TYPE_UINT16) {
         snprintf(tempStr, sizeof(tempStr), "%" PRIu16 "", uint16Value);
-    } else if (type == VALUE_TYPE_INT32 || type == VALUE_TYPE_BOOLEAN) {
+    } else if (type == VALUE_TYPE_INT32) {
         snprintf(tempStr, sizeof(tempStr), "%" PRId32 "", int32Value);
     } else if (type == VALUE_TYPE_UINT32) {
         snprintf(tempStr, sizeof(tempStr), "%" PRIu32 "", uint32Value);
@@ -1051,17 +1079,17 @@ Value Value::toString(uint32_t id) const {
 Value Value::makeStringRef(const char *str, int len, uint32_t id) {
     auto stringRef = ObjectAllocator<StringRef>::allocate(id);
 	if (stringRef == nullptr) {
-		return Value(VALUE_TYPE_NULL);
+		return Value(0, VALUE_TYPE_NULL);
 	}
 
 	if (len == -1) {
 		len = strlen(str);
 	}
 
-    stringRef->str = (char *)alloc(len + 1, 0xe45b0259);
+    stringRef->str = (char *)alloc(len + 1, id + 1);
     if (stringRef->str == nullptr) {
         ObjectAllocator<StringRef>::deallocate(stringRef);
-        return Value(VALUE_TYPE_NULL);
+        return Value(0, VALUE_TYPE_NULL);
     }
 
     stringCopyLength(stringRef->str, len + 1, str, len);
@@ -1083,14 +1111,14 @@ Value Value::makeStringRef(const char *str, int len, uint32_t id) {
 Value Value::concatenateString(const Value &str1, const Value &str2) {
     auto stringRef = ObjectAllocator<StringRef>::allocate(0xbab14c6a);;
 	if (stringRef == nullptr) {
-		return Value(VALUE_TYPE_NULL);
+		return Value(0, VALUE_TYPE_NULL);
 	}
 
     auto newStrLen = strlen(str1.getString()) + strlen(str2.getString()) + 1;
     stringRef->str = (char *)alloc(newStrLen, 0xb5320162);
     if (stringRef->str == nullptr) {
         ObjectAllocator<StringRef>::deallocate(stringRef);
-        return Value(VALUE_TYPE_NULL);
+        return Value(0, VALUE_TYPE_NULL);
     }
 
     stringCopy(stringRef->str, newStrLen, str1.getString());
@@ -1112,7 +1140,7 @@ Value Value::concatenateString(const Value &str1, const Value &str2) {
 Value Value::makeArrayRef(int arraySize, int arrayType, uint32_t id) {
     auto ptr = alloc(sizeof(ArrayValueRef) + (arraySize > 0 ? arraySize - 1 : 0) * sizeof(Value), id);
 	if (ptr == nullptr) {
-		return Value(VALUE_TYPE_NULL);
+		return Value(0, VALUE_TYPE_NULL);
 	}
 
     ArrayValueRef *arrayRef = new (ptr) ArrayValueRef;
@@ -1131,6 +1159,34 @@ Value Value::makeArrayRef(int arraySize, int arrayType, uint32_t id) {
     value.options = VALUE_OPTIONS_REF;
     value.reserved = 0;
     value.refValue = arrayRef;
+
+	return value;
+}
+
+Value Value::makeBlobRef(const uint8_t *blob, uint32_t len, uint32_t id) {
+    auto blobRef = ObjectAllocator<BlobRef>::allocate(id);
+	if (blobRef == nullptr) {
+		return Value(0, VALUE_TYPE_NULL);
+	}
+
+	blobRef->blob = (uint8_t *)alloc(len, id + 1);
+    if (blobRef->blob == nullptr) {
+        ObjectAllocator<BlobRef>::deallocate(blobRef);
+        return Value(0, VALUE_TYPE_NULL);
+    }
+    blobRef->len = len;
+
+    memcpy(blobRef->blob, blob, len);
+
+    blobRef->refCounter = 1;
+
+    Value value;
+
+    value.type = VALUE_TYPE_BLOB_REF;
+    value.unit = 0;
+    value.options = VALUE_OPTIONS_REF;
+    value.reserved = 0;
+    value.refValue = blobRef;
 
 	return value;
 }

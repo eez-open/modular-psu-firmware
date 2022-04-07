@@ -45,9 +45,8 @@ void executeDelayComponent(FlowState *flowState, unsigned componentIndex) {
 
 		double milliseconds = value.toDouble();
 		if (!isNaN(milliseconds)) {
-			delayComponentExecutionState = ObjectAllocator<DelayComponenentExecutionState>::allocate(0x28969c75);
+			delayComponentExecutionState = allocateComponentExecutionState<DelayComponenentExecutionState>(flowState, componentIndex);
 			delayComponentExecutionState->waitUntil = millis() + (uint32_t)floor(milliseconds);
-			flowState->componenentExecutionStates[componentIndex] = delayComponentExecutionState;
 		} else {
 			throwError(flowState, componentIndex, "Invalid Milliseconds value in Delay\n");
 			return;
@@ -59,8 +58,7 @@ void executeDelayComponent(FlowState *flowState, unsigned componentIndex) {
 		}
 	} else {
 		if (millis() >= delayComponentExecutionState->waitUntil) {
-			flowState->componenentExecutionStates[componentIndex] = nullptr;
-			ObjectAllocator<DelayComponenentExecutionState>::deallocate(delayComponentExecutionState);
+			deallocateComponentExecutionState(flowState, componentIndex);
 			propagateValueThroughSeqout(flowState, componentIndex);
 		} else {
 			if (!addToQueue(flowState, componentIndex, -1, -1, -1, true)) {

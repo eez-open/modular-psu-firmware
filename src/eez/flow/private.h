@@ -19,6 +19,7 @@
 #pragma once
 
 #include <eez/gui/assets.h>
+#include <eez/flow/debugger.h>
 
 namespace eez {
 namespace flow {
@@ -56,6 +57,7 @@ struct FlowState {
 	int parentComponentIndex;
 	Value *values;
 	ComponenentExecutionState **componenentExecutionStates;
+    bool *componenentAsyncStates;
 };
 
 extern FlowState *g_mainPageFlowState;
@@ -65,6 +67,19 @@ FlowState *initPageFlowState(Assets *assets, int flowIndex, FlowState *parentFlo
 
 bool canFreeFlowState(FlowState *flowState, bool includingWatchVariable = true);
 void freeFlowState(FlowState *flowState);
+
+void deallocateComponentExecutionState(FlowState *flowState, unsigned componentIndex);
+
+template<class T>
+T *allocateComponentExecutionState(FlowState *flowState, unsigned componentIndex) {
+    if (flowState->componenentExecutionStates[componentIndex]) {
+        deallocateComponentExecutionState(flowState, componentIndex);
+    }
+    auto executionState = ObjectAllocator<T>::allocate(0x72dc3bf4);
+    flowState->componenentExecutionStates[componentIndex] = executionState;
+    onComponentExecutionStateChanged(flowState, componentIndex);
+    return executionState;
+}
 
 void propagateValue(FlowState *flowState, unsigned componentIndex, unsigned outputIndex, const gui::Value &value);
 void propagateValue(FlowState *flowState, unsigned componentIndex, unsigned outputIndex); // propagates null value

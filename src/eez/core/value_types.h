@@ -39,16 +39,18 @@
     VALUE_TYPE(ARRAY)                              /* 14 */ \
 	VALUE_TYPE(STRING_REF)                         /* 15 */ \
     VALUE_TYPE(ARRAY_REF)                          /* 16 */ \
-	VALUE_TYPE(VERSIONED_STRING)                   /* 17 */ \
-	VALUE_TYPE(VALUE_PTR)                          /* 18 */ \
-    VALUE_TYPE(FLOW_OUTPUT)                        /* 19 */ \
-    VALUE_TYPE(NATIVE_VARIABLE)                    /* 20 */ \
-    VALUE_TYPE(RANGE)                              /* 21 */ \
-    VALUE_TYPE(POINTER)                            /* 22 */ \
-    VALUE_TYPE(ENUM)                               /* 23 */ \
-    VALUE_TYPE(IP_ADDRESS)                         /* 24 */ \
-    VALUE_TYPE(TIME_ZONE)                          /* 25 */ \
-    VALUE_TYPE(YT_DATA_GET_VALUE_FUNCTION_POINTER) /* 26 */ \
+    VALUE_TYPE(BLOB_REF)                           /* 17 */ \
+    VALUE_TYPE(STREAM)                             /* 18 */ \
+	VALUE_TYPE(VERSIONED_STRING)                   /* 19 */ \
+	VALUE_TYPE(VALUE_PTR)                          /* 20 */ \
+    VALUE_TYPE(FLOW_OUTPUT)                        /* 21 */ \
+    VALUE_TYPE(NATIVE_VARIABLE)                    /* 22 */ \
+    VALUE_TYPE(RANGE)                              /* 23 */ \
+    VALUE_TYPE(POINTER)                            /* 24 */ \
+    VALUE_TYPE(ENUM)                               /* 25 */ \
+    VALUE_TYPE(IP_ADDRESS)                         /* 26 */ \
+    VALUE_TYPE(TIME_ZONE)                          /* 27 */ \
+    VALUE_TYPE(YT_DATA_GET_VALUE_FUNCTION_POINTER) /* 28 */ \
     CUSTOM_VALUE_TYPES
 
 namespace eez {

@@ -60,6 +60,7 @@ bool evalExpression(FlowState *flowState, int componentIndex, const uint8_t *ins
 bool evalAssignableExpression(FlowState *flowState, int componentIndex, const uint8_t *instructions, Value &result, int *numInstructionBytes = nullptr, const int32_t *iterators = nullptr);
 
 bool evalProperty(FlowState *flowState, int componentIndex, int propertyIndex, Value &result, int *numInstructionBytes = nullptr, const int32_t *iterators = nullptr, eez::gui::DataOperationEnum operation = eez::gui::DATA_OPERATION_GET);
+bool evalAssignableProperty(FlowState *flowState, int componentIndex, int propertyIndex, Value &result, int *numInstructionBytes = nullptr, const int32_t *iterators = nullptr);
 
 } // flow
 } // eez

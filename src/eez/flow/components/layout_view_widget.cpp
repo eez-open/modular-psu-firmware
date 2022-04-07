@@ -40,8 +40,7 @@ struct LayoutViewWidgetExecutionState : public ComponenentExecutionState {
 };
 
 static LayoutViewWidgetExecutionState *createLayoutViewFlowState(FlowState *flowState, uint16_t layoutViewWidgetComponentIndex, int16_t pageId) {
-    auto layoutViewWidgetExecutionState =  ObjectAllocator<LayoutViewWidgetExecutionState>::allocate(0xa570ccad);
-    flowState->componenentExecutionStates[layoutViewWidgetComponentIndex] = layoutViewWidgetExecutionState;
+    auto layoutViewWidgetExecutionState =  allocateComponentExecutionState<LayoutViewWidgetExecutionState>(flowState, layoutViewWidgetComponentIndex);
     auto layoutViewFlowState = initPageFlowState(flowState->assets, pageId, flowState, layoutViewWidgetComponentIndex);
     layoutViewWidgetExecutionState->flowState = layoutViewFlowState;
     return layoutViewWidgetExecutionState;

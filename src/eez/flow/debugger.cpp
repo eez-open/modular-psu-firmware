@@ -35,7 +35,7 @@ namespace flow {
 enum MessagesToDebugger {
     MESSAGE_TO_DEBUGGER_STATE_CHANGED, // STATE
 
-    MESSAGE_TO_DEBUGGER_ADD_TO_QUEUE, // FLOW_STATE_INDEX, SOURCE_COMPONENT_INDEX, SOURCE_OUTPUT_INDEX, TARGET_COMPONENT_INDEX, TARGET_INPUT_INDEX
+    MESSAGE_TO_DEBUGGER_ADD_TO_QUEUE, // FLOW_STATE_INDEX, SOURCE_COMPONENT_INDEX, SOURCE_OUTPUT_INDEX, TARGET_COMPONENT_INDEX, TARGET_INPUT_INDEX, FREE_MEMORT, ALLOC_MEMORY
     MESSAGE_TO_DEBUGGER_REMOVE_FROM_QUEUE, // no params
 
     MESSAGE_TO_DEBUGGER_GLOBAL_VARIABLE_INIT, // GLOBAL_VARIABLE_INDEX, VALUE_ADDR, VALUE
@@ -51,7 +51,10 @@ enum MessagesToDebugger {
 
     MESSAGE_TO_DEBUGGER_LOG, // LOG_ITEM_TYPE, FLOW_STATE_INDEX, COMPONENT_INDEX, MESSAGE
 
-	MESSAGE_TO_DEBUGGER_PAGE_CHANGED // PAGE_ID
+	MESSAGE_TO_DEBUGGER_PAGE_CHANGED, // PAGE_ID
+
+    MESSAGE_TO_DEBUGGER_COMPONENT_EXECUTION_STATE_CHANGED, // FLOW_STATE_INDEX, COMPONENT_INDEX, STATE
+    MESSAGE_TO_DEBUGGER_COMPONENT_ASYNC_STATE_CHANGED // FLOW_STATE_INDEX, COMPONENT_INDEX, STATE
 };
 
 enum MessagesFromDebugger {
@@ -356,6 +359,14 @@ void writeValue(const Value &value) {
 		writeArray(value.getArray());
 		return;
 
+	case VALUE_TYPE_BLOB_REF:
+		snprintf(tempStr, sizeof(tempStr) - 1, "@%d", (int)((BlobRef *)value.refValue)->len);
+		break;
+
+	case VALUE_TYPE_STREAM:
+		snprintf(tempStr, sizeof(tempStr) - 1, ">%d", (int)(value.int32Value));
+		break;
+
 	default:
 		tempStr[0] = 0;
 		break;
@@ -398,14 +409,20 @@ void onAddToQueue(FlowState *flowState, int sourceComponentIndex, int sourceOutp
     if (g_debuggerIsConnected) {
 		startToDebuggerMessageHook();
 
+        uint32_t free;
+        uint32_t alloc;
+        getAllocInfo(free, alloc);
+
         char buffer[100];
-		snprintf(buffer, sizeof(buffer), "%d\t%d\t%d\t%d\t%d\t%d\n",
+		snprintf(buffer, sizeof(buffer), "%d\t%d\t%d\t%d\t%d\t%d\t%d\t%d\n",
 			MESSAGE_TO_DEBUGGER_ADD_TO_QUEUE,
 			(int)flowState->flowStateIndex,
 			sourceComponentIndex,
 			sourceOutputIndex,
 			targetComponentIndex,
-			targetInputIndex
+			targetInputIndex,
+            (int)free,
+            (int)ALLOC_BUFFER_SIZE
 		);
         writeDebuggerBufferHook(buffer, strlen(buffer));
     }
@@ -470,8 +487,8 @@ void onFlowStateCreated(FlowState *flowState) {
         }
 
 		for (uint32_t i = 0; i < flow->componentInputs.count; i++) {
-			auto &input = flow->componentInputs[i];
-			if (!(input & COMPONENT_INPUT_FLAG_IS_SEQ_INPUT)) {
+			//auto &input = flow->componentInputs[i];
+			//if (!(input & COMPONENT_INPUT_FLAG_IS_SEQ_INPUT)) {
 				auto pValue = &flowState->values[i];
 
 				char buffer[100];
@@ -484,7 +501,7 @@ void onFlowStateCreated(FlowState *flowState) {
 				writeDebuggerBufferHook(buffer, strlen(buffer));
 
 				writeValue(*pValue);
-			}
+			//}
         }
 	}
 }
@@ -514,6 +531,38 @@ void onFlowError(FlowState *flowState, int componentIndex, const char *errorMess
 		);
 		writeDebuggerBufferHook(buffer, strlen(buffer));
 		writeString(errorMessage);
+	}
+}
+
+void onComponentExecutionStateChanged(FlowState *flowState, int componentIndex) {
+	if (g_debuggerIsConnected) {
+		startToDebuggerMessageHook();
+
+		char buffer[100];
+		snprintf(buffer, sizeof(buffer), "%d\t%d\t%d\t%d\n",
+			MESSAGE_TO_DEBUGGER_COMPONENT_EXECUTION_STATE_CHANGED,
+			(int)flowState->flowStateIndex,
+			componentIndex,
+            flowState->componenentExecutionStates[componentIndex] ? 1 : 0
+		);
+
+        writeDebuggerBufferHook(buffer, strlen(buffer));
+	}
+}
+
+void onComponentAsyncStateChanged(FlowState *flowState, int componentIndex) {
+	if (g_debuggerIsConnected) {
+		startToDebuggerMessageHook();
+
+		char buffer[100];
+		snprintf(buffer, sizeof(buffer), "%d\t%d\t%d\t%d\n",
+			MESSAGE_TO_DEBUGGER_COMPONENT_ASYNC_STATE_CHANGED,
+			(int)flowState->flowStateIndex,
+			componentIndex,
+            flowState->componenentAsyncStates[componentIndex] ? 1 : 0
+		);
+
+        writeDebuggerBufferHook(buffer, strlen(buffer));
 	}
 }
 

@@ -25,15 +25,9 @@ using namespace eez::gui;
 namespace eez {
 namespace flow {
 
-struct SetVariableActionComponent : public Component {
-	uint8_t assignableExpressionEvalInstructions[1];
-};
-
 void executeSetVariableComponent(FlowState *flowState, unsigned componentIndex) {
-    auto component = (SetVariableActionComponent *)flowState->flow->components[componentIndex];
-
 	Value dstValue;
-	if (!evalAssignableExpression(flowState, componentIndex, component->assignableExpressionEvalInstructions, dstValue)) {
+	if (!evalAssignableProperty(flowState, componentIndex, defs_v3::SET_VARIABLE_ACTION_COMPONENT_PROPERTY_VARIABLE, dstValue)) {
 		throwError(flowState, componentIndex, "Failed to evaluate Variable in SetVariable\n");
 		return;
 	}

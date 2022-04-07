@@ -33,8 +33,7 @@ void executeRollerWidgetComponent(FlowState *flowState, unsigned componentIndex)
 	if (flowState->values[startInputIndex].type != VALUE_TYPE_UNDEFINED) {
         auto executionState = (RollerWidgetComponenentExecutionState *)flowState->componenentExecutionStates[componentIndex];
         if (!executionState) {
-            executionState = ObjectAllocator<RollerWidgetComponenentExecutionState>::allocate(0x4c669d4b);
-			flowState->componenentExecutionStates[componentIndex] = executionState;
+            executionState = allocateComponentExecutionState<RollerWidgetComponenentExecutionState>(flowState, componentIndex);
 		}
 		executionState->clear = true;
 	}

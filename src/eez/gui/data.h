@@ -19,6 +19,7 @@
 #pragma once
 
 #include <assert.h>
+#include <stdio.h>
 #include <stdint.h>
 #include <math.h>
 #include <memory.h>
@@ -233,7 +234,7 @@ struct Value {
 	~Value() {
 		if (options & VALUE_OPTIONS_REF) {
 			if (--refValue->refCounter == 0) {
-				free(refValue);
+                ObjectAllocator<Ref>::deallocate(refValue);
 			}
 		}
 	}
@@ -241,7 +242,7 @@ struct Value {
     Value& operator = (const Value &value) {
 		if (options & VALUE_OPTIONS_REF) {
 			if (--refValue->refCounter == 0) {
-				free(refValue);
+				ObjectAllocator<Ref>::deallocate(refValue);
 			}
 		}
 
@@ -455,6 +456,8 @@ struct Value {
 
     static Value makeArrayRef(int arraySize, int arrayType, uint32_t id);
 
+    static Value makeBlobRef(const uint8_t *blob, uint32_t len, uint32_t id);
+
 	//////////
 
   public:
@@ -496,7 +499,7 @@ struct Value {
 struct StringRef : public Ref {
     ~StringRef() {
         if (str) {
-            free(str);
+            eez::free(str);
         }
     }
 	char *str;
@@ -515,6 +518,16 @@ struct ArrayValueRef : public Ref {
         }
     }
 	ArrayValue arrayValue;
+};
+
+struct BlobRef : public Ref {
+    ~BlobRef() {
+        if (blob) {
+            eez::free(blob);
+        }
+    }
+	uint8_t *blob;
+    uint32_t len;
 };
 
 ////////////////////////////////////////////////////////////////////////////////
