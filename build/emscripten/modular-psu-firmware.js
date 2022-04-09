@@ -1436,12 +1436,13 @@ var tempI64;
 // === Body ===
 
 var ASM_CONSTS = {
-  577244: function() {FS.mkdir("/eez_modular_firmware"); FS.mount(IDBFS, {}, "/eez_modular_firmware"); Module.syncdone = 0; FS.syncfs(true, function(err) { assert(!err); Module.syncdone = 1; });},  
- 577417: function() {if (Module.syncdone) { Module.syncdone = 0; FS.syncfs(false, function(err) { assert(!err); Module.syncdone = 1; }); }},  
- 577535: function() {let jsArray = readScpiInputBuffer(); if (!jsArray) { return null; } let cppBuffer = _malloc(jsArray.length); writeArrayToMemory(jsArray, cppBuffer); return cppBuffer;},  
- 577706: function() {let jsArray = readDebuggerInputBuffer(); if (!jsArray) { return null; } let cppBuffer = _malloc(jsArray.length); writeArrayToMemory(jsArray, cppBuffer); return cppBuffer;},  
- 577881: function($0, $1) {writeScpiOutputBuffer(new Uint8Array(Module.HEAPU8.buffer, $0, $1));},  
- 577954: function($0, $1) {writeDebuggerOutputBuffer(new Uint8Array(Module.HEAPU8.buffer, $0, $1));}
+  578108: function($0) {freeComponentExecutionState($0);},  
+ 578145: function() {FS.mkdir("/eez_modular_firmware"); FS.mount(IDBFS, {}, "/eez_modular_firmware"); Module.syncdone = 0; FS.syncfs(true, function(err) { assert(!err); Module.syncdone = 1; });},  
+ 578318: function() {if (Module.syncdone) { Module.syncdone = 0; FS.syncfs(false, function(err) { assert(!err); Module.syncdone = 1; }); }},  
+ 578436: function() {let jsArray = readScpiInputBuffer(); if (!jsArray) { return null; } let cppBuffer = _malloc(jsArray.length); writeArrayToMemory(jsArray, cppBuffer); return cppBuffer;},  
+ 578607: function() {let jsArray = readDebuggerInputBuffer(); if (!jsArray) { return null; } let cppBuffer = _malloc(jsArray.length); writeArrayToMemory(jsArray, cppBuffer); return cppBuffer;},  
+ 578782: function($0, $1) {writeScpiOutputBuffer(new Uint8Array(Module.HEAPU8.buffer, $0, $1));},  
+ 578855: function($0, $1) {writeDebuggerOutputBuffer(new Uint8Array(Module.HEAPU8.buffer, $0, $1));}
 };
 
 
@@ -6983,13 +6984,148 @@ var ___wasm_call_ctors = Module["___wasm_call_ctors"] = function() {
 };
 
 /** @type {function(...*):?} */
-var _free = Module["_free"] = function() {
-  return (_free = Module["_free"] = Module["asm"]["free"]).apply(null, arguments);
+var _createUndefinedValue = Module["_createUndefinedValue"] = function() {
+  return (_createUndefinedValue = Module["_createUndefinedValue"] = Module["asm"]["createUndefinedValue"]).apply(null, arguments);
+};
+
+/** @type {function(...*):?} */
+var _createNullValue = Module["_createNullValue"] = function() {
+  return (_createNullValue = Module["_createNullValue"] = Module["asm"]["createNullValue"]).apply(null, arguments);
+};
+
+/** @type {function(...*):?} */
+var _createIntValue = Module["_createIntValue"] = function() {
+  return (_createIntValue = Module["_createIntValue"] = Module["asm"]["createIntValue"]).apply(null, arguments);
+};
+
+/** @type {function(...*):?} */
+var _createDoubleValue = Module["_createDoubleValue"] = function() {
+  return (_createDoubleValue = Module["_createDoubleValue"] = Module["asm"]["createDoubleValue"]).apply(null, arguments);
+};
+
+/** @type {function(...*):?} */
+var _createBooleanValue = Module["_createBooleanValue"] = function() {
+  return (_createBooleanValue = Module["_createBooleanValue"] = Module["asm"]["createBooleanValue"]).apply(null, arguments);
+};
+
+/** @type {function(...*):?} */
+var _createStringValue = Module["_createStringValue"] = function() {
+  return (_createStringValue = Module["_createStringValue"] = Module["asm"]["createStringValue"]).apply(null, arguments);
+};
+
+/** @type {function(...*):?} */
+var _createArrayValue = Module["_createArrayValue"] = function() {
+  return (_createArrayValue = Module["_createArrayValue"] = Module["asm"]["createArrayValue"]).apply(null, arguments);
+};
+
+/** @type {function(...*):?} */
+var _createStreamValue = Module["_createStreamValue"] = function() {
+  return (_createStreamValue = Module["_createStreamValue"] = Module["asm"]["createStreamValue"]).apply(null, arguments);
+};
+
+/** @type {function(...*):?} */
+var _arrayValueSetElementValue = Module["_arrayValueSetElementValue"] = function() {
+  return (_arrayValueSetElementValue = Module["_arrayValueSetElementValue"] = Module["asm"]["arrayValueSetElementValue"]).apply(null, arguments);
+};
+
+/** @type {function(...*):?} */
+var _valueFree = Module["_valueFree"] = function() {
+  return (_valueFree = Module["_valueFree"] = Module["asm"]["valueFree"]).apply(null, arguments);
+};
+
+/** @type {function(...*):?} */
+var _setGlobalVariable = Module["_setGlobalVariable"] = function() {
+  return (_setGlobalVariable = Module["_setGlobalVariable"] = Module["asm"]["setGlobalVariable"]).apply(null, arguments);
+};
+
+/** @type {function(...*):?} */
+var _updateGlobalVariable = Module["_updateGlobalVariable"] = function() {
+  return (_updateGlobalVariable = Module["_updateGlobalVariable"] = Module["asm"]["updateGlobalVariable"]).apply(null, arguments);
+};
+
+/** @type {function(...*):?} */
+var _getFlowIndex = Module["_getFlowIndex"] = function() {
+  return (_getFlowIndex = Module["_getFlowIndex"] = Module["asm"]["getFlowIndex"]).apply(null, arguments);
+};
+
+/** @type {function(...*):?} */
+var _getComponentExecutionState = Module["_getComponentExecutionState"] = function() {
+  return (_getComponentExecutionState = Module["_getComponentExecutionState"] = Module["asm"]["getComponentExecutionState"]).apply(null, arguments);
+};
+
+/** @type {function(...*):?} */
+var _setComponentExecutionState = Module["_setComponentExecutionState"] = function() {
+  return (_setComponentExecutionState = Module["_setComponentExecutionState"] = Module["asm"]["setComponentExecutionState"]).apply(null, arguments);
+};
+
+/** @type {function(...*):?} */
+var _getStringParam = Module["_getStringParam"] = function() {
+  return (_getStringParam = Module["_getStringParam"] = Module["asm"]["getStringParam"]).apply(null, arguments);
+};
+
+/** @type {function(...*):?} */
+var _getExpressionListParam = Module["_getExpressionListParam"] = function() {
+  return (_getExpressionListParam = Module["_getExpressionListParam"] = Module["asm"]["getExpressionListParam"]).apply(null, arguments);
 };
 
 /** @type {function(...*):?} */
 var _malloc = Module["_malloc"] = function() {
   return (_malloc = Module["_malloc"] = Module["asm"]["malloc"]).apply(null, arguments);
+};
+
+/** @type {function(...*):?} */
+var _freeExpressionListParam = Module["_freeExpressionListParam"] = function() {
+  return (_freeExpressionListParam = Module["_freeExpressionListParam"] = Module["asm"]["freeExpressionListParam"]).apply(null, arguments);
+};
+
+/** @type {function(...*):?} */
+var _free = Module["_free"] = function() {
+  return (_free = Module["_free"] = Module["asm"]["free"]).apply(null, arguments);
+};
+
+/** @type {function(...*):?} */
+var _evalProperty = Module["_evalProperty"] = function() {
+  return (_evalProperty = Module["_evalProperty"] = Module["asm"]["evalProperty"]).apply(null, arguments);
+};
+
+/** @type {function(...*):?} */
+var _assignProperty = Module["_assignProperty"] = function() {
+  return (_assignProperty = Module["_assignProperty"] = Module["asm"]["assignProperty"]).apply(null, arguments);
+};
+
+/** @type {function(...*):?} */
+var _setPropertyField = Module["_setPropertyField"] = function() {
+  return (_setPropertyField = Module["_setPropertyField"] = Module["asm"]["setPropertyField"]).apply(null, arguments);
+};
+
+/** @type {function(...*):?} */
+var _propagateValue = Module["_propagateValue"] = function() {
+  return (_propagateValue = Module["_propagateValue"] = Module["asm"]["propagateValue"]).apply(null, arguments);
+};
+
+/** @type {function(...*):?} */
+var _propagateValueThroughSeqout = Module["_propagateValueThroughSeqout"] = function() {
+  return (_propagateValueThroughSeqout = Module["_propagateValueThroughSeqout"] = Module["asm"]["propagateValueThroughSeqout"]).apply(null, arguments);
+};
+
+/** @type {function(...*):?} */
+var _startAsyncExecution = Module["_startAsyncExecution"] = function() {
+  return (_startAsyncExecution = Module["_startAsyncExecution"] = Module["asm"]["startAsyncExecution"]).apply(null, arguments);
+};
+
+/** @type {function(...*):?} */
+var _endAsyncExecution = Module["_endAsyncExecution"] = function() {
+  return (_endAsyncExecution = Module["_endAsyncExecution"] = Module["asm"]["endAsyncExecution"]).apply(null, arguments);
+};
+
+/** @type {function(...*):?} */
+var _executeCallAction = Module["_executeCallAction"] = function() {
+  return (_executeCallAction = Module["_executeCallAction"] = Module["asm"]["executeCallAction"]).apply(null, arguments);
+};
+
+/** @type {function(...*):?} */
+var _throwError = Module["_throwError"] = function() {
+  return (_throwError = Module["_throwError"] = Module["asm"]["throwError"]).apply(null, arguments);
 };
 
 /** @type {function(...*):?} */
