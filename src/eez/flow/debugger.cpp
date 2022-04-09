@@ -99,7 +99,7 @@ static void setDebuggerState(DebuggerState newState) {
 		if (g_debuggerIsConnected) {
 			startToDebuggerMessageHook();
 
-			char buffer[100];
+			char buffer[256];
 			snprintf(buffer, sizeof(buffer), "%d\t%d\n",
 				MESSAGE_TO_DEBUGGER_STATE_CHANGED,
 				g_debuggerState
@@ -392,7 +392,7 @@ void onStarted(Assets *assets) {
 		for (uint32_t i = 0; i < flowDefinition->globalVariables.count; i++) {
 			auto pValue = flowDefinition->globalVariables[i];
 
-            char buffer[100];
+            char buffer[256];
             snprintf(buffer, sizeof(buffer), "%d\t%d\t%p\t",
                 MESSAGE_TO_DEBUGGER_GLOBAL_VARIABLE_INIT,
 				(int)i,
@@ -413,7 +413,7 @@ void onAddToQueue(FlowState *flowState, int sourceComponentIndex, int sourceOutp
         uint32_t alloc;
         getAllocInfo(free, alloc);
 
-        char buffer[100];
+        char buffer[256];
 		snprintf(buffer, sizeof(buffer), "%d\t%d\t%d\t%d\t%d\t%d\t%d\t%d\n",
 			MESSAGE_TO_DEBUGGER_ADD_TO_QUEUE,
 			(int)flowState->flowStateIndex,
@@ -432,7 +432,7 @@ void onRemoveFromQueue() {
     if (g_debuggerIsConnected) {
 		startToDebuggerMessageHook();
 
-        char buffer[100];
+        char buffer[256];
 		snprintf(buffer, sizeof(buffer), "%d\n",
 			MESSAGE_TO_DEBUGGER_REMOVE_FROM_QUEUE
 		);
@@ -444,7 +444,7 @@ void onValueChanged(const Value *pValue) {
     if (g_debuggerIsConnected) {
 		startToDebuggerMessageHook();
 
-        char buffer[100];
+        char buffer[256];
 		snprintf(buffer, sizeof(buffer), "%d\t%p\t",
 			MESSAGE_TO_DEBUGGER_VALUE_CHANGED,
             (const void *)pValue
@@ -459,7 +459,7 @@ void onFlowStateCreated(FlowState *flowState) {
     if (g_debuggerIsConnected) {
 		startToDebuggerMessageHook();
 
-        char buffer[100];
+        char buffer[256];
 		snprintf(buffer, sizeof(buffer), "%d\t%d\t%d\t%d\t%d\n",
 			MESSAGE_TO_DEBUGGER_FLOW_STATE_CREATED,
 			(int)flowState->flowStateIndex,
@@ -474,7 +474,7 @@ void onFlowStateCreated(FlowState *flowState) {
 		for (uint32_t i = 0; i < flow->localVariables.count; i++) {
 			auto pValue = &flowState->values[flow->componentInputs.count + i];
 
-            char buffer[100];
+            char buffer[256];
             snprintf(buffer, sizeof(buffer), "%d\t%d\t%d\t%p\t",
                 MESSAGE_TO_DEBUGGER_LOCAL_VARIABLE_INIT,
 				(int)flowState->flowStateIndex,
@@ -491,7 +491,7 @@ void onFlowStateCreated(FlowState *flowState) {
 			//if (!(input & COMPONENT_INPUT_FLAG_IS_SEQ_INPUT)) {
 				auto pValue = &flowState->values[i];
 
-				char buffer[100];
+				char buffer[256];
 				snprintf(buffer, sizeof(buffer), "%d\t%d\t%d\t%p\t",
 					MESSAGE_TO_DEBUGGER_COMPONENT_INPUT_INIT,
 					(int)flowState->flowStateIndex,
@@ -510,7 +510,7 @@ void onFlowStateDestroyed(FlowState *flowState) {
 	if (g_debuggerIsConnected) {
 		startToDebuggerMessageHook();
 
-		char buffer[100];
+		char buffer[256];
 		snprintf(buffer, sizeof(buffer), "%d\t%d\n",
 			MESSAGE_TO_DEBUGGER_FLOW_STATE_DESTROYED,
 			(int)flowState->flowStateIndex
@@ -523,7 +523,7 @@ void onFlowError(FlowState *flowState, int componentIndex, const char *errorMess
 	if (g_debuggerIsConnected) {
 		startToDebuggerMessageHook();
 
-		char buffer[100];
+		char buffer[256];
 		snprintf(buffer, sizeof(buffer), "%d\t%d\t%d\t",
 			MESSAGE_TO_DEBUGGER_FLOW_STATE_ERROR,
 			(int)flowState->flowStateIndex,
@@ -538,7 +538,7 @@ void onComponentExecutionStateChanged(FlowState *flowState, int componentIndex) 
 	if (g_debuggerIsConnected) {
 		startToDebuggerMessageHook();
 
-		char buffer[100];
+		char buffer[256];
 		snprintf(buffer, sizeof(buffer), "%d\t%d\t%d\t%d\n",
 			MESSAGE_TO_DEBUGGER_COMPONENT_EXECUTION_STATE_CHANGED,
 			(int)flowState->flowStateIndex,
@@ -554,7 +554,7 @@ void onComponentAsyncStateChanged(FlowState *flowState, int componentIndex) {
 	if (g_debuggerIsConnected) {
 		startToDebuggerMessageHook();
 
-		char buffer[100];
+		char buffer[256];
 		snprintf(buffer, sizeof(buffer), "%d\t%d\t%d\t%d\n",
 			MESSAGE_TO_DEBUGGER_COMPONENT_ASYNC_STATE_CHANGED,
 			(int)flowState->flowStateIndex,
@@ -668,7 +668,7 @@ void onPageChanged(int pageId) {
 	if (g_debuggerIsConnected) {
 		startToDebuggerMessageHook();
 
-		char buffer[100];
+		char buffer[256];
 		snprintf(buffer, sizeof(buffer), "%d\t%d\n",
 			MESSAGE_TO_DEBUGGER_PAGE_CHANGED,
 			pageId

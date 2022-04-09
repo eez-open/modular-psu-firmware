@@ -77,8 +77,8 @@ uint8_t *allocBuffer(uint32_t size) {
 
     auto buffer = ALLOC_BUFFER;
 
-    ALLOC_BUFFER = buffer + size;
     assert(ALLOC_BUFFER_SIZE > size);
+    ALLOC_BUFFER += size;
     ALLOC_BUFFER_SIZE -= size;
 
     return buffer;
