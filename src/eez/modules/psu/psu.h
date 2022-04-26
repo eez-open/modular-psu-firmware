@@ -41,6 +41,8 @@
 /// Namespace for the everything from the EEZ.
 namespace eez {
 
+extern bool g_autoRecallFinished;
+
 extern TestResult g_masterTestResult;
 extern uint8_t g_numMasterErrors;
 static const size_t MASTER_ERROR_MESSAGE_SIZE = 100;

@@ -291,10 +291,8 @@ void boot() {
 
     g_bootTestSuccess &= testMaster();
 
-    if (!psu::autoRecall()) {
-        psu::psuReset();
-        psu::io_pins::refresh();
-    }
+    psu::psuReset();
+    psu::io_pins::refresh();
 
     // play beep if there is an error during boot procedure
     if (!g_bootTestSuccess) {

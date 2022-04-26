@@ -2,6 +2,8 @@
 build/emscripten
 build/linux
 build/win32
+build/.cmake
+build/CMakeFiles
 src/third_party/micropython/ports/bare-arm/build
 src/third_party/stm32_cubeide/Debug
 src/third_party/stm32_cubeide/Debug (FPGA)

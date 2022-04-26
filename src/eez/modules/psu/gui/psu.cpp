@@ -234,6 +234,9 @@ void PsuAppContext::stateManagment() {
 		}
 
 		if (!mp::isAutoStartEnabled()) {
+            if (activePageId == PAGE_ID_WELCOME) {
+                sendMessageToPsu(PSU_MESSAGE_AUTO_RECALL);
+            }
             showPage(getMainPageId());
 			return;
         }
