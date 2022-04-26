@@ -963,59 +963,39 @@ bool match(BufferedFileRead &file, unsigned int &result) {
 bool match(BufferedFileRead &file, float &result) {
     matchZeroOrMoreSpaces(file);
 
-    int c = file.peek();
-    if (c == -1) {
-        return false;
-    }
-
-    bool isNegative;
-    if (c == '-') {
-        file.read();
-        isNegative = true;
-        c = file.peek();
-    } else {
-        isNegative = false;
-    }
-
-    bool isFraction = false;
-    float fraction = 1.0;
-
-    long value = -1;
+    char str[64];
+    size_t i = 0;
 
     while (true) {
-        if (c == '.') {
-            if (isFraction) {
-                return false;
-            }
-            isFraction = true;
-        } else if (c >= '0' && c <= '9') {
-            if (value == -1) {
-                value = 0;
-            }
+        int c = file.peek();
 
-            value = value * 10 + c - '0';
-
-            if (isFraction) {
-                fraction *= 0.1f;
-            }
-        } else {
-            if (value == -1) {
+        if (isSpace(c) || c == -1) {
+            if (i == 0) {
                 return false;
             }
 
-            result = (float)value;
-            if (isNegative) {
-                result = -result;
-            }
-            if (isFraction) {
-                result *= fraction;
+            str[i] = 0;
+
+            char *endptr;
+            float value = strtof(str, &endptr);
+            if (endptr != str + i) {
+                return false;
             }
 
+            if (isNaN(value)) {
+                return false;
+            }
+
+            result = value;
             return true;
         }
 
+        if (i == sizeof(str) - 1) {
+            return false;
+        }
+
+        str[i++] = c;
         file.read();
-        c = file.peek();
     }
 }
 
