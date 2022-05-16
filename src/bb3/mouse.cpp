@@ -109,8 +109,8 @@ void updateDisplay() {
                     w = overlay->width;
                     h = overlay->height;
                 } else {
-                    w = g_foundWidgetAtMouse.widget->w;
-                    h = g_foundWidgetAtMouse.widget->h;
+                    w = g_foundWidgetAtMouse.w;
+                    h = g_foundWidgetAtMouse.h;
                 }
 
                 drawFocusFrame(g_foundWidgetAtMouse.x, g_foundWidgetAtMouse.y, w, h);

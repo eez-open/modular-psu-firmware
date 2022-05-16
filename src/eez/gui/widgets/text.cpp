@@ -34,8 +34,8 @@ namespace gui {
 void TextWidget_autoSize(TextWidget& widget) {
     const Style *style = getStyle(widget.style);
     font::Font font = styleGetFont(style);
-    widget.w = style->borderSizeLeft + style->paddingLeft + display::measureStr(static_cast<const char *>(widget.text), -1, font, 0) + style->borderSizeRight + style->paddingRight;
-    widget.h = style->borderSizeTop + style->paddingTop + font.getHeight() + style->borderSizeBottom + style->paddingBottom;
+    widget.width = style->borderSizeLeft + style->paddingLeft + display::measureStr(static_cast<const char *>(widget.text), -1, font, 0) + style->borderSizeRight + style->paddingRight;
+    widget.height = style->borderSizeTop + style->paddingTop + font.getHeight() + style->borderSizeBottom + style->paddingBottom;
 }
 
 bool TextWidgetState::updateState() {
@@ -72,7 +72,7 @@ void TextWidgetState::render() {
     if (text && text[0]) {
         drawText(
             text, -1,
-            widgetCursor.x, widgetCursor.y, (int)widget->w, (int)widget->h,
+            widgetCursor.x, widgetCursor.y, widgetCursor.w, widgetCursor.h,
             style,
             flags.active, flags.blinking, ignoreLuminosity,
             &overrideColor, &overrideBackgroundColor, &overrideActiveColor, &overrideActiveBackgroundColor
@@ -84,10 +84,10 @@ void TextWidgetState::render() {
                 int fullTextLength = strlen(fullText);
                 font::Font font = styleGetFont(style);
                 int fullTextWidth = display::measureStr(fullText, fullTextLength, font);
-                if (fullTextWidth <= widget->w) {
+                if (fullTextWidth <= widgetCursor.w) {
                     drawText(
                         fullText, fullTextLength,
-                        widgetCursor.x, widgetCursor.y, (int)widget->w, (int)widget->h,
+                        widgetCursor.x, widgetCursor.y, widgetCursor.w, widgetCursor.h,
                         style,
                         flags.active, flags.blinking, ignoreLuminosity,
                         &overrideColor, &overrideBackgroundColor, &overrideActiveColor, &overrideActiveBackgroundColor
@@ -101,7 +101,7 @@ void TextWidgetState::render() {
                     int iRight = strlen(fullText) - 1;
                     while (iLeft < iRight && textLength < (int)MAX_TEXT_LEN) {
                         int widthLeft = display::measureGlyph(fullText[iLeft], font);
-                        if (width + widthLeft > widget->w) {
+                        if (width + widthLeft > widgetCursor.w) {
                             break;
                         }
                         width += widthLeft;
@@ -109,7 +109,7 @@ void TextWidgetState::render() {
                         textLength++;
 
                         int widthRight = display::measureGlyph(fullText[iRight], font);
-                        if (width + widthRight > widget->w) {
+                        if (width + widthRight > widgetCursor.w) {
                             break;
                         }
                         width += widthRight;
@@ -124,7 +124,7 @@ void TextWidgetState::render() {
 
                     drawText(
                         text, textLength,
-                        widgetCursor.x, widgetCursor.y, (int)widget->w, (int)widget->h,
+                        widgetCursor.x, widgetCursor.y, widgetCursor.w, widgetCursor.h,
                         style,
                         flags.active, flags.blinking, ignoreLuminosity,
                         &overrideColor, &overrideBackgroundColor, &overrideActiveColor, &overrideActiveBackgroundColor
@@ -135,7 +135,7 @@ void TextWidgetState::render() {
                 const char *str = data.getString();
                 drawText(
                     str ? str : "", -1,
-                    widgetCursor.x, widgetCursor.y, (int)widget->w, (int)widget->h,
+                    widgetCursor.x, widgetCursor.y, widgetCursor.w, widgetCursor.h,
                     style,
                     flags.active, flags.blinking, ignoreLuminosity,
                     &overrideColor, &overrideBackgroundColor, &overrideActiveColor, &overrideActiveBackgroundColor
@@ -146,7 +146,7 @@ void TextWidgetState::render() {
             data.toText(text, sizeof(text));
             drawText(
                 text, -1,
-                widgetCursor.x, widgetCursor.y, (int)widget->w, (int)widget->h,
+                widgetCursor.x, widgetCursor.y, widgetCursor.w, widgetCursor.h,
                 style,
                 flags.active, flags.blinking, ignoreLuminosity,
                 &overrideColor, &overrideBackgroundColor, &overrideActiveColor, &overrideActiveBackgroundColor,

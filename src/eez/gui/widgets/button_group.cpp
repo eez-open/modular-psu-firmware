@@ -25,34 +25,37 @@
 namespace eez {
 namespace gui {
 
-void drawButtons(const Widget *widget, int x, int y, const Style *style, const Style *selectedStyle, int selectedButton, int count) {
-    if (widget->w > widget->h) {
+void drawButtons(const WidgetCursor &widgetCursor, const Style *style, const Style *selectedStyle, int selectedButton, int count) {
+    auto x = widgetCursor.x;
+    auto y = widgetCursor.y;
+
+    if (widgetCursor.w > widgetCursor.h) {
         // horizontal orientation
         display::setColor(style->backgroundColor);
-        display::fillRect(x, y, x + widget->w - 1, y + widget->h - 1);
+        display::fillRect(x, y, x + widgetCursor.w - 1, y + widgetCursor.h - 1);
 
-        int w = widget->w / count;
-        x += (widget->w - w * count) / 2;
-        int h = widget->h;
+        int w = widgetCursor.w / count;
+        x += (widgetCursor.w - w * count) / 2;
+        int h = widgetCursor.h;
         for (Cursor i = 0; i < count; i++) {
             char text[32];
 			WidgetCursor widgetCursor;
 			widgetCursor.cursor = i;
-            getLabel(widgetCursor, widget->data, text, 32);
+            getLabel(widgetCursor, widgetCursor.widget->data, text, 32);
             drawText(text, -1, x, y, w, h, i == selectedButton ? selectedStyle : style);
             x += w;
         }
     } else {
         // vertical orientation
-        int w = widget->w;
-        int h = widget->h / count;
+        int w = widgetCursor.w;
+        int h = widgetCursor.h / count;
 
-        int bottom = y + widget->h - 1;
-        int topPadding = (widget->h - h * count) / 2;
+        int bottom = y + widgetCursor.h - 1;
+        int topPadding = (widgetCursor.h - h * count) / 2;
 
         if (topPadding > 0) {
             display::setColor(style->backgroundColor);
-            display::fillRect(x, y, x + widget->w - 1, y + topPadding - 1);
+            display::fillRect(x, y, x + widgetCursor.w - 1, y + topPadding - 1);
 
             y += topPadding;
         }
@@ -65,12 +68,12 @@ void drawButtons(const Widget *widget, int x, int y, const Style *style, const S
 		for (Cursor i = 0; i < count; i++) {
             if (yOffset > 0) {
                 display::setColor(style->backgroundColor);
-                display::fillRect(x, y, x + widget->w - 1, y + yOffset - 1);
+                display::fillRect(x, y, x + widgetCursor.w - 1, y + yOffset - 1);
             }
 
             char text[32];
 			widgetCursor.cursor = i;
-            getLabel(widgetCursor, widget->data, text, 32);
+            getLabel(widgetCursor, widgetCursor.widget->data, text, 32);
             drawText(text, -1, x, y + yOffset, w, labelHeight, i == selectedButton ? selectedStyle: style);
 
             int b = y + yOffset + labelHeight;
@@ -79,13 +82,13 @@ void drawButtons(const Widget *widget, int x, int y, const Style *style, const S
 
             if (b < y) {
                 display::setColor(style->backgroundColor);
-                display::fillRect(x, b, x + widget->w - 1, y - 1);
+                display::fillRect(x, b, x + widgetCursor.w - 1, y - 1);
             }
         }
 
         if (y <= bottom) {
             display::setColor(style->backgroundColor);
-            display::fillRect(x, y, x + widget->w - 1, bottom);
+            display::fillRect(x, y, x + widgetCursor.w - 1, bottom);
         }
     }
 }
@@ -110,7 +113,7 @@ void ButtonGroupWidgetState::render() {
     const Style* style = getStyle(widget->style);
     const Style* selectedStyle = getStyle(widget->selectedStyle);
 
-    drawButtons(widget, widgetCursor.x, widgetCursor.y, style, selectedStyle, data.getInt(), count(widgetCursor, widget->data));
+    drawButtons(widgetCursor, style, selectedStyle, data.getInt(), count(widgetCursor, widget->data));
 }
 
 bool ButtonGroupWidgetState::hasOnTouch() {
@@ -124,14 +127,14 @@ void ButtonGroupWidgetState::onTouch(const WidgetCursor &widgetCursor, Event &to
         int count_ = count(widgetCursor, widget->data);
 
         int selectedButton;
-        if (widget->w > widget->h) {
-            int w = widget->w / count_;
-            int x = widgetCursor.x + (widget->w - w * count_) / 2;
+        if (widgetCursor.w > widgetCursor.h) {
+            int w = widgetCursor.w / count_;
+            int x = widgetCursor.x + (widgetCursor.w - w * count_) / 2;
 
             selectedButton = (touchEvent.x - x) / w;
         } else {
-            int h = widget->h / count_;
-            int y = widgetCursor.y + (widget->h - h * count_) / 2;
+            int h = widgetCursor.h / count_;
+            int y = widgetCursor.y + (widgetCursor.h - h * count_) / 2;
             selectedButton = (touchEvent.y - y) / h;
         }
 

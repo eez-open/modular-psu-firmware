@@ -49,7 +49,7 @@ void BitmapWidgetState::render() {
         if (data.getType() == VALUE_TYPE_POINTER) {
             auto image = (Image *)data.getVoidPointer();
             if (image) {
-                drawBitmap(image, widgetCursor.x, widgetCursor.y, (int)widget->w, (int)widget->h, style, flags.active);
+                drawBitmap(image, widgetCursor.x, widgetCursor.y, widgetCursor.w, widgetCursor.h, style, flags.active);
             }
             return;
         } else {
@@ -68,7 +68,7 @@ void BitmapWidgetState::render() {
         image.lineOffset = 0;
         image.pixels = (uint8_t *)bitmap->pixels;
 
-        drawBitmap(&image, widgetCursor.x, widgetCursor.y, (int)widget->w, (int)widget->h, style, flags.active);
+        drawBitmap(&image, widgetCursor.x, widgetCursor.y, widgetCursor.w, widgetCursor.h, style, flags.active);
     }
 }
 

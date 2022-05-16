@@ -71,7 +71,7 @@ void LayoutViewWidgetState::render() {
 	const WidgetCursor& widgetCursor = g_widgetCursor;
     auto widget = (const LayoutViewWidget *)widgetCursor.widget;
     const Style* style = getStyle(widget->style);
-    drawRectangle(widgetCursor.x, widgetCursor.y, (int)widget->w, (int)widget->h, style, flags.active);
+    drawRectangle(widgetCursor.x, widgetCursor.y, widgetCursor.w, widgetCursor.h, style, flags.active);
     // if (layout) {
     //     const Style* styleLayout = getStyle(layout->style);
     //     drawRectangle(widgetCursor.x, widgetCursor.y, (int)layout->w, (int)layout->h, styleLayout, flags.active);
@@ -114,40 +114,25 @@ void LayoutViewWidgetState::enumChildren() {
 
         auto &widgets = layout->widgets;
 
+        int containerOriginalWidth = layout->width;
+        int containerOriginalHeight = layout->height;
+        int containerWidth = widgetCursor.w;
+        int containerHeight = widgetCursor.h;
+
         if (
-            widgetCursor.widget->w != layout->w ||
-            widgetCursor.widget->h != layout->h
+            containerOriginalWidth != containerWidth ||
+            containerOriginalHeight != containerHeight
         ) {
-            Rect rectContainerOriginal = {
-                widgetCursor.x,
-                widgetCursor.y,
-                layout->w,
-                layout->h
-            };
-
-            Rect rectContainer;
-            rectContainer.x = widgetCursor.x;
-            rectContainer.y = widgetCursor.y;
-            rectContainer.w = widgetCursor.widget->w;
-            rectContainer.h = widgetCursor.widget->h;
-
             for (uint32_t index = 0; index < widgets.count; ++index) {
                 widgetCursor.widget = widgets[index];
-
-                Rect rectWidgetOriginal;
-                resizeWidget((Widget *)widgetCursor.widget, rectContainerOriginal, rectContainer, rectWidgetOriginal);
-                widgetCursor.rectWidgetOriginal = rectWidgetOriginal;
-
+                resizeWidget(widgetCursor, containerOriginalWidth, containerOriginalHeight, containerWidth, containerHeight);
                 enumWidget();
-
-                ((Widget *)widget)->x = rectWidgetOriginal.x;
-                ((Widget *)widget)->y = rectWidgetOriginal.y;
-                ((Widget *)widget)->w = rectWidgetOriginal.w;
-                ((Widget *)widget)->h = rectWidgetOriginal.h;
             }
         } else {
             for (uint32_t index = 0; index < widgets.count; ++index) {
                 widgetCursor.widget = widgets[index];
+                widgetCursor.w = widgetCursor.widget->width;
+                widgetCursor.h = widgetCursor.widget->height;
                 enumWidget();
             }
         }

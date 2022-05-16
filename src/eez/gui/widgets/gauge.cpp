@@ -136,19 +136,19 @@ void GaugeWidgetState::render() {
 	auto colorBorder = getColor16FromIndex(isActive ? style->activeColor : style->color);
 	auto colorBar = getColor16FromIndex(isActive ? barStyle->activeColor : barStyle->color);
 
-	auto xCenter = widget->w / 2;
-	auto yCenter = widget->h - 8;
+	auto xCenter = widgetCursor.w / 2;
+	auto yCenter = widgetCursor.h - 8;
 
 	// clear background
 	setColor(isActive ? style->activeBackgroundColor : style->backgroundColor);
-	fillRect(widgetCursor.x, widgetCursor.y, widgetCursor.x + widget->w - 1, widgetCursor.y + widget->h - 1);
+	fillRect(widgetCursor.x, widgetCursor.y, widgetCursor.x + widgetCursor.w - 1, widgetCursor.y + widgetCursor.h - 1);
 
 	// init AGG
 	display::AggDrawing aggDrawing;
 	display::aggInit(aggDrawing);
 	auto &graphics = aggDrawing.graphics;
 
-	graphics.clipBox(widgetCursor.x, widgetCursor.y, widgetCursor.x + widget->w, widgetCursor.y + widget->h);
+	graphics.clipBox(widgetCursor.x, widgetCursor.y, widgetCursor.x + widgetCursor.w, widgetCursor.y + widgetCursor.h);
 	graphics.translate(widgetCursor.x, widgetCursor.y);
 
 	// draw frame
@@ -159,8 +159,8 @@ void GaugeWidgetState::render() {
 		graphics.roundedRect(
 			style->borderSizeLeft / 2.0,
 			style->borderSizeLeft / 2.0,
-			widget->w - style->borderSizeLeft,
-			widget->h - style->borderSizeLeft,
+            widgetCursor.w - style->borderSizeLeft,
+            widgetCursor.h - style->borderSizeLeft,
 			style->borderRadiusTLX, style->borderRadiusTLY, style->borderRadiusTRX, style->borderRadiusTRY,
 			style->borderRadiusBRX, style->borderRadiusBRY, style->borderRadiusBLX, style->borderRadiusBLY
 		);
@@ -173,7 +173,7 @@ void GaugeWidgetState::render() {
 	static const int THRESHOLD_LINE_WIDTH = 2;
 
 	// draw border
-	auto radBorderOuter = (widget->w - PADDING_HORZ) / 2;
+	auto radBorderOuter = (widgetCursor.w - PADDING_HORZ) / 2;
 
 	auto BORDER_WIDTH = radBorderOuter / 3;
 	auto BAR_WIDTH = BORDER_WIDTH / 2;
@@ -187,7 +187,7 @@ void GaugeWidgetState::render() {
 	graphics.drawPath();
 
 	// draw bar
-	auto radBarOuter = (widget->w - PADDING_HORZ) / 2 - (BORDER_WIDTH - BAR_WIDTH) / 2;
+	auto radBarOuter = (widgetCursor.w - PADDING_HORZ) / 2 - (BORDER_WIDTH - BAR_WIDTH) / 2;
 	auto radBarInner = radBarOuter - BAR_WIDTH;
 	auto angle = remap(value, min, 180.0f, max, 0.0f);
 	graphics.resetPath();

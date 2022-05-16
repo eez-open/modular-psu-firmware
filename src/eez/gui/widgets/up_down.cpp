@@ -54,7 +54,7 @@ void UpDownWidgetState::render() {
     if (widget->downButtonText) {
         drawText(
             static_cast<const char *>(widget->downButtonText), -1,
-            widgetCursor.x, widgetCursor.y, buttonWidth, (int)widget->h,
+            widgetCursor.x, widgetCursor.y, buttonWidth, widgetCursor.h,
             buttonsStyle,
             flags.active && segment == UP_DOWN_WIDGET_SEGMENT_DOWN_BUTTON
         );
@@ -65,14 +65,14 @@ void UpDownWidgetState::render() {
     const Style *style = getStyle(widget->style);
     drawText(
         text, -1,
-        widgetCursor.x + buttonWidth, widgetCursor.y, (int)(widget->w - 2 * buttonWidth), (int)widget->h,
+        widgetCursor.x + buttonWidth, widgetCursor.y, (int)(widgetCursor.w - 2 * buttonWidth), widgetCursor.h,
         style
     );
 
     if (widget->upButtonText) {
         drawText(
             static_cast<const char *>(widget->upButtonText), -1, 
-            widgetCursor.x + widget->w - buttonWidth, widgetCursor.y, buttonWidth, (int)widget->h,
+            widgetCursor.x + widgetCursor.w - buttonWidth, widgetCursor.y, buttonWidth, widgetCursor.h,
             buttonsStyle,
             flags.active && segment == UP_DOWN_WIDGET_SEGMENT_UP_BUTTON
         );
@@ -114,10 +114,8 @@ bool UpDownWidgetState::hasOnTouch() {
 }
 
 void UpDownWidgetState::onTouch(const WidgetCursor &widgetCursor, Event &touchEvent) {
-    const Widget *widget = widgetCursor.widget;
-
     if (touchEvent.type == EVENT_TYPE_TOUCH_DOWN || touchEvent.type == EVENT_TYPE_AUTO_REPEAT) {
-        if (touchEvent.x < widgetCursor.x + widget->w / 2) {
+        if (touchEvent.x < widgetCursor.x + widgetCursor.w / 2) {
             upDown(widgetCursor, UP_DOWN_WIDGET_SEGMENT_DOWN_BUTTON);
         } else {
             upDown(widgetCursor, UP_DOWN_WIDGET_SEGMENT_UP_BUTTON);

@@ -2390,7 +2390,7 @@ float getDefaultAnimationDurationHook() {
     return psu::persist_conf::devConf.animationsDuration;
 }
 
-void executeExternalActionHook(const WidgetCursor &widgetCursor, int16_t actionId) {
+void executeExternalActionHook(const WidgetCursor &widgetCursor, int16_t actionId, void *param) {
     if (scripting::isFlowRunning()) {
         scripting::executeFlowAction(widgetCursor, actionId);
     } else {

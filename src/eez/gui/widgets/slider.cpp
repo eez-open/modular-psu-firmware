@@ -43,7 +43,7 @@ void SliderWidgetState::render() {
     const Style *style = getStyle(widget->style);
 
 	drawRectangle(
-		widgetCursor.x, widgetCursor.y, (int)widget->w, (int)widget->h,
+		widgetCursor.x, widgetCursor.y, widgetCursor.w, widgetCursor.h,
 		nullptr,
 		false,
 		false
@@ -51,8 +51,8 @@ void SliderWidgetState::render() {
 
     double x = widgetCursor.x + style->paddingLeft;
     double y = widgetCursor.y + style->paddingTop;
-    double w = widget->w - style->paddingLeft - style->paddingRight;
-    double h = widget->h - style->paddingTop - style->paddingBottom;
+    double w = widgetCursor.w - style->paddingLeft - style->paddingRight;
+    double h = widgetCursor.h - style->paddingTop - style->paddingBottom;
 
     double barX = x + h / 2.0;
     double barW = w - h;
@@ -95,8 +95,8 @@ void SliderWidgetState::onTouch(const WidgetCursor &widgetCursor, Event &touchEv
 	const Style *style = getStyle(widget->style);
 	
 	double x = widgetCursor.x + style->paddingLeft;
-    double w = widget->w - style->paddingLeft - style->paddingRight;
-    double h = widget->h - style->paddingTop - style->paddingBottom;
+    double w = widgetCursor.w - style->paddingLeft - style->paddingRight;
+    double h = widgetCursor.h - style->paddingTop - style->paddingBottom;
 
     double knobW = h;
 

@@ -5278,12 +5278,12 @@ void data_overlay(DataOperationEnum operation, const WidgetCursor &widgetCursor,
 					if (list::g_numChannelsWithVisibleCounters > 0) {
 						widgetOverrides[TITLE_LIST_ICON_WIDGET].isVisible = true;
 						widgetOverrides[TITLE_LIST_ICON_WIDGET].x = x;
-						x += titleListIconWidget->w;
+						x += titleListIconWidget->width;
 						widgetOverrides[TITLE_LIST_ICON_WIDGET].y = titleListIconWidget->y;
-						widgetOverrides[TITLE_LIST_ICON_WIDGET].w = titleListIconWidget->w;
-						widgetOverrides[TITLE_LIST_ICON_WIDGET].h = titleListIconWidget->h;
+						widgetOverrides[TITLE_LIST_ICON_WIDGET].w = titleListIconWidget->width;
+						widgetOverrides[TITLE_LIST_ICON_WIDGET].h = titleListIconWidget->height;
 
-						overlay.width += titleListIconWidget->w;
+						overlay.width += titleListIconWidget->width;
 					} else {
 						widgetOverrides[TITLE_LIST_ICON_WIDGET].isVisible = true;
 					}
@@ -5291,12 +5291,12 @@ void data_overlay(DataOperationEnum operation, const WidgetCursor &widgetCursor,
 					if (ramp::g_numChannelsWithVisibleCounters > 0) {
 						widgetOverrides[TITLE_RAMP_ICON_WIDGET].isVisible = true;
 						widgetOverrides[TITLE_RAMP_ICON_WIDGET].x = x;
-						x += titleRampIconWidget->w;
+						x += titleRampIconWidget->width;
 						widgetOverrides[TITLE_RAMP_ICON_WIDGET].y = titleRampIconWidget->y;
-						widgetOverrides[TITLE_RAMP_ICON_WIDGET].w = titleRampIconWidget->w;
-						widgetOverrides[TITLE_RAMP_ICON_WIDGET].h = titleRampIconWidget->h;
+						widgetOverrides[TITLE_RAMP_ICON_WIDGET].w = titleRampIconWidget->width;
+						widgetOverrides[TITLE_RAMP_ICON_WIDGET].h = titleRampIconWidget->height;
 
-						overlay.width += titleRampIconWidget->w;
+						overlay.width += titleRampIconWidget->width;
 					} else {
 						widgetOverrides[TITLE_RAMP_ICON_WIDGET].isVisible = false;
 					}
@@ -5304,12 +5304,12 @@ void data_overlay(DataOperationEnum operation, const WidgetCursor &widgetCursor,
 					if (isDlogVisible) {
 						widgetOverrides[TITLE_DLOG_ICON_WIDGET].isVisible = true;
 						widgetOverrides[TITLE_DLOG_ICON_WIDGET].x = x;
-						x += titleDlogIconWidget->w;
+						x += titleDlogIconWidget->width;
 						widgetOverrides[TITLE_DLOG_ICON_WIDGET].y = titleDlogIconWidget->y;
-						widgetOverrides[TITLE_DLOG_ICON_WIDGET].w = titleDlogIconWidget->w;
-						widgetOverrides[TITLE_DLOG_ICON_WIDGET].h = titleDlogIconWidget->h;
+						widgetOverrides[TITLE_DLOG_ICON_WIDGET].w = titleDlogIconWidget->width;
+						widgetOverrides[TITLE_DLOG_ICON_WIDGET].h = titleDlogIconWidget->height;
 
-						overlay.width += titleDlogIconWidget->w;
+						overlay.width += titleDlogIconWidget->width;
 					} else {
 						widgetOverrides[TITLE_DLOG_ICON_WIDGET].isVisible = false;
 					}
@@ -5317,12 +5317,12 @@ void data_overlay(DataOperationEnum operation, const WidgetCursor &widgetCursor,
 					if (isScriptVisible) {
 						widgetOverrides[TITLE_MP_ICON_WIDGET].isVisible = true;
 						widgetOverrides[TITLE_MP_ICON_WIDGET].x = x;
-						x += titleMpIconWidget->w;
+						x += titleMpIconWidget->width;
 						widgetOverrides[TITLE_MP_ICON_WIDGET].y = titleMpIconWidget->y;
-						widgetOverrides[TITLE_MP_ICON_WIDGET].w = titleMpIconWidget->w;
-						widgetOverrides[TITLE_MP_ICON_WIDGET].h = titleMpIconWidget->h;
+						widgetOverrides[TITLE_MP_ICON_WIDGET].w = titleMpIconWidget->width;
+						widgetOverrides[TITLE_MP_ICON_WIDGET].h = titleMpIconWidget->height;
 
-						overlay.width += titleMpIconWidget->w;
+						overlay.width += titleMpIconWidget->width;
 					} else {
 						widgetOverrides[TITLE_MP_ICON_WIDGET].isVisible = false;
 					}
@@ -5330,12 +5330,12 @@ void data_overlay(DataOperationEnum operation, const WidgetCursor &widgetCursor,
 					if (isFunctionGeneratorVisible) {
 						widgetOverrides[TITLE_FUNCGEN_ICON_WIDGET].isVisible = true;
 						widgetOverrides[TITLE_FUNCGEN_ICON_WIDGET].x = x;
-						x += titleFuncgenIconWidget->w;
+						x += titleFuncgenIconWidget->width;
 						widgetOverrides[TITLE_FUNCGEN_ICON_WIDGET].y = titleFuncgenIconWidget->y;
-						widgetOverrides[TITLE_FUNCGEN_ICON_WIDGET].w = titleFuncgenIconWidget->w;
-						widgetOverrides[TITLE_FUNCGEN_ICON_WIDGET].h = titleFuncgenIconWidget->h;
+						widgetOverrides[TITLE_FUNCGEN_ICON_WIDGET].w = titleFuncgenIconWidget->width;
+						widgetOverrides[TITLE_FUNCGEN_ICON_WIDGET].h = titleFuncgenIconWidget->height;
 
-						overlay.width += titleFuncgenIconWidget->w;
+						overlay.width += titleFuncgenIconWidget->width;
 					} else {
 						widgetOverrides[TITLE_FUNCGEN_ICON_WIDGET].isVisible = false;
 					}
@@ -5346,20 +5346,20 @@ void data_overlay(DataOperationEnum operation, const WidgetCursor &widgetCursor,
 
 					widgetOverrides[TITLE_MAX_ICON_WIDGET].isVisible = true;
 					widgetOverrides[TITLE_MAX_ICON_WIDGET].x = x;
-					x += titleMaxIconWidget->w;
+					x += titleMaxIconWidget->width;
 					widgetOverrides[TITLE_MAX_ICON_WIDGET].y = titleMaxIconWidget->y;
-					widgetOverrides[TITLE_MAX_ICON_WIDGET].w = titleMaxIconWidget->w;
-					widgetOverrides[TITLE_MAX_ICON_WIDGET].h = titleMaxIconWidget->h;
+					widgetOverrides[TITLE_MAX_ICON_WIDGET].w = titleMaxIconWidget->width;
+					widgetOverrides[TITLE_MAX_ICON_WIDGET].h = titleMaxIconWidget->height;
 
 					widgetOverrides[TITLE_HIDE_ICON_WIDGET].isVisible = true;
 					widgetOverrides[TITLE_HIDE_ICON_WIDGET].x = x;
-					x += titleHideIconWidget->w;
+					x += titleHideIconWidget->width;
 					widgetOverrides[TITLE_HIDE_ICON_WIDGET].y = titleHideIconWidget->y;
-					widgetOverrides[TITLE_HIDE_ICON_WIDGET].w = titleHideIconWidget->w;
-					widgetOverrides[TITLE_HIDE_ICON_WIDGET].h = titleHideIconWidget->h;
+					widgetOverrides[TITLE_HIDE_ICON_WIDGET].w = titleHideIconWidget->width;
+					widgetOverrides[TITLE_HIDE_ICON_WIDGET].h = titleHideIconWidget->height;
 
-					overlay.width = x + widgetCursor.widget->w - (titleHideIconWidget->x + titleHideIconWidget->w);
-					overlay.height = widgetCursor.widget->h - (widgetCursor.widget->h - (funcgenWidget->y + funcgenWidget->h));
+					overlay.width = x + widgetCursor.widget->width - (titleHideIconWidget->x + titleHideIconWidget->width);
+					overlay.height = widgetCursor.widget->height - (widgetCursor.widget->height - (funcgenWidget->y + funcgenWidget->height));
 				} else {
 					widgetOverrides[TITLE_LIST_ICON_WIDGET].isVisible = false;
 					widgetOverrides[TITLE_RAMP_ICON_WIDGET].isVisible = false;
@@ -5369,112 +5369,112 @@ void data_overlay(DataOperationEnum operation, const WidgetCursor &widgetCursor,
 
 					widgetOverrides[TITLE_MIN_ICON_WIDGET].isVisible = true;
 					widgetOverrides[TITLE_MIN_ICON_WIDGET].y = titleMinIconWidget->y;
-					widgetOverrides[TITLE_MIN_ICON_WIDGET].w = titleMinIconWidget->w;
-					widgetOverrides[TITLE_MIN_ICON_WIDGET].h = titleMinIconWidget->h;
+					widgetOverrides[TITLE_MIN_ICON_WIDGET].w = titleMinIconWidget->width;
+					widgetOverrides[TITLE_MIN_ICON_WIDGET].h = titleMinIconWidget->height;
 
 					widgetOverrides[TITLE_MAX_ICON_WIDGET].isVisible = false;
 
 					widgetOverrides[TITLE_HIDE_ICON_WIDGET].isVisible = true;
 					widgetOverrides[TITLE_HIDE_ICON_WIDGET].y = titleHideIconWidget->y;
-					widgetOverrides[TITLE_HIDE_ICON_WIDGET].w = titleHideIconWidget->w;
-					widgetOverrides[TITLE_HIDE_ICON_WIDGET].h = titleHideIconWidget->h;
+					widgetOverrides[TITLE_HIDE_ICON_WIDGET].w = titleHideIconWidget->width;
+					widgetOverrides[TITLE_HIDE_ICON_WIDGET].h = titleHideIconWidget->height;
 
-					overlay.width = widgetCursor.widget->w;
-					overlay.height = widgetCursor.widget->h;
+					overlay.width = widgetCursor.widget->width;
+					overlay.height = widgetCursor.widget->height;
 				}
 
 				if (!isMinimized && list::g_numChannelsWithVisibleCounters <= 1 && ramp::g_numChannelsWithVisibleCounters <= 1 && !isDlogVisible && !isScriptVisible && !isFunctionGeneratorVisible) {
-					overlay.width -= listGridWidget->w / 2;
+					overlay.width -= listGridWidget->width / 2;
 				}
 
 				if (!isMinimized && list::g_numChannelsWithVisibleCounters > 0) {
 					widgetOverrides[LIST_ICON_WIDGET].isVisible = true;
 					widgetOverrides[LIST_ICON_WIDGET].x = listIconWidget->x;
 					widgetOverrides[LIST_ICON_WIDGET].y = listIconWidget->y;
-					widgetOverrides[LIST_ICON_WIDGET].w = listIconWidget->w;
-					widgetOverrides[LIST_ICON_WIDGET].h = listIconWidget->h;
+					widgetOverrides[LIST_ICON_WIDGET].w = listIconWidget->width;
+					widgetOverrides[LIST_ICON_WIDGET].h = listIconWidget->height;
 
 					widgetOverrides[LIST_GRID_WIDGET].isVisible = true;
 					widgetOverrides[LIST_GRID_WIDGET].x = listGridWidget->x;
 					widgetOverrides[LIST_GRID_WIDGET].y = listGridWidget->y;
-					widgetOverrides[LIST_GRID_WIDGET].w = listGridWidget->w;
+					widgetOverrides[LIST_GRID_WIDGET].w = listGridWidget->width;
 
 					if (list::g_numChannelsWithVisibleCounters > 4) {
-						widgetOverrides[LIST_GRID_WIDGET].h = 3 * listGridWidget->h;
-						overlay.height += 2 * listGridWidget->h;
+						widgetOverrides[LIST_GRID_WIDGET].h = 3 * listGridWidget->height;
+						overlay.height += 2 * listGridWidget->height;
 					} else if (list::g_numChannelsWithVisibleCounters > 2) {
-						widgetOverrides[LIST_GRID_WIDGET].h = 2 * listGridWidget->h;
-						overlay.height += listGridWidget->h;
+						widgetOverrides[LIST_GRID_WIDGET].h = 2 * listGridWidget->height;
+						overlay.height += listGridWidget->height;
 					} else {
-						widgetOverrides[LIST_GRID_WIDGET].h = listGridWidget->h;
+						widgetOverrides[LIST_GRID_WIDGET].h = listGridWidget->height;
 						if (ramp::g_numChannelsWithVisibleCounters == 1) {
-							widgetOverrides[LIST_GRID_WIDGET].w = listGridWidget->w / 2;
+							widgetOverrides[LIST_GRID_WIDGET].w = listGridWidget->width / 2;
 						}
 					}
 				} else {
 					widgetOverrides[LIST_ICON_WIDGET].isVisible = false;
 					widgetOverrides[LIST_GRID_WIDGET].isVisible = false;
-					overlay.height -= listGridWidget->h;
+					overlay.height -= listGridWidget->height;
 				}
 
 				if (!isMinimized && ramp::g_numChannelsWithVisibleCounters > 0) {
 					widgetOverrides[RAMP_ICON_WIDGET].isVisible = true;
 					widgetOverrides[RAMP_ICON_WIDGET].x = rampIconWidget->x;
-					widgetOverrides[RAMP_ICON_WIDGET].y = overlay.height - (widgetCursor.widget->h - rampIconWidget->y);
-					widgetOverrides[RAMP_ICON_WIDGET].w = rampIconWidget->w;
-					widgetOverrides[RAMP_ICON_WIDGET].h = rampIconWidget->h;
+					widgetOverrides[RAMP_ICON_WIDGET].y = overlay.height - (widgetCursor.widget->height - rampIconWidget->y);
+					widgetOverrides[RAMP_ICON_WIDGET].w = rampIconWidget->width;
+					widgetOverrides[RAMP_ICON_WIDGET].h = rampIconWidget->height;
 
 					widgetOverrides[RAMP_GRID_WIDGET].isVisible = true;
 					widgetOverrides[RAMP_GRID_WIDGET].x = rampGridWidget->x;
-					widgetOverrides[RAMP_GRID_WIDGET].y = overlay.height - (widgetCursor.widget->h - rampGridWidget->y);
-					widgetOverrides[RAMP_GRID_WIDGET].w = rampGridWidget->w;
+					widgetOverrides[RAMP_GRID_WIDGET].y = overlay.height - (widgetCursor.widget->height - rampGridWidget->y);
+					widgetOverrides[RAMP_GRID_WIDGET].w = rampGridWidget->width;
 
 					if (ramp::g_numChannelsWithVisibleCounters > 4) {
-						widgetOverrides[RAMP_GRID_WIDGET].h = 3 * rampGridWidget->h;
-						overlay.height += 2 * rampGridWidget->h;
+						widgetOverrides[RAMP_GRID_WIDGET].h = 3 * rampGridWidget->height;
+						overlay.height += 2 * rampGridWidget->height;
 					} else if (ramp::g_numChannelsWithVisibleCounters > 2) {
-						widgetOverrides[RAMP_GRID_WIDGET].h = 2 * rampGridWidget->h;
-						overlay.height += rampGridWidget->h;
+						widgetOverrides[RAMP_GRID_WIDGET].h = 2 * rampGridWidget->height;
+						overlay.height += rampGridWidget->height;
 					} else {
-						widgetOverrides[RAMP_GRID_WIDGET].h = rampGridWidget->h;
+						widgetOverrides[RAMP_GRID_WIDGET].h = rampGridWidget->height;
 						if (ramp::g_numChannelsWithVisibleCounters == 1) {
-							widgetOverrides[RAMP_GRID_WIDGET].w = rampGridWidget->w / 2;
+							widgetOverrides[RAMP_GRID_WIDGET].w = rampGridWidget->width / 2;
 						}
 					}
 				} else {
 					widgetOverrides[RAMP_ICON_WIDGET].isVisible = false;
 					widgetOverrides[RAMP_GRID_WIDGET].isVisible = false;
-					overlay.height -= rampGridWidget->h;
+					overlay.height -= rampGridWidget->height;
 				}
 
 				if (!isMinimized && isDlogVisible) {
 					widgetOverrides[DLOG_INFO_WIDGET].isVisible = true;
 					widgetOverrides[DLOG_INFO_WIDGET].x = dlogInfoWidget->x;
-					widgetOverrides[DLOG_INFO_WIDGET].y = overlay.height - (widgetCursor.widget->h - dlogInfoWidget->y);
-					widgetOverrides[DLOG_INFO_WIDGET].w = dlogInfoWidget->w;
-					widgetOverrides[DLOG_INFO_WIDGET].h = dlogInfoWidget->h;
+					widgetOverrides[DLOG_INFO_WIDGET].y = overlay.height - (widgetCursor.widget->height - dlogInfoWidget->y);
+					widgetOverrides[DLOG_INFO_WIDGET].w = dlogInfoWidget->width;
+					widgetOverrides[DLOG_INFO_WIDGET].h = dlogInfoWidget->height;
 				} else {
 					widgetOverrides[DLOG_INFO_WIDGET].isVisible = false;
-					overlay.height -= dlogInfoWidget->h;
+					overlay.height -= dlogInfoWidget->height;
 				}
 
 				if (!isMinimized && isScriptVisible) {
 					widgetOverrides[SCRIPT_INFO_WIDGET].isVisible = true;
 					widgetOverrides[SCRIPT_INFO_WIDGET].x = scriptInfoWidget->x;
-					widgetOverrides[SCRIPT_INFO_WIDGET].y = overlay.height - (widgetCursor.widget->h - scriptInfoWidget->y);
-					widgetOverrides[SCRIPT_INFO_WIDGET].w = scriptInfoWidget->w;
-					widgetOverrides[SCRIPT_INFO_WIDGET].h = scriptInfoWidget->h;
+					widgetOverrides[SCRIPT_INFO_WIDGET].y = overlay.height - (widgetCursor.widget->height - scriptInfoWidget->y);
+					widgetOverrides[SCRIPT_INFO_WIDGET].w = scriptInfoWidget->width;
+					widgetOverrides[SCRIPT_INFO_WIDGET].h = scriptInfoWidget->height;
 				} else {
 					widgetOverrides[SCRIPT_INFO_WIDGET].isVisible = false;
-					overlay.height -= scriptInfoWidget->h;
+					overlay.height -= scriptInfoWidget->height;
 				}
 
 				if (!isMinimized && isFunctionGeneratorVisible) {
 					widgetOverrides[FUNCGEN_WIDGET].isVisible = true;
 					widgetOverrides[FUNCGEN_WIDGET].x = funcgenWidget->x;
-					widgetOverrides[FUNCGEN_WIDGET].y = overlay.height - (widgetCursor.widget->h - funcgenWidget->y);
-					widgetOverrides[FUNCGEN_WIDGET].w = funcgenWidget->w;
-					widgetOverrides[FUNCGEN_WIDGET].h = funcgenWidget->h;
+					widgetOverrides[FUNCGEN_WIDGET].y = overlay.height - (widgetCursor.widget->height - funcgenWidget->y);
+					widgetOverrides[FUNCGEN_WIDGET].w = funcgenWidget->width;
+					widgetOverrides[FUNCGEN_WIDGET].h = funcgenWidget->height;
 
 					if (isDC) {
 						overlay.height -= 24;
@@ -5484,15 +5484,15 @@ void data_overlay(DataOperationEnum operation, const WidgetCursor &widgetCursor,
 					}
 				} else {
 					widgetOverrides[FUNCGEN_WIDGET].isVisible = false;
-					overlay.height -= funcgenWidget->h;
+					overlay.height -= funcgenWidget->height;
 				}
 
 				overlay.x = 480 - overlay.width;
 				overlay.y = 240 - overlay.height;
 
 				if (!isMinimized) {
-					widgetOverrides[TITLE_MIN_ICON_WIDGET].x = overlay.width - (widgetCursor.widget->w - titleMaxIconWidget->x);
-					widgetOverrides[TITLE_HIDE_ICON_WIDGET].x = overlay.width - (widgetCursor.widget->w - titleHideIconWidget->x);
+					widgetOverrides[TITLE_MIN_ICON_WIDGET].x = overlay.width - (widgetCursor.widget->width - titleMaxIconWidget->x);
+					widgetOverrides[TITLE_HIDE_ICON_WIDGET].x = overlay.width - (widgetCursor.widget->width - titleHideIconWidget->x);
 				}
 			}
 

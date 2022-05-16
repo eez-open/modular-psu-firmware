@@ -977,7 +977,7 @@ void data_event_queue_event_long_message_overlay(DataOperationEnum operation, co
                 int height = MIN(
 					measureMultilineText(
 						getEventMessage(selectedEvent), 
-						0, 0, multiLineTextWidget->w, INT_MAX,
+						0, 0, multiLineTextWidget->width, INT_MAX,
 						style, 0, 0
 					) + style->paddingTop + style->paddingBottom + style->borderSizeTop + style->borderSizeBottom,
 					CONF_EVENTS_LIST_HEIGHT_PX
@@ -993,7 +993,7 @@ void data_event_queue_event_long_message_overlay(DataOperationEnum operation, co
 
 				overlay.x = 0;
 				overlay.y = overlayYOffset;
-                overlay.width = widgetCursor.widget->w;
+                overlay.width = widgetCursor.widget->width;
                 overlay.height = height;
 
                 widgetOverrides[MULTI_LINE_TEXT_WIDGET].isVisible = true;

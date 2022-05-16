@@ -146,7 +146,7 @@ void DisplayDataWidgetState::render() {
 
     drawText(
         start, length,
-        widgetCursor.x, widgetCursor.y, (int)widget->w, (int)widget->h,
+        widgetCursor.x, widgetCursor.y, widgetCursor.w, widgetCursor.h,
         style,
         flags.active, flags.blinking, false,
         &color, &backgroundColor, &activeColor, &activeBackgroundColor,
@@ -203,7 +203,7 @@ int DISPLAY_DATA_getCharIndexAtPosition(int xPos, const WidgetCursor &widgetCurs
 
     int xScroll = getXScroll(widgetCursor);
 
-    return getCharIndexAtPosition(xPos, start, length, widgetCursor.x - xScroll, widgetCursor.y, (int)widget->w, (int)widget->h, style);
+    return getCharIndexAtPosition(xPos, start, length, widgetCursor.x - xScroll, widgetCursor.y, widgetCursor.w, widgetCursor.h, style);
 }
 
 int DISPLAY_DATA_getCursorXPosition(int cursorPosition, const WidgetCursor &widgetCursor) {
@@ -251,7 +251,7 @@ int DISPLAY_DATA_getCursorXPosition(int cursorPosition, const WidgetCursor &widg
         length--;
     }
 
-    return getCursorXPosition(cursorPosition, start, length, widgetCursor.x, widgetCursor.y, (int)widget->w, (int)widget->h, style);
+    return getCursorXPosition(cursorPosition, start, length, widgetCursor.x, widgetCursor.y, widgetCursor.w, widgetCursor.h, style);
 }
 
 } // namespace gui

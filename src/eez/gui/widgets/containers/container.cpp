@@ -54,15 +54,13 @@ void ContainerWidgetState::render() {
 
     const WidgetCursor &widgetCursor = g_widgetCursor;
 
-	auto widget = (const ContainerWidget *)widgetCursor.widget;
-
 	displayBufferIndex = -1;
 	if (overlay) {
 		displayBufferIndex = display::beginBufferRendering();
 	}
 
 	drawRectangle(
-		widgetCursor.x, widgetCursor.y, (int)widget->w, (int)widget->h,
+		widgetCursor.x, widgetCursor.y, widgetCursor.w, widgetCursor.h,
 		getStyle(styleId), flags.active
 	);
 
@@ -131,22 +129,24 @@ void ContainerWidgetState::enumChildren() {
 			if (widgetOverrides) {
 				xSaved = widgetCursor.widget->x;
 				ySaved = widgetCursor.widget->y;
-				wSaved = widgetCursor.widget->w;
-				hSaved = widgetCursor.widget->h;
+				wSaved = widgetCursor.widget->width;
+				hSaved = widgetCursor.widget->height;
 
 				((Widget*)widgetCursor.widget)->x = widgetOverrides->x;
 				((Widget*)widgetCursor.widget)->y = widgetOverrides->y;
-				((Widget*)widgetCursor.widget)->w = widgetOverrides->w;
-				((Widget*)widgetCursor.widget)->h = widgetOverrides->h;
+				((Widget*)widgetCursor.widget)->width = widgetOverrides->w;
+				((Widget*)widgetCursor.widget)->height = widgetOverrides->h;
 			}
 
+            widgetCursor.w = widgetCursor.widget->width;
+            widgetCursor.h = widgetCursor.widget->height;
 			enumWidget();
 
 			if (widgetOverrides) {
 				((Widget*)widgetCursor.widget)->x = xSaved;
 				((Widget*)widgetCursor.widget)->y = ySaved;
-				((Widget*)widgetCursor.widget)->w = wSaved;
-				((Widget*)widgetCursor.widget)->h = hSaved;
+				((Widget*)widgetCursor.widget)->width = wSaved;
+				((Widget*)widgetCursor.widget)->height = hSaved;
 
 				widgetOverrides++;
 			}
@@ -157,34 +157,25 @@ void ContainerWidgetState::enumChildren() {
     } else {
 		auto &widgets = widget->widgets;
 
+        int containerOriginalWidth = widget->width;
+        int containerOriginalHeight = widget->height;
+        int containerWidth = widgetCursor.w;
+        int containerHeight = widgetCursor.h;
+
         if (
-            widgetCursor.widget->w != widgetCursor.rectWidgetOriginal.w ||
-            widgetCursor.widget->h != widgetCursor.rectWidgetOriginal.h
+            containerOriginalWidth != containerWidth ||
+            containerOriginalHeight != containerHeight
         ) {
-            Rect rectContainerOriginal = widgetCursor.rectWidgetOriginal;
-
-            Rect rectContainer;
-            rectContainer.x = widgetCursor.x;
-            rectContainer.y = widgetCursor.y;
-            rectContainer.w = widgetCursor.widget->w;
-            rectContainer.h = widgetCursor.widget->h;
-
             for (uint32_t index = 0; index < widgets.count; ++index) {
                 widgetCursor.widget = widgets[index];
-
-                Rect rectWidgetOriginal;
-                resizeWidget((Widget *)widgetCursor.widget, rectContainerOriginal, rectContainer, rectWidgetOriginal);
-
+                resizeWidget(widgetCursor, containerOriginalWidth, containerOriginalHeight, containerWidth, containerHeight);
                 enumWidget();
-
-                ((Widget *)widget)->x = rectWidgetOriginal.x;
-                ((Widget *)widget)->y = rectWidgetOriginal.y;
-                ((Widget *)widget)->w = rectWidgetOriginal.w;
-                ((Widget *)widget)->h = rectWidgetOriginal.h;
             }
         } else {
             for (uint32_t index = 0; index < widgets.count; ++index) {
                 widgetCursor.widget = widgets[index];
+                widgetCursor.w = widgetCursor.widget->width;
+                widgetCursor.h = widgetCursor.widget->height;
                 enumWidget();
             }
         }
@@ -201,8 +192,8 @@ void ContainerWidgetState::enumChildren() {
 				displayBufferIndex,
 				widgetCursor.x,
 				widgetCursor.y,
-				overlay ? overlay->width : widget->w,
-				overlay ? overlay->height : widget->h,
+				overlay ? overlay->width : widgetCursor.w,
+				overlay ? overlay->height : widgetCursor.h,
 				(widget->flags & SHADOW_FLAG) != 0,
 				style->opacity,
 				xOffset,

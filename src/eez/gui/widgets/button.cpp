@@ -53,14 +53,14 @@ void ButtonWidgetState::render() {
     
     if (widget->data) {
         if (data.isString()) {
-            drawText(data.getString(), -1, widgetCursor.x, widgetCursor.y, (int)widget->w, (int)widget->h, style, flags.active, flags.blinking);
+            drawText(data.getString(), -1, widgetCursor.x, widgetCursor.y, widgetCursor.w, widgetCursor.h, style, flags.active, flags.blinking);
         } else {
             char text[MAX_TEXT_LEN + 1];
             data.toText(text, sizeof(text));
-            drawText(text, -1, widgetCursor.x, widgetCursor.y, (int)widget->w, (int)widget->h, style, flags.active, flags.blinking);
+            drawText(text, -1, widgetCursor.x, widgetCursor.y, widgetCursor.w, widgetCursor.h, style, flags.active, flags.blinking);
         }
     } else if (widget->text) {
-        drawText(static_cast<const char *>(widget->text), -1, widgetCursor.x, widgetCursor.y, (int)widget->w, (int)widget->h, style, flags.active, flags.blinking);
+        drawText(static_cast<const char *>(widget->text), -1, widgetCursor.x, widgetCursor.y, widgetCursor.w, widgetCursor.h, style, flags.active, flags.blinking);
     }
 }
 

@@ -53,8 +53,8 @@ void updateScreen() {
 		g_rootWidget->action = ACTION_ID_NONE;
 		g_rootWidget->x = 0;
 		g_rootWidget->y = 0;
-		g_rootWidget->w = display::getDisplayWidth();
-		g_rootWidget->h = display::getDisplayHeight();
+		g_rootWidget->width = display::getDisplayWidth();
+		g_rootWidget->height = display::getDisplayHeight();
 		g_rootWidget->style = 0;
 	}
 
@@ -83,6 +83,9 @@ void updateScreen() {
 
 	g_foundWidgetAtDownInvalid = false;
 
+    g_widgetCursor.w = g_rootWidget->width;
+    g_widgetCursor.h = g_rootWidget->height;
+
     enumWidget();
 
 	g_widgetStateEnd = g_widgetCursor.currentState;
@@ -108,6 +111,9 @@ void enumRootWidget() {
 	g_widgetCursor.currentState = g_widgetStateStart;
 	g_widgetCursor.refreshed = false;
 	g_widgetCursor.hasPreviousState = true;
+
+    g_widgetCursor.w = g_rootWidget->width;
+    g_widgetCursor.h = g_rootWidget->height;
 
     enumWidget();
 }

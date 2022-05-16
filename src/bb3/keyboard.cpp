@@ -59,7 +59,7 @@ void updateDisplay() {
     if (g_lastFocusWidgetCursor) {
         display::drawFocusFrame(
             g_lastFocusWidgetCursor.x, g_lastFocusWidgetCursor.y, 
-            g_lastFocusWidgetCursor.widget->w, g_lastFocusWidgetCursor.widget->h
+            g_lastFocusWidgetCursor.w, g_lastFocusWidgetCursor.h
         );
     }
 }

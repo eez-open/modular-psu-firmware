@@ -281,7 +281,7 @@ void AppContext::onPageTouch(const WidgetCursor &foundWidget, Event &touchEvent)
     if (activePageId != PAGE_ID_NONE && !isPageInternal(activePageId)) {
         auto page = getPageAsset(activePageId);
         if ((page->flags & CLOSE_PAGE_IF_TOUCHED_OUTSIDE_FLAG) != 0) {
-            if (!pointInsideRect(touchEvent.x, touchEvent.y, foundWidget.appContext->rect.x + page->x, foundWidget.appContext->rect.y + page->y, page->w, page->h)) {
+            if (!pointInsideRect(touchEvent.x, touchEvent.y, foundWidget.appContext->rect.x + page->x, foundWidget.appContext->rect.y + page->y, page->width, page->height)) {
                 int activePageId = getActivePageId();
 
                 // clicked outside page, close page
@@ -324,6 +324,9 @@ void AppContext::updatePage(int i, WidgetCursor &widgetCursor) {
 		height = internalPage->height;
 		withShadow = true;
 
+        widgetCursor.w = width;
+        widgetCursor.h = height;
+
 		if (g_findCallback == nullptr) {
 			internalPage->updateInternalPage();
 		}
@@ -333,45 +336,34 @@ void AppContext::updatePage(int i, WidgetCursor &widgetCursor) {
         auto page = getPageAsset(m_pageNavigationStack[i].pageId, widgetCursor);
 
         if (page->flags & PAGE_SCALE_TO_FIT) {
-            widgetCursor.rectWidgetOriginal.x = page->x;
-            widgetCursor.rectWidgetOriginal.y = page->y;
-            widgetCursor.rectWidgetOriginal.w = page->w;
-            widgetCursor.rectWidgetOriginal.h = page->h;
-
 		    x = rect.x;
 		    y = rect.y;
 		    width = rect.w;
 		    height = rect.h;
-
-            ((PageAsset *)page)->x = 0;
-            ((PageAsset *)page)->y = 0;
-            ((PageAsset *)page)->w = width;
-            ((PageAsset *)page)->h = height;
 
 		    withShadow = false;
 
             auto savedWidget = widgetCursor.widget;
             widgetCursor.widget = page;
 
+            widgetCursor.w = page->width;
+            widgetCursor.h = page->height;
             enumWidget();
 
             widgetCursor.widget = savedWidget;
-
-            ((PageAsset *)page)->x = widgetCursor.rectWidgetOriginal.x;
-            ((PageAsset *)page)->y = widgetCursor.rectWidgetOriginal.y;
-            ((PageAsset *)page)->w = widgetCursor.rectWidgetOriginal.w;
-            ((PageAsset *)page)->h = widgetCursor.rectWidgetOriginal.h;
         } else {
             x = widgetCursor.x + page->x;
             y = widgetCursor.y + page->y;
-            width = page->w;
-            height = page->h;
+            width = page->width;
+            height = page->height;
 
 		    withShadow = page->x > 0;
 
             auto savedWidget = widgetCursor.widget;
             widgetCursor.widget = page;
 
+            widgetCursor.w = page->width;
+            widgetCursor.h = page->height;
             enumWidget();
 
             widgetCursor.widget = savedWidget;
@@ -409,8 +401,8 @@ void AppContext::getPageRect(int pageId, Page *page, int &x, int &y, int &w, int
         } else {
             x = page->x;
             y = page->y;
-            w = page->w;
-            h = page->h;
+            w = page->width;
+            h = page->height;
         }
     }
 }

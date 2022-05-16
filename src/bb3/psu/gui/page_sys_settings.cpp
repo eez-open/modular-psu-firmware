@@ -1376,7 +1376,7 @@ void SysSettingsRampAndDelayPage::draw(const WidgetCursor &widgetCursor) {
 
     const Widget *widget = widgetCursor.widget;
     const Style* style = getStyle(widget->style);
-    drawRectangle(widgetCursor.x, widgetCursor.y, (int)widget->w, (int)widget->h, style);
+    drawRectangle(widgetCursor.x, widgetCursor.y, widgetCursor.w, widgetCursor.h, style);
 
     float drawVoltageRamps = (g_focusDataId != DATA_ID_CHANNEL_I_TRIGGER_VALUE && g_focusDataId != DATA_ID_CHANNEL_CURRENT_RAMP_DURATION);
     float T = 1E-3f;
@@ -1416,12 +1416,12 @@ void SysSettingsRampAndDelayPage::drawRamp(const WidgetCursor &widgetCursor, int
     float step = (drawVoltageRamps ? triggerVoltage[channelIndex] : triggerCurrent[channelIndex]);
 
     int x1 = widgetCursor.x;
-    int x2 = x1 + (int)roundf(delay * (widget->w - 1) / T);
-    int x3 = x1 + (int)roundf((delay + duration)  * (widget->w - 1) / T);
-    int x4 = widgetCursor.x + widget->w - 1;
+    int x2 = x1 + (int)roundf(delay * (widgetCursor.w - 1) / T);
+    int x3 = x1 + (int)roundf((delay + duration)  * (widgetCursor.w - 1) / T);
+    int x4 = widgetCursor.x + widgetCursor.w - 1;
 
-    int y1 = widgetCursor.y + widget->h - 1;
-    int y2 = y1 - (int)roundf(step * (widget->h - 1) / limit);
+    int y1 = widgetCursor.y + widgetCursor.h - 1;
+    int y2 = y1 - (int)roundf(step * (widgetCursor.h - 1) / limit);
 
     y1 -= yOffset;
     y2 -= yOffset;
@@ -1442,7 +1442,7 @@ void SysSettingsRampAndDelayPage::drawRamp(const WidgetCursor &widgetCursor, int
         int textWidth = display::measureStr(label, -1, font, 0);
         display::drawStr(label, -1,
             x4 - textWidth, y2 - textHeight > widgetCursor.y ? y2 - textHeight : y2,
-            widgetCursor.x, widgetCursor.y, widgetCursor.x + widget->w - 1, widgetCursor.y + widget->h - 1,
+            widgetCursor.x, widgetCursor.y, widgetCursor.x + widgetCursor.w - 1, widgetCursor.y + widgetCursor.h - 1,
             font, -1
         );
     }

@@ -754,7 +754,7 @@ bool do_OPERATION_TYPE_FLOW_LANGUAGES(EvalStack &stack) {
 
     auto array = arrayValue.getArray();
 
-    for (int i = 0; i < languages.count; i++) {
+    for (uint32_t i = 0; i < languages.count; i++) {
         array->values[i] = Value((const char *)(languages[i]->languageID));
     }
 
@@ -773,9 +773,9 @@ bool do_OPERATION_TYPE_FLOW_TRANSLATE(EvalStack &stack) {
     int languageIndex = g_selectedLanguage;
 
     auto languages = stack.flowState->assets->languages;
-    if (languageIndex >= 0 && languageIndex < languages.count) {
+    if (languageIndex >= 0 && languageIndex < (int)languages.count) {
         auto translations = languages[languageIndex]->translations;
-        if (textResourceIndex >= 0 && textResourceIndex < translations.count) {
+        if (textResourceIndex >= 0 && textResourceIndex < (int)translations.count) {
             if (!stack.push(translations[textResourceIndex])) {
                 return false;
             }

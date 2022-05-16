@@ -54,8 +54,7 @@ void ListGraphWidgetState::render() {
 
     // draw background
     display::setColor(style->backgroundColor);
-    display::fillRect(widgetCursor.x, widgetCursor.y, widgetCursor.x + (int)widget->w - 1,
-                        widgetCursor.y + (int)widget->h - 1);
+    display::fillRect(widgetCursor.x, widgetCursor.y, widgetCursor.x + widgetCursor.w - 1, widgetCursor.y + widgetCursor.h - 1);
 
     int dwellListLength = getFloatListLength(widgetCursor, widget->dwellData);
     if (dwellListLength > 0) {
@@ -99,19 +98,19 @@ void ListGraphWidgetState::render() {
             int x1 = xPrev;
             int x2;
             if (i == maxListLength - 1) {
-                x2 = widgetCursor.x + (int)widget->w - 1;
+                x2 = widgetCursor.x + widgetCursor.w - 1;
             } else {
-                x2 = widgetCursor.x + int(currentDwellSum * (int)widget->w / dwellSum);
+                x2 = widgetCursor.x + int(currentDwellSum * widgetCursor.w / dwellSum);
             }
             if (x2 < x1)
                 x2 = x1;
-            if (x2 >= widgetCursor.x + (int)widget->w)
-                x2 = widgetCursor.x + (int)widget->w - 1;
+            if (x2 >= widgetCursor.x + widgetCursor.w)
+                x2 = widgetCursor.x + widgetCursor.w - 1;
 
             if (i == iRow) {
                 display::setColor(cursorStyle->backgroundColor);
                 display::fillRect(x1, widgetCursor.y, x2 - 1,
-                    widgetCursor.y + (int)widget->h - 1);
+                    widgetCursor.y + widgetCursor.h - 1);
             }
 
 
@@ -122,13 +121,13 @@ void ListGraphWidgetState::render() {
                     display::setColor(styles[j]->color);
 
                     float value = i < listLength[j] ? list[j][i] : list[j][listLength[j] - 1];
-                    int y = int((value - min[j]) * widget->h / (max[j] - min[j]));
+                    int y = int((value - min[j]) * widgetCursor.h / (max[j] - min[j]));
                     if (y < 0)
                         y = 0;
-                    if (y >= (int)widget->h)
-                        y = (int)widget->h - 1;
+                    if (y >= widgetCursor.h)
+                        y = widgetCursor.h - 1;
 
-                    y = widgetCursor.y + ((int)widget->h - 1) - y;
+                    y = widgetCursor.y + (widgetCursor.h - 1) - y;
 
                     if (i > 0 && abs(yPrev[j] - y) > 1) {
                         if (yPrev[j] < y) {
@@ -157,10 +156,10 @@ void ListGraphWidgetState::onTouch(const WidgetCursor &widgetCursor, Event &touc
     if (touchEvent.type == EVENT_TYPE_TOUCH_DOWN || touchEvent.type == EVENT_TYPE_TOUCH_MOVE) {
         auto widget = (const ListGraphWidget *)widgetCursor.widget;
 
-        if (touchEvent.x < widgetCursor.x || touchEvent.x >= widgetCursor.x + (int)widget->w) {
+        if (touchEvent.x < widgetCursor.x || touchEvent.x >= widgetCursor.x + widgetCursor.w) {
             return;
         }
-        if (touchEvent.y < widgetCursor.y || touchEvent.y >= widgetCursor.y + (int)widget->h) {
+        if (touchEvent.y < widgetCursor.y || touchEvent.y >= widgetCursor.y + widgetCursor.h) {
             return;
         }
 
@@ -189,14 +188,14 @@ void ListGraphWidgetState::onTouch(const WidgetCursor &widgetCursor, Event &touc
                 int x1 = xPrev;
                 int x2;
                 if (i == maxListLength - 1) {
-                    x2 = widgetCursor.x + (int)widget->w - 1;
+                    x2 = widgetCursor.x + widgetCursor.w - 1;
                 } else {
-                    x2 = widgetCursor.x + int(currentDwellSum * (int)widget->w / dwellSum);
+                    x2 = widgetCursor.x + int(currentDwellSum * widgetCursor.w / dwellSum);
                 }
                 if (x2 < x1)
                     x2 = x1;
-                if (x2 >= widgetCursor.x + (int)widget->w)
-                    x2 = widgetCursor.x + (int)widget->w - 1;
+                if (x2 >= widgetCursor.x + widgetCursor.w)
+                    x2 = widgetCursor.x + widgetCursor.w - 1;
 
                 if (touchEvent.x >= x1 && touchEvent.x < x2) {
                     int iCurrentCursor =

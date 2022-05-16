@@ -215,8 +215,8 @@ void ToastMessagePage::init(AppContext *appContext, ToastType type, const Value&
     containerRectangleWidget.flags.invertColors = 1;
 	containerRectangleWidget.x = 0;
 	containerRectangleWidget.y = 0;
-	containerRectangleWidget.w = width;
-	containerRectangleWidget.h = height;
+	containerRectangleWidget.width = width;
+	containerRectangleWidget.height = height;
 
     int yText = style->paddingTop;
 
@@ -228,8 +228,8 @@ void ToastMessagePage::init(AppContext *appContext, ToastType type, const Value&
     line1Widget.flags = 0;
     line1Widget.x = style->paddingLeft + (textWidth - line1Width) / 2;
     line1Widget.y = yText;
-    line1Widget.w = line1Width;
-    line1Widget.h = textHeight;
+    line1Widget.width = line1Width;
+    line1Widget.height = textHeight;
 
     yText += textHeight;
 
@@ -242,8 +242,8 @@ void ToastMessagePage::init(AppContext *appContext, ToastType type, const Value&
         line2Widget.flags = 0;
         line2Widget.x = style->paddingLeft + (textWidth - line2Width) / 2;
         line2Widget.y = yText;
-        line2Widget.w = line2Width;
-        line2Widget.h = textHeight;
+        line2Widget.width = line2Width;
+        line2Widget.height = textHeight;
 
         yText += textHeight;
 
@@ -256,8 +256,8 @@ void ToastMessagePage::init(AppContext *appContext, ToastType type, const Value&
             line3Widget.flags = 0;
             line3Widget.x = style->paddingLeft + (textWidth - line3Width) / 2;
             line3Widget.y = yText;
-            line3Widget.w = line3Width;
-            line3Widget.h = textHeight;
+            line3Widget.width = line3Width;
+            line3Widget.height = textHeight;
 
             yText += textHeight;
         } else {
@@ -275,8 +275,8 @@ void ToastMessagePage::init(AppContext *appContext, ToastType type, const Value&
         actionWidget.text = actionLabel;
         actionWidget.x = style->paddingLeft + (textWidth - actionLabelWidth) / 2;
         actionWidget.y = style->paddingTop + yText;
-        actionWidget.w = actionLabelWidth;
-        actionWidget.h = actionLabelHeight;
+        actionWidget.width = actionLabelWidth;
+        actionWidget.height = actionLabelHeight;
 
 		yText += textHeight;
     } else {
@@ -296,12 +296,13 @@ void ToastMessagePage::updateInternalPage() {
 
     lastActiveWidget = g_activeWidget;
 
-    auto savedWidgetCursor = g_widgetCursor;
-    g_widgetCursor = widgetCursor;
+    auto savedWidgetCursor = widgetCursor;
 
     widgetCursor.widget = &containerRectangleWidget;
     widgetCursor.x = x + containerRectangleWidget.x;
     widgetCursor.y = y + containerRectangleWidget.y;
+    widgetCursor.w = containerRectangleWidget.width;
+    widgetCursor.h = containerRectangleWidget.height;
     RectangleWidgetState rectangleWidgetState;
     rectangleWidgetState.flags.active = 0;
     rectangleWidgetState.render();
@@ -318,18 +319,24 @@ void ToastMessagePage::updateInternalPage() {
     widgetCursor.widget = &line1Widget;
     widgetCursor.x = x + line1Widget.x;
     widgetCursor.y = y + line1Widget.y;
+    widgetCursor.w = line1Widget.width;
+    widgetCursor.h = line1Widget.height;
     textWidgetState.render();
 
     if (line2Widget.type == WIDGET_TYPE_TEXT) {
         widgetCursor.widget = &line2Widget;
         widgetCursor.x = x + line2Widget.x;
         widgetCursor.y = y + line2Widget.y;
+        widgetCursor.w = line2Widget.width;
+        widgetCursor.h = line2Widget.height;
         textWidgetState.render();
 
         if (line3Widget.type == WIDGET_TYPE_TEXT) {
             widgetCursor.widget = &line3Widget;
             widgetCursor.x = x + line3Widget.x;
             widgetCursor.y = y + line3Widget.y;
+            widgetCursor.w = line3Widget.width;
+            widgetCursor.h = line3Widget.height;
             textWidgetState.render();
         }
     }
@@ -344,7 +351,8 @@ void ToastMessagePage::updateInternalPage() {
 		widgetCursor.widget = &actionWidget;
         widgetCursor.x = x + actionWidget.x;
         widgetCursor.y = y + actionWidget.y;
-
+        widgetCursor.w = actionWidget.width;
+        widgetCursor.h = actionWidget.height;
         buttonWidgetState.render();
     }
 
@@ -352,7 +360,7 @@ void ToastMessagePage::updateInternalPage() {
 	    widgetCursor.popBackground();
     }
 
-	g_widgetCursor = savedWidgetCursor;
+	widgetCursor = savedWidgetCursor;
 }
 
 WidgetCursor ToastMessagePage::findWidgetInternalPage(int x, int y, bool clicked) {
@@ -361,8 +369,8 @@ WidgetCursor ToastMessagePage::findWidgetInternalPage(int x, int y, bool clicked
         auto yActionWidget = this->y + actionWidget.y;
 
         if (
-            x >= xActionWidget && x < xActionWidget + actionWidget.w && 
-            y >= yActionWidget && y < yActionWidget + actionWidget.h
+            x >= xActionWidget && x < xActionWidget + actionWidget.width && 
+            y >= yActionWidget && y < yActionWidget + actionWidget.height
         ) {
 			WidgetCursor widgetCursor = g_widgetCursor;
 			widgetCursor.appContext = appContext;
@@ -600,14 +608,14 @@ bool SelectFromEnumPage::calcSize() {
 void SelectFromEnumPage::findPagePosition() {
     const WidgetCursor &widgetCursorAtTouchDown = getFoundWidgetAtDown();
     if (widgetCursorAtTouchDown.widget) {
-        x = widgetCursorAtTouchDown.x + widgetCursorAtTouchDown.widget->w - width;
+        x = widgetCursorAtTouchDown.x + widgetCursorAtTouchDown.w - width;
         int xMargin = MAX(MIN(22, (appContext->rect.w - width) / 2), 0);
         int right = appContext->rect.x + appContext->rect.w - xMargin;
         if (x + width > right) {
             x = right - width;
         }
 
-        y = widgetCursorAtTouchDown.y + widgetCursorAtTouchDown.widget->h;
+        y = widgetCursorAtTouchDown.y + widgetCursorAtTouchDown.h;
         int yMargin = MAX(MIN(30, (appContext->rect.h - height) / 2), 0);
         int bottom = appContext->rect.y + appContext->rect.h - yMargin;
         if (y + height > bottom) {
@@ -772,13 +780,13 @@ void MenuWithButtonsPage::init(AppContext *appContext, const char *message, cons
 
     int maxMenuItemWidth = 0;
     for (size_t i = 0; i < m_numButtonTextWidgets; i++) {
-        maxMenuItemWidth = MAX(maxMenuItemWidth, m_buttonTextWidgets[i].w);
+        maxMenuItemWidth = MAX(maxMenuItemWidth, m_buttonTextWidgets[i].width);
     }
 
     int menuItemsWidth = maxMenuItemWidth * m_numButtonTextWidgets + (m_numButtonTextWidgets - 1) * styleButton->paddingLeft;
 
-    int contentWidth = MAX(m_messageTextWidget.w, menuItemsWidth);
-    int contentHeight = m_messageTextWidget.h + m_buttonTextWidgets[0].h;
+    int contentWidth = MAX(m_messageTextWidget.width, menuItemsWidth);
+    int contentHeight = m_messageTextWidget.height + m_buttonTextWidgets[0].height;
 
     width = styleContainer->borderSizeLeft + styleContainer->paddingLeft + contentWidth + styleContainer->paddingRight + styleContainer->borderSizeRight;
     height = styleContainer->borderSizeTop + styleContainer->paddingTop + contentHeight + styleContainer->paddingBottom + styleContainer->borderSizeBottom;
@@ -788,32 +796,33 @@ void MenuWithButtonsPage::init(AppContext *appContext, const char *message, cons
 
     m_containerRectangleWidget.x = 0;
     m_containerRectangleWidget.y = 0;
-    m_containerRectangleWidget.w = width;
-    m_containerRectangleWidget.h = height;
+    m_containerRectangleWidget.width = width;
+    m_containerRectangleWidget.height = height;
 
-    m_messageTextWidget.x = styleContainer->borderSizeLeft + styleContainer->paddingLeft + (contentWidth - m_messageTextWidget.w) / 2;
+    m_messageTextWidget.x = styleContainer->borderSizeLeft + styleContainer->paddingLeft + (contentWidth - m_messageTextWidget.width) / 2;
     m_messageTextWidget.y = styleContainer->borderSizeTop + styleContainer->paddingTop;
 
     int xButtonTextWidget = styleContainer->borderSizeLeft + styleContainer->paddingLeft + (contentWidth - menuItemsWidth) / 2;
-    int yButtonTextWidget = styleContainer->borderSizeTop + styleContainer->paddingTop + m_messageTextWidget.h;
+    int yButtonTextWidget = styleContainer->borderSizeTop + styleContainer->paddingTop + m_messageTextWidget.height;
     for (size_t i = 0; i < m_numButtonTextWidgets; i++) {
         m_buttonTextWidgets[i].x = xButtonTextWidget;
         m_buttonTextWidgets[i].y = yButtonTextWidget;
-        m_buttonTextWidgets[i].w = maxMenuItemWidth;
+        m_buttonTextWidgets[i].width = maxMenuItemWidth;
         xButtonTextWidget += maxMenuItemWidth + styleButton->paddingLeft;
     }
 
 }
 
 void MenuWithButtonsPage::updateInternalPage() {
-    WidgetCursor widgetCursor = g_widgetCursor;
+    WidgetCursor &widgetCursor = g_widgetCursor;
 
-    auto savedWidgetCursor = g_widgetCursor;
-    g_widgetCursor = widgetCursor;
+    auto savedWidgetCursor = widgetCursor;
 
     widgetCursor.widget = &m_containerRectangleWidget;
     widgetCursor.x = x + m_containerRectangleWidget.x;
     widgetCursor.y = y + m_containerRectangleWidget.y;
+    widgetCursor.w = m_containerRectangleWidget.width;
+    widgetCursor.h = m_containerRectangleWidget.height;
     RectangleWidgetState rectangleWidgetState;
     rectangleWidgetState.flags.active = 0;
     rectangleWidgetState.render();
@@ -825,6 +834,8 @@ void MenuWithButtonsPage::updateInternalPage() {
     widgetCursor.widget = &m_messageTextWidget;
     widgetCursor.x = x + m_messageTextWidget.x;
     widgetCursor.y = y + m_messageTextWidget.y;
+    widgetCursor.w = m_messageTextWidget.width;
+    widgetCursor.h = m_messageTextWidget.height;
     TextWidgetState textWidgetState;
     textWidgetState.flags.active = 0;
 	textWidgetState.flags.blinking = 0;
@@ -835,6 +846,8 @@ void MenuWithButtonsPage::updateInternalPage() {
         widgetCursor.widget = &m_buttonTextWidgets[i];
         widgetCursor.x = x + m_buttonTextWidgets[i].x;
         widgetCursor.y = y + m_buttonTextWidgets[i].y;
+        widgetCursor.w = m_buttonTextWidgets[i].width;
+        widgetCursor.h = m_buttonTextWidgets[i].height;
         widgetCursor.cursor = i;
 		TextWidgetState textWidgetState;
 		textWidgetState.flags.active = widgetCursor == g_activeWidget;
@@ -847,7 +860,7 @@ void MenuWithButtonsPage::updateInternalPage() {
 	    widgetCursor.popBackground();
     }
 
-    g_widgetCursor = savedWidgetCursor;
+    widgetCursor = savedWidgetCursor;
 }
 
 WidgetCursor MenuWithButtonsPage::findWidgetInternalPage(int x, int y, bool clicked) {
@@ -858,10 +871,12 @@ WidgetCursor MenuWithButtonsPage::findWidgetInternalPage(int x, int y, bool clic
         widgetCursor.widget = &m_buttonTextWidgets[i];
         widgetCursor.x = this->x + m_buttonTextWidgets[i].x;
         widgetCursor.y = this->y + m_buttonTextWidgets[i].y;
+        widgetCursor.w = m_buttonTextWidgets[i].width;
+        widgetCursor.h = m_buttonTextWidgets[i].height;
         widgetCursor.cursor = i;
         if (
-            x >= widgetCursor.x && x < widgetCursor.x + m_buttonTextWidgets[i].w && 
-            y >= widgetCursor.y && y < widgetCursor.y + m_buttonTextWidgets[i].h
+            x >= widgetCursor.x && x < widgetCursor.x + widgetCursor.w &&
+            y >= widgetCursor.y && y < widgetCursor.y + widgetCursor.h
         ) {
             return widgetCursor;
         }

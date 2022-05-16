@@ -97,7 +97,7 @@ void stopFlowScript() {
 
 void executeFlowAction(const WidgetCursor &widgetCursor, int16_t actionId) {
 	if (isFlowRunning()) {
-		flow::executeFlowAction(widgetCursor, actionId);
+		flow::executeFlowAction(widgetCursor, actionId, nullptr);
 	}
 }
 

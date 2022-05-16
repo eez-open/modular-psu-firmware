@@ -125,8 +125,8 @@ struct WidgetV2 {
 	int16_t action;
 	int16_t x;
 	int16_t y;
-	int16_t w;
-	int16_t h;
+	int16_t width;
+	int16_t height;
 	uint16_t style;
 	uint32_t specific;
 };
@@ -272,8 +272,8 @@ static uint32_t convertWidget(WidgetV2 &widgetV2) {
 	widgetV3.action = widgetV2.action;
 	widgetV3.x = widgetV2.x;
 	widgetV3.y = widgetV2.y;
-	widgetV3.w = widgetV2.w;
-	widgetV3.h = widgetV2.h;
+	widgetV3.width = widgetV2.width;
+	widgetV3.height = widgetV2.height;
 	widgetV3.style = widgetV2.style;
 
 	auto specificV2 = (uint8_t *)g_documentV2 + widgetV2.specific;

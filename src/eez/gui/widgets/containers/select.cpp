@@ -47,7 +47,7 @@ void SelectWidgetState::render() {
 	auto widget = (const SelectWidget *)widgetCursor.widget;
 
 	drawRectangle(
-		widgetCursor.x, widgetCursor.y, (int)widget->w, (int)widget->h,
+		widgetCursor.x, widgetCursor.y, widgetCursor.w, widgetCursor.h,
 		getStyle(widget->style), false
 	);
 	
@@ -77,6 +77,8 @@ void SelectWidgetState::enumChildren() {
 		auto savedWidget = widgetCursor.widget;
 		widgetCursor.widget = widget->widgets[widgetIndex];
 
+        widgetCursor.w = widgetCursor.widget->width;
+        widgetCursor.h = widgetCursor.widget->height;
         enumWidget();
 
 		widgetCursor.widget = savedWidget;

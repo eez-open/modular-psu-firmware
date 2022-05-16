@@ -41,7 +41,7 @@ void ProgressWidgetState::render() {
     auto widget = (const ProgressWidget *)widgetCursor.widget;
     const Style* style = getStyle(widget->style);
 
-    drawRectangle(widgetCursor.x, widgetCursor.y, (int)widget->w, (int)widget->h, style);
+    drawRectangle(widgetCursor.x, widgetCursor.y, widgetCursor.w, widgetCursor.h, style);
 
     int percentFrom;
     int percentTo;
@@ -59,15 +59,15 @@ void ProgressWidgetState::render() {
         percentFrom = percentTo;
     }
 
-    auto isHorizontal = widget->w > widget->h;
+    auto isHorizontal = widgetCursor.w > widgetCursor.h;
     if (isHorizontal) {
-        auto xFrom = percentFrom * widget->w / 100;
-        auto xTo = percentTo * widget->w / 100;
-        drawRectangle(widgetCursor.x + xFrom, widgetCursor.y, xTo - xFrom, (int)widget->h, style, true);
+        auto xFrom = percentFrom * widgetCursor.w / 100;
+        auto xTo = percentTo * widgetCursor.w / 100;
+        drawRectangle(widgetCursor.x + xFrom, widgetCursor.y, xTo - xFrom, widgetCursor.h, style, true);
     } else {
-        auto yFrom = percentFrom * widget->h / 100;
-        auto yTo = percentTo * widget->h / 100;
-        drawRectangle(widgetCursor.x, widgetCursor.y - yFrom, yTo - yFrom, (int)widget->h, getStyle(widget->style), true);
+        auto yFrom = percentFrom * widgetCursor.h / 100;
+        auto yTo = percentTo * widgetCursor.h / 100;
+        drawRectangle(widgetCursor.x, widgetCursor.y - yFrom, yTo - yFrom, widgetCursor.h, getStyle(widget->style), true);
     }
 }
 

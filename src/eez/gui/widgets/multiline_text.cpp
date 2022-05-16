@@ -46,22 +46,23 @@ void MultilineTextWidgetState::render() {
 
     if (widget->data) {
         if (data.isString()) {
-            drawMultilineText(data.getString(), widgetCursor.x,
-                widgetCursor.y, (int)widget->w, (int)widget->h, style,
+            drawMultilineText(data.getString(), 
+                widgetCursor.x, widgetCursor.y, widgetCursor.w, widgetCursor.h, 
+                style,
                 flags.active, flags.blinking,
                 widget->firstLineIndent, widget->hangingIndent);
         } else {
             char text[64];
             data.toText(text, sizeof(text));
-            drawMultilineText(text, widgetCursor.x, widgetCursor.y, (int)widget->w,
-                (int)widget->h, style,
+            drawMultilineText(text, widgetCursor.x, widgetCursor.y, widgetCursor.w, widgetCursor.h,
+                style,
                 flags.active, flags.blinking,
                 widget->firstLineIndent, widget->hangingIndent);
         }
     } else if (widget->text) {
         drawMultilineText(
             static_cast<const char *>(widget->text), 
-            widgetCursor.x, widgetCursor.y, (int)widget->w, (int)widget->h,
+            widgetCursor.x, widgetCursor.y, widgetCursor.w, widgetCursor.h,
             style, flags.active, flags.blinking,
             widget->firstLineIndent, widget->hangingIndent);
     }

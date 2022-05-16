@@ -42,8 +42,8 @@ void AppViewWidgetState::enumChildren() {
 
     appContext->rect.x = widgetCursor.x;
     appContext->rect.y = widgetCursor.y;
-    appContext->rect.w = widgetCursor.widget->w;
-    appContext->rect.h = widgetCursor.widget->h;
+    appContext->rect.w = widgetCursor.w;
+    appContext->rect.h = widgetCursor.h;
 
 	auto savedAppContext = widgetCursor.appContext;
     widgetCursor.appContext = appContext;

@@ -54,34 +54,39 @@ void GridWidgetState::enumChildren() {
 
         Value oldValue;
 
+        auto width = widgetCursor.w;
+        auto height = widgetCursor.h;
+
         for (int index = startPosition; index < count; ++index) {
             select(widgetCursor, widget->data, index, oldValue);
 
 			widgetCursor.x = savedX + xOffset;
 			widgetCursor.y = savedY + yOffset;
+            widgetCursor.w = childWidget->width;
+            widgetCursor.h = childWidget->height;
 
 			widgetCursor.pushIterator(index);
             enumWidget();
 			widgetCursor.popIterator();
 
             if (widget->gridFlow == GRID_FLOW_ROW) {
-                if (xOffset + childWidget->w < widget->w) {
-                    xOffset += childWidget->w;
+                if (xOffset + childWidget->width < width) {
+                    xOffset += childWidget->width;
                 } else {
-                    if (yOffset + childWidget->h < widget->h) {
-                        yOffset += childWidget->h;
+                    if (yOffset + childWidget->height < height) {
+                        yOffset += childWidget->height;
                         xOffset = 0;
                     } else {
                         break;
                     }
                 }
             } else {
-                if (yOffset + childWidget->h < widget->h) {
-                    yOffset += childWidget->h;
+                if (yOffset + childWidget->height < height) {
+                    yOffset += childWidget->height;
                 } else {
-                    if (xOffset + childWidget->w < widget->w) {
+                    if (xOffset + childWidget->width < width) {
                         yOffset = 0;
-                        xOffset += childWidget->w;
+                        xOffset += childWidget->width;
                     } else {
                         break;
                     }

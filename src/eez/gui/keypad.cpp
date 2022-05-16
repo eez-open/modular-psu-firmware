@@ -256,10 +256,10 @@ int Keypad::getXScroll(const WidgetCursor &widgetCursor) {
     
     x -= widgetCursor.x;
 
-    if (x < m_xScroll + widgetCursor.widget->w / 4) {
-        m_xScroll = MAX(x - widgetCursor.widget->w / 2, 0);
-    } else if (m_xScroll + widgetCursor.widget->w < x + CURSOR_WIDTH) {
-        m_xScroll = x + CURSOR_WIDTH - widgetCursor.widget->w;
+    if (x < m_xScroll + widgetCursor.w / 4) {
+        m_xScroll = MAX(x - widgetCursor.w / 2, 0);
+    } else if (m_xScroll + widgetCursor.w < x + CURSOR_WIDTH) {
+        m_xScroll = x + CURSOR_WIDTH - widgetCursor.w;
     }
 
     return m_xScroll;

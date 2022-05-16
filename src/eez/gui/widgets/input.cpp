@@ -196,7 +196,7 @@ void InputWidgetState::render() {
 
 	drawText(
 		text, -1,
-		widgetCursor.x, widgetCursor.y, (int)widget->w, (int)widget->h,
+		widgetCursor.x, widgetCursor.y, widgetCursor.w, widgetCursor.h,
 		style,
 		flags.active, flags.blinking, false,
 		&overrideColor, &overrideBackgroundColor, &overrideActiveColor, &overrideActiveBackgroundColor,

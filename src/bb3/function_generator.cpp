@@ -421,7 +421,7 @@ public:
 	void draw(const WidgetCursor &widgetCursor) {
 		const Widget *widget = widgetCursor.widget;
 		const Style* style = getStyle(widget->style);
-		drawRectangle(widgetCursor.x, widgetCursor.y, (int)widget->w, (int)widget->h, style);
+		drawRectangle(widgetCursor.x, widgetCursor.y, widgetCursor.w, widgetCursor.h, style);
 
 		int D;
 		if (m_selectedResources.m_numResources <= 2) {
@@ -596,7 +596,7 @@ public:
 		float range = max - min;
 
 		int xLeft = widgetCursor.x;
-		int yBottom = widgetCursor.y + widget->h - 1;
+		int yBottom = widgetCursor.y + widgetCursor.h - 1;
 
 		int yPrev1 = 0;
 		int yPrev2 = 0;
@@ -604,9 +604,9 @@ public:
 		float ytMin = getMin(waveformParameters);
 		float ytMax = getMax(waveformParameters);
 
-		for (int xOffset = 0; xOffset < widget->w; xOffset++) {
-			float t1 = xOffset * T / widget->w;
-			float t2 = (xOffset + 1) * T / widget->w;
+		for (int xOffset = 0; xOffset < widgetCursor.w; xOffset++) {
+			float t1 = xOffset * T / widgetCursor.w;
+			float t2 = (xOffset + 1) * T / widgetCursor.w;
 
 			float fi1 = (2 * frequency * t1 + phaseShift / 180.0f) * M_PI_F;
 			float fi2 = (2 * frequency * t2 + phaseShift / 180.0f) * M_PI_F;
@@ -639,8 +639,8 @@ public:
 
 			int xNext = xLeft + xOffset;
 			
-			int yNext1 = yBottom - roundf((yt1 - min) / range * widget->h) - yOffset;
-			int yNext2 = yBottom - roundf((yt2 - min) / range * widget->h) - yOffset;
+			int yNext1 = yBottom - roundf((yt1 - min) / range * widgetCursor.h) - yOffset;
+			int yNext2 = yBottom - roundf((yt2 - min) / range * widgetCursor.h) - yOffset;
 
 			if (yNext1 > yNext2) {
 				auto temp = yNext2;
@@ -674,9 +674,9 @@ public:
 			const char *label = g_slots[slotIndex]->getFunctionGeneratorResourceLabel(subchannelIndex, resourceIndex);
 			int textWidth = display::measureStr(label, -1, font, 0);
 
-			int yText = yBottom - roundf(((ytMin + ytMax) / 2 - min) / range * widget->h) - yOffset;
+			int yText = yBottom - roundf(((ytMin + ytMax) / 2 - min) / range * widgetCursor.h) - yOffset;
 			
-			int x1 = xLeft + widget->w - textWidth;
+			int x1 = xLeft + widgetCursor.w - textWidth;
 			int y1 = yText - textHeight > widgetCursor.y ? yText - textHeight : yText;
 			int x2 = x1 + textWidth - 1;
 			int y2 = y1 + textHeight - 1;
@@ -687,7 +687,7 @@ public:
 			display::setColor(COLOR_ID_CHANNEL1);
 			display::drawStr(label, -1,
 				x1, y1,
-				widgetCursor.x, widgetCursor.y, widgetCursor.x + widget->w - 1, widgetCursor.y + widget->h - 1,
+				widgetCursor.x, widgetCursor.y, widgetCursor.x + widgetCursor.w - 1, widgetCursor.y + widgetCursor.h - 1,
 				font, -1
 			);
 		}
@@ -2958,8 +2958,8 @@ void data_function_generator_preview_overlay(DataOperationEnum operation, const 
         overlay.state = g_selectedResources.m_numResources > 0;
         
         WidgetCursor &widgetCursor = *(WidgetCursor *)value.getVoidPointer();
-        overlay.width = widgetCursor.widget->w;
-        overlay.height = widgetCursor.widget->h;
+        overlay.width = widgetCursor.widget->width;
+        overlay.height = widgetCursor.widget->height;
         
         overlay.x = widgetCursor.widget->x;
         overlay.y = widgetCursor.widget->y;

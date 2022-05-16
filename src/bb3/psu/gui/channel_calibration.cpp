@@ -99,8 +99,8 @@ void drawCalibrationChart(calibration::CalibrationBase &calibrationBase, const W
 
     int x = widgetCursor.x;
     int y = widgetCursor.y;
-    int w = (int)widget->w;
-    int h = (int)widget->h;
+    int w = widgetCursor.w;
+    int h = widgetCursor.h;
 
     drawRectangle(x, y, w, h, style);
 

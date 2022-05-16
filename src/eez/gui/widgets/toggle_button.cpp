@@ -47,7 +47,7 @@ void ToggleButtonWidgetState::render() {
         drawText(
             static_cast<const char *>(text),
             -1,
-            widgetCursor.x, widgetCursor.y, (int)widget->w, (int)widget->h,
+            widgetCursor.x, widgetCursor.y, widgetCursor.w, widgetCursor.h,
             style,
             flags.active
         );

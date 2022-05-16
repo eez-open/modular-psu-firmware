@@ -2843,7 +2843,7 @@ enum PagesEnum {
     PAGE_ID_DIB_MUX14D_RELAY_CYCLES = 231
 };
 
-extern const uint8_t assets[314617];
+extern const uint8_t assets[316707];
 
 #elif defined(EEZ_PLATFORM_SIMULATOR)
 
@@ -5738,7 +5738,7 @@ enum PagesEnum {
     PAGE_ID_DIB_MUX14D_RELAY_CYCLES = 243
 };
 
-extern const uint8_t assets[428832];
+extern const uint8_t assets[430857];
 
 #endif
 

@@ -44,8 +44,8 @@ void DropDownListWidgetState::render() {
 
     int x1 = widgetCursor.x;
     int y1 = widgetCursor.y;
-    int x2 = widgetCursor.x + widget->w - 1;
-    int y2 = widgetCursor.y + widget->h - 1;
+    int x2 = widgetCursor.x + widgetCursor.w - 1;
+    int y2 = widgetCursor.y + widgetCursor.h - 1;
 
     drawBorderAndBackground(x1, y1, x2, y2, style, flags.active ? style->activeBackgroundColor : style->backgroundColor, false);
 

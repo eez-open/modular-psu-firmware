@@ -53,26 +53,32 @@ void ListWidgetState::enumChildren() {
 
         Value oldValue;
 
+        auto width = widgetCursor.w;
+        auto height = widgetCursor.h;
+
         for (int index = startPosition; index < count; ++index) {
             select(widgetCursor, widget->data, index, oldValue);
 
+            widgetCursor.w = childWidget->width;
+            widgetCursor.h = childWidget->height;
+
             if (widget->listType == LIST_TYPE_VERTICAL) {
-                if (offset < widget->h) {
+                if (offset < height) {
 					widgetCursor.y = savedY + offset;
 					widgetCursor.pushIterator(index);
                     enumWidget();
 					widgetCursor.popIterator();
-                    offset += childWidget->h + widget->gap;
+                    offset += childWidget->height + widget->gap;
                 } else {
                     break;
                 }
             } else {
-                if (offset < widget->w) {
+                if (offset < width) {
 					widgetCursor.x = savedX + offset;
 					widgetCursor.pushIterator(index);
                     enumWidget();
 					widgetCursor.popIterator();
-                    offset += childWidget->w + widget->gap;
+                    offset += childWidget->width + widget->gap;
                 } else {
                     break;
                 }

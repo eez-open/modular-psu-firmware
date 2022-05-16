@@ -2311,7 +2311,7 @@ void data_recording(DataOperationEnum operation, const WidgetCursor &widgetCurso
 				cursorPosition = VIEW_WIDTH - CURSOR_REGION_SIZE_WIDTH / 2;
 			}
 			g_dragState.positionAtTouchDown = cursorPosition - touchDrag->x;
-			bool dragCursor = (abs((long)g_dragState.positionAtTouchDown) < CURSOR_REGION_SIZE_WIDTH / 2) && (touchDrag->y > (touchDrag->widgetCursor.widget->h - CURSOR_REGION_SIZE_HEIGHT));
+			bool dragCursor = (abs((long)g_dragState.positionAtTouchDown) < CURSOR_REGION_SIZE_WIDTH / 2) && (touchDrag->y > (touchDrag->widgetCursor.widget->height - CURSOR_REGION_SIZE_HEIGHT));
 			if (dragCursor) {
 				g_dragState.dragObject = DRAG_CURSOR;
 				g_hooks.setFocusCursor(WidgetCursor(), DATA_ID_RECORDING);
@@ -2463,16 +2463,16 @@ void data_dlog_multiple_values_overlay(DataOperationEnum operation, const Widget
                 widgetOverrides[LABELS_CONTAINER_WIDGET].isVisible = true;
                 widgetOverrides[LABELS_CONTAINER_WIDGET].x = labelsContainerWidget->x;
                 widgetOverrides[LABELS_CONTAINER_WIDGET].y = labelsContainerWidget->y;
-                widgetOverrides[LABELS_CONTAINER_WIDGET].w = labelsContainerWidget->w;
-                widgetOverrides[LABELS_CONTAINER_WIDGET].h = labelsContainerWidget->h;
+                widgetOverrides[LABELS_CONTAINER_WIDGET].w = labelsContainerWidget->width;
+                widgetOverrides[LABELS_CONTAINER_WIDGET].h = labelsContainerWidget->height;
 
                 widgetOverrides[DLOG_VALUES_LIST_WIDGET].isVisible = true;
                 widgetOverrides[DLOG_VALUES_LIST_WIDGET].x = dlogValuesListWidget->x;
                 widgetOverrides[DLOG_VALUES_LIST_WIDGET].y = dlogValuesListWidget->y;
-                widgetOverrides[DLOG_VALUES_LIST_WIDGET].w = dlogValuesListWidget->w;
-                widgetOverrides[DLOG_VALUES_LIST_WIDGET].h = numVisibleDlogValues * dlogValuesListWidget->h;
+                widgetOverrides[DLOG_VALUES_LIST_WIDGET].w = dlogValuesListWidget->width;
+                widgetOverrides[DLOG_VALUES_LIST_WIDGET].h = numVisibleDlogValues * dlogValuesListWidget->height;
 
-                overlay.width = widgetCursor.widget->w;
+                overlay.width = widgetCursor.widget->width;
                 overlay.height = widgetOverrides[LABELS_CONTAINER_WIDGET].h + widgetOverrides[DLOG_VALUES_LIST_WIDGET].h;
 
                 overlay.x = 40;
@@ -2494,8 +2494,8 @@ void data_dlog_single_value_overlay(DataOperationEnum operation, const WidgetCur
         overlay.state = !persist_conf::devConf.viewFlags.dlogViewDrawerIsOpen && isSingleValueOverlay(recording);
         
         WidgetCursor &widgetCursor = *(WidgetCursor *)value.getVoidPointer();
-        overlay.width = widgetCursor.widget->w;
-        overlay.height = widgetCursor.widget->h;
+        overlay.width = widgetCursor.widget->width;
+        overlay.height = widgetCursor.widget->height;
         
         overlay.x = 40;
         overlay.y = 8;
@@ -2858,8 +2858,8 @@ void data_dlog_preview_overlay(DataOperationEnum operation, const WidgetCursor &
             ) ? 1 : 0;
         
         WidgetCursor &widgetCursor = *(WidgetCursor *)value.getVoidPointer();
-        overlay.width = widgetCursor.widget->w;
-        overlay.height = widgetCursor.widget->h;
+        overlay.width = widgetCursor.widget->width;
+        overlay.height = widgetCursor.widget->height;
         
         overlay.x = widgetCursor.widget->x;
         overlay.y = widgetCursor.widget->y;

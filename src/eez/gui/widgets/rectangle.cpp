@@ -39,7 +39,7 @@ void RectangleWidgetState::render() {
     auto widget = (const RectangleWidget *)widgetCursor.widget;
     const Style* style = getStyle(widget->style);
     drawRectangle(
-        widgetCursor.x, widgetCursor.y, (int)widget->w, (int)widget->h,
+        widgetCursor.x, widgetCursor.y, widgetCursor.w, widgetCursor.h,
         style, 
         flags.active, 
         widget->flags.ignoreLuminosity,

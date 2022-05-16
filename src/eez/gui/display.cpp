@@ -20,7 +20,7 @@
 #include <string.h>
 #include <memory.h>
 
-#include <eez/libs/utf8.h>
+#include <eez/core/utf8.h>
 
 #include <eez/conf.h>
 #include <eez/core/util.h>

@@ -112,7 +112,7 @@ void RollerWidgetState::render() {
 	}
 
 	drawRectangle(
-        widgetCursor.x, widgetCursor.y, (int)widget->w, (int)widget->h,
+        widgetCursor.x, widgetCursor.y, widgetCursor.w, widgetCursor.h,
         style
     );
 
@@ -124,30 +124,30 @@ void RollerWidgetState::render() {
 	int rectHeight = selectedValueStyle->borderSizeTop + textHeight + selectedValueStyle->borderSizeBottom;
 
 	display::setColor(selectedValueStyle->borderColor);
-	auto yCenter = widgetCursor.y + (widget->h - rectHeight) / 2;
+	auto yCenter = widgetCursor.y + (widgetCursor.h - rectHeight) / 2;
 	display::drawRoundedRect(
 		aggDrawing,
-		x, yCenter, x + widget->w - 1, yCenter + rectHeight - 1, selectedValueStyle->borderSizeLeft,
+		x, yCenter, x + widgetCursor.w - 1, yCenter + rectHeight - 1, selectedValueStyle->borderSizeLeft,
 		selectedValueStyle->borderRadiusTLX, selectedValueStyle->borderRadiusTLY, selectedValueStyle->borderRadiusTRX, selectedValueStyle->borderRadiusTRY,
 		selectedValueStyle->borderRadiusBRX, selectedValueStyle->borderRadiusBRY, selectedValueStyle->borderRadiusBLX, selectedValueStyle->borderRadiusBLY
 	);
 
 	int clip1_x1 = widgetCursor.x;
 	int clip1_y1 = widgetCursor.y;
-	int clip1_x2 = widgetCursor.x + widget->w - 1;
+	int clip1_x2 = widgetCursor.x + widgetCursor.w - 1;
 	int clip1_y2 = yCenter - 1;
 
 	int clip2_x1 = widgetCursor.x;
 	int clip2_y1 = yCenter + selectedValueStyle->borderSizeTop;
-	int clip2_x2 = widgetCursor.x + widget->w - 1;
+	int clip2_x2 = widgetCursor.x + widgetCursor.w - 1;
 	int clip2_y2 = yCenter + rectHeight - selectedValueStyle->borderSizeBottom;
 
 	int clip3_x1 = widgetCursor.x;
 	int clip3_y1 = yCenter + rectHeight;
-	int clip3_x2 = widgetCursor.x + widget->w - 1;
-	int clip3_y2 = widgetCursor.y + widget->h - 1;
+	int clip3_x2 = widgetCursor.x + widgetCursor.w - 1;
+	int clip3_y2 = widgetCursor.y + widgetCursor.h - 1;
 
-    auto y = widgetCursor.y + (widget->h - textHeight) / 2 + (int)roundf(position);
+    auto y = widgetCursor.y + (widgetCursor.h - textHeight) / 2 + (int)roundf(position);
 
 	display::setColor(unselectedValueStyle->color);
 
@@ -155,7 +155,7 @@ void RollerWidgetState::render() {
         if (y + textHeight <= widgetCursor.y) {
             continue;
         }
-        if (y >= widgetCursor.y + widget->h) {
+        if (y >= widgetCursor.y + widgetCursor.h) {
             break;
         }
 
@@ -172,7 +172,7 @@ void RollerWidgetState::render() {
 		if (y < clip1_y2) {
 			display::drawStr(
 				text, textLength,
-				x + (widget->w - textWidth) / 2, y,
+				x + (widgetCursor.w - textWidth) / 2, y,
 				clip1_x1, clip1_y1, clip1_x2, clip1_y2,
 				fontUnselectedValue,
 				-1
@@ -180,7 +180,7 @@ void RollerWidgetState::render() {
 		} else {
 			display::drawStr(
 				text, textLength,
-				x + (widget->w - textWidth) / 2, y,
+				x + (widgetCursor.w - textWidth) / 2, y,
 				clip3_x1, clip3_y1, clip3_x2, clip3_y2,
 				fontUnselectedValue,
 				-1
@@ -193,7 +193,7 @@ void RollerWidgetState::render() {
 			display::setColor(selectedValueStyle->color);
 			display::drawStr(
 				text, textLength,
-				x + (widget->w - textWidth) / 2, y,
+				x + (widgetCursor.w - textWidth) / 2, y,
 				clip2_x1, clip2_y1, clip2_x2, clip2_y2,
 				fontSelectedValue,
 				-1
@@ -223,9 +223,9 @@ void RollerWidgetState::onTouch(const WidgetCursor &widgetCursor, Event &touchEv
 	} else if (touchEvent.type == EVENT_TYPE_TOUCH_UP || touchEvent.type == EVENT_TYPE_AUTO_REPEAT) {
 		if (!isDragging) {
 			isRunning = true;
-			if (touchEvent.y < widgetCursor.y + (widgetCursor.widget->h - textHeight) / 2) {
+			if (touchEvent.y < widgetCursor.y + (widgetCursor.h - textHeight) / 2) {
 				applyForce(textHeight * FRICTION);
-			} else if (touchEvent.y > widgetCursor.y + (widgetCursor.widget->h - textHeight) / 2 + textHeight) {
+			} else if (touchEvent.y > widgetCursor.y + (widgetCursor.h - textHeight) / 2 + textHeight) {
 				applyForce(-textHeight * FRICTION);
 			}
 		} else {

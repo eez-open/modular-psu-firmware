@@ -107,8 +107,8 @@ void BarGraphWidgetState::render() {
 
     int x = widgetCursor.x;
     int y = widgetCursor.y;
-    const int w = widget->w;
-    const int h = widget->h;
+    const int w = widgetCursor.w;
+    const int h = widgetCursor.h;
 
     float min = getMin(widgetCursor, widget->data).getFloat();
 

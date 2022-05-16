@@ -217,6 +217,8 @@ void enumNoneWidget() {
     WidgetCursor &widgetCursor = g_widgetCursor;
     auto savedWidget = widgetCursor.widget;
     widgetCursor.widget = &g_noneWidget;
+    g_widgetCursor.w = g_noneWidget.width;
+    g_widgetCursor.h = g_noneWidget.height;
 	enumWidget();
     widgetCursor.widget = savedWidget;
 }
@@ -317,13 +319,13 @@ static void findWidgetStep() {
 
     static const int MIN_SIZE = 50;
 
-    int w = overlay ? overlay->width : widget->w;
+    int w = overlay ? overlay->width : widgetCursor.w;
     if (w < MIN_SIZE) {
         x = x - (MIN_SIZE - w) / 2;
         w = MIN_SIZE;
     }
 
-    int h = overlay ? overlay->height : widget->h;
+    int h = overlay ? overlay->height : widgetCursor.h;
     if (h < MIN_SIZE) {
         y = y - (MIN_SIZE - h) / 2;
         h = MIN_SIZE;
@@ -392,11 +394,13 @@ WidgetCursor findWidget(int16_t x, int16_t y, bool clicked) {
 }
 
 void resizeWidget(
-    Widget *widget,
-    const Rect &rectContainerOriginal,
-    const Rect &rectContainer,
-    Rect &rectWidgetOriginal
+    WidgetCursor &widgetCursor,
+    int containerOriginalWidth,
+    int containerOriginalHeight,
+    int containerWidth,
+    int containerHeight
 ) {
+    auto widget = widgetCursor.widget;
     auto flags = widget->flags;
 
     auto pinToLeft = flags & WIDGET_FLAG_PIN_TO_LEFT;
@@ -408,87 +412,83 @@ void resizeWidget(
     auto fixHeight = flags & WIDGET_FLAG_FIX_HEIGHT;
 
     auto left = widget->x;
-    auto right = widget->x + widget->w;
+    auto right = widget->x + widget->width;
 
     if (pinToLeft) {
         // left = left;
     } else {
         if (!fixWidth) {
             left =
-                (widget->x * rectContainer.w) /
-                rectContainerOriginal.w;
+                (widget->x * containerWidth) /
+                containerOriginalWidth;
         }
     }
 
     if (pinToRight) {
-        right = rectContainer.w - (rectContainerOriginal.w - right);
+        right = containerWidth - (containerOriginalWidth - right);
     } else {
         if (!fixWidth) {
-            right = (right * rectContainer.w) / rectContainerOriginal.w;
+            right = (right * containerWidth) / containerOriginalWidth;
         }
     }
 
     if (fixWidth) {
         if (pinToLeft && !pinToRight) {
-            right = left + widget->w;
+            right = left + widget->width;
         } else if (pinToRight && !pinToLeft) {
-            left = right - widget->w;
+            left = right - widget->width;
         } else if (!pinToLeft && !pinToRight) {
             auto center =
-                ((widget->x + widget->w / 2) *
-                    rectContainer.w) /
-                rectContainerOriginal.w;
-            left = center - widget->w / 2;
-            right = left + widget->w;
+                ((widget->x + widget->width / 2) *
+                    containerWidth) /
+                containerOriginalWidth;
+            left = center - widget->width / 2;
+            right = left + widget->width;
         }
     }
 
     auto top = widget->y;
-    auto bottom = widget->y + widget->h;
+    auto bottom = widget->y + widget->height;
 
     if (pinToTop) {
         //top = top;
     } else {
         if (!fixHeight) {
             top =
-                (widget->y * rectContainer.h) /
-                rectContainerOriginal.h;
+                (widget->y * containerHeight) /
+                containerOriginalHeight;
         }
     }
 
     if (pinToBottom) {
-        bottom = rectContainer.h - (rectContainerOriginal.h - bottom);
+        bottom = containerHeight - (containerOriginalHeight - bottom);
     } else {
         if (!fixHeight) {
             bottom =
-                (bottom * rectContainer.h) / rectContainerOriginal.h;
+                (bottom * containerHeight) / containerOriginalHeight;
         }
     }
 
     if (fixHeight) {
         if (pinToTop && !pinToBottom) {
-            bottom = top + widget->h;
+            bottom = top + widget->height;
         } else if (pinToBottom && !pinToTop) {
-            top = bottom - widget->h;
+            top = bottom - widget->height;
         } else if (!pinToTop && !pinToBottom) {
             auto center =
-                ((widget->y + widget->h / 2) *
-                    rectContainer.h) /
-                rectContainerOriginal.h;
-            top = center - widget->h / 2;
-            bottom = top + widget->h;
+                ((widget->y + widget->height / 2) *
+                    containerHeight) /
+                containerOriginalHeight;
+            top = center - widget->height / 2;
+            bottom = top + widget->height;
         }
     }
 
-    rectWidgetOriginal.x = widget->x;
-    rectWidgetOriginal.y = widget->y;
-    rectWidgetOriginal.w = widget->w;
-    rectWidgetOriginal.h = widget->h;
 
-    widget->x = left;
-    widget->y = top;
-    widget->w = right - left;
-    widget->h = bottom - top;
+    widgetCursor.x += left - widget->x;
+    widgetCursor.y += top - widget->y;
+    widgetCursor.w = right - left;
+    widgetCursor.h = bottom - top;
 }
 
 } // namespace gui

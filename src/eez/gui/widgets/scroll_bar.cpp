@@ -84,9 +84,9 @@ void ScrollBarWidgetState::render() {
     auto widget = (const ScrollBarWidget *)widgetCursor.widget;
     if (pageSize < size) {
         const Style *buttonsStyle = getStyle(widget->buttonsStyle);
-        auto isHorizontal = widget->w > widget->h;
+        auto isHorizontal = widgetCursor.w > widgetCursor.h;
 
-        int buttonSize = isHorizontal ? widget->h : widget->w;
+        int buttonSize = isHorizontal ? widgetCursor.h : widgetCursor.w;
 
         // draw left button
         if (widget->leftButtonText) {
@@ -94,8 +94,8 @@ void ScrollBarWidgetState::render() {
                 static_cast<const char *>(widget->leftButtonText), -1, 
                 widgetCursor.x, 
                 widgetCursor.y, 
-                isHorizontal ? buttonSize : (int)widget->w, 
-                isHorizontal ? (int)widget->h : buttonSize, buttonsStyle, 
+                isHorizontal ? buttonSize : widgetCursor.w,
+                isHorizontal ? widgetCursor.h : buttonSize, buttonsStyle,
                 flags.active && dragSegment == SCROLL_BAR_WIDGET_SEGMENT_LEFT_BUTTON
             );
         }
@@ -109,13 +109,13 @@ void ScrollBarWidgetState::render() {
         if (isHorizontal) {
             xTrack = widgetCursor.x + buttonSize;
             yTrack = widgetCursor.y;
-            wTrack = widget->w - 2 * buttonSize;
-            hTrack = widget->h;
+            wTrack = widgetCursor.w - 2 * buttonSize;
+            hTrack = widgetCursor.h;
         } else {
             xTrack = widgetCursor.x;
             yTrack = widgetCursor.y + buttonSize;
-            wTrack = widget->w;
-            hTrack = widget->h - 2 * buttonSize;
+            wTrack = widgetCursor.w;
+            hTrack = widgetCursor.h - 2 * buttonSize;
         }
 
         const Style *trackStyle = getStyle(widget->style);
@@ -139,10 +139,10 @@ void ScrollBarWidgetState::render() {
         if (widget->rightButtonText) {
             drawText(
                 static_cast<const char *>(widget->rightButtonText), -1,
-                isHorizontal ? widgetCursor.x + widget->w - buttonSize : widgetCursor.x, 
-                isHorizontal ? widgetCursor.y : widgetCursor.y + widget->h - buttonSize, 
-                isHorizontal ? buttonSize : (int)widget->w, 
-                isHorizontal ? (int)widget->h : buttonSize,
+                isHorizontal ? widgetCursor.x + widgetCursor.w - buttonSize : widgetCursor.x,
+                isHorizontal ? widgetCursor.y : widgetCursor.y + widgetCursor.h - buttonSize,
+                isHorizontal ? buttonSize : widgetCursor.w,
+                isHorizontal ? widgetCursor.h : buttonSize,
                 buttonsStyle, 
                 flags.active && dragSegment == SCROLL_BAR_WIDGET_SEGMENT_RIGHT_BUTTON
             );
@@ -152,14 +152,14 @@ void ScrollBarWidgetState::render() {
         if (flags.focused && action == ACTION_ID_SCROLL) {
             const Style *style = getStyle(widgetCursor.widget->style);
             display::setColor(style->focusColor);
-            display::drawRect(widgetCursor.x, widgetCursor.y, widgetCursor.x + widget->w - 1, widgetCursor.y + widget->h - 1);
-            display::drawRect(widgetCursor.x + 1, widgetCursor.y + 1, widgetCursor.x + widget->w - 2, widgetCursor.y + widget->h - 2);
+            display::drawRect(widgetCursor.x, widgetCursor.y, widgetCursor.x + widgetCursor.w - 1, widgetCursor.y + widgetCursor.h - 1);
+            display::drawRect(widgetCursor.x + 1, widgetCursor.y + 1, widgetCursor.x + widgetCursor.w - 2, widgetCursor.y + widgetCursor.h - 2);
         }
     } else {
         // scroll bar is hidden
         const Style *trackStyle = getStyle(widget->style);
         display::setColor(trackStyle->color);
-        display::fillRect(widgetCursor.x, widgetCursor.y, widgetCursor.x + widget->w - 1, widgetCursor.y + widget->h - 1);
+        display::fillRect(widgetCursor.x, widgetCursor.y, widgetCursor.x + widgetCursor.w - 1, widgetCursor.y + widgetCursor.h - 1);
     }
 }
 
@@ -174,8 +174,8 @@ void ScrollBarWidgetState::onTouch(const WidgetCursor &widgetCursor, Event &touc
     if (size > pageSize) {
         const Widget *widget = widgetCursor.widget;
 
-        auto isHorizontal = widget->w > widget->h;
-        int buttonSize = isHorizontal ? widget->h : widget->w;
+        auto isHorizontal = widgetCursor.w > widgetCursor.h;
+        int buttonSize = isHorizontal ? widgetCursor.h : widgetCursor.w;
 
         int xTrack;
         int wTrack;
@@ -184,11 +184,11 @@ void ScrollBarWidgetState::onTouch(const WidgetCursor &widgetCursor, Event &touc
         if (isHorizontal) {
             x = touchEvent.x;
             xTrack = widgetCursor.x + buttonSize;
-            wTrack = widget->w - 2 * buttonSize;
+            wTrack = widgetCursor.w - 2 * buttonSize;
         } else {
             x = touchEvent.y;
             xTrack = widgetCursor.y + buttonSize;
-            wTrack = widget->h - 2 * buttonSize;
+            wTrack = widgetCursor.h - 2 * buttonSize;
         }
 
         if (touchEvent.type == EVENT_TYPE_TOUCH_DOWN || touchEvent.type == EVENT_TYPE_AUTO_REPEAT || dragSegment == SCROLL_BAR_WIDGET_SEGMENT_UNINITIALIZED) {
@@ -206,7 +206,7 @@ void ScrollBarWidgetState::onTouch(const WidgetCursor &widgetCursor, Event &touc
                 if (touchEvent.type == EVENT_TYPE_TOUCH_DOWN) {
                     sound::playClick();
                 }
-            } else if ((isHorizontal && (touchEvent.x >= widgetCursor.x + widget->w - buttonSize)) || (!isHorizontal && (touchEvent.y >= widgetCursor.y + widget->h - buttonSize))) {
+            } else if ((isHorizontal && (touchEvent.x >= widgetCursor.x + widgetCursor.w - buttonSize)) || (!isHorizontal && (touchEvent.y >= widgetCursor.y + widgetCursor.h - buttonSize))) {
                 setPosition(widgetCursor, getPosition(widgetCursor) + getPositionIncrement(widgetCursor));
                 dragSegment = SCROLL_BAR_WIDGET_SEGMENT_RIGHT_BUTTON;
                 if (touchEvent.type == EVENT_TYPE_TOUCH_DOWN) {

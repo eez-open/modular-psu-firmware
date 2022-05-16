@@ -249,10 +249,11 @@ typedef void (*OnTouchFunctionType)(const WidgetCursor &widgetCursor, Event &tou
 OnTouchFunctionType getWidgetTouchFunction(const WidgetCursor &widgetCursor);
 
 void resizeWidget(
-    Widget *widget,
-    const Rect &rectContainerOriginal,
-    const Rect &rectContainer,
-    Rect &rectWidgetOriginal
+    WidgetCursor &widgetCursor,
+    int containerOriginalWidth,
+    int containerOriginalHeight,
+    int containerWidth,
+    int containerHeight
 );
 
 } // namespace gui

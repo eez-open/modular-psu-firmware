@@ -51,7 +51,7 @@ void SwitchWidgetState::render() {
     const Style *style = getStyle(widget->style);
 
 	drawRectangle(
-		widgetCursor.x, widgetCursor.y, (int)widget->w, (int)widget->h,
+		widgetCursor.x, widgetCursor.y, widgetCursor.w, widgetCursor.h,
 		nullptr,
 		false,
 		false
@@ -75,11 +75,11 @@ void SwitchWidgetState::render() {
     double x = widgetCursor.x + style->paddingLeft;
 	double y = widgetCursor.y + style->paddingTop;
 	double w =
-        widget->w -
+        widgetCursor.w -
         style->paddingLeft -
         style->paddingRight;
 	double h =
-        widget->h -
+        widgetCursor.h -
         style->paddingTop -
         style->paddingBottom;
 
