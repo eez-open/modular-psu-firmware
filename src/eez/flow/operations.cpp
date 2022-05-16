@@ -18,6 +18,13 @@
 
 #include <stdio.h>
 #include <math.h>
+#include <chrono>
+#include <string>
+#include <iostream>
+#include <sstream>
+
+// https://howardhinnant.github.io/date/date.html
+#include <eez/libs/date.h>
 
 #include <eez/gui/gui.h>
 
@@ -30,8 +37,8 @@ namespace flow {
 using namespace gui;
 
 Value op_add(const Value& a1, const Value& b1) {
-	const Value &a = a1.getType() == VALUE_TYPE_VALUE_PTR ? *a1.pValueValue : a1.getType() == VALUE_TYPE_NATIVE_VARIABLE ? get(g_widgetCursor, a1.getInt()) : a1;
-	const Value &b = b1.getType() == VALUE_TYPE_VALUE_PTR ? *b1.pValueValue : b1.getType() == VALUE_TYPE_NATIVE_VARIABLE ? get(g_widgetCursor, b1.getInt()) : b1;
+	auto a = a1.getValue();
+	auto b = b1.getValue();
 
 	if (a.isAnyStringType() || b.isAnyStringType()) {
 		Value value1 = a.toString(0x84eafaa8);
@@ -64,8 +71,8 @@ Value op_add(const Value& a1, const Value& b1) {
 }
 
 Value op_sub(const Value& a1, const Value& b1) {
-	const Value &a = a1.getType() == VALUE_TYPE_VALUE_PTR ? *a1.pValueValue : a1.getType() == VALUE_TYPE_NATIVE_VARIABLE ? get(g_widgetCursor, a1.getInt()) : a1;
-	const Value &b = b1.getType() == VALUE_TYPE_VALUE_PTR ? *b1.pValueValue : b1.getType() == VALUE_TYPE_NATIVE_VARIABLE ? get(g_widgetCursor, b1.getInt()) : b1;
+	auto a = a1.getValue();
+	auto b = b1.getValue();
 
 	if (a.isDouble() || b.isDouble()) {
 		return Value(a.toDouble() - b.toDouble(), VALUE_TYPE_DOUBLE);
@@ -87,8 +94,8 @@ Value op_sub(const Value& a1, const Value& b1) {
 }
 
 Value op_mul(const Value& a1, const Value& b1) {
-	const Value &a = a1.getType() == VALUE_TYPE_VALUE_PTR ? *a1.pValueValue : a1.getType() == VALUE_TYPE_NATIVE_VARIABLE ? get(g_widgetCursor, a1.getInt()) : a1;
-	const Value &b = b1.getType() == VALUE_TYPE_VALUE_PTR ? *b1.pValueValue : b1.getType() == VALUE_TYPE_NATIVE_VARIABLE ? get(g_widgetCursor, b1.getInt()) : b1;
+	auto a = a1.getValue();
+	auto b = b1.getValue();
 
 	if (a.isDouble() || b.isDouble()) {
 		return Value(a.toDouble() * b.toDouble(), VALUE_TYPE_DOUBLE);
@@ -110,8 +117,8 @@ Value op_mul(const Value& a1, const Value& b1) {
 }
 
 Value op_div(const Value& a1, const Value& b1) {
-	const Value &a = a1.getType() == VALUE_TYPE_VALUE_PTR ? *a1.pValueValue : a1.getType() == VALUE_TYPE_NATIVE_VARIABLE ? get(g_widgetCursor, a1.getInt()) : a1;
-	const Value &b = b1.getType() == VALUE_TYPE_VALUE_PTR ? *b1.pValueValue : b1.getType() == VALUE_TYPE_NATIVE_VARIABLE ? get(g_widgetCursor, b1.getInt()) : b1;
+	auto a = a1.getValue();
+	auto b = b1.getValue();
 
 	if (a.isDouble() || b.isDouble()) {
 		return Value(a.toDouble() / b.toDouble(), VALUE_TYPE_DOUBLE);
@@ -133,54 +140,53 @@ Value op_div(const Value& a1, const Value& b1) {
 }
 
 Value op_mod(const Value& a1, const Value& b1) {
-	const Value &a = a1.getType() == VALUE_TYPE_VALUE_PTR ? *a1.pValueValue : a1.getType() == VALUE_TYPE_NATIVE_VARIABLE ? get(g_widgetCursor, a1.getInt()) : a1;
-	const Value &b = b1.getType() == VALUE_TYPE_VALUE_PTR ? *b1.pValueValue : b1.getType() == VALUE_TYPE_NATIVE_VARIABLE ? get(g_widgetCursor, b1.getInt()) : b1;
+	auto a = a1.getValue();
+	auto b = b1.getValue();
 
 	return Value(a.toDouble() - floor(a.toDouble() / b.toDouble()) * b.toDouble(), VALUE_TYPE_DOUBLE);
 }
 
 Value op_left_shift(const Value& a1, const Value& b1) {
-	const Value &a = a1.getType() == VALUE_TYPE_VALUE_PTR ? *a1.pValueValue : a1.getType() == VALUE_TYPE_NATIVE_VARIABLE ? get(g_widgetCursor, a1.getInt()) : a1;
-	const Value &b = b1.getType() == VALUE_TYPE_VALUE_PTR ? *b1.pValueValue : b1.getType() == VALUE_TYPE_NATIVE_VARIABLE ? get(g_widgetCursor, b1.getInt()) : b1;
+	auto a = a1.getValue();
+	auto b = b1.getValue();
 
 	return Value((int)(a.toInt32() << b.toInt32()), VALUE_TYPE_INT32);
 }
 
 Value op_right_shift(const Value& a1, const Value& b1) {
-	const Value &a = a1.getType() == VALUE_TYPE_VALUE_PTR ? *a1.pValueValue : a1.getType() == VALUE_TYPE_NATIVE_VARIABLE ? get(g_widgetCursor, a1.getInt()) : a1;
-	const Value &b = b1.getType() == VALUE_TYPE_VALUE_PTR ? *b1.pValueValue : b1.getType() == VALUE_TYPE_NATIVE_VARIABLE ? get(g_widgetCursor, b1.getInt()) : b1;
+	auto a = a1.getValue();
+	auto b = b1.getValue();
 
 	return Value((int)(a.toInt32() >> b.toInt32()), VALUE_TYPE_INT32);
 }
 
 Value op_binary_and(const Value& a1, const Value& b1) {
-	const Value &a = a1.getType() == VALUE_TYPE_VALUE_PTR ? *a1.pValueValue : a1.getType() == VALUE_TYPE_NATIVE_VARIABLE ? get(g_widgetCursor, a1.getInt()) : a1;
-	const Value &b = b1.getType() == VALUE_TYPE_VALUE_PTR ? *b1.pValueValue : b1.getType() == VALUE_TYPE_NATIVE_VARIABLE ? get(g_widgetCursor, b1.getInt()) : b1;
+	auto a = a1.getValue();
+	auto b = b1.getValue();
 
 	return Value((int)(a.toBool() & b.toBool()), VALUE_TYPE_INT32);
 }
 
 Value op_binary_or(const Value& a1, const Value& b1) {
-	const Value &a = a1.getType() == VALUE_TYPE_VALUE_PTR ? *a1.pValueValue : a1.getType() == VALUE_TYPE_NATIVE_VARIABLE ? get(g_widgetCursor, a1.getInt()) : a1;
-	const Value &b = b1.getType() == VALUE_TYPE_VALUE_PTR ? *b1.pValueValue : b1.getType() == VALUE_TYPE_NATIVE_VARIABLE ? get(g_widgetCursor, b1.getInt()) : b1;
+	auto a = a1.getValue();
+	auto b = b1.getValue();
 
 	return Value((int)(a.toBool() | b.toBool()), VALUE_TYPE_INT32);
 }
 
 Value op_binary_xor(const Value& a1, const Value& b1) {
-	const Value &a = a1.getType() == VALUE_TYPE_VALUE_PTR ? *a1.pValueValue : a1.getType() == VALUE_TYPE_NATIVE_VARIABLE ? get(g_widgetCursor, a1.getInt()) : a1;
-	const Value &b = b1.getType() == VALUE_TYPE_VALUE_PTR ? *b1.pValueValue : b1.getType() == VALUE_TYPE_NATIVE_VARIABLE ? get(g_widgetCursor, b1.getInt()) : b1;
+	auto a = a1.getValue();
+	auto b = b1.getValue();
 
 	return Value((int)(a.toBool() ^ b.toBool()), VALUE_TYPE_INT32);
 }
 
 bool is_equal(const Value& a1, const Value& b1) {
-	const Value &a = a1.getType() == VALUE_TYPE_VALUE_PTR ? *a1.pValueValue : a1.getType() == VALUE_TYPE_NATIVE_VARIABLE ? get(g_widgetCursor, a1.getInt()) : a1;
-	const Value &b = b1.getType() == VALUE_TYPE_VALUE_PTR ? *b1.pValueValue : b1.getType() == VALUE_TYPE_NATIVE_VARIABLE ? get(g_widgetCursor, b1.getInt()) : b1;
+	auto a = a1.getValue();
+	auto b = b1.getValue();
 
     auto aIsUndefinedOrNull = a.getType() == VALUE_TYPE_UNDEFINED || a.getType() == VALUE_TYPE_NULL;
     auto bIsUndefinedOrNull = b.getType() == VALUE_TYPE_UNDEFINED || b.getType() == VALUE_TYPE_NULL;
-
 
     if (aIsUndefinedOrNull) {
         return bIsUndefinedOrNull;
@@ -204,8 +210,8 @@ bool is_equal(const Value& a1, const Value& b1) {
 }
 
 bool is_less(const Value& a1, const Value& b1) {
-	const Value &a = a1.getType() == VALUE_TYPE_VALUE_PTR ? *a1.pValueValue : a1.getType() == VALUE_TYPE_NATIVE_VARIABLE ? get(g_widgetCursor, a1.getInt()) : a1;
-	const Value &b = b1.getType() == VALUE_TYPE_VALUE_PTR ? *b1.pValueValue : b1.getType() == VALUE_TYPE_NATIVE_VARIABLE ? get(g_widgetCursor, b1.getInt()) : b1;
+	auto a = a1.getValue();
+	auto b = b1.getValue();
 
 	if (a.isAnyStringType() && b.isAnyStringType()) {
 		const char *aStr = a.getString();
@@ -467,20 +473,8 @@ bool do_OPERATION_TYPE_GREATER_OR_EQUAL(EvalStack &stack) {
 }
 
 bool do_OPERATION_TYPE_LOGICAL_AND(EvalStack &stack) {
-	auto b = stack.pop();
-	auto a = stack.pop();
-
-	if (a.getType() == VALUE_TYPE_VALUE_PTR) {
-		a = *a.pValueValue;
-	} else if (a.getType() == VALUE_TYPE_NATIVE_VARIABLE) {
-		a = get(g_widgetCursor, a.getInt());
-	}
-
-	if (b.getType() == VALUE_TYPE_VALUE_PTR) {
-		b = *b.pValueValue;
-	} else if (b.getType() == VALUE_TYPE_NATIVE_VARIABLE) {
-		b = get(g_widgetCursor, b.getInt());
-	}
+	auto b = stack.pop().getValue();
+	auto a = stack.pop().getValue();
 
 	if (!stack.push(Value(a.toBool() && b.toBool(), VALUE_TYPE_BOOLEAN))) {
 		return false;
@@ -490,20 +484,8 @@ bool do_OPERATION_TYPE_LOGICAL_AND(EvalStack &stack) {
 }
 
 bool do_OPERATION_TYPE_LOGICAL_OR(EvalStack &stack) {
-	auto b = stack.pop();
-	auto a = stack.pop();
-
-	if (a.getType() == VALUE_TYPE_VALUE_PTR) {
-		a = *a.pValueValue;
-	} else if (a.getType() == VALUE_TYPE_NATIVE_VARIABLE) {
-		a = get(g_widgetCursor, a.getInt());
-	}
-
-	if (b.getType() == VALUE_TYPE_VALUE_PTR) {
-		b = *b.pValueValue;
-	} else if (b.getType() == VALUE_TYPE_NATIVE_VARIABLE) {
-		b = get(g_widgetCursor, b.getInt());
-	}
+	auto b = stack.pop().getValue();
+	auto a = stack.pop().getValue();
 
 	if (!stack.push(Value(a.toBool() || b.toBool(), VALUE_TYPE_BOOLEAN))) {
 		return false;
@@ -513,13 +495,7 @@ bool do_OPERATION_TYPE_LOGICAL_OR(EvalStack &stack) {
 }
 
 bool do_OPERATION_TYPE_UNARY_PLUS(EvalStack &stack) {
-	auto a = stack.pop();
-
-	if (a.getType() == VALUE_TYPE_VALUE_PTR) {
-		a = *a.pValueValue;
-	} else if (a.getType() == VALUE_TYPE_NATIVE_VARIABLE) {
-		a = get(g_widgetCursor, a.getInt());
-	}
+	auto a = stack.pop().getValue();
 
 	if (a.isDouble()) {
 		if (!stack.push(Value(a.getDouble(), VALUE_TYPE_DOUBLE))) {
@@ -568,13 +544,7 @@ bool do_OPERATION_TYPE_UNARY_PLUS(EvalStack &stack) {
 }
 
 bool do_OPERATION_TYPE_UNARY_MINUS(EvalStack &stack) {
-	auto a = stack.pop();
-
-	if (a.getType() == VALUE_TYPE_VALUE_PTR) {
-		a = *a.pValueValue;
-	} else if (a.getType() == VALUE_TYPE_NATIVE_VARIABLE) {
-		a = get(g_widgetCursor, a.getInt());
-	}
+	auto a = stack.pop().getValue();
 
 	if (a.isDouble()) {
 		if (!stack.push(Value(-a.getDouble(), VALUE_TYPE_DOUBLE))) {
@@ -623,13 +593,7 @@ bool do_OPERATION_TYPE_UNARY_MINUS(EvalStack &stack) {
 }
 
 bool do_OPERATION_TYPE_BINARY_ONE_COMPLEMENT(EvalStack &stack) {
-	auto a = stack.pop();
-
-	if (a.getType() == VALUE_TYPE_VALUE_PTR) {
-		a = *a.pValueValue;
-	} else if (a.getType() == VALUE_TYPE_NATIVE_VARIABLE) {
-		a = get(g_widgetCursor, a.getInt());
-	}
+	auto a = stack.pop().getValue();
 
 	if (a.isInt64()) {
 		if (!stack.push(Value(~a.uint64Value, VALUE_TYPE_UINT64))) {
@@ -773,8 +737,7 @@ bool do_OPERATION_TYPE_FLOW_MAKE_ARRAY_VALUE(EvalStack &stack) {
     auto array = arrayValue.getArray();
 
     for (int i = 0; i < arraySize; i++) {
-        auto value = stack.pop();
-        array->values[i] = value.getType() == VALUE_TYPE_VALUE_PTR ? *value.pValueValue : value.getType() == VALUE_TYPE_NATIVE_VARIABLE ? get(g_widgetCursor, value.getInt()) : value;
+        array->values[i] = stack.pop().getValue();
     }
 
     if (!stack.push(arrayValue)) {
@@ -784,14 +747,106 @@ bool do_OPERATION_TYPE_FLOW_MAKE_ARRAY_VALUE(EvalStack &stack) {
     return true;
 }
 
-bool do_OPERATION_TYPE_MATH_SIN(EvalStack &stack) {
-	auto a = stack.pop();
+bool do_OPERATION_TYPE_FLOW_LANGUAGES(EvalStack &stack) {
+    auto languages = stack.flowState->assets->languages;
 
-	if (a.getType() == VALUE_TYPE_VALUE_PTR) {
-		a = *a.pValueValue;
-	} else if (a.getType() == VALUE_TYPE_NATIVE_VARIABLE) {
-		a = get(g_widgetCursor, a.getInt());
-	}
+    auto arrayValue = Value::makeArrayRef(languages.count, VALUE_TYPE_STRING, 0xff4787fc);
+
+    auto array = arrayValue.getArray();
+
+    for (int i = 0; i < languages.count; i++) {
+        array->values[i] = Value((const char *)(languages[i]->languageID));
+    }
+
+    if (!stack.push(arrayValue)) {
+        return false;
+    }
+
+    return true;
+}
+
+bool do_OPERATION_TYPE_FLOW_TRANSLATE(EvalStack &stack) {
+    auto textResourceIndexValue = stack.pop();
+
+    int textResourceIndex = textResourceIndexValue.getInt();
+
+    int languageIndex = g_selectedLanguage;
+
+    auto languages = stack.flowState->assets->languages;
+    if (languageIndex >= 0 && languageIndex < languages.count) {
+        auto translations = languages[languageIndex]->translations;
+        if (textResourceIndex >= 0 && textResourceIndex < translations.count) {
+            if (!stack.push(translations[textResourceIndex])) {
+                return false;
+            }
+            return true;
+        }
+    }
+
+    if (!stack.push("")) {
+        return false;
+    }
+
+    return true;
+}
+
+bool do_OPERATION_TYPE_DATE_NOW(EvalStack &stack) {
+    using namespace std::chrono;
+    milliseconds ms = duration_cast<milliseconds>(system_clock::now().time_since_epoch());
+
+    if (!stack.push(Value((double)ms.count(), VALUE_TYPE_DATE))) {
+        return false;
+    }
+
+	return true;
+}
+
+bool do_OPERATION_TYPE_DATE_TO_STRING(EvalStack &stack) {
+	auto a = stack.pop().getValue();
+    if (a.getType() != VALUE_TYPE_DATE) {
+        return false;
+    }
+
+    using namespace std;
+    using namespace std::chrono;
+    using namespace date;
+
+    auto tp = system_clock::time_point(milliseconds((long long)a.getDouble()));
+
+    stringstream out;
+    out << tp << endl;
+
+    if (!stack.push(Value::makeStringRef(out.str().c_str(), -1, 0xbe440ec8))) {
+        return false;
+    }
+
+	return true;
+}
+
+bool do_OPERATION_TYPE_DATE_FROM_STRING(EvalStack &stack) {
+	auto a = stack.pop().getValue();
+
+    Value dateStrValue = a.toString(0x99cb1a93);
+
+    using namespace std;
+    using namespace std::chrono;
+    using namespace date;
+
+    istringstream in{dateStrValue.getString()};
+
+    system_clock::time_point tp;
+    in >> date::parse("%Y-%m-%d %T", tp);
+
+    milliseconds ms = duration_cast<milliseconds>(tp.time_since_epoch());
+    if (!stack.push(Value((double)ms.count(), VALUE_TYPE_DATE))) {
+        return false;
+    }
+
+	return true;
+}
+
+bool do_OPERATION_TYPE_MATH_SIN(EvalStack &stack) {
+	auto a = stack.pop().getValue();
 
 	if (a.isDouble()) {
 		if (!stack.push(Value(sin(a.getDouble()), VALUE_TYPE_DOUBLE))) {
@@ -825,13 +880,7 @@ bool do_OPERATION_TYPE_MATH_SIN(EvalStack &stack) {
 }
 
 bool do_OPERATION_TYPE_MATH_COS(EvalStack &stack) {
-	auto a = stack.pop();
-
-	if (a.getType() == VALUE_TYPE_VALUE_PTR) {
-		a = *a.pValueValue;
-	} else if (a.getType() == VALUE_TYPE_NATIVE_VARIABLE) {
-		a = get(g_widgetCursor, a.getInt());
-	}
+	auto a = stack.pop().getValue();
 
 	if (a.isDouble()) {
 		if (!stack.push(Value(cos(a.getDouble()), VALUE_TYPE_DOUBLE))) {
@@ -865,13 +914,7 @@ bool do_OPERATION_TYPE_MATH_COS(EvalStack &stack) {
 }
 
 bool do_OPERATION_TYPE_MATH_LOG(EvalStack &stack) {
-	auto a = stack.pop();
-
-	if (a.getType() == VALUE_TYPE_VALUE_PTR) {
-		a = *a.pValueValue;
-	} else if (a.getType() == VALUE_TYPE_NATIVE_VARIABLE) {
-		a = get(g_widgetCursor, a.getInt());
-	}
+	auto a = stack.pop().getValue();
 
 	if (a.isDouble()) {
 		if (!stack.push(Value(log(a.getDouble()), VALUE_TYPE_DOUBLE))) {
@@ -905,13 +948,7 @@ bool do_OPERATION_TYPE_MATH_LOG(EvalStack &stack) {
 }
 
 bool do_OPERATION_TYPE_MATH_LOG10(EvalStack &stack) {
-	auto a = stack.pop();
-
-	if (a.getType() == VALUE_TYPE_VALUE_PTR) {
-		a = *a.pValueValue;
-	} else if (a.getType() == VALUE_TYPE_NATIVE_VARIABLE) {
-		a = get(g_widgetCursor, a.getInt());
-	}
+	auto a = stack.pop().getValue();
 
 	if (a.isDouble()) {
 		if (!stack.push(Value(log10(a.getDouble()), VALUE_TYPE_DOUBLE))) {
@@ -945,13 +982,7 @@ bool do_OPERATION_TYPE_MATH_LOG10(EvalStack &stack) {
 }
 
 bool do_OPERATION_TYPE_MATH_ABS(EvalStack &stack) {
-	auto a = stack.pop();
-
-	if (a.getType() == VALUE_TYPE_VALUE_PTR) {
-		a = *a.pValueValue;
-	} else if (a.getType() == VALUE_TYPE_NATIVE_VARIABLE) {
-		a = get(g_widgetCursor, a.getInt());
-	}
+	auto a = stack.pop().getValue();
 
 	if (a.isDouble()) {
 		if (!stack.push(Value(abs(a.getDouble()), VALUE_TYPE_DOUBLE))) {
@@ -1000,13 +1031,7 @@ bool do_OPERATION_TYPE_MATH_ABS(EvalStack &stack) {
 }
 
 bool do_OPERATION_TYPE_MATH_FLOOR(EvalStack &stack) {
-	auto a = stack.pop();
-
-	if (a.getType() == VALUE_TYPE_VALUE_PTR) {
-		a = *a.pValueValue;
-	} else if (a.getType() == VALUE_TYPE_NATIVE_VARIABLE) {
-		a = get(g_widgetCursor, a.getInt());
-	}
+	auto a = stack.pop().getValue();
 
 	if (a.isDouble()) {
 		if (!stack.push(Value(floor(a.getDouble()), VALUE_TYPE_DOUBLE))) {
@@ -1026,13 +1051,7 @@ bool do_OPERATION_TYPE_MATH_FLOOR(EvalStack &stack) {
 }
 
 bool do_OPERATION_TYPE_MATH_CEIL(EvalStack &stack) {
-	auto a = stack.pop();
-
-	if (a.getType() == VALUE_TYPE_VALUE_PTR) {
-		a = *a.pValueValue;
-	} else if (a.getType() == VALUE_TYPE_NATIVE_VARIABLE) {
-		a = get(g_widgetCursor, a.getInt());
-	}
+	auto a = stack.pop().getValue();
 
 	if (a.isDouble()) {
 		if (!stack.push(Value(ceil(a.getDouble()), VALUE_TYPE_DOUBLE))) {
@@ -1051,47 +1070,93 @@ bool do_OPERATION_TYPE_MATH_CEIL(EvalStack &stack) {
 	return false;
 }
 
-bool do_OPERATION_TYPE_MATH_ROUND(EvalStack &stack) {
-	auto a = stack.pop();
+float roundN(float value, unsigned int numDigits) {
+  float pow_10 = pow(10.0f, numDigits);
+  return round(value * pow_10) / pow_10;
+}
 
-	if (a.getType() == VALUE_TYPE_VALUE_PTR) {
-		a = *a.pValueValue;
-	} else if (a.getType() == VALUE_TYPE_NATIVE_VARIABLE) {
-		a = get(g_widgetCursor, a.getInt());
-	}
+double roundN(double value, unsigned int numDigits) {
+  float pow_10 = pow(10.0f, numDigits);
+  return round(value * pow_10) / pow_10;
+}
+
+bool do_OPERATION_TYPE_MATH_ROUND(EvalStack &stack) {
+    auto numArgs = stack.pop().getInt();
+	auto a = stack.pop().getValue();
+
+    unsigned int numDigits;
+    if (numArgs > 1) {
+        auto b = stack.pop().getValue();
+        numDigits = b.toInt32();
+    } else {
+        numDigits = 0;
+    }
 
 	if (a.isDouble()) {
-		if (!stack.push(Value(round(a.getDouble()), VALUE_TYPE_DOUBLE))) {
+		if (!stack.push(Value(roundN(a.getDouble(), numDigits), VALUE_TYPE_DOUBLE))) {
 			return false;
 		}
 		return true;
 	}
 
 	if (a.isFloat()) {
-		if (!stack.push(Value(roundf(a.toFloat()), VALUE_TYPE_FLOAT))) {
+		if (!stack.push(Value(roundN(a.toFloat(), numDigits), VALUE_TYPE_FLOAT))) {
 			return false;
 		}
 		return true;
 	}
 
+    if (a.isInt32OrLess()) {
+		if (!stack.push(a)) {
+			return false;
+		}
+		return true;
+    }
+
 	return false;
 }
 
+bool do_OPERATION_TYPE_MATH_MIN(EvalStack &stack) {
+    auto numArgs = stack.pop().getInt();
+
+    double minValue = INFINITY;
+
+    for (int i = 0; i < numArgs; i++) {
+        auto value = stack.pop().getValue().toDouble();
+        if (value < minValue) {
+            minValue = value;
+        }
+    }
+
+	if (!stack.push(Value(minValue, VALUE_TYPE_DOUBLE))) {
+		return false;
+	}
+
+	return true;
+}
+
+bool do_OPERATION_TYPE_MATH_MAX(EvalStack &stack) {
+    auto numArgs = stack.pop().getInt();
+
+    double maxValue = -INFINITY;
+
+    for (int i = 0; i < numArgs; i++) {
+        auto value = stack.pop().getValue().toDouble();
+        if (value > maxValue) {
+            maxValue = value;
+        }
+    }
+
+	if (!stack.push(Value(maxValue, VALUE_TYPE_DOUBLE))) {
+		return false;
+	}
+
+	return true;
+}
+
 bool do_OPERATION_TYPE_STRING_FIND(EvalStack &stack) {
-	auto b = stack.pop();
-	auto a = stack.pop();
-
-	if (a.getType() == VALUE_TYPE_VALUE_PTR) {
-		a = *a.pValueValue;
-	} else if (a.getType() == VALUE_TYPE_NATIVE_VARIABLE) {
-		a = get(g_widgetCursor, a.getInt());
-	}
-
-	if (b.getType() == VALUE_TYPE_VALUE_PTR) {
-		b = *b.pValueValue;
-	} else if (b.getType() == VALUE_TYPE_NATIVE_VARIABLE) {
-		b = get(g_widgetCursor, b.getInt());
-	}
+	auto b = stack.pop().getValue();
+	auto a = stack.pop().getValue();
 
 	Value aStr = a.toString(0xf616bf4d);
 	Value bStr = b.toString(0x81229133);
@@ -1116,27 +1181,9 @@ bool do_OPERATION_TYPE_STRING_FIND(EvalStack &stack) {
 }
 
 bool do_OPERATION_TYPE_STRING_PAD_START(EvalStack &stack) {
-	auto c = stack.pop();
-	auto b = stack.pop();
-	auto a = stack.pop();
-
-	if (a.getType() == VALUE_TYPE_VALUE_PTR) {
-		a = *a.pValueValue;
-	} else if (a.getType() == VALUE_TYPE_NATIVE_VARIABLE) {
-		a = get(g_widgetCursor, a.getInt());
-	}
-
-	if (b.getType() == VALUE_TYPE_VALUE_PTR) {
-		b = *b.pValueValue;
-	} else if (b.getType() == VALUE_TYPE_NATIVE_VARIABLE) {
-		b = get(g_widgetCursor, b.getInt());
-	}
-
-	if (c.getType() == VALUE_TYPE_VALUE_PTR) {
-		c = *c.pValueValue;
-	} else if (c.getType() == VALUE_TYPE_NATIVE_VARIABLE) {
-		c = get(g_widgetCursor, c.getInt());
-	}
+	auto c = stack.pop().getValue();
+	auto b = stack.pop().getValue();
+	auto a = stack.pop().getValue();
 
 	auto str = a.toString(0xcf6aabe6);
 	if (!str.getString()) {
@@ -1185,13 +1232,7 @@ bool do_OPERATION_TYPE_STRING_SPLIT(EvalStack &stack) {
 }
 
 bool do_OPERATION_TYPE_ARRAY_LENGTH(EvalStack &stack) {
-    auto a = stack.pop();
-
-	if (a.getType() == VALUE_TYPE_VALUE_PTR) {
-		a = *a.pValueValue;
-	} else if (a.getType() == VALUE_TYPE_NATIVE_VARIABLE) {
-		a = get(g_widgetCursor, a.getInt());
-	}
+    auto a = stack.pop().getValue();
 
     if (a.getType() == VALUE_TYPE_ARRAY || a.getType() == VALUE_TYPE_ARRAY_REF) {
         auto array = a.getArray();
@@ -1240,6 +1281,11 @@ EvalOperation g_evalOperations[] = {
 	do_OPERATION_TYPE_FLOW_IS_PAGE_ACTIVE,
     do_OPERATION_TYPE_FLOW_MAKE_ARRAY_VALUE,
     do_OPERATION_TYPE_FLOW_MAKE_ARRAY_VALUE,
+    do_OPERATION_TYPE_FLOW_LANGUAGES,
+    do_OPERATION_TYPE_FLOW_TRANSLATE,
+    do_OPERATION_TYPE_DATE_NOW,
+    do_OPERATION_TYPE_DATE_TO_STRING,
+    do_OPERATION_TYPE_DATE_FROM_STRING,
 	do_OPERATION_TYPE_MATH_SIN,
 	do_OPERATION_TYPE_MATH_COS,
 	do_OPERATION_TYPE_MATH_LOG,
@@ -1248,6 +1294,8 @@ EvalOperation g_evalOperations[] = {
 	do_OPERATION_TYPE_MATH_FLOOR,
 	do_OPERATION_TYPE_MATH_CEIL,
 	do_OPERATION_TYPE_MATH_ROUND,
+    do_OPERATION_TYPE_MATH_MIN,
+    do_OPERATION_TYPE_MATH_MAX,
 	do_OPERATION_TYPE_STRING_FIND,
 	do_OPERATION_TYPE_STRING_PAD_START,
 	do_OPERATION_TYPE_STRING_SPLIT,

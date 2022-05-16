@@ -145,7 +145,7 @@ void aggInit(AggDrawing& aggDrawing);
 void drawRoundedRect(
 	AggDrawing &aggDrawing,
 	double x1, double y1, double x2, double y2,
-	double lineWidth, 
+	double lineWidth,
 	double rtlx, double rtly, double rtrx, double rtry,
 	double rbrx, double rbry, double rblx, double rbly
 );
@@ -172,7 +172,7 @@ void fillRoundedRect(
 void drawStr(const char *text, int textLength, int x, int y, int clip_x1, int clip_y1, int clip_x2, int clip_y2, gui::font::Font &font, int cursorPosition);
 int getCharIndexAtPosition(int xPos, const char *text, int textLength, int x, int y, int clip_x1, int clip_y1, int clip_x2,int clip_y2, gui::font::Font &font);
 int getCursorXPosition(int cursorPosition, const char *text, int textLength, int x, int y, int clip_x1, int clip_y1, int clip_x2,int clip_y2, gui::font::Font &font);
-int8_t measureGlyph(uint8_t encoding, gui::font::Font &font);
+int8_t measureGlyph(int32_t encoding, gui::font::Font &font);
 int measureStr(const char *text, int textLength, gui::font::Font &font, int max_width = 0);
 
 } // namespace display

@@ -449,6 +449,18 @@ const char *STREAM_value_type_name(const Value &value) {
     return "stream";
 }
 
+bool compare_DATE_value(const Value &a, const Value &b) {
+    return a.doubleValue == b.doubleValue;
+}
+
+void DATE_value_to_text(const Value &value, char *text, int count) {
+    text[0] = 0;
+}
+
+const char *DATE_value_type_name(const Value &value) {
+    return "date";
+}
+
 bool compare_VERSIONED_STRING_value(const Value &a, const Value &b) {
     return a.unit == b.unit; // here unit is used as string version
 }
@@ -484,6 +496,19 @@ const char *VALUE_PTR_value_type_name(const Value &value) {
 	} else {
 		return "null";
 	}
+}
+
+bool compare_ARRAY_ELEMENT_VALUE_value(const Value &a, const Value &b) {
+	return a.getValue() == b.getValue();
+}
+
+void ARRAY_ELEMENT_VALUE_value_to_text(const Value &value, char *text, int count) {
+	value.getValue().toText(text, count);
+}
+
+const char *ARRAY_ELEMENT_VALUE_value_type_name(const Value &value) {
+    auto value2 = value.getValue();
+    return g_valueTypeNames[value2.type](value2);
 }
 
 bool compare_FLOW_OUTPUT_value(const Value &a, const Value &b) {
@@ -628,9 +653,19 @@ ValueTypeNameFunction g_valueTypeNames[] = {
 
 ////////////////////////////////////////////////////////////////////////////////
 
+ArrayValueRef::~ArrayValueRef() {
+    g_hooks.onArrayValueFreeHook(&arrayValue);
+    for (uint32_t i = 1; i < arrayValue.arraySize; i++) {
+        (arrayValue.values + i)->~Value();
+    }
+}
+
+////////////////////////////////////////////////////////////////////////////////
+
 bool assignValue(Value &dstValue, const Value &srcValue) {
-/*
-    if (dstValue.isInt32OrLess()) {
+    if (dstValue.isBoolean()) {
+        dstValue = srcValue;
+    } else if (dstValue.isInt32OrLess()) {
         dstValue = srcValue.toInt32();
     } else if (dstValue.isFloat()) {
         dstValue.floatValue = srcValue.toFloat();
@@ -639,10 +674,8 @@ bool assignValue(Value &dstValue, const Value &srcValue) {
     } else if (dstValue.isAnyStringType()) {
         dstValue = srcValue.toString(0x30a91156);
     } else {
-        return false;
+        dstValue = srcValue;
     }
-*/
-    dstValue = srcValue;
     return true;
 }
 
@@ -677,10 +710,14 @@ Value MakeEnumDefinitionValue(uint8_t enumValue, uint8_t enumDefinition) {
 ////////////////////////////////////////////////////////////////////////////////
 
 const char *Value::getString() const {
-	if (type == VALUE_TYPE_STRING_REF) {
-		return ((StringRef *)refValue)->str;
+    auto value = getValue();
+	if (value.type == VALUE_TYPE_STRING_REF) {
+		return ((StringRef *)value.refValue)->str;
 	}
-	return strValue;
+	if (value.type == VALUE_TYPE_STRING) {
+		return value.strValue;
+	}
+	return nullptr;
 }
 
 const ArrayValue *Value::getArray() const {
@@ -1073,7 +1110,6 @@ Value Value::toString(uint32_t id) const {
 #endif
 
 	return makeStringRef(tempStr, strlen(tempStr), id);
-
 }
 
 Value Value::makeStringRef(const char *str, int len, uint32_t id) {
@@ -1159,6 +1195,28 @@ Value Value::makeArrayRef(int arraySize, int arrayType, uint32_t id) {
     value.options = VALUE_OPTIONS_REF;
     value.reserved = 0;
     value.refValue = arrayRef;
+
+	return value;
+}
+
+Value Value::makeArrayElementRef(Value arrayValue, int elementIndex, uint32_t id) {
+    auto arrayElementValueRef = ObjectAllocator<ArrayElementValue>::allocate(id);
+	if (arrayElementValueRef == nullptr) {
+		return Value(0, VALUE_TYPE_NULL);
+	}
+
+    arrayElementValueRef->arrayValue = arrayValue;
+    arrayElementValueRef->elementIndex = elementIndex;
+
+    arrayElementValueRef->refCounter = 1;
+
+    Value value;
+
+    value.type = VALUE_TYPE_ARRAY_ELEMENT_VALUE;
+    value.unit = 0;
+    value.options = VALUE_OPTIONS_REF;
+    value.reserved = 0;
+    value.refValue = arrayElementValueRef;
 
 	return value;
 }

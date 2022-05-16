@@ -58,6 +58,8 @@ struct EnumValue {
 
 const char *getWidgetLabel(EnumItem *enumDefinition, uint16_t value);
 
+extern WidgetCursor g_widgetCursor;
+
 ////////////////////////////////////////////////////////////////////////////////
 
 #define VALUE_OPTIONS_REF (1 << 0)
@@ -72,6 +74,8 @@ const char *getWidgetLabel(EnumItem *enumDefinition, uint16_t value);
 ////////////////////////////////////////////////////////////////////////////////
 
 struct Value;
+
+Value get(const WidgetCursor &widgetCursor, int16_t id);
 
 typedef bool (*CompareValueFunction)(const Value &a, const Value &b);
 typedef void (*ValueToTextFunction)(const Value &value, char *text, int count);
@@ -105,6 +109,7 @@ struct Ref {
 };
 
 struct ArrayValue;
+struct ArrayElementValue;
 
 ////////////////////////////////////////////////////////////////////////////////
 
@@ -131,7 +136,11 @@ struct Value {
     }
 
 	Value(Value *pValue)
-		: type(VALUE_TYPE_VALUE_PTR), unit(UNIT_UNKNOWN), options(0), pValueValue(pValue) {
+		: type(VALUE_TYPE_VALUE_PTR), unit(UNIT_UNKNOWN), options(0), pValueValue(pValue)
+    {
+        // if (pValue->options & VALUE_OPTIONS_REF) {
+		// 	pValue->refValue->refCounter++;
+		// }
 	}
 
     Value(const char *str, ValueType type)
@@ -232,19 +241,25 @@ struct Value {
 	}
 
 	~Value() {
+        freeRef();
+	}
+
+    void freeRef() {
 		if (options & VALUE_OPTIONS_REF) {
 			if (--refValue->refCounter == 0) {
                 ObjectAllocator<Ref>::deallocate(refValue);
 			}
-		}
-	}
+		}/* else if (type == VALUE_TYPE_VALUE_PTR) {
+            if (pValueValue->options & VALUE_OPTIONS_REF) {
+                if (--pValueValue->refValue->refCounter == 0) {
+                    ObjectAllocator<Ref>::deallocate(pValueValue->refValue);
+                }
+            }
+        }*/
+    }
 
     Value& operator = (const Value &value) {
-		if (options & VALUE_OPTIONS_REF) {
-			if (--refValue->refCounter == 0) {
-				ObjectAllocator<Ref>::deallocate(refValue);
-			}
-		}
+		freeRef();
 
 		type = value.type;
 		unit = value.unit;
@@ -253,7 +268,11 @@ struct Value {
 
 		if (options & VALUE_OPTIONS_REF) {
 			refValue->refCounter++;
-		}
+		}/* else if (type == VALUE_TYPE_VALUE_PTR) {
+            if (pValueValue->options & VALUE_OPTIONS_REF) {
+			    pValueValue->refValue->refCounter++;
+		    }
+        }*/
 
         return *this;
     }
@@ -270,6 +289,8 @@ struct Value {
     ValueType getType() const {
         return (ValueType)type;
     }
+
+    Value getValue() const;
 
 	bool isInt32OrLess() const {
 		return (type >= VALUE_TYPE_INT8 && type <= VALUE_TYPE_UINT32) || type == VALUE_TYPE_BOOLEAN;
@@ -455,6 +476,7 @@ struct Value {
 	static Value concatenateString(const Value &str1, const Value &str2);
 
     static Value makeArrayRef(int arraySize, int arrayType, uint32_t id);
+    static Value makeArrayElementRef(Value arrayValue, int elementIndex, uint32_t id);
 
     static Value makeBlobRef(const uint8_t *blob, uint32_t len, uint32_t id);
 
@@ -512,11 +534,7 @@ struct ArrayValue {
 };
 
 struct ArrayValueRef : public Ref {
-    ~ArrayValueRef() {
-        for (uint32_t i = 1; i < arrayValue.arraySize; i++) {
-            (arrayValue.values + i)->~Value();
-        }
-    }
+    ~ArrayValueRef();
 	ArrayValue arrayValue;
 };
 
@@ -529,6 +547,26 @@ struct BlobRef : public Ref {
 	uint8_t *blob;
     uint32_t len;
 };
+
+struct ArrayElementValue : public Ref {
+	Value arrayValue;
+    int elementIndex;
+};
+
+inline Value Value::getValue() const {
+    if (type == VALUE_TYPE_VALUE_PTR) {
+        return *pValueValue;
+    }
+    if (type == VALUE_TYPE_NATIVE_VARIABLE) {
+        return get(g_widgetCursor, int32Value);
+    }
+    if (type == VALUE_TYPE_ARRAY_ELEMENT_VALUE) {
+        auto arrayElementValue = (ArrayElementValue *)refValue;
+        auto array = arrayElementValue->arrayValue.getArray();
+        return array->values[arrayElementValue->elementIndex];
+    }
+    return *this;
+}
 
 ////////////////////////////////////////////////////////////////////////////////
 

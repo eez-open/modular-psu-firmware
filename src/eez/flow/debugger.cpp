@@ -81,6 +81,7 @@ enum DebuggerState {
     DEBUGGER_STATE_RESUMED,
     DEBUGGER_STATE_PAUSED,
     DEBUGGER_STATE_SINGLE_STEP,
+    DEBUGGER_STATE_STOPPED,
 };
 
 bool g_debuggerIsConnected;
@@ -146,7 +147,7 @@ void processDebuggerInput(char *buffer, uint32_t length) {
 				auto flowIndex = (uint32_t)strtol(g_inputFromDebugger + 2, &p, 10);
 				auto componentIndex = (uint32_t)strtol(p + 1, nullptr, 10);
 
-				auto assets = g_mainPageFlowState->assets;
+				auto assets = g_firstFlowState->assets;
 				auto flowDefinition = static_cast<FlowDefinition *>(assets->flowDefinition);
 				if (flowIndex >= 0 && flowIndex < flowDefinition->flows.count) {
 					auto flow = flowDefinition->flows[flowIndex];
@@ -209,7 +210,11 @@ bool canExecuteStep(FlowState *&flowState, unsigned &componentIndex) {
 
 ////////////////////////////////////////////////////////////////////////////////
 
+#if defined(__EMSCRIPTEN__)
+char outputBuffer[1024 * 1024];
+#else
 char outputBuffer[64];
+#endif
 int outputBufferPosition = 0;
 
 #define WRITE_TO_OUTPUT_BUFFER(ch) \
@@ -288,6 +293,14 @@ void writeArray(const ArrayValue *arrayValue) {
     }
 }
 
+void writeHex(char *dst, uint8_t *src, size_t srcLength) {
+    *dst++ = 'H';
+    for (size_t i = 0; i < srcLength; i++) {
+        *dst++ = toHexDigit(src[i] / 16);
+        *dst++ = toHexDigit(src[i] % 16);
+    }
+}
+
 void writeValue(const Value &value) {
 	char tempStr[64];
 
@@ -342,11 +355,11 @@ void writeValue(const Value &value) {
 		break;
 
 	case VALUE_TYPE_DOUBLE:
-		snprintf(tempStr, sizeof(tempStr) - 1, "%g", value.doubleValue);
+        writeHex(tempStr, (uint8_t *)&value.doubleValue, sizeof(double));
 		break;
 
 	case VALUE_TYPE_FLOAT:
-		snprintf(tempStr, sizeof(tempStr) - 1, "%g", value.floatValue);
+        writeHex(tempStr, (uint8_t *)&value.floatValue, sizeof(float));
 		break;
 
 	case VALUE_TYPE_STRING:
@@ -365,6 +378,11 @@ void writeValue(const Value &value) {
 
 	case VALUE_TYPE_STREAM:
 		snprintf(tempStr, sizeof(tempStr) - 1, ">%d", (int)(value.int32Value));
+		break;
+
+	case VALUE_TYPE_DATE:
+        tempStr[0] = '!';
+		writeHex(tempStr + 1, (uint8_t *)&value.doubleValue, sizeof(double));
 		break;
 
 	default:
@@ -403,6 +421,10 @@ void onStarted(Assets *assets) {
 			writeValue(*pValue);
         }
     }
+}
+
+void onStopped() {
+    setDebuggerState(DEBUGGER_STATE_STOPPED);
 }
 
 void onAddToQueue(FlowState *flowState, int sourceComponentIndex, int sourceOutputIndex, unsigned targetComponentIndex, int targetInputIndex) {

@@ -139,10 +139,13 @@ private:
 
 ////////////////////////////////////////////////////////////////////////////////
 
-#define SHADOW_FLAG (1 << 0)
-#define CLOSE_PAGE_IF_TOUCHED_OUTSIDE_FLAG (1 << 1)
-#define PAGE_IS_USED_AS_CUSTOM_WIDGET (1 << 2)
-#define PAGE_CONTAINER (1 << 3)
+#define WIDGET_FLAG_PIN_TO_LEFT (1 << 0)
+#define WIDGET_FLAG_PIN_TO_RIGHT (1 << 1)
+#define WIDGET_FLAG_PIN_TO_TOP (1 << 2)
+#define WIDGET_FLAG_PIN_TO_BOTTOM (1 << 3)
+
+#define WIDGET_FLAG_FIX_WIDTH (1 << 4)
+#define WIDGET_FLAG_FIX_HEIGHT (1 << 5)
 
 struct Widget {
 	uint16_t type;
@@ -150,10 +153,17 @@ struct Widget {
 	int16_t action;
 	int16_t x;
 	int16_t y;
-	int16_t w;
-	int16_t h;
+	int16_t width;
+	int16_t height;
 	int16_t style;
+    uint32_t flags;
 };
+
+#define SHADOW_FLAG (1 << 0)
+#define CLOSE_PAGE_IF_TOUCHED_OUTSIDE_FLAG (1 << 1)
+#define PAGE_IS_USED_AS_CUSTOM_WIDGET (1 << 2)
+#define PAGE_CONTAINER (1 << 3)
+#define PAGE_SCALE_TO_FIT (1 << 4)
 
 struct PageAsset : public Widget {
 	ListOfAssetsPtr<Widget> widgets;
@@ -222,18 +232,27 @@ struct GlyphData {
 	uint8_t height;    // BBX height
 	int8_t x;          // BBX xoffset
 	int8_t y;          // BBX yoffset
-    int8_t reserved1;
-    int8_t reserved2;
-    int8_t reserved3;
+    uint8_t reserved1;
+    uint8_t reserved2;
+    uint8_t reserved3;
 	uint8_t pixels[1];
+};
+
+struct GlyphsGroup {
+    uint32_t encoding;
+    uint32_t glyphIndex;
+    uint32_t length;
 };
 
 struct FontData {
 	uint8_t ascent;
 	uint8_t descent;
-	uint8_t encodingStart;
-	uint8_t encodingEnd;
-	AssetsPtr<const GlyphData> glyphs[1];
+    uint8_t reserved1;
+    uint8_t reserved2;
+	uint32_t encodingStart;
+	uint32_t encodingEnd;
+    ListOfAssetsPtr<GlyphsGroup> groups;
+    ListOfAssetsPtr<GlyphData> glyphs;
 };
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -330,6 +349,11 @@ struct Flow {
 	ListOfAssetsPtr<WidgetActionItem> widgetActions;
 };
 
+struct Language {
+    AssetsPtr<const char> languageID;
+    ListOfAssetsPtr<const char> translations;
+};
+
 struct FlowDefinition {
 	ListOfAssetsPtr<Flow> flows;
 	ListOfAssetsPtr<Value> constants;
@@ -352,6 +376,7 @@ struct Assets {
 	ListOfAssetsPtr<const char> actionNames;
 	ListOfAssetsPtr<const char> variableNames;
 	AssetsPtr<FlowDefinition> flowDefinition;
+    ListOfAssetsPtr<Language> languages;
 };
 
 ////////////////////////////////////////////////////////////////////////////////

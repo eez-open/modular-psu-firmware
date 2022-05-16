@@ -68,7 +68,7 @@ inline int getWidgetAction(const WidgetCursor &widgetCursor) {
 	return widgetCursor.widget->action;
 }
 
-void executeAction(const WidgetCursor &widgetCursor, int actionId);
+void executeAction(const WidgetCursor &widgetCursor, int actionId, void *param = nullptr);
 void executeActionFunction(int actionId);
 void executeInternalAction(int actionId);
 

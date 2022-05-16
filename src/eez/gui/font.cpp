@@ -23,12 +23,12 @@ namespace gui {
 namespace font {
 
 Font::Font()
-	: fontData(0) 
+	: fontData(0)
 {
 }
 
 Font::Font(const FontData *fontData_)
-	: fontData(fontData_) 
+	: fontData(fontData_)
 {
 }
 
@@ -44,17 +44,29 @@ uint8_t Font::getHeight() {
     return fontData->ascent + fontData->descent;
 }
 
-const GlyphData *Font::getGlyph(uint8_t encoding) {
+const GlyphData *Font::getGlyph(int32_t encoding) {
 	auto start = fontData->encodingStart;
 	auto end = fontData->encodingEnd;
 
-	if (encoding < start || encoding > end) {
-		// Not found!
-		return nullptr;
-	}
+    uint32_t glyphIndex = 0;
+	if ((uint32_t)encoding < start || (uint32_t)encoding > end) {
+        // TODO use binary search
+        uint32_t i;
+		for (i = 0; i < fontData->groups.count; i++) {
+            auto group = fontData->groups[i];
+            if ((uint32_t)encoding >= group->encoding && (uint32_t)encoding < group->encoding + group->length) {
+                glyphIndex = group->glyphIndex + (encoding - group->encoding);
+                break;
+            }
+        }
+        if (i == fontData->groups.count) {
+            return nullptr;
+        }
+	} else {
+        glyphIndex = encoding - start;
+    }
 
-	auto glyphIndex = encoding - start;
-	auto glyphData = static_cast<const GlyphData *>(fontData->glyphs[glyphIndex]);
+	auto glyphData = fontData->glyphs[glyphIndex];
 
 	if (glyphData->dx == -128) {
 		// empty glyph

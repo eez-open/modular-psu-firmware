@@ -33,7 +33,9 @@ void executeSwitchComponent(FlowState *flowState, unsigned componentIndex) {
 
         Value conditionValue;
         if (!evalExpression(flowState, componentIndex, test->conditionInstructions, conditionValue)) {
-            throwError(flowState, componentIndex, "Failed to evaluate test condition in Switch\n");
+            char strMessage[256];
+            snprintf(strMessage, sizeof(strMessage), "Failed to evaluate test condition no. %d in Switch\n", (int)testIndex);
+            throwError(flowState, componentIndex, strMessage);
             return;
         }
 
@@ -45,7 +47,9 @@ void executeSwitchComponent(FlowState *flowState, unsigned componentIndex) {
                 break;
             }
         } else {
-            throwError(flowState, componentIndex, "Failed to convert Value to boolean in IsTrue\n");
+            char strMessage[256];
+            snprintf(strMessage, sizeof(strMessage), "Failed to convert Value no. %d to boolean in Switch\n", (int)testIndex);
+            throwError(flowState, componentIndex, strMessage);
             return;
         }
     }

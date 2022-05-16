@@ -130,8 +130,9 @@ protected:
     void updatePage(int i, WidgetCursor &widgetCursor);
     virtual void pageRenderCustom(int i, WidgetCursor &widgetCursor);
 
+    void getPageRect(int pageId, Page *page, int &x, int &y, int &w, int &h);
     bool isPageFullyCovered(int pageNavigationStackIndex);
-    
+
     virtual bool canExecuteActionWhenTouchedOutsideOfActivePage(int pageId, int action);
 
     void pushToastMessage(ToastMessagePage *toastMessage);

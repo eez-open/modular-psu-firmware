@@ -41,10 +41,11 @@ namespace flow {
 
 static const uint32_t FLOW_TICK_MAX_DURATION_MS = 20;
 
-FlowState *g_mainPageFlowState;
+int g_selectedLanguage = 0;
+FlowState *g_firstFlowState;
+FlowState *g_lastFlowState;
 
-static const uint32_t MAX_PAGES = 100;
-FlowState *g_pagesFlowState[MAX_PAGES];
+static bool g_isStopped = true;
 
 ////////////////////////////////////////////////////////////////////////////////
 
@@ -54,13 +55,11 @@ unsigned start(Assets *assets) {
 		return 0;
 	}
 
+    g_isStopped = false;
+
 	queueReset();
 
 	scpiComponentInitHook();
-
-	for (uint32_t i = 0; i < MAX_PAGES; i++) {
-		g_pagesFlowState[i] = nullptr;
-	}
 
 	onStarted(assets);
 
@@ -91,6 +90,10 @@ void tick() {
 
 		executeComponent(flowState, componentIndex);
 
+        if (isFlowStopped()) {
+            break;
+        }
+
 		auto component = flowState->flow->components[componentIndex];
 
 		for (uint32_t i = 0; i < component->inputs.count; i++) {
@@ -114,14 +117,29 @@ void tick() {
 	finishToDebuggerMessageHook();
 }
 
+void freeAllChildrenFlowStates(FlowState *firstChildFlowState) {
+    auto flowState = firstChildFlowState;
+    while (flowState != nullptr) {
+        auto nextFlowState = flowState->nextSibling;
+        freeAllChildrenFlowStates(flowState->firstChild);
+        freeFlowState(flowState);
+        flowState = nextFlowState;
+    }
+}
+
 void stop() {
-	if (g_mainPageFlowState) {
-		for (unsigned i = 0; i < MAX_PAGES && g_pagesFlowState[i]; i++) {
-			freeFlowState(g_pagesFlowState[i]);
-		}
-		g_mainPageFlowState = nullptr;
-	}
+    freeAllChildrenFlowStates(g_firstFlowState);
+    g_firstFlowState = nullptr;
+    g_lastFlowState = nullptr;
+
+    g_isStopped = true;
+
 	queueReset();
+    onStopped();
+}
+
+bool isFlowStopped() {
+    return g_isStopped;
 }
 
 FlowState *getFlowState(Assets *assets, int flowStateIndex) {
@@ -145,13 +163,18 @@ FlowState *getFlowState(Assets *assets, int16_t pageId, const WidgetCursor &widg
 		auto pageIndex = pageId;
 		auto page = assets->pages[pageIndex];
 		if (!(page->flags & PAGE_IS_USED_AS_CUSTOM_WIDGET)) {
-			if (!g_pagesFlowState[pageIndex]) {
-				g_pagesFlowState[pageIndex] = initPageFlowState(assets, pageIndex, nullptr, 0);
-				if (pageIndex == 0) {
-					g_mainPageFlowState = g_pagesFlowState[0];
-				}
+            FlowState *flowState;
+            for (flowState = g_firstFlowState; flowState; flowState = flowState->nextSibling) {
+                if (flowState->flowIndex == pageIndex) {
+                    break;
+                }
+            }
+
+            if (!flowState) {
+				flowState = initPageFlowState(assets, pageIndex, nullptr, 0);
 			}
-			return g_pagesFlowState[pageIndex];
+
+			return flowState;
 		}
 	}
 
@@ -159,15 +182,10 @@ FlowState *getFlowState(Assets *assets, int16_t pageId, const WidgetCursor &widg
 }
 
 int getPageIndex(FlowState *flowState) {
-	for (uint32_t pageIndex = 0; pageIndex < MAX_PAGES; pageIndex++) {
-		if (g_pagesFlowState[pageIndex] == flowState) {
-			return (int)pageIndex;
-		}
-	}
-	return -1;
+	return flowState->flowIndex;
 }
 
-void executeFlowAction(const gui::WidgetCursor &widgetCursor, int16_t actionId) {
+void executeFlowAction(const gui::WidgetCursor &widgetCursor, int16_t actionId, void *param) {
 	if (!isFlowRunningHook()) {
 		return;
 	}
@@ -180,17 +198,38 @@ void executeFlowAction(const gui::WidgetCursor &widgetCursor, int16_t actionId) 
 	if (actionId >= 0 && actionId < (int16_t)flow->widgetActions.count) {
 		auto componentOutput = flow->widgetActions[actionId];
 		if (componentOutput->componentIndex != -1 && componentOutput->componentOutputIndex != -1) {
-            auto params = Value::makeArrayRef(defs_v3::SYSTEM_STRUCTURE_ACTION_PARAMS_NUM_FIELDS, defs_v3::SYSTEM_STRUCTURE_ACTION_PARAMS, 0x285940bb);
+            if (widgetCursor.widget->type == WIDGET_TYPE_DROP_DOWN_LIST) {
+                auto params = Value::makeArrayRef(defs_v3::SYSTEM_STRUCTURE_DROP_DOWN_LIST_ACTION_PARAMS_NUM_FIELDS, defs_v3::SYSTEM_STRUCTURE_DROP_DOWN_LIST_ACTION_PARAMS, 0x53e3b30b);
 
-            ((ArrayValueRef *)params.refValue)->arrayValue.values[defs_v3::SYSTEM_STRUCTURE_ACTION_PARAMS_FIELD_INDEX] = widgetCursor.iterators[0];
-            
-            auto indexes = Value::makeArrayRef(MAX_ITERATORS, defs_v3::ARRAY_TYPE_INTEGER, 0xb1f68ef8);
-            for (size_t i = 0; i < MAX_ITERATORS; i++) {
-                ((ArrayValueRef *)indexes.refValue)->arrayValue.values[i] = (int)widgetCursor.iterators[i];
+                // index
+                ((ArrayValueRef *)params.refValue)->arrayValue.values[defs_v3::SYSTEM_STRUCTURE_DROP_DOWN_LIST_ACTION_PARAMS_FIELD_INDEX] = widgetCursor.iterators[0];
+
+                // indexes
+                auto indexes = Value::makeArrayRef(MAX_ITERATORS, defs_v3::ARRAY_TYPE_INTEGER, 0xb1f68ef8);
+                for (size_t i = 0; i < MAX_ITERATORS; i++) {
+                    ((ArrayValueRef *)indexes.refValue)->arrayValue.values[i] = (int)widgetCursor.iterators[i];
+                }
+                ((ArrayValueRef *)params.refValue)->arrayValue.values[defs_v3::SYSTEM_STRUCTURE_DROP_DOWN_LIST_ACTION_PARAMS_FIELD_INDEXES] = indexes;
+
+                // selectedIndex
+                ((ArrayValueRef *)params.refValue)->arrayValue.values[defs_v3::SYSTEM_STRUCTURE_DROP_DOWN_LIST_ACTION_PARAMS_FIELD_SELECTED_INDEX] = *((int *)param);
+
+                propagateValue(flowState, componentOutput->componentIndex, componentOutput->componentOutputIndex, params);
+            } else {
+                auto params = Value::makeArrayRef(defs_v3::SYSTEM_STRUCTURE_ACTION_PARAMS_NUM_FIELDS, defs_v3::SYSTEM_STRUCTURE_ACTION_PARAMS, 0x285940bb);
+
+                // index
+                ((ArrayValueRef *)params.refValue)->arrayValue.values[defs_v3::SYSTEM_STRUCTURE_ACTION_PARAMS_FIELD_INDEX] = widgetCursor.iterators[0];
+
+                // indexes
+                auto indexes = Value::makeArrayRef(MAX_ITERATORS, defs_v3::ARRAY_TYPE_INTEGER, 0xb1f68ef8);
+                for (size_t i = 0; i < MAX_ITERATORS; i++) {
+                    ((ArrayValueRef *)indexes.refValue)->arrayValue.values[i] = (int)widgetCursor.iterators[i];
+                }
+                ((ArrayValueRef *)params.refValue)->arrayValue.values[defs_v3::SYSTEM_STRUCTURE_ACTION_PARAMS_FIELD_INDEXES] = indexes;
+
+                propagateValue(flowState, componentOutput->componentIndex, componentOutput->componentOutputIndex, params);
             }
-            ((ArrayValueRef *)params.refValue)->arrayValue.values[defs_v3::SYSTEM_STRUCTURE_ACTION_PARAMS_FIELD_INDEXES] = indexes;
-
-			propagateValue(flowState, componentOutput->componentIndex, componentOutput->componentOutputIndex, params);
 		}
 	}
 
@@ -262,7 +301,7 @@ void dataOperation(int16_t dataId, DataOperationEnum operation, const gui::Widge
 					setValue(flowDataId, widgetCursor, value);
 				}
 
-				executeFlowAction(widgetCursor, inputWidget->action);
+				executeFlowAction(widgetCursor, inputWidget->action, nullptr);
 			} else {
 				setValue(flowDataId, widgetCursor, value);
 			}

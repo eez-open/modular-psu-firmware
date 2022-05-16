@@ -26,6 +26,7 @@ extern bool g_debuggerIsConnected;
 bool canExecuteStep(FlowState *&flowState, unsigned &componentIndex);
 
 void onStarted(gui::Assets *assets);
+void onStopped();
 
 void onAddToQueue(FlowState *flowState, int sourceComponentIndex, int sourceOutputIndex, unsigned targetComponentIndex, int targetInputIndex);
 void onRemoveFromQueue();

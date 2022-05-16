@@ -34,6 +34,7 @@
 
 #include <eez/flow/flow_defs_v3.h>
 #include <eez/flow/components/switch.h>
+#include <eez/flow/components/set_variable.h>
 
 namespace eez {
 namespace gui {
@@ -69,6 +70,7 @@ void fixOffset(ListOfFundamentalType<T> &list, Assets *assets) {
 void fixOffsets(Assets *assets, ListOfAssetsPtr<Widget> &widgets);
 void fixOffsets(Assets *assets, Widget *widget);
 void fixOffsets(Assets *assets, ListOfAssetsPtr<Value> &values);
+void fixOffsets(Assets *assets, ListOfAssetsPtr<Language> &languages);
 void fixOffsets(Assets *assets, Value &value);
 
 void fixOffsets(Assets *assets) {
@@ -82,9 +84,8 @@ void fixOffsets(Assets *assets) {
 	fixOffset(assets->fonts, assets);
     for (uint32_t i = 0; i < assets->fonts.count; i++) {
         auto font = assets->fonts[i];
-        for (uint32_t glyphIndex = font->encodingStart; glyphIndex <= font->encodingEnd; glyphIndex++) {
-            fixOffset(font->glyphs[glyphIndex - font->encodingStart], assets);
-        }
+        fixOffset(font->groups, assets);
+        fixOffset(font->glyphs, assets);
     }
 
     fixOffset(assets->bitmaps, assets);
@@ -125,6 +126,17 @@ void fixOffsets(Assets *assets) {
                 case COMPONENT_TYPE_SWITCH_ACTION:
                     fixOffset(((SwitchActionComponent *)component)->tests, assets);
                     break;
+                case COMPONENT_TYPE_SET_VARIABLE_ACTION:
+                    {
+                        auto setVariableActionComponent = (SetVariableActionComponent *)component;
+                        fixOffset(setVariableActionComponent->entries, assets);
+                        for (uint32_t entryIndex = 0; entryIndex < setVariableActionComponent->entries.count; entryIndex++) {
+                            auto entry = setVariableActionComponent->entries[entryIndex];
+                            fixOffset(entry->variable, assets);
+                            fixOffset(entry->value, assets);
+                        }
+                    }
+                    break;
                 }
 
                 fixOffset(component->inputs, assets);
@@ -146,6 +158,8 @@ void fixOffsets(Assets *assets) {
         fixOffsets(assets, flowDefinition->constants);
         fixOffsets(assets, flowDefinition->globalVariables);
     }
+
+    fixOffsets(assets, assets->languages);
 }
 
 void fixOffsets(Assets *assets, ListOfAssetsPtr<Widget> &widgets) {
@@ -211,6 +225,16 @@ void fixOffsets(Assets *assets, ListOfAssetsPtr<Value> &values) {
     for (uint32_t i = 0; i < values.count; i++) {
         auto value = values[i];
         fixOffsets(assets, *value);
+    }
+}
+
+void fixOffsets(Assets *assets, ListOfAssetsPtr<Language> &languages) {
+    fixOffset(languages, assets);
+
+    for (uint32_t i = 0; i < languages.count; i++) {
+        auto language = languages[i];
+        fixOffset(language->languageID, assets);
+        fixOffset(language->translations, assets);
     }
 }
 

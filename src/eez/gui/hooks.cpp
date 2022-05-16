@@ -34,8 +34,8 @@ static float getDefaultAnimationDuration() {
     return 0;
 }
 
-static void executeExternalAction(const WidgetCursor &widgetCursor, int16_t actionId) {
-    flow::executeFlowAction(widgetCursor, actionId);
+static void executeExternalAction(const WidgetCursor &widgetCursor, int16_t actionId, void *param) {
+    flow::executeFlowAction(widgetCursor, actionId, param);
 }
 
 static void externalData(int16_t id, DataOperationEnum operation, const WidgetCursor &widgetCursor, Value &value) {
@@ -165,6 +165,8 @@ static void setTouchScreenCalibrationParams(
 static void onGuiQueueMessage(uint8_t type, int16_t param) {
 }
 
+static void onArrayValueFree(ArrayValue *) {}
+
 ////////////////////////////////////////////////////////////////////////////////
 
 Hooks g_hooks = {
@@ -197,7 +199,8 @@ Hooks g_hooks = {
     onTouchCalibrationConfirm,
     getTouchScreenCalibrationParams,
     setTouchScreenCalibrationParams,
-    onGuiQueueMessage
+    onGuiQueueMessage,
+    onArrayValueFree
 };
 
 } // namespace gui

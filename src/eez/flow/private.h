@@ -58,9 +58,16 @@ struct FlowState {
 	Value *values;
 	ComponenentExecutionState **componenentExecutionStates;
     bool *componenentAsyncStates;
+
+    FlowState *firstChild;
+    FlowState *lastChild;
+    FlowState *previousSibling;
+    FlowState *nextSibling;
 };
 
-extern FlowState *g_mainPageFlowState;
+extern int g_selectedLanguage;
+extern FlowState *g_firstFlowState;
+extern FlowState *g_lastFlowState;
 
 FlowState *initActionFlowState(int flowIndex, FlowState *parentFlowState, int parentComponentIndex);
 FlowState *initPageFlowState(Assets *assets, int flowIndex, FlowState *parentFlowState, int parentComponentIndex);

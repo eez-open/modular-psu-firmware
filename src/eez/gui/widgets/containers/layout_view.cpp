@@ -28,7 +28,7 @@ int getLayoutId(const WidgetCursor &widgetCursor) {
         auto layoutValue = get(widgetCursor, widgetCursor.widget->data);
         return layoutValue.getInt();
     }
-    
+
     auto layoutView = (const LayoutViewWidget *)widgetCursor.widget;
     return layoutView->layout;
 }
@@ -111,12 +111,45 @@ void LayoutViewWidgetState::enumChildren() {
 
     if (layout) {
 		auto savedWidget = widgetCursor.widget;
-        
-        auto &widgets = layout->widgets;
-        for (uint32_t index = 0; index < widgets.count; ++index) {
-			widgetCursor.widget = widgets[index];
 
-            enumWidget();
+        auto &widgets = layout->widgets;
+
+        if (
+            widgetCursor.widget->w != layout->w ||
+            widgetCursor.widget->h != layout->h
+        ) {
+            Rect rectContainerOriginal = {
+                widgetCursor.x,
+                widgetCursor.y,
+                layout->w,
+                layout->h
+            };
+
+            Rect rectContainer;
+            rectContainer.x = widgetCursor.x;
+            rectContainer.y = widgetCursor.y;
+            rectContainer.w = widgetCursor.widget->w;
+            rectContainer.h = widgetCursor.widget->h;
+
+            for (uint32_t index = 0; index < widgets.count; ++index) {
+                widgetCursor.widget = widgets[index];
+
+                Rect rectWidgetOriginal;
+                resizeWidget((Widget *)widgetCursor.widget, rectContainerOriginal, rectContainer, rectWidgetOriginal);
+                widgetCursor.rectWidgetOriginal = rectWidgetOriginal;
+
+                enumWidget();
+
+                ((Widget *)widget)->x = rectWidgetOriginal.x;
+                ((Widget *)widget)->y = rectWidgetOriginal.y;
+                ((Widget *)widget)->w = rectWidgetOriginal.w;
+                ((Widget *)widget)->h = rectWidgetOriginal.h;
+            }
+        } else {
+            for (uint32_t index = 0; index < widgets.count; ++index) {
+                widgetCursor.widget = widgets[index];
+                enumWidget();
+            }
         }
 
 		widgetCursor.widget = savedWidget;

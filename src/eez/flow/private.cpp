@@ -127,13 +127,39 @@ static FlowState *initFlowState(Assets *assets, int flowIndex, FlowState *parent
 	flowState->error = false;
 	flowState->numAsyncComponents = 0;
 	flowState->parentFlowState = parentFlowState;
-	if (parentFlowState) {
+
+    if (parentFlowState) {
+        if (parentFlowState->lastChild) {
+            parentFlowState->lastChild->nextSibling = flowState;
+            flowState->previousSibling = parentFlowState->lastChild;
+            parentFlowState->lastChild = flowState;
+        } else {
+            flowState->previousSibling = nullptr;
+            parentFlowState->firstChild = flowState;
+            parentFlowState->lastChild = flowState;
+        }
+
 		flowState->parentComponentIndex = parentComponentIndex;
 		flowState->parentComponent = parentFlowState->flow->components[parentComponentIndex];
 	} else {
+        if (g_lastFlowState) {
+            g_lastFlowState->nextSibling = flowState;
+            flowState->previousSibling = g_lastFlowState;
+            g_lastFlowState = flowState;
+        } else {
+            flowState->previousSibling = nullptr;
+            g_firstFlowState = flowState;
+            g_lastFlowState = flowState;
+        }
+
 		flowState->parentComponentIndex = -1;
 		flowState->parentComponent = nullptr;
 	}
+
+    flowState->firstChild = nullptr;
+    flowState->lastChild = nullptr;
+    flowState->nextSibling = nullptr;
+
 	flowState->values = (Value *)(flowState + 1);
 	flowState->componenentExecutionStates = (ComponenentExecutionState **)(flowState->values + nValues);
     flowState->componenentAsyncStates = (bool *)(flowState->componenentExecutionStates + flow->components.count);
@@ -219,6 +245,27 @@ void freeFlowState(FlowState *flowState) {
             deallocateComponentExecutionState(flowState->parentFlowState, flowState->parentComponentIndex);
             return;
         }
+
+        if (parentFlowState->firstChild == flowState) {
+            parentFlowState->firstChild = flowState->nextSibling;
+        }
+        if (parentFlowState->lastChild == flowState) {
+            parentFlowState->lastChild = flowState->previousSibling;
+        }
+    } else {
+        if (g_firstFlowState == flowState) {
+            g_firstFlowState = flowState->nextSibling;
+        }
+        if (g_lastFlowState == flowState) {
+            g_lastFlowState = flowState->previousSibling;
+        }
+    }
+
+    if (flowState->previousSibling) {
+        flowState->previousSibling->nextSibling = flowState->nextSibling;
+    }
+    if (flowState->nextSibling) {
+        flowState->nextSibling->previousSibling = flowState->previousSibling;
     }
 
 	auto flow = flowState->flow;
@@ -257,7 +304,7 @@ void propagateValue(FlowState *flowState, unsigned componentIndex, unsigned outp
 	auto component = flowState->flow->components[componentIndex];
 	auto componentOutput = component->outputs[outputIndex];
 
-    auto value2 = value.getType() == VALUE_TYPE_VALUE_PTR ? *value.pValueValue : value.getType() == VALUE_TYPE_NATIVE_VARIABLE ? get(g_widgetCursor, value.getInt()) : value;
+    auto value2 = value.getValue();
 
 	for (unsigned connectionIndex = 0; connectionIndex < componentOutput->connections.count; connectionIndex++) {
 		auto connection = componentOutput->connections[connectionIndex];
@@ -336,7 +383,15 @@ void assignValue(FlowState *flowState, int componentIndex, Value &dstValue, cons
 	} else if (dstValue.getType() == VALUE_TYPE_NATIVE_VARIABLE) {
 		set(g_widgetCursor, dstValue.getInt(), srcValue);
 	} else {
-		Value *pDstValue = dstValue.pValueValue;
+		Value *pDstValue;
+        if (dstValue.getType() == VALUE_TYPE_ARRAY_ELEMENT_VALUE) {
+            auto arrayElementValue = (ArrayElementValue *)dstValue.refValue;
+            auto array = arrayElementValue->arrayValue.getArray();
+            pDstValue = &array->values[arrayElementValue->elementIndex];
+        } else {
+            pDstValue = dstValue.pValueValue;
+        }
+
 		if (assignValue(*pDstValue, srcValue)) {
 			onValueChanged(pDstValue);
 		} else {
@@ -361,6 +416,10 @@ void startAsyncExecution(FlowState *flowState, int componentIndex) {
 }
 
 void endAsyncExecution(FlowState *flowState, int componentIndex) {
+    if (!g_firstFlowState) {
+        return;
+    }
+
     if (flowState->componenentAsyncStates[componentIndex]) {
         flowState->componenentAsyncStates[componentIndex] = false;
         onComponentAsyncStateChanged(flowState, componentIndex);

@@ -49,7 +49,7 @@ bool TextWidgetState::updateState() {
     WIDGET_STATE(flags.focused, isFocusWidget(widgetCursor));
 
     WIDGET_STATE(flags.blinking, g_isBlinkTime && styleIsBlink(style));
-    
+
     const char *text = widget->text ? static_cast<const char *>(widget->text) : nullptr;
 	WIDGET_STATE(data, !(text && text[0]) && widget->data ? get(widgetCursor, widget->data) : 0);
 

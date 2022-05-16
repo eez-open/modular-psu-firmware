@@ -31,6 +31,8 @@ unsigned start(eez::gui::Assets *assets);
 void tick();
 void stop();
 
+bool isFlowStopped();
+
 FlowState *getFlowState(Assets *assets, int flowStateIndex);
 
 FlowState *getFlowState(Assets *assets, int16_t pageId, const WidgetCursor &widgetCursor);
@@ -38,7 +40,7 @@ int getPageIndex(FlowState *flowState);
 
 FlowState *getLayoutViewFlowState(FlowState *flowState, uint16_t layoutViewWidgetComponentIndex, int16_t pageId);
 
-void executeFlowAction(const WidgetCursor &widgetCursor, int16_t actionId);
+void executeFlowAction(const WidgetCursor &widgetCursor, int16_t actionId, void *param);
 void dataOperation(int16_t dataId, DataOperationEnum operation, const WidgetCursor &widgetCursor, Value &value);
 int16_t getNativeVariableId(const WidgetCursor &widgetCursor);
 

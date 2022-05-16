@@ -36,7 +36,7 @@ struct Font {
 		return fontData != nullptr;
 	}
 
-    const GlyphData *getGlyph(uint8_t encoding);
+    const GlyphData *getGlyph(int32_t encoding);
 
     uint8_t getAscent();
     uint8_t getDescent();

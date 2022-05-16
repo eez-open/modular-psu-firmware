@@ -67,20 +67,8 @@ static bool evalExpression(FlowState *flowState, const uint8_t *instructions, in
 				return false;
 			}
 		} else if (instructionType == EXPR_EVAL_INSTRUCTION_ARRAY_ELEMENT) {
-			auto elementIndexValue = g_stack.pop();
-			auto arrayValue = g_stack.pop();
-
-			if (arrayValue.getType() == VALUE_TYPE_VALUE_PTR) {
-				arrayValue = *arrayValue.pValueValue;
-			} else if (arrayValue.getType() == VALUE_TYPE_NATIVE_VARIABLE) {
-				arrayValue = get(g_widgetCursor, arrayValue.getInt());
-			}
-
-			if (elementIndexValue.getType() == VALUE_TYPE_VALUE_PTR) {
-				elementIndexValue = *elementIndexValue.pValueValue;
-			} else if (arrayValue.getType() == VALUE_TYPE_NATIVE_VARIABLE) {
-				elementIndexValue = get(g_widgetCursor, elementIndexValue.getInt());
-			}
+			auto elementIndexValue = g_stack.pop().getValue();
+			auto arrayValue = g_stack.pop().getValue();
 
             if (arrayValue.getType() == VALUE_TYPE_UNDEFINED || arrayValue.getType() == VALUE_TYPE_NULL) {
                 if (!g_stack.push(Value(0, VALUE_TYPE_UNDEFINED))) {
@@ -106,7 +94,7 @@ static bool evalExpression(FlowState *flowState, const uint8_t *instructions, in
                     return false;
                 }
 
-                if (!g_stack.push(&array->values[elementIndex])) {
+                if (!g_stack.push(Value::makeArrayElementRef(arrayValue, elementIndex, 0x132e0e2f))) {
                     return false;
                 }
             }
@@ -137,16 +125,7 @@ bool evalExpression(FlowState *flowState, int componentIndex, const uint8_t *ins
 
 	if (evalExpression(flowState, instructions, numInstructionBytes)) {
 		if (g_stack.sp == 1) {
-			auto finalResult = g_stack.pop();
-
-			if (finalResult.getType() == VALUE_TYPE_VALUE_PTR) {
-				result = *finalResult.pValueValue;
-			} else if (finalResult.getType() == VALUE_TYPE_NATIVE_VARIABLE) {
-				DATA_OPERATION_FUNCTION(finalResult.getInt(), operation, g_widgetCursor, result);
-			} else {
-				result = finalResult;
-			}
-
+			result = g_stack.pop().getValue();
 			return true;
 		}
 	}
@@ -164,7 +143,7 @@ bool evalAssignableExpression(FlowState *flowState, int componentIndex, const ui
 	if (evalExpression(flowState, instructions, numInstructionBytes)) {
 		if (g_stack.sp == 1) {
 			auto finalResult = g_stack.pop();
-			if (finalResult.getType() == VALUE_TYPE_VALUE_PTR || finalResult.getType() == VALUE_TYPE_NATIVE_VARIABLE || finalResult.getType() == VALUE_TYPE_FLOW_OUTPUT) {
+			if (finalResult.getType() == VALUE_TYPE_VALUE_PTR || finalResult.getType() == VALUE_TYPE_NATIVE_VARIABLE || finalResult.getType() == VALUE_TYPE_FLOW_OUTPUT || finalResult.getType() == VALUE_TYPE_ARRAY_ELEMENT_VALUE) {
 				result = finalResult;
 				return true;
 			}

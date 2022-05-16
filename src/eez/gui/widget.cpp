@@ -116,8 +116,8 @@ bool WidgetState::hasOnKeyboard() {
     return false;
 }
 
-bool WidgetState::onKeyboard(const WidgetCursor &widgetCursor, uint8_t key, uint8_t mod) { 
-    return false; 
+bool WidgetState::onKeyboard(const WidgetCursor &widgetCursor, uint8_t key, uint8_t mod) {
+    return false;
 }
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -219,7 +219,7 @@ void enumNoneWidget() {
     widgetCursor.widget = &g_noneWidget;
 	enumWidget();
     widgetCursor.widget = savedWidget;
-}    
+}
 
 ////////////////////////////////////////////////////////////////////////////////
 
@@ -316,7 +316,7 @@ static void findWidgetStep() {
 	}
 
     static const int MIN_SIZE = 50;
-        
+
     int w = overlay ? overlay->width : widget->w;
     if (w < MIN_SIZE) {
         x = x - (MIN_SIZE - w) / 2;
@@ -329,8 +329,8 @@ static void findWidgetStep() {
         h = MIN_SIZE;
     }
 
-    bool inside = 
-        g_findWidgetAtX >= x && g_findWidgetAtX < x + w && 
+    bool inside =
+        g_findWidgetAtX >= x && g_findWidgetAtX < x + w &&
         g_findWidgetAtY >= y && g_findWidgetAtY < y + h;
 
     if (inside && (widget->type == WIDGET_TYPE_APP_VIEW || getWidgetTouchFunction(widgetCursor))) {
@@ -338,7 +338,7 @@ static void findWidgetStep() {
         int dy = g_findWidgetAtY - (y + h / 2);
         int distance = dx * dx + dy * dy;
 
-        auto action = getWidgetAction(widgetCursor);        
+        auto action = getWidgetAction(widgetCursor);
         if (action == ACTION_ID_DRAG_OVERLAY) {
             if (overlay && !overlay->state) {
                 return;
@@ -347,8 +347,8 @@ static void findWidgetStep() {
             g_distanceToFoundWidget = INT_MAX;
         } else {
             if (
-				!g_foundWidget || 
-				distance <= g_distanceToFoundWidget || 
+				!g_foundWidget ||
+				distance <= g_distanceToFoundWidget ||
 				g_foundWidget.widget->type == WIDGET_TYPE_APP_VIEW ||
 				g_foundWidget.widget->type == WIDGET_TYPE_LIST ||
 				g_foundWidget.widget->type == WIDGET_TYPE_GRID
@@ -389,6 +389,106 @@ WidgetCursor findWidget(int16_t x, int16_t y, bool clicked) {
     }
 
     return g_foundWidget;
+}
+
+void resizeWidget(
+    Widget *widget,
+    const Rect &rectContainerOriginal,
+    const Rect &rectContainer,
+    Rect &rectWidgetOriginal
+) {
+    auto flags = widget->flags;
+
+    auto pinToLeft = flags & WIDGET_FLAG_PIN_TO_LEFT;
+    auto pinToRight = flags & WIDGET_FLAG_PIN_TO_RIGHT;
+    auto pinToTop = flags & WIDGET_FLAG_PIN_TO_TOP;
+    auto pinToBottom = flags & WIDGET_FLAG_PIN_TO_BOTTOM;
+
+    auto fixWidth = flags & WIDGET_FLAG_FIX_WIDTH;
+    auto fixHeight = flags & WIDGET_FLAG_FIX_HEIGHT;
+
+    auto left = widget->x;
+    auto right = widget->x + widget->w;
+
+    if (pinToLeft) {
+        // left = left;
+    } else {
+        if (!fixWidth) {
+            left =
+                (widget->x * rectContainer.w) /
+                rectContainerOriginal.w;
+        }
+    }
+
+    if (pinToRight) {
+        right = rectContainer.w - (rectContainerOriginal.w - right);
+    } else {
+        if (!fixWidth) {
+            right = (right * rectContainer.w) / rectContainerOriginal.w;
+        }
+    }
+
+    if (fixWidth) {
+        if (pinToLeft && !pinToRight) {
+            right = left + widget->w;
+        } else if (pinToRight && !pinToLeft) {
+            left = right - widget->w;
+        } else if (!pinToLeft && !pinToRight) {
+            auto center =
+                ((widget->x + widget->w / 2) *
+                    rectContainer.w) /
+                rectContainerOriginal.w;
+            left = center - widget->w / 2;
+            right = left + widget->w;
+        }
+    }
+
+    auto top = widget->y;
+    auto bottom = widget->y + widget->h;
+
+    if (pinToTop) {
+        //top = top;
+    } else {
+        if (!fixHeight) {
+            top =
+                (widget->y * rectContainer.h) /
+                rectContainerOriginal.h;
+        }
+    }
+
+    if (pinToBottom) {
+        bottom = rectContainer.h - (rectContainerOriginal.h - bottom);
+    } else {
+        if (!fixHeight) {
+            bottom =
+                (bottom * rectContainer.h) / rectContainerOriginal.h;
+        }
+    }
+
+    if (fixHeight) {
+        if (pinToTop && !pinToBottom) {
+            bottom = top + widget->h;
+        } else if (pinToBottom && !pinToTop) {
+            top = bottom - widget->h;
+        } else if (!pinToTop && !pinToBottom) {
+            auto center =
+                ((widget->y + widget->h / 2) *
+                    rectContainer.h) /
+                rectContainerOriginal.h;
+            top = center - widget->h / 2;
+            bottom = top + widget->h;
+        }
+    }
+
+    rectWidgetOriginal.x = widget->x;
+    rectWidgetOriginal.y = widget->y;
+    rectWidgetOriginal.w = widget->w;
+    rectWidgetOriginal.h = widget->h;
+
+    widget->x = left;
+    widget->y = top;
+    widget->w = right - left;
+    widget->h = bottom - top;
 }
 
 } // namespace gui

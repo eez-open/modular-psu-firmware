@@ -19,6 +19,7 @@
 #include <eez/flow/components.h>
 #include <eez/flow/flow_defs_v3.h>
 #include <eez/flow/expression.h>
+#include <eez/flow/components/set_variable.h>
 
 using namespace eez::gui;
 
@@ -26,19 +27,29 @@ namespace eez {
 namespace flow {
 
 void executeSetVariableComponent(FlowState *flowState, unsigned componentIndex) {
-	Value dstValue;
-	if (!evalAssignableProperty(flowState, componentIndex, defs_v3::SET_VARIABLE_ACTION_COMPONENT_PROPERTY_VARIABLE, dstValue)) {
-		throwError(flowState, componentIndex, "Failed to evaluate Variable in SetVariable\n");
-		return;
-	}
+    auto component = (SetVariableActionComponent *)flowState->flow->components[componentIndex];
 
-	Value srcValue;
-	if (!evalProperty(flowState, componentIndex, defs_v3::SET_VARIABLE_ACTION_COMPONENT_PROPERTY_VALUE, srcValue)) {
-		throwError(flowState, componentIndex, "Failed to evaluate Value in SetVariable\n");
-		return;
-	}
+    for (uint32_t entryIndex = 0; entryIndex < component->entries.count; entryIndex++) {
+        auto entry = component->entries[entryIndex];
 
-	assignValue(flowState, componentIndex, dstValue, srcValue);
+        Value dstValue;
+        if (!evalAssignableExpression(flowState, componentIndex, entry->variable, dstValue)) {
+            char strMessage[256];
+            snprintf(strMessage, sizeof(strMessage), "Failed to evaluate Variable no. %d in SetVariable\n", (int)(entryIndex + 1));
+            throwError(flowState, componentIndex, strMessage);
+            return;
+        }
+
+        Value srcValue;
+        if (!evalExpression(flowState, componentIndex, entry->value, srcValue)) {
+            char strMessage[256];
+            snprintf(strMessage, sizeof(strMessage), "Failed to evaluate Value no. %d in SetVariable\n", (int)(entryIndex + 1));
+            throwError(flowState, componentIndex, strMessage);
+            return;
+        }
+
+        assignValue(flowState, componentIndex, dstValue, srcValue);
+    }
 
 	propagateValueThroughSeqout(flowState, componentIndex);
 }

@@ -30,6 +30,7 @@ struct LoopComponenentExecutionState : public ComponenentExecutionState {
     Value dstValue;
     Value toValue;
     Value stepValue;
+    Value currentValue;
 };
 
 void executeLoopComponent(FlowState *flowState, unsigned componentIndex) {
@@ -45,9 +46,11 @@ void executeLoopComponent(FlowState *flowState, unsigned componentIndex) {
             deallocateComponentExecutionState(flowState, componentIndex);
             loopComponentExecutionState = nullptr;
         }
+    } else {
+        if (!loopComponentExecutionState) {
+            return;
+        }
     }
-
-    Value value;
 
     if (!loopComponentExecutionState) {
         Value dstValue;
@@ -79,24 +82,24 @@ void executeLoopComponent(FlowState *flowState, unsigned componentIndex) {
         loopComponentExecutionState->toValue = toValue;
         loopComponentExecutionState->stepValue = stepValue;
 
-		value = fromValue;
+		loopComponentExecutionState->currentValue = fromValue;
     } else {
-        value = op_add(loopComponentExecutionState->dstValue, loopComponentExecutionState->stepValue);
+        loopComponentExecutionState->currentValue = op_add(loopComponentExecutionState->currentValue, loopComponentExecutionState->stepValue);
     }
 
     bool condition;
     if (loopComponentExecutionState->stepValue.getInt() > 0) {
-        condition = op_great(value, loopComponentExecutionState->toValue).toBool();
+        condition = op_great(loopComponentExecutionState->currentValue, loopComponentExecutionState->toValue).toBool();
     } else {
-        condition = op_less(value, loopComponentExecutionState->toValue).toBool();
+        condition = op_less(loopComponentExecutionState->currentValue, loopComponentExecutionState->toValue).toBool();
     }
 
     if (condition) {
         // done
         deallocateComponentExecutionState(flowState, componentIndex);
-        propagateValue(flowState, componentIndex, 1);
+        propagateValue(flowState, componentIndex, component->outputs.count - 1);
     } else {
-        assignValue(flowState, componentIndex, loopComponentExecutionState->dstValue, value);
+        assignValue(flowState, componentIndex, loopComponentExecutionState->dstValue, loopComponentExecutionState->currentValue);
         propagateValueThroughSeqout(flowState, componentIndex);
     }
 }

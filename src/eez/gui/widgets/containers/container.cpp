@@ -65,7 +65,7 @@ void ContainerWidgetState::render() {
 		widgetCursor.x, widgetCursor.y, (int)widget->w, (int)widget->h,
 		getStyle(styleId), flags.active
 	);
-	
+
 	repainted = true;
 }
 
@@ -147,7 +147,7 @@ void ContainerWidgetState::enumChildren() {
 				((Widget*)widgetCursor.widget)->y = ySaved;
 				((Widget*)widgetCursor.widget)->w = wSaved;
 				((Widget*)widgetCursor.widget)->h = hSaved;
-				
+
 				widgetOverrides++;
 			}
 		}
@@ -157,10 +157,38 @@ void ContainerWidgetState::enumChildren() {
     } else {
 		auto &widgets = widget->widgets;
 
-		for (uint32_t index = 0; index < widgets.count; ++index) {
-			widgetCursor.widget = widgets[index];
-			enumWidget();
-		}
+        if (
+            widgetCursor.widget->w != widgetCursor.rectWidgetOriginal.w ||
+            widgetCursor.widget->h != widgetCursor.rectWidgetOriginal.h
+        ) {
+            Rect rectContainerOriginal = widgetCursor.rectWidgetOriginal;
+
+            Rect rectContainer;
+            rectContainer.x = widgetCursor.x;
+            rectContainer.y = widgetCursor.y;
+            rectContainer.w = widgetCursor.widget->w;
+            rectContainer.h = widgetCursor.widget->h;
+
+            for (uint32_t index = 0; index < widgets.count; ++index) {
+                widgetCursor.widget = widgets[index];
+
+                Rect rectWidgetOriginal;
+                resizeWidget((Widget *)widgetCursor.widget, rectContainerOriginal, rectContainer, rectWidgetOriginal);
+
+                enumWidget();
+
+                ((Widget *)widget)->x = rectWidgetOriginal.x;
+                ((Widget *)widget)->y = rectWidgetOriginal.y;
+                ((Widget *)widget)->w = rectWidgetOriginal.w;
+                ((Widget *)widget)->h = rectWidgetOriginal.h;
+            }
+        } else {
+            for (uint32_t index = 0; index < widgets.count; ++index) {
+                widgetCursor.widget = widgets[index];
+                enumWidget();
+            }
+        }
+
 	}
 
 	widgetCursor.widget = savedWidget;
@@ -184,7 +212,7 @@ void ContainerWidgetState::enumChildren() {
 
 			displayBufferIndex = -1;
 		}
-		
+
 		if (!widgetCursor.refreshed) {
 			widgetCursor.popBackground();
 		}

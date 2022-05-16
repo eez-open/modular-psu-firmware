@@ -71,7 +71,7 @@ bool isInternalAction(int actionId) {
     return actionId > FIRST_INTERNAL_ACTION_ID;
 }
 
-void executeAction(const WidgetCursor &widgetCursor, int actionId) {
+void executeAction(const WidgetCursor &widgetCursor, int actionId, void *param) {
     if (actionId == ACTION_ID_NONE) {
         return;
     }
@@ -86,7 +86,7 @@ void executeAction(const WidgetCursor &widgetCursor, int actionId) {
         if (actionId >= 0) {
             g_actionExecFunctions[actionId]();
         } else {
-			g_hooks.executeExternalAction(widgetCursor, actionId);
+			g_hooks.executeExternalAction(widgetCursor, actionId, param);
         }
     }
 }

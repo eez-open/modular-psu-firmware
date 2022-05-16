@@ -24,7 +24,7 @@ namespace gui {
 struct Hooks {
     int (*getExtraLongTouchAction)();
     float (*getDefaultAnimationDuration)();
-    void (*executeExternalAction)(const WidgetCursor &widgetCursor, int16_t actionId);
+    void (*executeExternalAction)(const WidgetCursor &widgetCursor, int16_t actionId, void *param);
     void (*externalData)(int16_t id, DataOperationEnum operation, const WidgetCursor &widgetCursor, Value &value);
     OnTouchFunctionType (*getWidgetTouchFunction)(const WidgetCursor &widgetCursor);
     Page *(*getPageFromId)(int pageId);
@@ -60,6 +60,7 @@ struct Hooks {
         int16_t touchScreenCalTrx, int16_t touchScreenCalTry
     );
     void (*onGuiQueueMessage)(uint8_t type, int16_t param);
+    void (*onArrayValueFreeHook)(ArrayValue *arrayValue);
 };
 
 extern Hooks g_hooks;

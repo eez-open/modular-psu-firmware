@@ -20,6 +20,8 @@
 #include <string.h>
 #include <memory.h>
 
+#include <eez/libs/utf8.h>
+
 #include <eez/conf.h>
 #include <eez/core/util.h>
 
@@ -110,7 +112,7 @@ void init() {
     fillRect(0, 0, getDisplayWidth() - 1, getDisplayHeight() - 1);
 
     g_animationBuffer = g_animationBuffer1;
-    
+
     g_syncedBuffer = g_renderBuffer1;
     syncBuffer();
 }
@@ -299,7 +301,7 @@ void update() {
 
         if (g_takeScreenshot) {
             copySyncedBufferToScreenshotBuffer();
-            
+
             g_takeScreenshot = false;
             g_screenshotAllocated = true;
         }
@@ -360,7 +362,7 @@ int beginBufferRendering() {
 
 void endBufferRendering(int bufferIndex, int x, int y, int width, int height, bool withShadow, uint8_t opacity, int xOffset, int yOffset, Rect *backdrop) {
     RenderBuffer &renderBuffer = g_renderBuffers[bufferIndex];
-    
+
 	renderBuffer.x = x;
 	renderBuffer.y = y;
 	renderBuffer.width = width;
@@ -440,7 +442,7 @@ void endRendering() {
             bitBlt(g_renderBuffer1, 0, 0, getDisplayWidth() - 1, getDisplayHeight() - 1);
         } else if (g_syncedBuffer == g_renderBuffer2) {
             bitBlt(g_renderBuffer2, 0, 0, getDisplayWidth() - 1, getDisplayHeight() - 1);
-        }        
+        }
     }
 }
 
@@ -742,7 +744,7 @@ void fillRoundedRect(
 	double x1, double y1, double x2, double y2,
 	double lineWidth,
 	double rtlx, double rtly, double rtrx, double rtry,
-	double rbrx, double rbry, double rblx, double rbly, 
+	double rbrx, double rbry, double rblx, double rbly,
 	bool drawLine, bool fill,
 	double clip_x1, double clip_y1, double clip_x2, double clip_y2
 ) {
@@ -760,7 +762,7 @@ void fillRoundedRect(
 	    graphics.lineColor(COLOR_TO_R(g_fc), COLOR_TO_G(g_fc), COLOR_TO_B(g_fc));
     } else {
         graphics.noLine();
-    }	
+    }
     if (fill) {
         graphics.fillColor(COLOR_TO_R(g_bc), COLOR_TO_G(g_bc), COLOR_TO_B(g_bc));
     } else {
@@ -772,7 +774,7 @@ void fillRoundedRect(
 		lineWidth / 2.0, lineWidth / 2.0, w - lineWidth, h - lineWidth,
 		rtlx, rtly, rtrx, rtry, rbrx, rbry, rblx, rbly
 	);
-    
+
 	graphics.translate(-x1, -y1);
 	graphics.clipBox(0, 0, aggDrawing.rbuf.width(), aggDrawing.rbuf.height());
 }
@@ -781,7 +783,7 @@ void fillRoundedRect(
     AggDrawing& aggDrawing,
 	double x1, double y1, double x2, double y2,
 	double lineWidth,
-	double r, 
+	double r,
 	bool drawLine, bool fill,
 	double clip_x1, double clip_y1, double clip_x2, double clip_y2
 ) {
@@ -790,7 +792,7 @@ void fillRoundedRect(
 
 ////////////////////////////////////////////////////////////////////////////////
 
-static int8_t measureGlyph(uint8_t encoding) {
+static int8_t measureGlyph(int32_t encoding) {
     auto glyph = g_font.getGlyph(encoding);
     if (!glyph)
         return 0;
@@ -798,8 +800,8 @@ static int8_t measureGlyph(uint8_t encoding) {
     return glyph->dx;
 }
 
-int8_t measureGlyph(uint8_t encoding, gui::font::Font &font) {
-    auto glyph = g_font.getGlyph(encoding);
+int8_t measureGlyph(int32_t encoding, gui::font::Font &font) {
+    auto glyph = font.getGlyph(encoding);
     if (!glyph)
         return 0;
 
@@ -812,8 +814,12 @@ int measureStr(const char *text, int textLength, gui::font::Font &font, int max_
     int width = 0;
 
     if (textLength == -1) {
-        char encoding;
-        while ((encoding = *text++) != 0) {
+        while (true) {
+            utf8_int32_t encoding;
+            text = utf8codepoint(text, &encoding);
+            if (!encoding) {
+                break;
+            }
             int glyph_width = measureGlyph(encoding);
             if (max_width > 0 && width + glyph_width > max_width) {
                 return max_width;
@@ -821,8 +827,12 @@ int measureStr(const char *text, int textLength, gui::font::Font &font, int max_
             width += glyph_width;
         }
     } else {
-        for (int i = 0; i < textLength && text[i]; ++i) {
-            char encoding = text[i];
+        for (int i = 0; i < textLength; ++i) {
+            utf8_int32_t encoding;
+            text = utf8codepoint(text, &encoding);
+            if (!encoding) {
+                break;
+            }
             int glyph_width = measureGlyph(encoding);
             if (max_width > 0 && width + glyph_width > max_width) {
                 return max_width;
@@ -840,15 +850,20 @@ void drawStr(const char *text, int textLength, int x, int y, int clip_x1, int cl
     drawStrInit();
 
     if (textLength == -1) {
-        textLength = strlen(text);
+        textLength = utf8len(text);
     }
 
     int xCursor = x;
 
     int i;
 
-    for (i = 0; i < textLength && text[i]; ++i) {
-        char encoding = text[i];
+    for (i = 0; i < textLength; ++i) {
+        utf8_int32_t encoding;
+        text = utf8codepoint(text, &encoding);
+        if (!encoding) {
+            break;
+        }
+
         if (i == cursorPosition) {
             xCursor = x;
         }
@@ -897,7 +912,7 @@ void drawStr(const char *text, int textLength, int x, int y, int clip_x1, int cl
 					drawGlyph(glyph->pixels + offset + iStartByte, glyph->width - width, x_glyph, y_glyph, width, height);
 				}
 			}
-			
+
 			x += glyph->dx;
 		}
     }
@@ -916,13 +931,18 @@ void drawStr(const char *text, int textLength, int x, int y, int clip_x1, int cl
 
 int getCharIndexAtPosition(int xPos, const char *text, int textLength, int x, int y, int clip_x1, int clip_y1, int clip_x2,int clip_y2, gui::font::Font &font) {
     if (textLength == -1) {
-        textLength = strlen(text);
+        textLength = utf8len(text);
     }
 
     int i;
 
-    for (i = 0; i < textLength && text[i]; ++i) {
-        char encoding = text[i];
+    for (i = 0; i < textLength; ++i) {
+        utf8_int32_t encoding;
+        text = utf8codepoint(text, &encoding);
+        if (!encoding) {
+            break;
+        }
+
         auto glyph = font.getGlyph(encoding);
         auto dx = 0;
         if (glyph) {
@@ -939,14 +959,20 @@ int getCharIndexAtPosition(int xPos, const char *text, int textLength, int x, in
 
 int getCursorXPosition(int cursorPosition, const char *text, int textLength, int x, int y, int clip_x1, int clip_y1, int clip_x2,int clip_y2, gui::font::Font &font) {
     if (textLength == -1) {
-        textLength = strlen(text);
+        textLength = utf8len(text);
     }
 
-    for (int i = 0; i < textLength && text[i]; ++i) {
+    for (int i = 0; i < textLength; ++i) {
+        utf8_int32_t encoding;
+        text = utf8codepoint(text, &encoding);
+        if (!encoding) {
+            break;
+        }
+
         if (i == cursorPosition) {
             return x;
         }
-        char encoding = text[i];
+
         auto glyph = font.getGlyph(encoding);
         if (glyph) {
             x += glyph->dx;

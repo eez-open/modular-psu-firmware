@@ -58,6 +58,7 @@ void executeShowPageComponent(FlowState *flowState, unsigned componentIndex);
 void executeShowMessageBoxComponent(FlowState *flowState, unsigned componentIndex);
 void executeShowKeyboardComponent(FlowState *flowState, unsigned componentIndex);
 void executeShowKeypadComponent(FlowState *flowState, unsigned componentIndex);
+void executeSelectLanguageComponent(FlowState *flowState, unsigned componentIndex);
 
 void executeNoopComponent(FlowState *flowState, unsigned componentIndex) {
 }
@@ -93,6 +94,7 @@ static ExecuteComponentFunctionType g_executeComponentFunctions[] = {
 	executeShowKeypadComponent,
 	executeNoopComponent, // COMPONENT_TYPE_NOOP_ACTION
 	nullptr, // COMPONENT_TYPE_COMMENT_ACTION
+    executeSelectLanguageComponent, // COMPONENT_TYPE_SELECT_LANGUAGE_ACTION
 };
 
 void registerComponent(ComponentTypes componentType, ExecuteComponentFunctionType executeComponentFunction) {
