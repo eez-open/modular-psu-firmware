@@ -27,8 +27,7 @@ namespace flow {
 
 void executeEvalExprComponent(FlowState *flowState, unsigned componentIndex) {
 	Value expressionValue;
-	if (!evalProperty(flowState, componentIndex, defs_v3::EVAL_EXPR_ACTION_COMPONENT_PROPERTY_EXPRESSION, expressionValue)) {
-		throwError(flowState, componentIndex, "Failed to evaluate Expression in EvalExpr\n");
+	if (!evalProperty(flowState, componentIndex, defs_v3::EVAL_EXPR_ACTION_COMPONENT_PROPERTY_EXPRESSION, expressionValue, "Failed to evaluate Expression in EvalExpr")) {
 		return;
 	}
 

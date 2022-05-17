@@ -38,8 +38,7 @@ void executeDelayComponent(FlowState *flowState, unsigned componentIndex) {
 
 	if (!delayComponentExecutionState) {
 		Value value;
-		if (!evalProperty(flowState, componentIndex, defs_v3::DELAY_ACTION_COMPONENT_PROPERTY_MILLISECONDS, value)) {
-			throwError(flowState, componentIndex, "Failed to evaluate Milliseconds in Delay\n");
+		if (!evalProperty(flowState, componentIndex, defs_v3::DELAY_ACTION_COMPONENT_PROPERTY_MILLISECONDS, value, "Failed to evaluate Milliseconds in Delay")) {
 			return;
 		}
 

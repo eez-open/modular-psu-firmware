@@ -349,9 +349,7 @@ void getValue(uint16_t dataId, DataOperationEnum operation, const WidgetCursor &
 
 		WidgetDataItem *widgetDataItem = flow->widgetDataItems[dataId];
 		if (widgetDataItem && widgetDataItem->componentIndex != -1 && widgetDataItem->propertyValueIndex != -1) {
-			if (!evalProperty(flowState, widgetDataItem->componentIndex, widgetDataItem->propertyValueIndex, value, nullptr, widgetCursor.iterators, operation)) {
-				throwError(flowState, widgetDataItem->componentIndex, "doGetFlowValue failed\n");
-			}
+			evalProperty(flowState, widgetDataItem->componentIndex, widgetDataItem->propertyValueIndex, value, "doGetFlowValue failed", nullptr, widgetCursor.iterators, operation);
 		}
 	}
 }
@@ -366,10 +364,8 @@ void setValue(uint16_t dataId, const WidgetCursor &widgetCursor, const Value& va
 			auto component = flow->components[widgetDataItem->componentIndex];
 			auto property = component->properties[widgetDataItem->propertyValueIndex];
 			Value dstValue;
-			if (evalAssignableExpression(flowState, widgetDataItem->componentIndex, property->evalInstructions, dstValue, nullptr, widgetCursor.iterators)) {
+			if (evalAssignableExpression(flowState, widgetDataItem->componentIndex, property->evalInstructions, dstValue, "doSetFlowValue failed", nullptr, widgetCursor.iterators)) {
 				assignValue(flowState, widgetDataItem->componentIndex, dstValue, value);
-			} else {
-				throwError(flowState, widgetDataItem->componentIndex, "doSetFlowValue failed\n");
 			}
 		}
 	}
@@ -489,6 +485,16 @@ void throwError(FlowState *flowState, int componentIndex, const char *errorMessa
 			stopScriptHook();
 		}
 	}
+}
+
+void throwError(FlowState *flowState, int componentIndex, const char *errorMessage, const char *errorMessageDescription) {
+    if (errorMessage) {
+        char throwErrorMessage[512];
+        snprintf(throwErrorMessage, sizeof(throwErrorMessage), "%s: %s", errorMessage, errorMessageDescription);
+        throwError(flowState, componentIndex, throwErrorMessage);
+    } else {
+        throwError(flowState, componentIndex, errorMessageDescription);
+    }
 }
 
 } // namespace flow

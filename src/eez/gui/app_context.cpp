@@ -38,6 +38,8 @@
 #include <eez/gui/touch_calibration.h>
 #include <eez/gui/widgets/button.h>
 
+#include <eez/flow/debugger.h>
+
 #include <eez/core/hmi.h>
 
 #define CONF_GUI_TOAST_DURATION_MS 1000L
@@ -281,7 +283,13 @@ void AppContext::onPageTouch(const WidgetCursor &foundWidget, Event &touchEvent)
     if (activePageId != PAGE_ID_NONE && !isPageInternal(activePageId)) {
         auto page = getPageAsset(activePageId);
         if ((page->flags & CLOSE_PAGE_IF_TOUCHED_OUTSIDE_FLAG) != 0) {
-            if (!pointInsideRect(touchEvent.x, touchEvent.y, foundWidget.appContext->rect.x + page->x, foundWidget.appContext->rect.y + page->y, page->width, page->height)) {
+            int xPage;
+            int yPage;
+            int wPage;
+            int hPage;
+            getPageRect(activePageId, getActivePage(), xPage, yPage, wPage, hPage);
+
+            if (!pointInsideRect(touchEvent.x, touchEvent.y, xPage, yPage, wPage, hPage)) {
                 int activePageId = getActivePageId();
 
                 // clicked outside page, close page
@@ -335,39 +343,28 @@ void AppContext::updatePage(int i, WidgetCursor &widgetCursor) {
     } else {
         auto page = getPageAsset(m_pageNavigationStack[i].pageId, widgetCursor);
 
-        if (page->flags & PAGE_SCALE_TO_FIT) {
+        auto savedWidget = widgetCursor.widget;
+        widgetCursor.widget = page;
+
+        if ((page->flags & PAGE_SCALE_TO_FIT) && flow::g_debuggerMode == flow::DEBUGGER_MODE_RUN) {
 		    x = rect.x;
 		    y = rect.y;
 		    width = rect.w;
 		    height = rect.h;
-
-		    withShadow = false;
-
-            auto savedWidget = widgetCursor.widget;
-            widgetCursor.widget = page;
-
-            widgetCursor.w = page->width;
-            widgetCursor.h = page->height;
-            enumWidget();
-
-            widgetCursor.widget = savedWidget;
         } else {
             x = widgetCursor.x + page->x;
             y = widgetCursor.y + page->y;
             width = page->width;
             height = page->height;
-
-		    withShadow = page->x > 0;
-
-            auto savedWidget = widgetCursor.widget;
-            widgetCursor.widget = page;
-
-            widgetCursor.w = page->width;
-            widgetCursor.h = page->height;
-            enumWidget();
-
-            widgetCursor.widget = savedWidget;
         }
+
+        withShadow = page->x > 0;
+
+        widgetCursor.w = width;
+        widgetCursor.h = height;
+        enumWidget();
+
+        widgetCursor.widget = savedWidget;
     }
 
 	if (g_findCallback == nullptr) {
@@ -385,22 +382,22 @@ bool isRect1FullyCoveredByRect2(int xRect1, int yRect1, int wRect1, int hRect1, 
     return xRect2 <= xRect1 && yRect2 <= yRect1 && xRect2 + wRect2 >= xRect1 + wRect1 && yRect2 + hRect2 >= yRect1 + hRect1;
 }
 
-void AppContext::getPageRect(int pageId, Page *page, int &x, int &y, int &w, int &h) {
+void AppContext::getPageRect(int pageId, const Page *page, int &x, int &y, int &w, int &h) {
     if (isPageInternal(pageId)) {
-        x = ((InternalPage *)page)->x;
-        y = ((InternalPage *)page)->y;
+        x = rect.x + ((InternalPage *)page)->x;
+        y = rect.y + ((InternalPage *)page)->y;
         w = ((InternalPage *)page)->width;
         h = ((InternalPage *)page)->height;
     } else {
         auto page = getPageAsset(pageId);
-        if (page->flags & PAGE_SCALE_TO_FIT) {
+        if ((page->flags & PAGE_SCALE_TO_FIT) && flow::g_debuggerMode == flow::DEBUGGER_MODE_RUN) {
 		    x = rect.x;
 		    y = rect.y;
 		    w = rect.w;
 		    h = rect.h;
         } else {
-            x = page->x;
-            y = page->y;
+            x = rect.x + page->x;
+            y = rect.y + page->y;
             w = page->width;
             h = page->height;
         }
@@ -481,6 +478,36 @@ void AppContext::errorMessageWithAction(const char *message, void (*action)(), c
 
 void AppContext::pushToastMessage(ToastMessagePage *toastMessage) {
     pushPage(INTERNAL_PAGE_ID_TOAST_MESSAGE, toastMessage);
+}
+
+void AppContext::getBoundingRect(Rect &rectBounding) {
+    if (m_pageNavigationStackPointer >= 0) {
+        int x1 = rect.x + rect.w;
+        int y1 = rect.y + rect.h;
+        int x2 = rect.x;
+        int y2 = rect.y;
+
+        for (int i = 0; i <= m_pageNavigationStackPointer; ++i) {
+            if (!isPageInternal(m_pageNavigationStack[i].pageId)) {
+                int xPage, yPage, wPage, hPage;
+                getPageRect(m_pageNavigationStack[i].pageId, m_pageNavigationStack[i].page, xPage, yPage, wPage, hPage);
+                if (xPage < x1) x1 = xPage;
+                if (xPage + wPage > x2) x2 = xPage + wPage;
+                if (yPage < y1) y1 = yPage;
+                if (yPage + hPage > y2) y2 = yPage + hPage;
+            }
+        }
+
+        rectBounding.x = x1;
+        rectBounding.y = y1;
+        rectBounding.w = x2 - x1;
+        rectBounding.h = y2 - y1;
+    } else {
+        rectBounding.x = rect.x;
+        rectBounding.y = rect.y;
+        rectBounding.w = rect.w;
+        rectBounding.h = rect.h;
+    }
 }
 
 AppContext *getRootAppContext() {

@@ -210,8 +210,7 @@ EM_PORT_API(void *) getExpressionListParam(int flowStateIndex, int componentInde
         new (expressionList->values + i) Value();
 
         auto valueExpression = (const uint8_t *)(MEMORY_BEGIN + 4 + items[i]);
-        if (!evalExpression(flowState, componentIndex, valueExpression, expressionList->values[i])) {
-            throwError(flowState, componentIndex, "Failed to evaluate expression");
+        if (!evalExpression(flowState, componentIndex, valueExpression, expressionList->values[i], "Failed to evaluate expression")) {
             return nullptr;
         }
     }
@@ -245,8 +244,7 @@ EM_PORT_API(Value *) evalProperty(int flowStateIndex, int componentIndex, int pr
     auto flowState = getFlowState(g_mainAssets, flowStateIndex);
 
     Value result;
-    if (!eez::flow::evalProperty(flowState, componentIndex, propertyIndex, result, nullptr, iterators)) {
-        throwError(flowState, componentIndex, "Failed to evaluate property\n");
+    if (!eez::flow::evalProperty(flowState, componentIndex, propertyIndex, result, "Failed to evaluate property", nullptr, iterators)) {
         return nullptr;
     }
 
@@ -265,7 +263,7 @@ EM_PORT_API(void) assignProperty(int flowStateIndex, int componentIndex, int pro
     auto flowState = getFlowState(g_mainAssets, flowStateIndex);
 
     Value dstValue;
-    if (evalAssignableProperty(flowState, componentIndex, propertyIndex, dstValue, nullptr, iterators)) {
+    if (evalAssignableProperty(flowState, componentIndex, propertyIndex, dstValue, nullptr, nullptr, iterators)) {
         assignValue(flowState, componentIndex, dstValue, *srcValuePtr);
     }
 }
@@ -274,8 +272,7 @@ EM_PORT_API(void) setPropertyField(int flowStateIndex, int componentIndex, int p
     auto flowState = getFlowState(g_mainAssets, flowStateIndex);
 
     Value result;
-    if (!eez::flow::evalProperty(flowState, componentIndex, propertyIndex, result)) {
-        throwError(flowState, componentIndex, "Failed to evaluate property\n");
+    if (!eez::flow::evalProperty(flowState, componentIndex, propertyIndex, result, "Failed to evaluate property")) {
         return;
     }
 

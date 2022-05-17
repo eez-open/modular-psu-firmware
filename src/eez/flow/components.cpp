@@ -59,9 +59,7 @@ void executeShowMessageBoxComponent(FlowState *flowState, unsigned componentInde
 void executeShowKeyboardComponent(FlowState *flowState, unsigned componentIndex);
 void executeShowKeypadComponent(FlowState *flowState, unsigned componentIndex);
 void executeSelectLanguageComponent(FlowState *flowState, unsigned componentIndex);
-
-void executeNoopComponent(FlowState *flowState, unsigned componentIndex) {
-}
+void executeNoopComponent(FlowState *flowState, unsigned componentIndex);
 
 void executeLayoutViewWidgetComponent(FlowState *flowState, unsigned componentIndex);
 void executeRollerWidgetComponent(FlowState *flowState, unsigned componentIndex);

@@ -168,8 +168,12 @@ void ContainerWidgetState::enumChildren() {
         ) {
             for (uint32_t index = 0; index < widgets.count; ++index) {
                 widgetCursor.widget = widgets[index];
+                auto savedX = widgetCursor.x;
+	            auto savedY = widgetCursor.y;
                 resizeWidget(widgetCursor, containerOriginalWidth, containerOriginalHeight, containerWidth, containerHeight);
                 enumWidget();
+                widgetCursor.x = savedX;
+                widgetCursor.y = savedY;
             }
         } else {
             for (uint32_t index = 0; index < widgets.count; ++index) {

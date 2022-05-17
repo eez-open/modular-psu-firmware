@@ -283,8 +283,11 @@ void ToastMessagePage::init(AppContext *appContext, ToastType type, const Value&
         actionWidget.type = WIDGET_TYPE_NONE;
     }
 
-	x = appContext->rect.x + (appContext->rect.w - width) / 2;
-	y = appContext->rect.y + (appContext->rect.h - height) / 2;
+    Rect rect;
+    appContext->getBoundingRect(rect);
+
+	x = rect.x + (rect.w - width) / 2;
+	y = rect.y + (rect.h - height) / 2;
 }
 
 void ToastMessagePage::updateInternalPage() {
@@ -589,41 +592,47 @@ bool SelectFromEnumPage::calcSize() {
 
     itemWidth = itemStyle->paddingLeft + itemWidth + itemStyle->paddingRight;
 
+    Rect rect;
+    appContext->getBoundingRect(rect);
+
     width = containerStyle->paddingLeft + (numColumns == 2 ? itemWidth + containerStyle->paddingLeft + itemWidth : itemWidth) + containerStyle->paddingRight;
-    if (width > appContext->rect.w) {
-        width = appContext->rect.w;
+    if (width > rect.w) {
+        width = rect.w;
     }
 
     height = containerStyle->paddingTop + (numColumns == 2 ? (numItems + 1) / 2 : numItems) * itemHeight + containerStyle->paddingBottom;
-    if (height > appContext->rect.h) {
+    if (height >rect.h) {
         if (numColumns == 1) {
             return false;
         }
-        height = appContext->rect.h;
+        height = rect.h;
     }
 
     return true;
 }
 
 void SelectFromEnumPage::findPagePosition() {
+    Rect rect;
+    appContext->getBoundingRect(rect);
+
     const WidgetCursor &widgetCursorAtTouchDown = getFoundWidgetAtDown();
     if (widgetCursorAtTouchDown.widget) {
         x = widgetCursorAtTouchDown.x + widgetCursorAtTouchDown.w - width;
-        int xMargin = MAX(MIN(22, (appContext->rect.w - width) / 2), 0);
-        int right = appContext->rect.x + appContext->rect.w - xMargin;
+        int xMargin = MAX(MIN(22, (rect.w - width) / 2), 0);
+        int right = rect.x + rect.w - xMargin;
         if (x + width > right) {
             x = right - width;
         }
 
         y = widgetCursorAtTouchDown.y + widgetCursorAtTouchDown.h;
-        int yMargin = MAX(MIN(30, (appContext->rect.h - height) / 2), 0);
-        int bottom = appContext->rect.y + appContext->rect.h - yMargin;
+        int yMargin = MAX(MIN(30, (rect.h - height) / 2), 0);
+        int bottom = rect.y + rect.h - yMargin;
         if (y + height > bottom) {
             y = bottom - height;
         }
     } else {
-        x = appContext->rect.x + (appContext->rect.w - width) / 2;
-        y = appContext->rect.y + (appContext->rect.h - height) / 2;
+        x = rect.x + (rect.w - width) / 2;
+        y = rect.y + (rect.h - height) / 2;
     }
 }
 
@@ -791,8 +800,11 @@ void MenuWithButtonsPage::init(AppContext *appContext, const char *message, cons
     width = styleContainer->borderSizeLeft + styleContainer->paddingLeft + contentWidth + styleContainer->paddingRight + styleContainer->borderSizeRight;
     height = styleContainer->borderSizeTop + styleContainer->paddingTop + contentHeight + styleContainer->paddingBottom + styleContainer->borderSizeBottom;
 
-    x = m_appContext->rect.x + (m_appContext->rect.w - width) / 2;
-    y = m_appContext->rect.y + (m_appContext->rect.h - height) / 2;
+    Rect rect;
+    m_appContext->getBoundingRect(rect);
+    
+    x = rect.x + (rect.w - width) / 2;
+    y = rect.y + (rect.h - height) / 2;
 
     m_containerRectangleWidget.x = 0;
     m_containerRectangleWidget.y = 0;

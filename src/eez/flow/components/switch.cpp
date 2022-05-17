@@ -31,11 +31,11 @@ void executeSwitchComponent(FlowState *flowState, unsigned componentIndex) {
     for (uint32_t testIndex = 0; testIndex < component->tests.count; testIndex++) {
         auto test = component->tests[testIndex];
 
+        char strMessage[256];
+        snprintf(strMessage, sizeof(strMessage), "Failed to evaluate test condition no. %d in Switch", (int)(testIndex + 1));
+
         Value conditionValue;
-        if (!evalExpression(flowState, componentIndex, test->conditionInstructions, conditionValue)) {
-            char strMessage[256];
-            snprintf(strMessage, sizeof(strMessage), "Failed to evaluate test condition no. %d in Switch\n", (int)testIndex);
-            throwError(flowState, componentIndex, strMessage);
+        if (!evalExpression(flowState, componentIndex, test->conditionInstructions, conditionValue, strMessage)) {
             return;
         }
 
@@ -48,7 +48,7 @@ void executeSwitchComponent(FlowState *flowState, unsigned componentIndex) {
             }
         } else {
             char strMessage[256];
-            snprintf(strMessage, sizeof(strMessage), "Failed to convert Value no. %d to boolean in Switch\n", (int)testIndex);
+            snprintf(strMessage, sizeof(strMessage), "Failed to convert Value no. %d to boolean in Switch\n", (int)(testIndex + 1));
             throwError(flowState, componentIndex, strMessage);
             return;
         }

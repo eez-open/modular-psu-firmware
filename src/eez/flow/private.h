@@ -103,6 +103,7 @@ void endAsyncExecution(FlowState *flowState, int componentIndex);
 void executeCallAction(FlowState *flowState, unsigned componentIndex, int flowIndex);
 
 void throwError(FlowState *flowState, int componentIndex, const char *errorMessage);
+void throwError(FlowState *flowState, int componentIndex, const char *errorMessage, const char *errorMessageDescription);
 
 } // flow
 } // eez

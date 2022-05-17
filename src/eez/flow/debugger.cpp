@@ -24,6 +24,8 @@
 #include <eez/core/debug.h>
 #include <eez/core/os.h>
 
+#include <eez/gui/gui.h>
+
 #include <eez/flow/flow.h>
 #include <eez/flow/private.h>
 #include <eez/flow/debugger.h>
@@ -66,6 +68,8 @@ enum MessagesFromDebugger {
     MESSAGE_FROM_DEBUGGER_REMOVE_BREAKPOINT, // FLOW_INDEX, COMPONENT_INDEX
     MESSAGE_FROM_DEBUGGER_ENABLE_BREAKPOINT, // FLOW_INDEX, COMPONENT_INDEX
     MESSAGE_FROM_DEBUGGER_DISABLE_BREAKPOINT, // FLOW_INDEX, COMPONENT_INDEX
+
+    MESSAGE_FROM_DEBUGGER_MODE // MODE (0:RUN | 1:DEBUG)
 };
 
 enum LogItemType {
@@ -90,6 +94,8 @@ static bool g_skipNextBreakpoint;
 
 static char g_inputFromDebugger[64];
 static unsigned g_inputFromDebuggerPosition;
+
+int g_debuggerMode = DEBUGGER_MODE_RUN;
 
 ////////////////////////////////////////////////////////////////////////////////
 
@@ -162,7 +168,10 @@ void processDebuggerInput(char *buffer, uint32_t length) {
 				} else {
 					ErrorTrace("Invalid breakpoint flow index\n");
 				}
-			}
+			} else if (messageFromDebugger == MESSAGE_FROM_DEBUGGER_MODE) {
+                g_debuggerMode = strtol(g_inputFromDebugger + 2, nullptr, 10);
+                gui::refreshScreen();
+            }
 
 			g_inputFromDebuggerPosition = 0;
 		} else {

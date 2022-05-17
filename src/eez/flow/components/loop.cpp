@@ -54,26 +54,22 @@ void executeLoopComponent(FlowState *flowState, unsigned componentIndex) {
 
     if (!loopComponentExecutionState) {
         Value dstValue;
-        if (!evalAssignableProperty(flowState, componentIndex, defs_v3::LOOP_ACTION_COMPONENT_PROPERTY_VARIABLE, dstValue)) {
-            throwError(flowState, componentIndex, "Failed to evaluate Variable in Loop\n");
+        if (!evalAssignableProperty(flowState, componentIndex, defs_v3::LOOP_ACTION_COMPONENT_PROPERTY_VARIABLE, dstValue, "Failed to evaluate Variable in Loop")) {
             return;
         }
 
         Value fromValue;
-        if (!evalProperty(flowState, componentIndex, defs_v3::LOOP_ACTION_COMPONENT_PROPERTY_FROM, fromValue)) {
-            throwError(flowState, componentIndex, "Failed to evaluate From in Loop\n");
+        if (!evalProperty(flowState, componentIndex, defs_v3::LOOP_ACTION_COMPONENT_PROPERTY_FROM, fromValue, "Failed to evaluate From in Loop")) {
             return;
         }
 
         Value toValue;
-        if (!evalProperty(flowState, componentIndex, defs_v3::LOOP_ACTION_COMPONENT_PROPERTY_TO, toValue)) {
-            throwError(flowState, componentIndex, "Failed to evaluate To in Loop\n");
+        if (!evalProperty(flowState, componentIndex, defs_v3::LOOP_ACTION_COMPONENT_PROPERTY_TO, toValue, "Failed to evaluate To in Loop")) {
             return;
         }
 
         Value stepValue;
-        if (!evalProperty(flowState, componentIndex, defs_v3::LOOP_ACTION_COMPONENT_PROPERTY_STEP, stepValue)) {
-            throwError(flowState, componentIndex, "Failed to evaluate Step in Loop\n");
+        if (!evalProperty(flowState, componentIndex, defs_v3::LOOP_ACTION_COMPONENT_PROPERTY_STEP, stepValue, "Failed to evaluate Step in Loop")) {
             return;
         }
 

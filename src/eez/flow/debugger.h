@@ -23,6 +23,12 @@ namespace flow {
 
 extern bool g_debuggerIsConnected;
 
+enum {
+    DEBUGGER_MODE_RUN,
+    DEBUGGER_MODE_DEBUG,
+};
+extern int g_debuggerMode;
+
 bool canExecuteStep(FlowState *&flowState, unsigned &componentIndex);
 
 void onStarted(gui::Assets *assets);

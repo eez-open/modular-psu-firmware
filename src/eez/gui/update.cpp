@@ -66,6 +66,11 @@ void updateScreen() {
 			freeWidgetStates(g_widgetStateStart);
 			g_widgetStateStart = nullptr;
 		}
+
+        // auto bufferIndex = display::beginBufferRendering();
+        // display::setColor(0, 0, 0);
+        // display::fillRect(0, 0, display::getDisplayWidth(), display::getDisplayHeight());
+        // display::endBufferRendering(bufferIndex, 0, 0, display::getDisplayWidth(), display::getDisplayHeight(), false, 255, 0, 0, nullptr);
 	}
 
 	bool hasPreviousState = g_widgetStateStart != nullptr;

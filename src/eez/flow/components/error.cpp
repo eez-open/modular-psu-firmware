@@ -27,8 +27,7 @@ namespace flow {
 
 void executeErrorComponent(FlowState *flowState, unsigned componentIndex) {
 	Value expressionValue;
-	if (!evalProperty(flowState, componentIndex, defs_v3::EVAL_EXPR_ACTION_COMPONENT_PROPERTY_EXPRESSION, expressionValue)) {
-		throwError(flowState, componentIndex, "Failed to evaluate Message in Error\n");
+	if (!evalProperty(flowState, componentIndex, defs_v3::EVAL_EXPR_ACTION_COMPONENT_PROPERTY_EXPRESSION, expressionValue, "Failed to evaluate Message in Error")) {
 		return;
 	}
 

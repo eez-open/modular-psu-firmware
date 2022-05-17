@@ -33,8 +33,7 @@ void executeCompareComponent(FlowState *flowState, unsigned componentIndex) {
     auto component = (CompareActionComponent *)flowState->flow->components[componentIndex];
 
     Value conditionValue;
-    if (!evalExpression(flowState, componentIndex, component->conditionInstructions, conditionValue)) {
-        throwError(flowState, componentIndex, "Failed to evaluate Condition in Compare\n");
+    if (!evalExpression(flowState, componentIndex, component->conditionInstructions, conditionValue, "Failed to evaluate Condition in Compare")) {
         return;
     }
 

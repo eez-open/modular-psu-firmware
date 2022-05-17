@@ -27,8 +27,7 @@ namespace flow {
 
 void executeIsTrueComponent(FlowState *flowState, unsigned componentIndex) {
 	Value srcValue;
-	if (!evalProperty(flowState, componentIndex, defs_v3::IS_TRUE_ACTION_COMPONENT_PROPERTY_VALUE, srcValue)) {
-		throwError(flowState, componentIndex, "Failed to evaluate Value in IsTrue\n");
+	if (!evalProperty(flowState, componentIndex, defs_v3::IS_TRUE_ACTION_COMPONENT_PROPERTY_VALUE, srcValue, "Failed to evaluate Value in IsTrue")) {
 		return;
 	}
 

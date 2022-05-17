@@ -16,37 +16,20 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
+#include <eez/core/debug.h>
+
 #include <eez/flow/components.h>
 #include <eez/flow/flow_defs_v3.h>
 #include <eez/flow/expression.h>
-#include <eez/flow/private.h>
+#include <eez/flow/debugger.h>
 
 using namespace eez::gui;
 
 namespace eez {
 namespace flow {
 
-void executeSelectLanguageComponent(FlowState *flowState, unsigned componentIndex) {
-	Value languageValue;
-	if (!evalProperty(flowState, componentIndex, defs_v3::SELECT_LANGUAGE_ACTION_COMPONENT_PROPERTY_LANGUAGE, languageValue, "Failed to evaluate Language in SelectLanguage")) {
-		return;
-	}
-
-	const char *language = languageValue.getString();
-
-    auto languages = flowState->assets->languages;
-
-    for (uint32_t languageIndex = 0; languageIndex < languages.count; languageIndex++) {
-        if (strcmp(languages[languageIndex]->languageID, language) == 0) {
-            g_selectedLanguage = languageIndex;
-	        propagateValueThroughSeqout(flowState, componentIndex);
-            return;
-        }
-    }
-
-    char message[256];
-    snprintf(message, sizeof(message), "Unknown language %s", language);
-    throwError(flowState, componentIndex, message);
+void executeNoopComponent(FlowState *flowState, unsigned componentIndex) {
+	propagateValueThroughSeqout(flowState, componentIndex);
 }
 
 } // namespace flow

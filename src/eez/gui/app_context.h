@@ -115,6 +115,8 @@ public:
 
     virtual int getMainPageId() = 0;
 
+    void getBoundingRect(Rect &rect);
+
 protected:
     PageOnStack m_pageNavigationStack[CONF_GUI_PAGE_NAVIGATION_STACK_SIZE];
     int m_pageNavigationStackPointer = 0;
@@ -130,7 +132,7 @@ protected:
     void updatePage(int i, WidgetCursor &widgetCursor);
     virtual void pageRenderCustom(int i, WidgetCursor &widgetCursor);
 
-    void getPageRect(int pageId, Page *page, int &x, int &y, int &w, int &h);
+    void getPageRect(int pageId, const Page *page, int &x, int &y, int &w, int &h);
     bool isPageFullyCovered(int pageNavigationStackIndex);
 
     virtual bool canExecuteActionWhenTouchedOutsideOfActivePage(int pageId, int action);

@@ -37,8 +37,7 @@ void executeShowMessageBoxComponent(FlowState *flowState, unsigned componentInde
 	auto component = (ShowMessagePageActionComponent *)flowState->flow->components[componentIndex];
 
     Value messageValue;
-    if (!evalProperty(flowState, componentIndex, defs_v3::SHOW_MESSAGE_BOX_ACTION_COMPONENT_PROPERTY_MESSAGE, messageValue)) {
-        throwError(flowState, componentIndex, "Failed to evaluate Message in ShowMessageBox\n");
+    if (!evalProperty(flowState, componentIndex, defs_v3::SHOW_MESSAGE_BOX_ACTION_COMPONENT_PROPERTY_MESSAGE, messageValue, "Failed to evaluate Message in ShowMessageBox")) {
         return;
     }
 

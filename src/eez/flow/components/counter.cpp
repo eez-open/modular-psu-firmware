@@ -35,8 +35,7 @@ void executeCounterComponent(FlowState *flowState, unsigned componentIndex) {
 
     if (!counterComponenentExecutionState) {
         Value counterValue;
-        if (!evalProperty(flowState, componentIndex, defs_v3::COUNTER_ACTION_COMPONENT_PROPERTY_COUNT_VALUE, counterValue)) {
-            throwError(flowState, componentIndex, "Failed to evaluate countValue in Counter\n");
+        if (!evalProperty(flowState, componentIndex, defs_v3::COUNTER_ACTION_COMPONENT_PROPERTY_COUNT_VALUE, counterValue, "Failed to evaluate countValue in Counter")) {
             return;
         }
 
