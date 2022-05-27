@@ -22,10 +22,16 @@ namespace eez {
 namespace gui {
 
 struct ProgressWidget : public Widget {
+    uint16_t min;
+    uint16_t max;
+    uint8_t orientation;
+    uint8_t reserved1;
 };
 
 struct ProgressWidgetState : public WidgetState {
 	Value data;
+    Value min;
+    Value max;
 
     bool updateState() override;
     void render() override;

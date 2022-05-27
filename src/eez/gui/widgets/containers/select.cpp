@@ -23,11 +23,9 @@ namespace eez {
 namespace gui {
 
 bool SelectWidgetState::updateState() {
-    const WidgetCursor &widgetCursor = g_widgetCursor;
+    WIDGET_STATE_START(SelectWidget);
 
-	bool hasPreviousState = widgetCursor.hasPreviousState;
-	auto widget = (const SelectWidget *)widgetCursor.widget;
-   	if (widget->widgets.count > 0) {
+    if (widget->widgets.count > 0) {
 		Value indexValue = get(widgetCursor, widgetCursor.widget->data);
 		int err;
 		int index = indexValue.toInt32(&err);
@@ -39,7 +37,7 @@ bool SelectWidgetState::updateState() {
 		WIDGET_STATE(widgetIndex, -1);
 	}
 
-	return !hasPreviousState;
+    WIDGET_STATE_END()
 }
 
 void SelectWidgetState::render() {
@@ -50,7 +48,7 @@ void SelectWidgetState::render() {
 		widgetCursor.x, widgetCursor.y, widgetCursor.w, widgetCursor.h,
 		getStyle(widget->style), false
 	);
-	
+
 	repainted = true;
 }
 
@@ -77,9 +75,19 @@ void SelectWidgetState::enumChildren() {
 		auto savedWidget = widgetCursor.widget;
 		widgetCursor.widget = widget->widgets[widgetIndex];
 
+        auto savedX = widgetCursor.x;
+        auto savedY = widgetCursor.y;
+
+        widgetCursor.x += widgetCursor.widget->x;
+        widgetCursor.y += widgetCursor.widget->y;
+
         widgetCursor.w = widgetCursor.widget->width;
         widgetCursor.h = widgetCursor.widget->height;
+
         enumWidget();
+
+        widgetCursor.x = savedX;
+        widgetCursor.y = savedY;
 
 		widgetCursor.widget = savedWidget;
 	}

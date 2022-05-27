@@ -35,7 +35,7 @@ void arcBar(Agg2D &graphics, int xCenter, int yCenter, int radOuter, int radInne
 	auto angle = Agg2D::deg2Rad(angleDeg);
 	auto cosa = cos(angle);
 	auto sina = sin(angle);
-	
+
 	graphics.moveTo(xCenter - radOuter, yCenter);
 
 	graphics.arcTo(
@@ -83,11 +83,8 @@ float firstTick(float n) {
 ////////////////////////////////////////////////////////////////////////////////
 
 bool GaugeWidgetState::updateState() {
-    const WidgetCursor &widgetCursor = g_widgetCursor;
+    WIDGET_STATE_START(GaugeWidget);
 
-	bool hasPreviousState = widgetCursor.hasPreviousState;
-	auto widget = (const GaugeWidget *)widgetCursor.widget;
-	
 	WIDGET_STATE(flags.active, g_isActiveWidget);
 	WIDGET_STATE(data, get(widgetCursor, widget->data));
 	WIDGET_STATE(minValue, get(widgetCursor, widget->min));
@@ -95,7 +92,7 @@ bool GaugeWidgetState::updateState() {
 	WIDGET_STATE(thresholdValue, get(widgetCursor, widget->threshold));
 	WIDGET_STATE(unitValue, get(widgetCursor, widget->unit));
 
-	return !hasPreviousState;
+    WIDGET_STATE_END()
 }
 
 void GaugeWidgetState::render() {

@@ -28,15 +28,12 @@ namespace eez {
 namespace gui {
 
 bool ListGraphWidgetState::updateState() {
-    const WidgetCursor &widgetCursor = g_widgetCursor;
+    WIDGET_STATE_START(ListGraphWidget);
 
-    bool hasPreviousState = widgetCursor.hasPreviousState;
-    auto widget = (const ListGraphWidget *)widgetCursor.widget;
-    
     WIDGET_STATE(data, get(widgetCursor, widget->data));
     WIDGET_STATE(cursorData, get(widgetCursor, widget->cursorData));
 
-    return !hasPreviousState;
+    WIDGET_STATE_END()
 }
 
 void ListGraphWidgetState::render() {

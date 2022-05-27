@@ -150,13 +150,14 @@ private:
 struct Widget {
 	uint16_t type;
 	int16_t data;
+    int16_t visible;
 	int16_t action;
 	int16_t x;
 	int16_t y;
 	int16_t width;
 	int16_t height;
 	int16_t style;
-    uint32_t flags;
+    uint16_t flags;
 };
 
 #define SHADOW_FLAG (1 << 0)

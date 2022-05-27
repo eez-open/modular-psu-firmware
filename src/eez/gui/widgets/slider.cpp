@@ -26,15 +26,13 @@ namespace eez {
 namespace gui {
 
 bool SliderWidgetState::updateState() {
-    const WidgetCursor &widgetCursor = g_widgetCursor;
-    bool hasPreviousState = widgetCursor.hasPreviousState;
-	auto widget = (const SliderWidget *)widgetCursor.widget;
+    WIDGET_STATE_START(SliderWidget);
 
     WIDGET_STATE(value, get(widgetCursor, widget->data));
     WIDGET_STATE(minValue, get(widgetCursor, widget->min));
     WIDGET_STATE(maxValue, get(widgetCursor, widget->max));
 
-    return !hasPreviousState;
+    WIDGET_STATE_END()
 }
 
 void SliderWidgetState::render() {
@@ -93,7 +91,7 @@ bool SliderWidgetState::hasOnTouch() {
 void SliderWidgetState::onTouch(const WidgetCursor &widgetCursor, Event &touchEvent) {
 	auto widget = (const ButtonWidget *)widgetCursor.widget;
 	const Style *style = getStyle(widget->style);
-	
+
 	double x = widgetCursor.x + style->paddingLeft;
     double w = widgetCursor.w - style->paddingLeft - style->paddingRight;
     double h = widgetCursor.h - style->paddingTop - style->paddingBottom;
@@ -109,7 +107,7 @@ void SliderWidgetState::onTouch(const WidgetCursor &widgetCursor, Event &touchEv
 		else if (knobRelativePosition > 1.0f) knobRelativePosition = 1.0f;
 
 		double knobPosition = barX + knobRelativePosition * (barW - 1);
-		
+
 		if (abs(touchEvent.x - knobPosition) < knobW * 2) {
             dragging = true;
             dragOrigin = touchEvent.x;

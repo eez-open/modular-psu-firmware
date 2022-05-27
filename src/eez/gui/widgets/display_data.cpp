@@ -48,16 +48,14 @@ int findStartOfUnit(char *text, int i) {
 }
 
 bool DisplayDataWidgetState::updateState() {
-    const WidgetCursor &widgetCursor = g_widgetCursor;
+    WIDGET_STATE_START(DisplayDataWidget);
 
-    bool hasPreviousState = widgetCursor.hasPreviousState;
-    auto widget = (const DisplayDataWidget *)widgetCursor.widget;
     const Style *style = getStyle(g_hooks.overrideStyle(widgetCursor, widget->style));
 
     WIDGET_STATE(flags.active, g_isActiveWidget);
     WIDGET_STATE(flags.focused, isFocusWidget(widgetCursor));
     WIDGET_STATE(flags.blinking, g_isBlinkTime && isBlinking(widgetCursor, widget->data));
-    
+
     bool refreshData = true;
     auto newData = get(widgetCursor, widget->data);
     auto currentTime = millis();
@@ -79,10 +77,10 @@ bool DisplayDataWidgetState::updateState() {
 
     bool cursorVisible = millis() % (2 * CONF_GUI_TEXT_CURSOR_BLINK_TIME_MS) < CONF_GUI_TEXT_CURSOR_BLINK_TIME_MS;
     WIDGET_STATE(cursorPosition, cursorVisible ? getTextCursorPosition(widgetCursor, widget->data) : -1);
-    
+
     WIDGET_STATE(xScroll, getXScroll(widgetCursor));
 
-    return !hasPreviousState;
+    WIDGET_STATE_END()
 }
 
 void DisplayDataWidgetState::render() {

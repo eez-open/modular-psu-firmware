@@ -144,10 +144,8 @@ Value getInputWidgetData(const gui::WidgetCursor &widgetCursor, const Value &dat
 }
 
 bool InputWidgetState::updateState() {
-    const WidgetCursor &widgetCursor = g_widgetCursor;
+    WIDGET_STATE_START(InputWidget);
 
-	bool hasPreviousState = widgetCursor.hasPreviousState;
-	auto widget = (const InputWidget*)widgetCursor.widget;
 	const Style *style = getStyle(g_hooks.overrideStyle(widgetCursor, widget->style));
 
 	WIDGET_STATE(flags.active, g_isActiveWidget);
@@ -155,7 +153,7 @@ bool InputWidgetState::updateState() {
 	WIDGET_STATE(flags.blinking, g_isBlinkTime && styleIsBlink(style));
 	WIDGET_STATE(data, get(widgetCursor, widget->data));
 
-	return !hasPreviousState;
+    WIDGET_STATE_END()
 }
 
 void InputWidgetState::render() {

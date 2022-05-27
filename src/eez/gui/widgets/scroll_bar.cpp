@@ -65,9 +65,7 @@ void getThumbGeometry(int size, int position, int pageSize, int xTrack, int wTra
 }
 
 bool ScrollBarWidgetState::updateState() {
-    const WidgetCursor &widgetCursor = g_widgetCursor;
-
-    bool hasPreviousState = widgetCursor.hasPreviousState;
+    WIDGET_STATE_START(Widget);
 
     WIDGET_STATE(flags.active, g_isActiveWidget);
     WIDGET_STATE(flags.focused, isFocusWidget(widgetCursor));
@@ -75,7 +73,7 @@ bool ScrollBarWidgetState::updateState() {
     WIDGET_STATE(position, getPosition(widgetCursor));
     WIDGET_STATE(pageSize, getPageSize(widgetCursor));
 
-    return !hasPreviousState;
+    WIDGET_STATE_END()
 }
 
 void ScrollBarWidgetState::render() {
@@ -91,9 +89,9 @@ void ScrollBarWidgetState::render() {
         // draw left button
         if (widget->leftButtonText) {
             drawText(
-                static_cast<const char *>(widget->leftButtonText), -1, 
-                widgetCursor.x, 
-                widgetCursor.y, 
+                static_cast<const char *>(widget->leftButtonText), -1,
+                widgetCursor.x,
+                widgetCursor.y,
                 isHorizontal ? buttonSize : widgetCursor.w,
                 isHorizontal ? widgetCursor.h : buttonSize, buttonsStyle,
                 flags.active && dragSegment == SCROLL_BAR_WIDGET_SEGMENT_LEFT_BUTTON
@@ -143,12 +141,12 @@ void ScrollBarWidgetState::render() {
                 isHorizontal ? widgetCursor.y : widgetCursor.y + widgetCursor.h - buttonSize,
                 isHorizontal ? buttonSize : widgetCursor.w,
                 isHorizontal ? widgetCursor.h : buttonSize,
-                buttonsStyle, 
+                buttonsStyle,
                 flags.active && dragSegment == SCROLL_BAR_WIDGET_SEGMENT_RIGHT_BUTTON
             );
         }
 
-        auto action = getWidgetAction(widgetCursor);        
+        auto action = getWidgetAction(widgetCursor);
         if (flags.focused && action == ACTION_ID_SCROLL) {
             const Style *style = getStyle(widgetCursor.widget->style);
             display::setColor(style->focusColor);
@@ -214,7 +212,7 @@ void ScrollBarWidgetState::onTouch(const WidgetCursor &widgetCursor, Event &touc
                 }
             } else {
                 int xThumb, wThumb;
-                
+
                 int position = getPosition(widgetCursor);
 
                 getThumbGeometry(size, position, pageSize, xTrack, wTrack, buttonSize, xThumb, wThumb);
@@ -237,8 +235,8 @@ void ScrollBarWidgetState::onTouch(const WidgetCursor &widgetCursor, Event &touc
                     dragStartPosition = getPosition(widgetCursor);
                 }
             }
-        } 
-        
+        }
+
         if (touchEvent.type == EVENT_TYPE_TOUCH_MOVE) {
             if (dragSegment == SCROLL_BAR_WIDGET_SEGMENT_THUMB) {
                 int size = getSize(widgetCursor);
@@ -248,7 +246,7 @@ void ScrollBarWidgetState::onTouch(const WidgetCursor &widgetCursor, Event &touc
             dragSegment = SCROLL_BAR_WIDGET_SEGMENT_NONE;
         }
 
-        auto action = getWidgetAction(widgetCursor);        
+        auto action = getWidgetAction(widgetCursor);
 		if (action == ACTION_ID_SCROLL) {
 			g_hooks.setFocusCursor(widgetCursor, widget->data);
 		}

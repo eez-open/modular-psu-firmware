@@ -26,15 +26,13 @@ namespace eez {
 namespace gui {
 
 bool DropDownListWidgetState::updateState() {
-	const WidgetCursor &widgetCursor = g_widgetCursor;
-	bool hasPreviousState = widgetCursor.hasPreviousState;
-	auto widget = (const DropDownListWidget *)widgetCursor.widget;
+    WIDGET_STATE_START(DropDownListWidget);
 
 	WIDGET_STATE(flags.active, g_isActiveWidget);
 	WIDGET_STATE(data, get(widgetCursor, widget->data));
 	WIDGET_STATE(options, get(widgetCursor, widget->options));
 
-	return !hasPreviousState;
+    WIDGET_STATE_END()
 }
 
 void DropDownListWidgetState::render() {

@@ -84,7 +84,7 @@ struct YTGraphDrawHelper {
     void drawValue(int valueIndex) {
 		int yPrevValue = yPrev[valueIndex];
 		int yValue = y[valueIndex];
-		
+
 		if (yValue == INT_MIN) {
             return;
         }
@@ -241,8 +241,8 @@ struct YTGraphStaticDrawHelper {
     int xLabels[MAX_NUM_OF_Y_VALUES];
     int yLabels[MAX_NUM_OF_Y_VALUES];
 
-    YTGraphStaticDrawHelper(YTGraphWidgetState *widgetState_, const WidgetCursor &widgetCursor_) 
-        : widgetState(widgetState_), widgetCursor(widgetCursor_), widget(widgetCursor.widget) 
+    YTGraphStaticDrawHelper(YTGraphWidgetState *widgetState_, const WidgetCursor &widgetCursor_)
+        : widgetState(widgetState_), widgetCursor(widgetCursor_), widget(widgetCursor.widget)
     {
         ytDataGetValue = ytDataGetGetValueFunc(widgetCursor, widget->data);
     }
@@ -475,7 +475,7 @@ struct YTGraphStaticDrawHelper {
                 widgetState->flags.focused
 			);
 		}
-		
+
 		// draw labels
         if (showLabels) {
             font::Font font = styleGetFont(style);
@@ -500,10 +500,7 @@ struct YTGraphStaticDrawHelper {
 ////////////////////////////////////////////////////////////////////////////////
 
 bool YTGraphWidgetState::updateState() {
-    const WidgetCursor &widgetCursor = g_widgetCursor;
-
-    bool hasPreviousState = widgetCursor.hasPreviousState;
-    auto widget = (const YTGraphWidget *)widgetCursor.widget;
+    WIDGET_STATE_START(YTGraphWidget);
 
     refreshBackground = !hasPreviousState;
 
@@ -539,7 +536,7 @@ bool YTGraphWidgetState::updateState() {
         }
     }
 
-    return !hasPreviousState;
+    WIDGET_STATE_END()
 }
 
 void YTGraphWidgetState::render() {
@@ -607,7 +604,7 @@ void YTGraphWidgetState::onTouch(const WidgetCursor &widgetCursor, Event &touchE
     } else {
         if (touchEvent.type == EVENT_TYPE_TOUCH_DOWN) {
             if (widgetCursor.appContext->isWidgetActionEnabled(widgetCursor)) {
-                auto action = getWidgetAction(widgetCursor);        
+                auto action = getWidgetAction(widgetCursor);
                 executeAction(widgetCursor, action);
             }
         }

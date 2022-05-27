@@ -28,10 +28,7 @@ namespace eez {
 namespace gui {
 
 bool SwitchWidgetState::updateState() {
-    const WidgetCursor &widgetCursor = g_widgetCursor;
-
-    bool hasPreviousState = widgetCursor.hasPreviousState;
-    auto widget = (const ButtonWidget *)widgetCursor.widget;
+    WIDGET_STATE_START(SwitchWidget);
 
 	if (changeStartTime != 0) {
 		if (millis() - changeStartTime > ANIMATION_DURATION) {
@@ -42,7 +39,7 @@ bool SwitchWidgetState::updateState() {
 
     WIDGET_STATE(data, widget->data ? get(widgetCursor, widget->data) : 0);
 
-    return !hasPreviousState;
+    WIDGET_STATE_END()
 }
 
 void SwitchWidgetState::render() {
@@ -99,7 +96,7 @@ void SwitchWidgetState::render() {
 	display::setBackColor(style->activeBackgroundColor);
 	display::fillRoundedRect(
 		aggDrawing,
-		x, y, x + w - 1, y + h - 1, 
+		x, y, x + w - 1, y + h - 1,
 		style->borderSizeLeft, h, true, true,
 		x, y, x + t * (w - 1), y + h - 1
 	);

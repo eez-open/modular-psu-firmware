@@ -27,22 +27,19 @@ namespace eez {
 namespace gui {
 
 bool ButtonWidgetState::updateState() {
-    const WidgetCursor &widgetCursor = g_widgetCursor;
-
-    bool hasPreviousState = widgetCursor.hasPreviousState;
-    auto widget = (const ButtonWidget *)widgetCursor.widget;
-    const Style *style = getStyle(flags.enabled ? widget->style : widget->disabledStyle);
+    WIDGET_STATE_START(ButtonWidget);
 
     WIDGET_STATE(flags.active, g_isActiveWidget);
 
     auto enabled = get(widgetCursor, widget->enabled);
     WIDGET_STATE(flags.enabled, enabled.getType() == VALUE_TYPE_UNDEFINED || enabled.getInt() ? 1 : 0);
 
+    const Style *style = getStyle(flags.enabled ? widget->style : widget->disabledStyle);
     WIDGET_STATE(flags.blinking, g_isBlinkTime && (isBlinking(widgetCursor, widget->data) || styleIsBlink(style)));
 
     WIDGET_STATE(data, widget->data ? get(widgetCursor, widget->data) : 0);
 
-    return !hasPreviousState;
+    WIDGET_STATE_END()
 }
 
 void ButtonWidgetState::render() {
@@ -50,7 +47,7 @@ void ButtonWidgetState::render() {
 
     auto widget = (const ButtonWidget *)widgetCursor.widget;
     const Style *style = getStyle(flags.enabled ? widget->style : widget->disabledStyle);
-    
+
     if (widget->data) {
         if (data.isString()) {
             drawText(data.getString(), -1, widgetCursor.x, widgetCursor.y, widgetCursor.w, widgetCursor.h, style, flags.active, flags.blinking);

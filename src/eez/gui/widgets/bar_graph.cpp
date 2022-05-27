@@ -67,10 +67,8 @@ void drawLineInBarGraphWidget(const BarGraphWidget *barGraphWidget, int p, uint1
 }
 
 bool BarGraphWidgetState::updateState() {
-    const WidgetCursor &widgetCursor = g_widgetCursor;
+    WIDGET_STATE_START(BarGraphWidget);
 
-    bool hasPreviousState = widgetCursor.hasPreviousState;
-    auto widget = (const BarGraphWidget *)widgetCursor.widget;
     const Style* style = getStyle(g_hooks.overrideStyle(widgetCursor, widget->style));
 
     WIDGET_STATE(flags.active, g_isActiveWidget);
@@ -96,7 +94,7 @@ bool BarGraphWidgetState::updateState() {
         textDataRefreshLastTime = currentTime;
     }
 
-    return !hasPreviousState;
+    WIDGET_STATE_END()
 }
 
 void BarGraphWidgetState::render() {
@@ -120,7 +118,7 @@ void BarGraphWidgetState::render() {
         max = getMax(widgetCursor, widget->data).getFloat();
     }
 
-    bool horizontal = 
+    bool horizontal =
         (widget->orientation & BAR_GRAPH_ORIENTATION_MASK) == BAR_GRAPH_ORIENTATION_LEFT_RIGHT ||
         (widget->orientation & BAR_GRAPH_ORIENTATION_MASK) == BAR_GRAPH_ORIENTATION_RIGHT_LEFT;
 

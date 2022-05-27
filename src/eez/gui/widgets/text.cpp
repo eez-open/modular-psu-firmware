@@ -39,10 +39,8 @@ void TextWidget_autoSize(TextWidget& widget) {
 }
 
 bool TextWidgetState::updateState() {
-    const WidgetCursor &widgetCursor = g_widgetCursor;
+    WIDGET_STATE_START(TextWidget);
 
-    bool hasPreviousState = widgetCursor.hasPreviousState;
-    auto widget = (const TextWidget *)widgetCursor.widget;
     const Style *style = getStyle(g_hooks.overrideStyle(widgetCursor, widget->style));
 
     WIDGET_STATE(flags.active, g_isActiveWidget);
@@ -53,7 +51,7 @@ bool TextWidgetState::updateState() {
     const char *text = widget->text ? static_cast<const char *>(widget->text) : nullptr;
 	WIDGET_STATE(data, !(text && text[0]) && widget->data ? get(widgetCursor, widget->data) : 0);
 
-    return !hasPreviousState;
+    WIDGET_STATE_END()
 }
 
 void TextWidgetState::render() {

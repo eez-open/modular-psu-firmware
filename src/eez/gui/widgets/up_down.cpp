@@ -31,15 +31,12 @@ namespace eez {
 namespace gui {
 
 bool UpDownWidgetState::updateState() {
-    const WidgetCursor &widgetCursor = g_widgetCursor;
-
-    bool hasPreviousState = widgetCursor.hasPreviousState;
-    auto widget = (const UpDownWidget *)widgetCursor.widget;
+    WIDGET_STATE_START(UpDownWidget);
 
     WIDGET_STATE(flags.active, g_isActiveWidget);
     WIDGET_STATE(data, get(widgetCursor, widget->data));
 
-    return !hasPreviousState;
+    WIDGET_STATE_END()
 }
 
 void UpDownWidgetState::render() {
@@ -71,7 +68,7 @@ void UpDownWidgetState::render() {
 
     if (widget->upButtonText) {
         drawText(
-            static_cast<const char *>(widget->upButtonText), -1, 
+            static_cast<const char *>(widget->upButtonText), -1,
             widgetCursor.x + widgetCursor.w - buttonWidth, widgetCursor.y, buttonWidth, widgetCursor.h,
             buttonsStyle,
             flags.active && segment == UP_DOWN_WIDGET_SEGMENT_UP_BUTTON

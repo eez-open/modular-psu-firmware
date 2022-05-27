@@ -6,6 +6,6 @@ if not exist "build\win32" mkdir "build\win32"
 
 cd build\win32
 
-cmake -G "Visual Studio 15 2017" ..\..
+cmake -A Win32 ..\..
 
 cd ..\..

@@ -21,10 +21,16 @@
 namespace eez {
 namespace gui {
 
+#define CONTAINER_WIDGET_LAYOUT_STATIC 0
+#define CONTAINER_WIDGET_LAYOUT_HORIZONTAL 1
+#define CONTAINER_WIDGET_LAYOUT_VERTICAL 2
+
 struct ContainerWidget : public Widget {
 	ListOfAssetsPtr<Widget> widgets;
 	uint16_t flags;
 	int16_t overlay;
+    uint16_t layout;
+    uint16_t reserved1;
 };
 
 struct ContainerWidgetState : public WidgetState {
@@ -35,6 +41,7 @@ struct ContainerWidgetState : public WidgetState {
     int displayBufferIndex;
 	bool displayBufferSelected;
 	bool repainted;
+    int offsetPrevious;
 
     bool updateState() override;
 	void render() override;

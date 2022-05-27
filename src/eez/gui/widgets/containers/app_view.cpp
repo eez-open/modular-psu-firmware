@@ -25,7 +25,7 @@ namespace eez {
 namespace gui {
 
 bool AppViewWidgetState::updateState() {
-    const WidgetCursor &widgetCursor = g_widgetCursor;
+    WIDGET_STATE_START(Widget)
 
     if (widgetCursor.widget->data != DATA_ID_NONE) {
         Value appContextValue = get(widgetCursor, widgetCursor.widget->data);
@@ -34,7 +34,7 @@ bool AppViewWidgetState::updateState() {
         appContext = widgetCursor.appContext;
     }
 
-    return false;
+    WIDGET_STATE_END()
 }
 
 void AppViewWidgetState::enumChildren() {

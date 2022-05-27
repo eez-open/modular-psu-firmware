@@ -29,7 +29,6 @@ namespace flow {
 struct LoopComponenentExecutionState : public ComponenentExecutionState {
     Value dstValue;
     Value toValue;
-    Value stepValue;
     Value currentValue;
 };
 
@@ -52,6 +51,11 @@ void executeLoopComponent(FlowState *flowState, unsigned componentIndex) {
         }
     }
 
+    Value stepValue;
+    if (!evalProperty(flowState, componentIndex, defs_v3::LOOP_ACTION_COMPONENT_PROPERTY_STEP, stepValue, "Failed to evaluate Step in Loop")) {
+        return;
+    }
+
     if (!loopComponentExecutionState) {
         Value dstValue;
         if (!evalAssignableProperty(flowState, componentIndex, defs_v3::LOOP_ACTION_COMPONENT_PROPERTY_VARIABLE, dstValue, "Failed to evaluate Variable in Loop")) {
@@ -68,23 +72,17 @@ void executeLoopComponent(FlowState *flowState, unsigned componentIndex) {
             return;
         }
 
-        Value stepValue;
-        if (!evalProperty(flowState, componentIndex, defs_v3::LOOP_ACTION_COMPONENT_PROPERTY_STEP, stepValue, "Failed to evaluate Step in Loop")) {
-            return;
-        }
-
         loopComponentExecutionState = allocateComponentExecutionState<LoopComponenentExecutionState>(flowState, componentIndex);
         loopComponentExecutionState->dstValue = dstValue;
         loopComponentExecutionState->toValue = toValue;
-        loopComponentExecutionState->stepValue = stepValue;
 
 		loopComponentExecutionState->currentValue = fromValue;
     } else {
-        loopComponentExecutionState->currentValue = op_add(loopComponentExecutionState->currentValue, loopComponentExecutionState->stepValue);
+        loopComponentExecutionState->currentValue = op_add(loopComponentExecutionState->currentValue, stepValue);
     }
 
     bool condition;
-    if (loopComponentExecutionState->stepValue.getInt() > 0) {
+    if (stepValue.getInt() > 0) {
         condition = op_great(loopComponentExecutionState->currentValue, loopComponentExecutionState->toValue).toBool();
     } else {
         condition = op_less(loopComponentExecutionState->currentValue, loopComponentExecutionState->toValue).toBool();

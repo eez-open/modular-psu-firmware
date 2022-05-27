@@ -26,12 +26,12 @@ namespace gui {
 #define LIST_TYPE_HORIZONTAL 2
 
 bool ListWidgetState::updateState() {
-    const WidgetCursor &widgetCursor = g_widgetCursor;
+    WIDGET_STATE_START(ListWidget);
 
-    auto widget = (const ListWidget *)widgetCursor.widget;
     startPosition = ytDataGetPosition(widgetCursor, widget->data);
     count = eez::gui::count(widgetCursor, widget->data);
-    return false;
+
+    WIDGET_STATE_END()
 }
 
 void ListWidgetState::enumChildren() {

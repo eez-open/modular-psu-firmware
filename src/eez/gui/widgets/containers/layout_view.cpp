@@ -34,10 +34,7 @@ int getLayoutId(const WidgetCursor &widgetCursor) {
 }
 
 bool LayoutViewWidgetState::updateState() {
-    WidgetCursor &widgetCursor = g_widgetCursor;
-
-    bool hasPreviousState = widgetCursor.hasPreviousState;
-    auto widget = (const LayoutViewWidget *)widgetCursor.widget;
+    WIDGET_STATE_START(LayoutViewWidget);
 
     auto savedCursor = widgetCursor.cursor;
 
@@ -54,18 +51,18 @@ bool LayoutViewWidgetState::updateState() {
     WIDGET_STATE(flags.active, g_isActiveWidget);
 
     auto savedFlowState = widgetCursor.flowState;
-    WIDGET_STATE(layout, getPageAsset(getLayoutId(widgetCursor), widgetCursor));
+    WIDGET_STATE(layout, getPageAsset(getLayoutId(widgetCursor), (WidgetCursor &)widgetCursor));
     flowState = widgetCursor.flowState;
-    widgetCursor.flowState = savedFlowState;
+    ((WidgetCursor &)widgetCursor).flowState = savedFlowState;
 
     if (widget->context) {
-        restoreContext(widgetCursor, widget->context, oldContext);
+        restoreContext((WidgetCursor &)widgetCursor, widget->context, oldContext);
     }
 
-    widgetCursor.cursor = savedCursor;
+    ((WidgetCursor &)widgetCursor).cursor = savedCursor;
 
-    return !hasPreviousState;
-}
+    WIDGET_STATE_END()
+    }
 
 void LayoutViewWidgetState::render() {
 	const WidgetCursor& widgetCursor = g_widgetCursor;
@@ -125,19 +122,42 @@ void LayoutViewWidgetState::enumChildren() {
         ) {
             for (uint32_t index = 0; index < widgets.count; ++index) {
                 widgetCursor.widget = widgets[index];
+
                 auto savedX = widgetCursor.x;
 	            auto savedY = widgetCursor.y;
+
                 resizeWidget(widgetCursor, containerOriginalWidth, containerOriginalHeight, containerWidth, containerHeight);
+
+                if (g_isRTL) {
+                    widgetCursor.x = savedX + containerWidth - ((widgetCursor.x - savedX) + widgetCursor.w);
+                }
+
                 enumWidget();
+
                 widgetCursor.x = savedX;
                 widgetCursor.y = savedY;
             }
         } else {
             for (uint32_t index = 0; index < widgets.count; ++index) {
                 widgetCursor.widget = widgets[index];
+
+                auto savedX = widgetCursor.x;
+                auto savedY = widgetCursor.y;
+
+                widgetCursor.x += widgetCursor.widget->x;
+                widgetCursor.y += widgetCursor.widget->y;
+
                 widgetCursor.w = widgetCursor.widget->width;
                 widgetCursor.h = widgetCursor.widget->height;
+
+                if (g_isRTL) {
+                    widgetCursor.x = savedX + containerWidth - ((widgetCursor.x - savedX) + widgetCursor.w);
+                }
+
                 enumWidget();
+
+                widgetCursor.x = savedX;
+                widgetCursor.y = savedY;
             }
         }
 

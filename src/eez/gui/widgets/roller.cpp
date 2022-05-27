@@ -33,9 +33,7 @@ namespace eez {
 namespace gui {
 
 bool RollerWidgetState::updateState() {
-    const WidgetCursor &widgetCursor = g_widgetCursor;
-	auto widget = (const RollerWidget *)widgetCursor.widget;
-    bool hasPreviousState = widgetCursor.hasPreviousState;
+    WIDGET_STATE_START(RollerWidget);
 
 	const Style* selectedValueStyle = getStyle(widget->selectedValueStyle);
 	font::Font fontSelectedValue = styleGetFont(selectedValueStyle);
@@ -91,7 +89,7 @@ bool RollerWidgetState::updateState() {
 
 	WIDGET_STATE(data, dataValue);
 
-	return !hasPreviousState;
+    WIDGET_STATE_END()
 }
 
 void RollerWidgetState::render() {
@@ -118,7 +116,7 @@ void RollerWidgetState::render() {
 
 	display::AggDrawing aggDrawing;
 	display::aggInit(aggDrawing);
-	
+
 	auto x = widgetCursor.x;
 
 	int rectHeight = selectedValueStyle->borderSizeTop + textHeight + selectedValueStyle->borderSizeBottom;

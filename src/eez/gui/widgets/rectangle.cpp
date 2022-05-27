@@ -25,12 +25,11 @@ namespace eez {
 namespace gui {
 
 bool RectangleWidgetState::updateState() {
-    const WidgetCursor &widgetCursor = g_widgetCursor;
+    WIDGET_STATE_START(Widget);
 
-    bool hasPreviousState = widgetCursor.hasPreviousState;
     WIDGET_STATE(flags.active, g_isActiveWidget);
 
-    return !hasPreviousState;
+    WIDGET_STATE_END()
 }
 
 void RectangleWidgetState::render() {
@@ -40,8 +39,8 @@ void RectangleWidgetState::render() {
     const Style* style = getStyle(widget->style);
     drawRectangle(
         widgetCursor.x, widgetCursor.y, widgetCursor.w, widgetCursor.h,
-        style, 
-        flags.active, 
+        style,
+        flags.active,
         widget->flags.ignoreLuminosity,
         widget->flags.invertColors
     );

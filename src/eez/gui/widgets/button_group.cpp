@@ -64,7 +64,7 @@ void drawButtons(const WidgetCursor &widgetCursor, const Style *style, const Sty
         int yOffset = (h - labelHeight) / 2;
 
 		WidgetCursor widgetCursor;
-		
+
 		for (Cursor i = 0; i < count; i++) {
             if (yOffset > 0) {
                 display::setColor(style->backgroundColor);
@@ -94,15 +94,12 @@ void drawButtons(const WidgetCursor &widgetCursor, const Style *style, const Sty
 }
 
 bool ButtonGroupWidgetState::updateState() {
-    const WidgetCursor &widgetCursor = g_widgetCursor;
+    WIDGET_STATE_START(ButtonGroupWidget);
 
-    bool hasPreviousState = widgetCursor.hasPreviousState;
-    auto widget = (const ButtonGroupWidget *)widgetCursor.widget;
-    
     WIDGET_STATE(flags.active, g_isActiveWidget);
     WIDGET_STATE(data, get(widgetCursor, widget->data));
 
-    return !hasPreviousState;
+    WIDGET_STATE_END()
 }
 
 void ButtonGroupWidgetState::render() {

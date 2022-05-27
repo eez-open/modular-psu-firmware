@@ -203,6 +203,11 @@ struct WidgetStateFlags {
 
 struct WidgetState {
 	uint16_t type;
+    int x;
+    int y;
+    int w;
+    int h;
+    Value visible;
 
 	virtual ~WidgetState() {}
 
@@ -217,6 +222,19 @@ struct WidgetState {
 	virtual bool onKeyboard(const WidgetCursor &widgetCursor, uint8_t key, uint8_t mod);
 };
 
+#define WIDGET_STATE_START(WidgetClass) \
+    const WidgetCursor &widgetCursor = g_widgetCursor; \
+	auto widget = (const WidgetClass *)widgetCursor.widget; \
+	bool hasPreviousState = widgetCursor.hasPreviousState; \
+    WIDGET_STATE(visible, widget->visible ? get(widgetCursor, widget->visible) : true); \
+    if (x != widgetCursor.x || y != widgetCursor.y || w != widgetCursor.w || h != widgetCursor.h) { \
+        x = widgetCursor.x; \
+        y = widgetCursor.y; \
+        w = widgetCursor.w; \
+        h = widgetCursor.h; \
+        hasPreviousState = false; \
+    }
+
 #define WIDGET_STATE(A, B) \
 	if (hasPreviousState) { \
 		auto temp = B; \
@@ -228,9 +246,13 @@ struct WidgetState {
 		A = B; \
 	}
 
+#define WIDGET_STATE_END() \
+    return !hasPreviousState;
+
 ////////////////////////////////////////////////////////////////////////////////
 
 extern bool g_isActiveWidget;
+extern bool g_isRTL;
 
 void enumRootWidget();
 void enumWidget();

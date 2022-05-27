@@ -26,12 +26,12 @@ namespace gui {
 #define GRID_FLOW_COLUMN 2
 
 bool GridWidgetState::updateState() {
-    const WidgetCursor &widgetCursor = g_widgetCursor;
+    WIDGET_STATE_START(GridWidget);
 
-    auto widget = (const GridWidget *)widgetCursor.widget;
     startPosition = ytDataGetPosition(widgetCursor, widget->data);
     count = eez::gui::count(widgetCursor, widget->data);
-    return false;
+
+    WIDGET_STATE_END()
 }
 
 void GridWidgetState::enumChildren() {
@@ -70,26 +70,23 @@ void GridWidgetState::enumChildren() {
 			widgetCursor.popIterator();
 
             if (widget->gridFlow == GRID_FLOW_ROW) {
-                if (xOffset + childWidget->width < width) {
-                    xOffset += childWidget->width;
-                } else {
-                    if (yOffset + childWidget->height < height) {
-                        yOffset += childWidget->height;
-                        xOffset = 0;
-                    } else {
+                xOffset += childWidget->width;
+
+                if (xOffset + childWidget->width > width) {
+                    yOffset += childWidget->height;
+                    if (yOffset + childWidget->height > height) {
                         break;
                     }
+                    xOffset = 0;
                 }
             } else {
-                if (yOffset + childWidget->height < height) {
-                    yOffset += childWidget->height;
-                } else {
-                    if (xOffset + childWidget->width < width) {
-                        yOffset = 0;
-                        xOffset += childWidget->width;
-                    } else {
+                yOffset += childWidget->height;
+                if (yOffset + childWidget->height > height) {
+                    xOffset += childWidget->width;
+                    if (xOffset + childWidget->width > width) {
                         break;
                     }
+                    yOffset = 0;
                 }
             }
         }

@@ -88,6 +88,8 @@ void updateScreen() {
 
 	g_foundWidgetAtDownInvalid = false;
 
+    g_widgetCursor.x = 0;
+    g_widgetCursor.y = 0;
     g_widgetCursor.w = g_rootWidget->width;
     g_widgetCursor.h = g_rootWidget->height;
 
@@ -117,6 +119,8 @@ void enumRootWidget() {
 	g_widgetCursor.refreshed = false;
 	g_widgetCursor.hasPreviousState = true;
 
+    g_widgetCursor.x = 0;
+    g_widgetCursor.y = 0;
     g_widgetCursor.w = g_rootWidget->width;
     g_widgetCursor.h = g_rootWidget->height;
 

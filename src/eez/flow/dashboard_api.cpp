@@ -370,4 +370,9 @@ EM_PORT_API(int) getFlowStateFlowIndex(int flowStateIndex) {
     return flowState->flowIndex;
 }
 
+EM_PORT_API(bool) isRTL() {
+    return g_isRTL;
+}
+
+
 #endif // __EMSCRIPTEN__

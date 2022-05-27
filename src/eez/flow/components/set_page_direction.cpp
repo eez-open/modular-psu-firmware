@@ -1,6 +1,6 @@
 /*
  * EEZ Modular Firmware
- * Copyright (C) 2020-present, Envox d.o.o.
+ * Copyright (C) 2021-present, Envox d.o.o.
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -16,32 +16,34 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#include <eez/core/util.h>
+#include <eez/flow/components.h>
+#include <eez/flow/flow_defs_v3.h>
+#include <eez/flow/expression.h>
+#include <eez/flow/private.h>
 
 #include <eez/gui/gui.h>
-#include <eez/gui/widgets/canvas.h>
+
+using namespace eez::gui;
 
 namespace eez {
-namespace gui {
+namespace flow {
 
-bool CanvasWidgetState::updateState() {
-    WIDGET_STATE_START(CanvasWidget);
+#define PAGE_DIRECTION_LTR 0
+#define PAGE_DIRECTION_RTL 0
 
-    WIDGET_STATE(data, getCanvasRefreshState(widgetCursor, widget->data));
+struct SetPageDirectionComponent : public Component {
+	uint8_t direction;
+};
 
-    WIDGET_STATE_END()
+void executeSetPageDirectionComponent(FlowState *flowState, unsigned componentIndex) {
+	auto component = (SetPageDirectionComponent *)flowState->flow->components[componentIndex];
+
+    gui::g_isRTL = component->direction == PAGE_DIRECTION_RTL;
+
+    gui::refreshScreen();
+
+    propagateValueThroughSeqout(flowState, componentIndex);
 }
 
-void CanvasWidgetState::render() {
-    const WidgetCursor &widgetCursor = g_widgetCursor;
-
-    auto widget = (const CanvasWidget *)widgetCursor.widget;
-
-    auto drawFunction = getCanvasDrawFunction(widgetCursor, widget->data);
-    if (drawFunction) {
-        drawFunction(widgetCursor);
-    }
-}
-
-} // namespace gui
+} // namespace flow
 } // namespace eez

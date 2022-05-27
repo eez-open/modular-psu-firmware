@@ -26,20 +26,17 @@ namespace eez {
 namespace gui {
 
 bool BitmapWidgetState::updateState() {
-    const WidgetCursor &widgetCursor = g_widgetCursor;
+    WIDGET_STATE_START(BitmapWidget);
 
-    bool hasPreviousState = widgetCursor.hasPreviousState;
-    auto widget = (const BitmapWidget *)widgetCursor.widget;
-    
     WIDGET_STATE(flags.active, g_isActiveWidget);
     WIDGET_STATE(data, widget->data ? getBitmapImage(widgetCursor, widget->data) : get(widgetCursor, widget->data));
 
-    return !hasPreviousState;
+    WIDGET_STATE_END()
 }
 
 void BitmapWidgetState::render() {
     const WidgetCursor &widgetCursor = g_widgetCursor;
-    
+
     auto widget = (const BitmapWidget *)widgetCursor.widget;
     const Style* style = getStyle(widget->style);
 

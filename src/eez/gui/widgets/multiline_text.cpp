@@ -25,17 +25,15 @@ namespace eez {
 namespace gui {
 
 bool MultilineTextWidgetState::updateState() {
-    const WidgetCursor &widgetCursor = g_widgetCursor;
+    WIDGET_STATE_START(MultilineTextWidget);
 
-    bool hasPreviousState = widgetCursor.hasPreviousState;
-    auto widget = (const MultilineTextWidget *)widgetCursor.widget;
     const Style *style = getStyle(g_hooks.overrideStyle(widgetCursor, widget->style));
 
     WIDGET_STATE(flags.blinking, g_isBlinkTime && styleIsBlink(style));
     WIDGET_STATE(flags.active, g_isActiveWidget);
     WIDGET_STATE(data, widget->data ? get(widgetCursor, widget->data) : 0);
 
-    return !hasPreviousState;
+    WIDGET_STATE_END()
 }
 
 void MultilineTextWidgetState::render() {
@@ -46,8 +44,8 @@ void MultilineTextWidgetState::render() {
 
     if (widget->data) {
         if (data.isString()) {
-            drawMultilineText(data.getString(), 
-                widgetCursor.x, widgetCursor.y, widgetCursor.w, widgetCursor.h, 
+            drawMultilineText(data.getString(),
+                widgetCursor.x, widgetCursor.y, widgetCursor.w, widgetCursor.h,
                 style,
                 flags.active, flags.blinking,
                 widget->firstLineIndent, widget->hangingIndent);
@@ -61,7 +59,7 @@ void MultilineTextWidgetState::render() {
         }
     } else if (widget->text) {
         drawMultilineText(
-            static_cast<const char *>(widget->text), 
+            static_cast<const char *>(widget->text),
             widgetCursor.x, widgetCursor.y, widgetCursor.w, widgetCursor.h,
             style, flags.active, flags.blinking,
             widget->firstLineIndent, widget->hangingIndent);

@@ -360,9 +360,19 @@ void AppContext::updatePage(int i, WidgetCursor &widgetCursor) {
 
         withShadow = page->x > 0;
 
+        auto savedX = widgetCursor.x;
+        auto savedY = widgetCursor.y;
+
+        widgetCursor.x = x;
+        widgetCursor.y = y;
+
         widgetCursor.w = width;
         widgetCursor.h = height;
+
         enumWidget();
+
+        widgetCursor.x = savedX;
+        widgetCursor.y = savedY;
 
         widgetCursor.widget = savedWidget;
     }

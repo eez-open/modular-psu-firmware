@@ -25,15 +25,12 @@ namespace eez {
 namespace gui {
 
 bool ToggleButtonWidgetState::updateState() {
-    const WidgetCursor &widgetCursor = g_widgetCursor;
-
-    bool hasPreviousState = widgetCursor.hasPreviousState;
-    auto widget = (const ToggleButtonWidget *)widgetCursor.widget;
+    WIDGET_STATE_START(ToggleButtonWidget);
 
     WIDGET_STATE(flags.active, g_isActiveWidget);
     WIDGET_STATE(flags.enabled, get(widgetCursor, widget->data).getInt() ? 1 : 0);
 
-    return !hasPreviousState;
+    WIDGET_STATE_END()
 }
 
 void ToggleButtonWidgetState::render() {
