@@ -29,7 +29,7 @@ namespace eez {
 namespace flow {
 
 #define PAGE_DIRECTION_LTR 0
-#define PAGE_DIRECTION_RTL 0
+#define PAGE_DIRECTION_RTL 1
 
 struct SetPageDirectionComponent : public Component {
 	uint8_t direction;
