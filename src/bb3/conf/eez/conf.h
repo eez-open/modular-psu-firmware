@@ -122,3 +122,10 @@ static const char *ICON = "eez.png";
 #define DISPLAY_BACKGROUND_LUMINOSITY_STEP_DEFAULT 10
 
 #define UTF8_SUPPORT 0
+
+#if defined(EEZ_PLATFORM_STM32)
+static const uint32_t GUI_STATE_BUFFER_SIZE = 64 * 1024;
+#endif
+#if defined(EEZ_PLATFORM_SIMULATOR)
+static const uint32_t GUI_STATE_BUFFER_SIZE = 128 * 1024;
+#endif

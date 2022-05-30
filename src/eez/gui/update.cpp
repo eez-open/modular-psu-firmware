@@ -27,7 +27,6 @@
 namespace eez {
 namespace gui {
 
-static uint8_t g_stateBuffer[GUI_STATE_BUFFER_SIZE];
 static bool g_refreshScreen;
 static Widget *g_rootWidget;
 
@@ -74,7 +73,7 @@ void updateScreen() {
 	}
 
 	bool hasPreviousState = g_widgetStateStart != nullptr;
-	g_widgetStateStart = (WidgetState *)g_stateBuffer;
+	g_widgetStateStart = (WidgetState *)GUI_STATE_BUFFER;
 
     g_isActiveWidget = false;
 

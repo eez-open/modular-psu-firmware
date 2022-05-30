@@ -72,6 +72,8 @@ extern uint8_t *VRAM_AUX_BUFFER6_START_ADDRESS;
 
 extern uint8_t* SCREENSHOOT_BUFFER_START_ADDRESS;
 
+extern uint8_t* GUI_STATE_BUFFER;
+
 void initMemory();
 uint8_t *allocBuffer(uint32_t size);
 

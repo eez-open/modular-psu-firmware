@@ -18,13 +18,6 @@
 
 #pragma once
 
-#if defined(EEZ_PLATFORM_STM32)
-static const uint32_t GUI_STATE_BUFFER_SIZE = 32 * 1024;
-#endif
-#if defined(EEZ_PLATFORM_SIMULATOR)
-static const uint32_t GUI_STATE_BUFFER_SIZE = 64 * 1024;
-#endif
-
 namespace eez {
 namespace gui {
 

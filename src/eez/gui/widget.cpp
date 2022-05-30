@@ -68,7 +68,12 @@ bool g_isRTL = false;
 
 ////////////////////////////////////////////////////////////////////////////////
 
-struct NoneWidgetState : public WidgetState {};
+struct NoneWidgetState : public WidgetState {
+    bool updateState() {
+        WIDGET_STATE_START(Widget);
+        WIDGET_STATE_END()
+    }
+};
 
 static Widget g_noneWidget = { WIDGET_TYPE_NONE };
 
@@ -209,7 +214,7 @@ void enumWidget() {
 	widgetCursor.currentState = (WidgetState *)((uint8_t *)widgetCursor.currentState + g_widgetStateSizes[widget->type]);
 
 	uint32_t stateSize = (uint8_t *)widgetCursor.currentState - (uint8_t *)g_widgetStateStart;
-	assert(stateSize <= CONF_MAX_STATE_SIZE);
+	assert(stateSize <= GUI_STATE_BUFFER_SIZE);
 
 	widgetState->enumChildren();
 
