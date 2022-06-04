@@ -722,7 +722,11 @@ void onPageChanged(int previousPageId, int activePageId) {
     if (previousPageId > 0) {
         auto flowState = getFlowState(g_mainAssets, previousPageId - 1, WidgetCursor());
         if (flowState) {
-            printf("T3\n");
+            onEvent(flowState, FLOW_EVENT_CLOSE_PAGE);
+        }
+    } else {
+        auto flowState = getFlowState(g_externalAssets, -previousPageId - 1, WidgetCursor());
+        if (flowState) {
             onEvent(flowState, FLOW_EVENT_CLOSE_PAGE);
         }
     }
@@ -732,17 +736,22 @@ void onPageChanged(int previousPageId, int activePageId) {
         if (flowState) {
             onEvent(flowState, FLOW_EVENT_OPEN_PAGE);
         }
-
-        if (g_debuggerIsConnected) {
-            startToDebuggerMessageHook();
-
-            char buffer[256];
-            snprintf(buffer, sizeof(buffer), "%d\t%d\n",
-                MESSAGE_TO_DEBUGGER_PAGE_CHANGED,
-                activePageId
-            );
-            writeDebuggerBufferHook(buffer, strlen(buffer));
+    } else {
+        auto flowState = getFlowState(g_externalAssets, -activePageId - 1, WidgetCursor());
+        if (flowState) {
+            onEvent(flowState, FLOW_EVENT_OPEN_PAGE);
         }
+    }
+
+    if (g_debuggerIsConnected) {
+        startToDebuggerMessageHook();
+
+        char buffer[256];
+        snprintf(buffer, sizeof(buffer), "%d\t%d\n",
+            MESSAGE_TO_DEBUGGER_PAGE_CHANGED,
+            activePageId
+        );
+        writeDebuggerBufferHook(buffer, strlen(buffer));
     }
 }
 
