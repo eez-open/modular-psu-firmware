@@ -725,6 +725,14 @@ bool do_OPERATION_TYPE_FLOW_IS_PAGE_ACTIVE(EvalStack &stack) {
 	return true;
 }
 
+bool do_OPERATION_TYPE_FLOW_PAGE_TIMELINE_POSITION(EvalStack &stack) {
+	if (!stack.push(Value(stack.flowState->timelinePosition, VALUE_TYPE_FLOAT))) {
+		return false;
+	}
+
+	return true;
+}
+
 bool do_OPERATION_TYPE_FLOW_MAKE_ARRAY_VALUE(EvalStack &stack) {
     auto arrayTypeValue = stack.pop();
     auto arraySizeValue = stack.pop();
@@ -1279,6 +1287,7 @@ EvalOperation g_evalOperations[] = {
 	do_OPERATION_TYPE_SYSTEM_GET_TICK,
 	do_OPERATION_TYPE_FLOW_INDEX,
 	do_OPERATION_TYPE_FLOW_IS_PAGE_ACTIVE,
+    do_OPERATION_TYPE_FLOW_PAGE_TIMELINE_POSITION,
     do_OPERATION_TYPE_FLOW_MAKE_ARRAY_VALUE,
     do_OPERATION_TYPE_FLOW_MAKE_ARRAY_VALUE,
     do_OPERATION_TYPE_FLOW_LANGUAGES,

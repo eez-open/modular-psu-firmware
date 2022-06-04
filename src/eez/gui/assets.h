@@ -139,6 +139,13 @@ private:
 
 ////////////////////////////////////////////////////////////////////////////////
 
+struct Settings {
+    uint16_t displayWidth;
+    uint16_t displayHeight;
+};
+
+////////////////////////////////////////////////////////////////////////////////
+
 #define WIDGET_FLAG_PIN_TO_LEFT (1 << 0)
 #define WIDGET_FLAG_PIN_TO_RIGHT (1 << 1)
 #define WIDGET_FLAG_PIN_TO_TOP (1 << 2)
@@ -146,6 +153,23 @@ private:
 
 #define WIDGET_FLAG_FIX_WIDTH (1 << 4)
 #define WIDGET_FLAG_FIX_HEIGHT (1 << 5)
+
+#define WIDGET_TIMELINE_PROPERTY_X (1 << 0)
+#define WIDGET_TIMELINE_PROPERTY_Y (1 << 1)
+#define WIDGET_TIMELINE_PROPERTY_WIDTH (1 << 2)
+#define WIDGET_TIMELINE_PROPERTY_HEIGHT (1 << 3)
+#define WIDGET_TIMELINE_PROPERTY_OPACITY (1 << 4)
+
+struct TimelineKeyframe {
+    float start;
+    float end;
+    uint32_t enabledProperties;
+	int16_t x;
+	int16_t y;
+	int16_t width;
+	int16_t height;
+    float opacity;
+};
 
 struct Widget {
 	uint16_t type;
@@ -158,6 +182,7 @@ struct Widget {
 	int16_t height;
 	int16_t style;
     uint16_t flags;
+    ListOfAssetsPtr<TimelineKeyframe> timeline;
 };
 
 #define SHADOW_FLAG (1 << 0)
@@ -350,15 +375,15 @@ struct Flow {
 	ListOfAssetsPtr<WidgetActionItem> widgetActions;
 };
 
-struct Language {
-    AssetsPtr<const char> languageID;
-    ListOfAssetsPtr<const char> translations;
-};
-
 struct FlowDefinition {
 	ListOfAssetsPtr<Flow> flows;
 	ListOfAssetsPtr<Value> constants;
 	ListOfAssetsPtr<Value> globalVariables;
+};
+
+struct Language {
+    AssetsPtr<const char> languageID;
+    ListOfAssetsPtr<const char> translations;
 };
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -369,6 +394,7 @@ struct Assets {
     uint8_t reserved;
     uint8_t external;
 
+    AssetsPtr<Settings> settings;
 	ListOfAssetsPtr<PageAsset> pages;
 	ListOfAssetsPtr<Style> styles;
 	ListOfAssetsPtr<FontData> fonts;

@@ -75,7 +75,7 @@ bool decompressAssetsData(const uint8_t *assetsData, uint32_t assetsDataSize, As
 #pragma GCC diagnostic ignored "-Winvalid-offsetof"
 #endif
 
-	auto decompressedDataOffset = offsetof(Assets, pages);
+	auto decompressedDataOffset = offsetof(Assets, settings);
 
 #ifdef __GNUC__
 #pragma GCC diagnostic pop

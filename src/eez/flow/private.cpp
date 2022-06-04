@@ -42,6 +42,10 @@ bool isComponentReadyToRun(FlowState *flowState, unsigned componentIndex) {
 		return false;
 	}
 
+    if (component->type == defs_v3::COMPONENT_TYPE_ON_EVENT_ACTION) {
+        return false;
+    }
+
     if (component->type < defs_v3::COMPONENT_TYPE_START_ACTION) {
         // always execute widget
         return true;
@@ -127,6 +131,8 @@ static FlowState *initFlowState(Assets *assets, int flowIndex, FlowState *parent
 	flowState->error = false;
 	flowState->numAsyncComponents = 0;
 	flowState->parentFlowState = parentFlowState;
+
+    flowState->timelinePosition = 0;
 
     if (parentFlowState) {
         if (parentFlowState->lastChild) {
@@ -426,6 +432,24 @@ void endAsyncExecution(FlowState *flowState, int componentIndex) {
             freeFlowState(flowState);
         }
     }
+}
+
+void onEvent(FlowState *flowState, FlowEvent flowEvent) {
+	for (unsigned componentIndex = 0; componentIndex < flowState->flow->components.count; componentIndex++) {
+		auto component = flowState->flow->components[componentIndex];
+		if (component->type == defs_v3::COMPONENT_TYPE_ON_EVENT_ACTION) {
+            struct OnEventComponent : public Component {
+                uint8_t event;
+            };
+            auto onEventComponent = (OnEventComponent *)component;
+            if (onEventComponent->event == flowEvent) {
+                if (!addToQueue(flowState, componentIndex, -1, -1, -1, false)) {
+                    throwError(flowState, componentIndex, "Execution queue is full\n");
+                    return;
+                }
+            }
+		}
+	}
 }
 
 ////////////////////////////////////////////////////////////////////////////////

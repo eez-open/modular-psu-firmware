@@ -74,6 +74,8 @@ void fixOffsets(Assets *assets, ListOfAssetsPtr<Language> &languages);
 void fixOffsets(Assets *assets, Value &value);
 
 void fixOffsets(Assets *assets) {
+    fixOffset(assets->settings, assets);
+
 	fixOffset(assets->pages, assets);
     for (uint32_t i = 0; i < assets->pages.count; i++) {
         fixOffsets(assets, assets->pages[i]->widgets);
@@ -170,6 +172,8 @@ void fixOffsets(Assets *assets, ListOfAssetsPtr<Widget> &widgets) {
 }
 
 void fixOffsets(Assets *assets, Widget *widget) {
+    fixOffset(widget->timeline, assets);
+
     switch (widget->type) {
     case WIDGET_TYPE_CONTAINER:
         fixOffsets(assets, ((ContainerWidget *)widget)->widgets);

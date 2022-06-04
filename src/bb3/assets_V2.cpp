@@ -82,13 +82,13 @@ static uint32_t g_offsetAdjust;
 
 ////////////////////////////////////////////////////////////////////////////////
 
-void covertV2toV3(Assets *assetsV2, Assets *assetsV3) {
+void convertV2toV3(Assets *assetsV2, Assets *assetsV3) {
 	assetsV3->projectMajorVersion = PROJECT_VERSION_V3;
 	assetsV3->projectMinorVersion = 0;
 	assetsV3->reserved = assetsV2->reserved;
 	assetsV3->external = assetsV2->external;
 
-	g_assetsV2 = (AssetsV2 *)&assetsV2->pages;
+	g_assetsV2 = (AssetsV2 *)&assetsV2->settings;
 	g_assetsV3 = assetsV3;
 	g_offsetV3 = sizeof(Assets) - 4;
 
@@ -269,12 +269,15 @@ static uint32_t convertWidget(WidgetV2 &widgetV2) {
 
 	widgetV3.type = widgetV2.type;
 	widgetV3.data = widgetV2.data;
+    widgetV3.visible = DATA_ID_NONE;
 	widgetV3.action = widgetV2.action;
 	widgetV3.x = widgetV2.x;
 	widgetV3.y = widgetV2.y;
 	widgetV3.width = widgetV2.width;
 	widgetV3.height = widgetV2.height;
 	widgetV3.style = widgetV2.style;
+    widgetV3.flags = 0;
+    widgetV3.timeline.count = 0;
 
 	auto specificV2 = (uint8_t *)g_documentV2 + widgetV2.specific;
 
@@ -287,6 +290,7 @@ static uint32_t convertWidget(WidgetV2 &widgetV2) {
 		convertWidgetList(widgetV2Specific.widgets, (AssetsV3List *)&widgetV3Specific.widgets);
 		widgetV3Specific.flags = widgetV2Specific.flags;
 		widgetV3Specific.overlay = widgetV2Specific.overlay;
+        widgetV3Specific.layout = CONTAINER_WIDGET_LAYOUT_STATIC;
 
 		return savedOffset;
 	}

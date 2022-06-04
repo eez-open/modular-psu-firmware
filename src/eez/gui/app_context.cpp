@@ -39,6 +39,7 @@
 #include <eez/gui/widgets/button.h>
 
 #include <eez/flow/debugger.h>
+#include <eez/flow/private.h>
 
 #include <eez/core/hmi.h>
 
@@ -108,6 +109,8 @@ void AppContext::onPageChanged(int previousPageId, int activePageId) {
 #if OPTION_KEYBOARD
     keyboard::onPageChanged();
 #endif
+
+    flow::onPageChanged(previousPageId, activePageId);
 }
 
 void AppContext::doShowPage(int pageId, Page *page, int previousPageId) {
@@ -121,6 +124,7 @@ void AppContext::doShowPage(int pageId, Page *page, int previousPageId) {
     m_pageNavigationStack[m_pageNavigationStackPointer].page = page;
     m_pageNavigationStack[m_pageNavigationStackPointer].pageId = pageId;
     m_pageNavigationStack[m_pageNavigationStackPointer].displayBufferIndex = -1;
+    m_pageNavigationStack[m_pageNavigationStackPointer].timelinePosition = 0;
 
     if (page) {
         page->pageWillAppear();
@@ -342,6 +346,11 @@ void AppContext::updatePage(int i, WidgetCursor &widgetCursor) {
 		enumNoneWidget();
     } else {
         auto page = getPageAsset(m_pageNavigationStack[i].pageId, widgetCursor);
+
+        if (widgetCursor.flowState && widgetCursor.flowState->timelinePosition != m_pageNavigationStack[i].timelinePosition) {
+            widgetCursor.hasPreviousState = false;
+            m_pageNavigationStack[i].timelinePosition = widgetCursor.flowState->timelinePosition;
+        }
 
         auto savedWidget = widgetCursor.widget;
         widgetCursor.widget = page;

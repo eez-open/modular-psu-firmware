@@ -104,7 +104,7 @@ void updateScreen() {
 }
 
 void enumRootWidget() {
-	if (!g_widgetStateStart || g_refreshScreen) {
+	if (!g_widgetStateStart  || g_refreshScreen) {
 		return;
 	}
 

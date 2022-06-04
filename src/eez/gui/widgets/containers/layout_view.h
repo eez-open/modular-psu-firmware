@@ -38,6 +38,7 @@ struct LayoutViewWidgetState : public WidgetState {
 	bool repainted;
     const PageAsset* layout;
     flow::FlowState *flowState;
+    float timelinePosition;
 
     bool updateState() override;
     void render() override;

@@ -50,10 +50,18 @@ uint8_t *ALLOC_BUFFER;
 uint32_t ALLOC_BUFFER_SIZE;
 
 void initMemory() {
+    initAssetsMemory();
+    initOtherMemory();
+}
+
+void initAssetsMemory() {
     ALLOC_BUFFER = MEMORY_BEGIN;
     ALLOC_BUFFER_SIZE = MEMORY_SIZE;
 
     DECOMPRESSED_ASSETS_START_ADDRESS = allocBuffer(MAX_DECOMPRESSED_ASSETS_SIZE);
+}
+
+void initOtherMemory() {
     FLOW_TO_DEBUGGER_MESSAGE_BUFFER = allocBuffer(FLOW_TO_DEBUGGER_MESSAGE_BUFFER_SIZE);
 
     uint32_t VRAM_BUFFER_SIZE = DISPLAY_WIDTH * DISPLAY_HEIGHT * DISPLAY_BPP / 8;

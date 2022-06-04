@@ -146,7 +146,7 @@ FlowState *getFlowState(Assets *assets, int flowStateIndex) {
     return (FlowState *)(ALLOC_BUFFER + flowStateIndex);
 }
 
-FlowState *getFlowState(Assets *assets, int16_t pageId, const WidgetCursor &widgetCursor) {
+FlowState *getFlowState(Assets *assets, int16_t pageIndex, const WidgetCursor &widgetCursor) {
 	if (!isFlowRunningHook()) {
 		return nullptr;
 	}
@@ -157,10 +157,9 @@ FlowState *getFlowState(Assets *assets, int16_t pageId, const WidgetCursor &widg
 			auto flowState = widgetCursor.flowState;
 			auto layoutViewWidgetComponentIndex = layoutViewWidget->componentIndex;
 
-			return getLayoutViewFlowState(flowState, layoutViewWidgetComponentIndex, pageId);
+			return getLayoutViewFlowState(flowState, layoutViewWidgetComponentIndex, pageIndex);
 		}
 	} else {
-		auto pageIndex = pageId;
 		auto page = assets->pages[pageIndex];
 		if (!(page->flags & PAGE_IS_USED_AS_CUSTOM_WIDGET)) {
             FlowState *flowState;

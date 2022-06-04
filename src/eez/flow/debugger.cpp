@@ -47,6 +47,7 @@ enum MessagesToDebugger {
     MESSAGE_TO_DEBUGGER_VALUE_CHANGED, // VALUE_ADDR, VALUE
 
     MESSAGE_TO_DEBUGGER_FLOW_STATE_CREATED, // FLOW_STATE_INDEX, FLOW_INDEX, PARENT_FLOW_STATE_INDEX (-1 - NO PARENT), PARENT_COMPONENT_INDEX (-1 - NO PARENT COMPONENT)
+    MESSAGE_TO_DEBUGGER_FLOW_STATE_TIMELINE_CHANGED, // FLOW_STATE_INDEX, TIMELINE_POSITION
     MESSAGE_TO_DEBUGGER_FLOW_STATE_DESTROYED, // FLOW_STATE_INDEX
 
 	MESSAGE_TO_DEBUGGER_FLOW_STATE_ERROR, // FLOW_STATE_INDEX, COMPONENT_INDEX, ERROR_MESSAGE
@@ -550,6 +551,20 @@ void onFlowStateDestroyed(FlowState *flowState) {
 	}
 }
 
+void onFlowStateTimelineChanged(FlowState *flowState) {
+	if (g_debuggerIsConnected) {
+		startToDebuggerMessageHook();
+
+		char buffer[256];
+		snprintf(buffer, sizeof(buffer), "%d\t%d\t%g\n",
+			MESSAGE_TO_DEBUGGER_FLOW_STATE_TIMELINE_CHANGED,
+			(int)flowState->flowStateIndex,
+            flowState->timelinePosition
+		);
+		writeDebuggerBufferHook(buffer, strlen(buffer));
+	}
+}
+
 void onFlowError(FlowState *flowState, int componentIndex, const char *errorMessage) {
 	if (g_debuggerIsConnected) {
 		startToDebuggerMessageHook();
@@ -695,17 +710,40 @@ void logScpiQueryResult(FlowState *flowState, unsigned componentIndex, const cha
     }
 }
 
-void onPageChanged(int pageId) {
-	if (g_debuggerIsConnected) {
-		startToDebuggerMessageHook();
+void onPageChanged(int previousPageId, int activePageId) {
+    if (flow::isFlowStopped()) {
+        return;
+    }
 
-		char buffer[256];
-		snprintf(buffer, sizeof(buffer), "%d\t%d\n",
-			MESSAGE_TO_DEBUGGER_PAGE_CHANGED,
-			pageId
-		);
-		writeDebuggerBufferHook(buffer, strlen(buffer));
-	}
+    if (previousPageId == activePageId) {
+        return;
+    }
+
+    if (previousPageId > 0) {
+        auto flowState = getFlowState(g_mainAssets, previousPageId - 1, WidgetCursor());
+        if (flowState) {
+            printf("T3\n");
+            onEvent(flowState, FLOW_EVENT_CLOSE_PAGE);
+        }
+    }
+
+    if (activePageId > 0) {
+        auto flowState = getFlowState(g_mainAssets, activePageId - 1, WidgetCursor());
+        if (flowState) {
+            onEvent(flowState, FLOW_EVENT_OPEN_PAGE);
+        }
+
+        if (g_debuggerIsConnected) {
+            startToDebuggerMessageHook();
+
+            char buffer[256];
+            snprintf(buffer, sizeof(buffer), "%d\t%d\n",
+                MESSAGE_TO_DEBUGGER_PAGE_CHANGED,
+                activePageId
+            );
+            writeDebuggerBufferHook(buffer, strlen(buffer));
+        }
+    }
 }
 
 } // namespace flow
