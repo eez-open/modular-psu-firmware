@@ -75,6 +75,8 @@ extern uint8_t* SCREENSHOOT_BUFFER_START_ADDRESS;
 extern uint8_t* GUI_STATE_BUFFER;
 
 void initMemory();
+void initAssetsMemory();
+void initOtherMemory();
 uint8_t *allocBuffer(uint32_t size);
 
 } // eez

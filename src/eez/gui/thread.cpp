@@ -41,7 +41,7 @@ EEZ_MESSAGE_QUEUE_DECLARE(gui, {
             int pageId;
             Page *page;
         } changePage;
-        
+
         Event touchEvent;
     };
 });
@@ -55,9 +55,6 @@ void oneIter();
 
 void mainLoop(void *) {
 #ifdef __EMSCRIPTEN__
-    if (!g_isMainAssetsLoaded) {
-        guiInit();
-    }
 	oneIter();
 #else
 

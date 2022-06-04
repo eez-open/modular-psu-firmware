@@ -97,6 +97,7 @@ struct WidgetCursor {
     int16_t y;
     int16_t w;
     int16_t h;
+    uint8_t opacity;
 
 	WidgetState *currentState;
 	bool refreshed;
@@ -113,6 +114,7 @@ struct WidgetCursor {
 		, flowState(nullptr)
 		, x(0)
 		, y(0)
+        , opacity(255)
 		, currentState(nullptr)
 		, refreshed(true)
 		, hasPreviousState(false)
@@ -138,6 +140,7 @@ struct WidgetCursor {
 		, flowState(nullptr)
 		, x(x_)
 		, y(y_)
+        , opacity(255)
 		, currentState(currentState_)
 		, refreshed(refreshed_)
 		, hasPreviousState(hasPreviousState_)
@@ -154,6 +157,7 @@ struct WidgetCursor {
 		, flowState(nullptr)
 		, x(0)
 		, y(0)
+        , opacity(255)
 		, currentState(nullptr)
 		, refreshed(true)
 		, hasPreviousState(false)
@@ -271,7 +275,25 @@ typedef void (*OnTouchFunctionType)(const WidgetCursor &widgetCursor, Event &tou
 OnTouchFunctionType getWidgetTouchFunction(const WidgetCursor &widgetCursor);
 
 void resizeWidget(
-    WidgetCursor &widgetCursor,
+    const Widget *widget,
+    Rect &widgetRect,
+    int containerOriginalWidth,
+    int containerOriginalHeight,
+    int containerWidth,
+    int containerHeight
+);
+
+void applyTimeline(
+    WidgetCursor& widgetCursor,
+    Rect &widgetRect
+);
+
+template<typename T>
+struct ListOfAssetsPtr;
+
+void doStaticLayout(
+    WidgetCursor& widgetCursor,
+    const ListOfAssetsPtr<Widget> &widgets,
     int containerOriginalWidth,
     int containerOriginalHeight,
     int containerWidth,

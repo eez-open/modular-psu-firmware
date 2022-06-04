@@ -35,7 +35,7 @@ bool isFlowStopped();
 
 FlowState *getFlowState(Assets *assets, int flowStateIndex);
 
-FlowState *getFlowState(Assets *assets, int16_t pageId, const WidgetCursor &widgetCursor);
+FlowState *getFlowState(Assets *assets, int16_t pageIndex, const WidgetCursor &widgetCursor);
 int getPageIndex(FlowState *flowState);
 
 FlowState *getLayoutViewFlowState(FlowState *flowState, uint16_t layoutViewWidgetComponentIndex, int16_t pageId);

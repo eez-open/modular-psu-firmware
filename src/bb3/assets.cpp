@@ -27,7 +27,7 @@
 namespace eez {
 namespace gui {
 
-void covertV2toV3(Assets *assetsV2, Assets *assetsV3);
+void convertV2toV3(Assets *assetsV2, Assets *assetsV3);
 
 bool loadExternalAssets(const char *filePath, int *err) {
 	unloadExternalAssets();
@@ -116,7 +116,7 @@ bool loadExternalAssets(const char *filePath, int *err) {
 	}
 
 	if (g_externalAssets->projectMajorVersion == PROJECT_VERSION_V2) {
-		static const size_t MAX_SIZE_DIFF_BETWEEN_V2_AND_V3_ASSETS = 16 * 1000;
+		static const size_t MAX_SIZE_DIFF_BETWEEN_V2_AND_V3_ASSETS = 32 * 1000;
 
 		auto externalAssetsV3 = (Assets *)alloc(externalAssetsSize + MAX_SIZE_DIFF_BETWEEN_V2_AND_V3_ASSETS, 302);
 		if (!externalAssetsV3) {
@@ -130,8 +130,10 @@ bool loadExternalAssets(const char *filePath, int *err) {
 			return false;
 		}
 
+        memset((uint8_t *)externalAssetsV3, 0, externalAssetsSize + MAX_SIZE_DIFF_BETWEEN_V2_AND_V3_ASSETS);
+
 		DebugTrace("V2 size: %d\n", externalAssetsSize);
-		covertV2toV3(g_externalAssets, externalAssetsV3);
+		convertV2toV3(g_externalAssets, externalAssetsV3);
 
 		free(g_externalAssets);
 		g_externalAssets = externalAssetsV3;

@@ -41,6 +41,7 @@ void onValueChanged(const gui::Value *pValue);
 
 void onFlowStateCreated(FlowState *flowState);
 void onFlowStateDestroyed(FlowState *flowState);
+void onFlowStateTimelineChanged(FlowState *flowState);
 
 void onFlowError(FlowState *flowState, int componentIndex, const char *errorMessage);
 
@@ -53,7 +54,7 @@ void logScpiCommand(FlowState *flowState, unsigned componentIndex, const char *c
 void logScpiQuery(FlowState *flowState, unsigned componentIndex, const char *query);
 void logScpiQueryResult(FlowState *flowState, unsigned componentIndex, const char *resultText, size_t resultTextLen);
 
-void onPageChanged(int pageId);
+void onPageChanged(int previousPageId, int activePageId);
 
 void processDebuggerInput(char *buffer, uint32_t length);
 

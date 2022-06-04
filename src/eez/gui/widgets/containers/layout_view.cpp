@@ -116,50 +116,7 @@ void LayoutViewWidgetState::enumChildren() {
         int containerWidth = widgetCursor.w;
         int containerHeight = widgetCursor.h;
 
-        if (
-            containerOriginalWidth != containerWidth ||
-            containerOriginalHeight != containerHeight
-        ) {
-            for (uint32_t index = 0; index < widgets.count; ++index) {
-                widgetCursor.widget = widgets[index];
-
-                auto savedX = widgetCursor.x;
-	            auto savedY = widgetCursor.y;
-
-                resizeWidget(widgetCursor, containerOriginalWidth, containerOriginalHeight, containerWidth, containerHeight);
-
-                if (g_isRTL) {
-                    widgetCursor.x = savedX + containerWidth - ((widgetCursor.x - savedX) + widgetCursor.w);
-                }
-
-                enumWidget();
-
-                widgetCursor.x = savedX;
-                widgetCursor.y = savedY;
-            }
-        } else {
-            for (uint32_t index = 0; index < widgets.count; ++index) {
-                widgetCursor.widget = widgets[index];
-
-                auto savedX = widgetCursor.x;
-                auto savedY = widgetCursor.y;
-
-                widgetCursor.x += widgetCursor.widget->x;
-                widgetCursor.y += widgetCursor.widget->y;
-
-                widgetCursor.w = widgetCursor.widget->width;
-                widgetCursor.h = widgetCursor.widget->height;
-
-                if (g_isRTL) {
-                    widgetCursor.x = savedX + containerWidth - ((widgetCursor.x - savedX) + widgetCursor.w);
-                }
-
-                enumWidget();
-
-                widgetCursor.x = savedX;
-                widgetCursor.y = savedY;
-            }
-        }
+        doStaticLayout(widgetCursor, widgets, containerOriginalWidth, containerOriginalHeight, containerWidth, containerHeight);
 
 		widgetCursor.widget = savedWidget;
 	}

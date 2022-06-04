@@ -175,7 +175,7 @@ void enumWidget() {
             // reuse existing widget state
             bool refresh = widgetState->updateState();
             if (refresh || widgetCursor.refreshed) {
-                if (widgetState->visible.toBool()) {
+                if (widgetState->visible.toBool() && widgetCursor.opacity == 255) {
                     widgetState->render();
                 } else {
                     drawRectangle(widgetCursor.x, widgetCursor.y, widgetCursor.w, widgetCursor.h, nullptr);
@@ -194,7 +194,7 @@ void enumWidget() {
 
 			widgetState->updateState();
 
-            if (widgetState->visible.toBool()) {
+            if (widgetState->visible.toBool() && widgetCursor.opacity == 255) {
                 widgetState->render();
             } else {
                 drawRectangle(widgetCursor.x, widgetCursor.y, widgetCursor.w, widgetCursor.h, nullptr);
@@ -408,13 +408,13 @@ WidgetCursor findWidget(int16_t x, int16_t y, bool clicked) {
 }
 
 void resizeWidget(
-    WidgetCursor &widgetCursor,
+    const Widget *widget,
+    Rect &widgetRect,
     int containerOriginalWidth,
     int containerOriginalHeight,
     int containerWidth,
     int containerHeight
 ) {
-    auto widget = widgetCursor.widget;
     auto flags = widget->flags;
 
     auto pinToLeft = flags & WIDGET_FLAG_PIN_TO_LEFT;
@@ -425,15 +425,15 @@ void resizeWidget(
     auto fixWidth = flags & WIDGET_FLAG_FIX_WIDTH;
     auto fixHeight = flags & WIDGET_FLAG_FIX_HEIGHT;
 
-    auto left = widget->x;
-    auto right = widget->x + widget->width;
+    auto left = widgetRect.x;
+    auto right = widgetRect.x + widgetRect.w;
 
     if (pinToLeft) {
         // left = left;
     } else {
         if (!fixWidth) {
             left =
-                (widget->x * containerWidth) /
+                (widgetRect.x * containerWidth) /
                 containerOriginalWidth;
         }
     }
@@ -448,28 +448,28 @@ void resizeWidget(
 
     if (fixWidth) {
         if (pinToLeft && !pinToRight) {
-            right = left + widget->width;
+            right = left + widgetRect.w;
         } else if (pinToRight && !pinToLeft) {
-            left = right - widget->width;
+            left = right - widgetRect.w;
         } else if (!pinToLeft && !pinToRight) {
             auto center =
-                ((widget->x + widget->width / 2) *
+                ((widgetRect.x + widgetRect.w / 2) *
                     containerWidth) /
                 containerOriginalWidth;
-            left = center - widget->width / 2;
-            right = left + widget->width;
+            left = center - widgetRect.w / 2;
+            right = left + widgetRect.w;
         }
     }
 
-    auto top = widget->y;
-    auto bottom = widget->y + widget->height;
+    auto top = widgetRect.y;
+    auto bottom = widgetRect.y + widgetRect.h;
 
     if (pinToTop) {
         //top = top;
     } else {
         if (!fixHeight) {
             top =
-                (widget->y * containerHeight) /
+                (widgetRect.y * containerHeight) /
                 containerOriginalHeight;
         }
     }
@@ -485,24 +485,158 @@ void resizeWidget(
 
     if (fixHeight) {
         if (pinToTop && !pinToBottom) {
-            bottom = top + widget->height;
+            bottom = top + widgetRect.h;
         } else if (pinToBottom && !pinToTop) {
-            top = bottom - widget->height;
+            top = bottom - widgetRect.h;
         } else if (!pinToTop && !pinToBottom) {
             auto center =
-                ((widget->y + widget->height / 2) *
+                ((widgetRect.y + widgetRect.h / 2) *
                     containerHeight) /
                 containerOriginalHeight;
-            top = center - widget->height / 2;
-            bottom = top + widget->height;
+            top = center - widgetRect.h / 2;
+            bottom = top + widgetRect.h;
         }
     }
 
 
-    widgetCursor.x += left;
-    widgetCursor.y += top;
-    widgetCursor.w = right - left;
-    widgetCursor.h = bottom - top;
+    widgetRect.x = left;
+    widgetRect.y = top;
+    widgetRect.w = right - left;
+    widgetRect.h = bottom - top;
+}
+
+void applyTimeline(WidgetCursor& widgetCursor, Rect &widgetRect) {
+    if (widgetCursor.widget->timeline.count > 0) {
+        auto x = widgetCursor.widget->x;
+        auto y = widgetCursor.widget->y;
+        auto w = widgetCursor.widget->width;
+        auto h = widgetCursor.widget->height;
+        float opacity = 1.0f;
+
+        auto timelinePosition = widgetCursor.flowState->timelinePosition;
+        for (uint32_t i = 0; i < widgetCursor.widget->timeline.count; i++) {
+            auto keyframe = widgetCursor.widget->timeline[i];
+
+            if (timelinePosition < keyframe->start) {
+                continue;
+            }
+
+            if (
+                timelinePosition >= keyframe->start &&
+                timelinePosition <= keyframe->end
+            ) {
+                auto t =
+                    keyframe->start == keyframe->end
+                        ? 1
+                        : (timelinePosition - keyframe->start) /
+                        (keyframe->end - keyframe->start);
+
+                if (keyframe->enabledProperties & WIDGET_TIMELINE_PROPERTY_X) {
+                    auto savedX = x;
+                    x += t * (keyframe->x - x);
+                    if (keyframe->enabledProperties & WIDGET_TIMELINE_PROPERTY_WIDTH) {
+                        auto right = savedX + w;
+                        right += t * ((keyframe->x + keyframe->width) - right);
+                        w = right - x;
+                    }
+                } else if (keyframe->enabledProperties & WIDGET_TIMELINE_PROPERTY_WIDTH) {
+                    w += t * (keyframe->width - w);
+                }
+
+                if (keyframe->enabledProperties & WIDGET_TIMELINE_PROPERTY_Y) {
+                    auto savedY = y;
+                    y += t * (keyframe->y - y);
+                    if (keyframe->enabledProperties & WIDGET_TIMELINE_PROPERTY_HEIGHT) {
+                        auto bottom = savedY + h;
+                        bottom += t * ((keyframe->y + keyframe->height) - bottom);
+                        h = bottom - y;
+                    }
+                } else if (keyframe->enabledProperties & WIDGET_TIMELINE_PROPERTY_HEIGHT) {
+                    h += t * (keyframe->height - h);
+                }
+
+                if (keyframe->enabledProperties & WIDGET_TIMELINE_PROPERTY_OPACITY) {
+                    opacity += t * (keyframe->opacity - opacity);
+                }
+
+                break;
+            }
+
+            if (keyframe->enabledProperties & WIDGET_TIMELINE_PROPERTY_X) {
+                x = keyframe->x;
+            }
+            if (keyframe->enabledProperties & WIDGET_TIMELINE_PROPERTY_Y) {
+                y = keyframe->y;
+            }
+            if (keyframe->enabledProperties & WIDGET_TIMELINE_PROPERTY_WIDTH) {
+                w = keyframe->width;
+            }
+            if (keyframe->enabledProperties & WIDGET_TIMELINE_PROPERTY_HEIGHT) {
+                h = keyframe->height;
+            }
+
+            if (keyframe->enabledProperties & WIDGET_TIMELINE_PROPERTY_OPACITY) {
+                opacity = keyframe->opacity;
+            }
+        }
+
+        widgetRect.x = x;
+        widgetRect.y = y;
+
+        widgetRect.w = w;
+        widgetRect.h = h;
+
+        widgetCursor.opacity = (uint8_t)roundf(255.0f * opacity);
+    } else {
+        widgetRect.x = widgetCursor.widget->x;
+        widgetRect.y = widgetCursor.widget->y;
+
+        widgetRect.w = widgetCursor.widget->width;
+        widgetRect.h = widgetCursor.widget->height;
+    }
+}
+
+void doStaticLayout(
+    WidgetCursor& widgetCursor,
+    const ListOfAssetsPtr<Widget> &widgets,
+    int containerOriginalWidth,
+    int containerOriginalHeight,
+    int containerWidth,
+    int containerHeight
+) {
+    bool callResizeWidget = containerOriginalWidth != containerWidth || containerOriginalHeight != containerHeight;
+
+    for (uint32_t index = 0; index < widgets.count; ++index) {
+        widgetCursor.widget = widgets[index];
+
+        auto savedX = widgetCursor.x;
+        auto savedY = widgetCursor.y;
+        auto savedOpacity = widgetCursor.opacity;
+
+        Rect widgetRect;
+
+        applyTimeline(widgetCursor, widgetRect);
+
+        if (callResizeWidget) {
+            resizeWidget(widgetCursor.widget, widgetRect, containerOriginalWidth, containerOriginalHeight, containerWidth, containerHeight);
+        }
+
+        widgetCursor.x += widgetRect.x;
+        widgetCursor.y += widgetRect.y;
+
+        widgetCursor.w = widgetRect.w;
+        widgetCursor.h = widgetRect.h;
+
+        if (g_isRTL) {
+            widgetCursor.x = savedX + containerWidth - ((widgetCursor.x - savedX) + widgetCursor.w);
+        }
+
+        enumWidget();
+
+        widgetCursor.x = savedX;
+        widgetCursor.y = savedY;
+        widgetCursor.opacity = savedOpacity;
+    }
 }
 
 } // namespace gui

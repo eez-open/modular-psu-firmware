@@ -108,6 +108,8 @@ void AppContext::onPageChanged(int previousPageId, int activePageId) {
 #if OPTION_KEYBOARD
     keyboard::onPageChanged();
 #endif
+
+    flow::onPageChanged(previousPageId, activePageId);
 }
 
 void AppContext::doShowPage(int pageId, Page *page, int previousPageId) {
