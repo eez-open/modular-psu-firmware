@@ -20,6 +20,8 @@
 #include <eez/gui/widgets/containers/container.h>
 #include <eez/gui/widgets/containers/layout_view.h>
 
+#include <eez/flow/private.h>
+
 namespace eez {
 namespace gui {
 
@@ -51,8 +53,16 @@ bool LayoutViewWidgetState::updateState() {
     WIDGET_STATE(flags.active, g_isActiveWidget);
 
     auto savedFlowState = widgetCursor.flowState;
+
     WIDGET_STATE(layout, getPageAsset(getLayoutId(widgetCursor), (WidgetCursor &)widgetCursor));
+
     flowState = widgetCursor.flowState;
+
+    if (flowState && flowState->timelinePosition != timelinePosition) {
+        hasPreviousState = false;
+        timelinePosition = flowState->timelinePosition;
+    }
+
     ((WidgetCursor &)widgetCursor).flowState = savedFlowState;
 
     if (widget->context) {
@@ -62,7 +72,7 @@ bool LayoutViewWidgetState::updateState() {
     ((WidgetCursor &)widgetCursor).cursor = savedCursor;
 
     WIDGET_STATE_END()
-    }
+}
 
 void LayoutViewWidgetState::render() {
 	const WidgetCursor& widgetCursor = g_widgetCursor;

@@ -32,6 +32,7 @@ struct PageOnStack {
     int pageId = PAGE_ID_NONE;
     Page *page = nullptr;
     int displayBufferIndex = -1;
+    float timelinePosition;
 };
 
 class ToastMessagePage;

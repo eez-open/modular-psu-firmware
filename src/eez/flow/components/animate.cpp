@@ -83,7 +83,6 @@ void executeAnimateComponent(FlowState *flowState, unsigned componentIndex) {
         }
 
         flowState->timelinePosition = currentTime;
-        gui::refreshScreen();
         onFlowStateTimelineChanged(flowState);
 
         if (currentTime == state->endPosition) {
