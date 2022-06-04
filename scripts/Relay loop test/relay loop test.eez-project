@@ -47,6 +47,7 @@
           "style": {
             "inheritFrom": "default_S"
           },
+          "timeline": [],
           "name": ""
         },
         {
@@ -60,7 +61,8 @@
           "customOutputs": [],
           "style": {
             "inheritFrom": "default_inverse"
-          }
+          },
+          "timeline": []
         },
         {
           "type": "TextWidget",
@@ -75,6 +77,7 @@
           "style": {
             "inheritFrom": "default_S_left"
           },
+          "timeline": [],
           "name": ""
         },
         {
@@ -95,6 +98,7 @@
             "focusColor": "text_enable_background",
             "focusBackgroundColor": "action_color"
           },
+          "timeline": [],
           "inputType": "number",
           "min": "4.5",
           "max": "12",
@@ -114,6 +118,7 @@
           "style": {
             "inheritFrom": "default_S_left"
           },
+          "timeline": [],
           "name": ""
         },
         {
@@ -134,6 +139,7 @@
             "focusColor": "text_enable_background",
             "focusBackgroundColor": "action_color"
           },
+          "timeline": [],
           "inputType": "number",
           "min": "10",
           "max": "2000",
@@ -158,6 +164,7 @@
           "style": {
             "inheritFrom": "default"
           },
+          "timeline": [],
           "widgets": [
             {
               "type": "Container",
@@ -171,6 +178,7 @@
               "style": {
                 "inheritFrom": "default"
               },
+              "timeline": [],
               "widgets": [
                 {
                   "type": "BitmapWidget",
@@ -184,9 +192,11 @@
                   "style": {
                     "inheritFrom": "default"
                   },
+                  "timeline": [],
                   "bitmap": "sw_off"
                 }
-              ]
+              ],
+              "layout": "static"
             },
             {
               "type": "Container",
@@ -200,6 +210,7 @@
               "style": {
                 "inheritFrom": "default"
               },
+              "timeline": [],
               "widgets": [
                 {
                   "type": "BitmapWidget",
@@ -213,9 +224,11 @@
                   "style": {
                     "inheritFrom": "default"
                   },
+                  "timeline": [],
                   "bitmap": "sw_on"
                 }
-              ]
+              ],
+              "layout": "static"
             }
           ]
         },
@@ -235,6 +248,7 @@
           "style": {
             "inheritFrom": "button_M_rounded"
           },
+          "timeline": [],
           "enabled": "!continue",
           "disabledStyle": {
             "inheritFrom": "button_M_disabled_rounded"
@@ -256,6 +270,7 @@
           "style": {
             "inheritFrom": "button_M_rounded"
           },
+          "timeline": [],
           "enabled": "continue",
           "disabledStyle": {
             "inheritFrom": "button_M_disabled_rounded"
@@ -277,6 +292,7 @@
           "style": {
             "inheritFrom": "button_M_rounded"
           },
+          "timeline": [],
           "disabledStyle": {
             "inheritFrom": "button_M_disabled_rounded"
           }
@@ -293,7 +309,8 @@
           "data": "\"Passed:\"",
           "style": {
             "inheritFrom": "passed"
-          }
+          },
+          "timeline": []
         },
         {
           "type": "TextWidget",
@@ -307,7 +324,8 @@
           "data": "cnt_ok",
           "style": {
             "inheritFrom": "passed"
-          }
+          },
+          "timeline": []
         },
         {
           "type": "TextWidget",
@@ -321,7 +339,8 @@
           "data": "\"Failed:\"",
           "style": {
             "inheritFrom": "failed"
-          }
+          },
+          "timeline": []
         },
         {
           "type": "TextWidget",
@@ -335,7 +354,8 @@
           "data": "cnt_failed",
           "style": {
             "inheritFrom": "failed"
-          }
+          },
+          "timeline": []
         },
         {
           "type": "TextWidget",
@@ -349,7 +369,8 @@
           "data": "\"Total:\"",
           "style": {
             "inheritFrom": "default_S_left"
-          }
+          },
+          "timeline": []
         },
         {
           "type": "TextWidget",
@@ -363,14 +384,15 @@
           "data": "cnt_ok + cnt_failed",
           "style": {
             "inheritFrom": "default_S_left"
-          }
+          },
+          "timeline": []
         },
         {
           "type": "ErrorActionComponent",
           "left": 775,
           "top": -20,
-          "width": 176,
-          "height": 53,
+          "width": 170,
+          "height": 55,
           "wireID": "50539db7-f5e2-45c8-80ed-e5faaa975557",
           "customInputs": [],
           "customOutputs": [],
@@ -380,61 +402,77 @@
           "type": "SetVariableActionComponent",
           "left": 526,
           "top": 191,
-          "width": 138,
-          "height": 58,
+          "width": 147,
+          "height": 56,
           "wireID": "c7977a49-1e80-4c8c-e941-b6949515fc42",
           "customInputs": [],
           "customOutputs": [],
-          "variable": "continue",
-          "value": "false"
+          "entries": [
+            {
+              "variable": "continue",
+              "value": "false"
+            }
+          ]
         },
         {
           "type": "SetVariableActionComponent",
           "left": 526,
           "top": 460,
-          "width": 132,
-          "height": 58,
+          "width": 140,
+          "height": 56,
           "wireID": "72b9ec7d-df66-42c9-90c6-3ee9d06b5256",
           "customInputs": [],
           "customOutputs": [],
-          "variable": "continue",
-          "value": "true"
+          "entries": [
+            {
+              "variable": "continue",
+              "value": "true"
+            }
+          ]
         },
         {
           "type": "SetVariableActionComponent",
           "left": 385,
           "top": 351,
-          "width": 101,
-          "height": 58,
+          "width": 110,
+          "height": 56,
           "wireID": "697c1293-f8c1-4aaf-aa7b-1058d2546818",
           "customInputs": [],
           "customOutputs": [],
-          "variable": "cnt_ok",
-          "value": "0"
+          "entries": [
+            {
+              "variable": "cnt_ok",
+              "value": "0"
+            }
+          ]
         },
         {
           "type": "SetVariableActionComponent",
           "left": 526,
           "top": 351,
-          "width": 126,
-          "height": 58,
+          "width": 134,
+          "height": 56,
           "wireID": "a9f95a96-54bc-4265-d868-0f55136f810b",
           "customInputs": [],
           "customOutputs": [],
-          "variable": "cnt_failed",
-          "value": "0"
+          "entries": [
+            {
+              "variable": "cnt_failed",
+              "value": "0"
+            }
+          ]
         },
         {
           "type": "SwitchActionComponent",
           "left": 1280,
           "top": 453,
-          "width": 139,
-          "height": 73,
+          "width": 152,
+          "height": 74,
           "wireID": "407651ae-7c58-4cf7-f915-e35ef7321b3c",
           "customInputs": [
             {
               "name": "state",
-              "type": "boolean"
+              "type": "integer"
             }
           ],
           "customOutputs": [],
@@ -453,32 +491,40 @@
           "type": "SetVariableActionComponent",
           "left": 1495,
           "top": 453,
-          "width": 157,
-          "height": 58,
+          "width": 165,
+          "height": 56,
           "wireID": "bba3cfc7-f43d-4d1e-db65-2539978188b2",
           "customInputs": [],
           "customOutputs": [],
-          "variable": "cnt_ok",
-          "value": "cnt_ok + 1"
+          "entries": [
+            {
+              "variable": "cnt_ok",
+              "value": "cnt_ok + 1"
+            }
+          ]
         },
         {
           "type": "SetVariableActionComponent",
           "left": 1495,
           "top": 534,
-          "width": 206,
-          "height": 58,
+          "width": 214,
+          "height": 56,
           "wireID": "b351db85-6c94-4132-add0-05f61330ee57",
           "customInputs": [],
           "customOutputs": [],
-          "variable": "cnt_failed",
-          "value": "cnt_failed + 1"
+          "entries": [
+            {
+              "variable": "cnt_failed",
+              "value": "cnt_failed + 1"
+            }
+          ]
         },
         {
           "type": "SwitchActionComponent",
           "left": -521,
           "top": 462,
-          "width": 272,
-          "height": 54,
+          "width": 285,
+          "height": 55,
           "wireID": "ae9b0d6e-ef34-434e-d1aa-01c2c14f6bf0",
           "customInputs": [],
           "customOutputs": [],
@@ -493,20 +539,24 @@
           "type": "SetVariableActionComponent",
           "left": -526,
           "top": 572,
-          "width": 280,
-          "height": 58,
+          "width": 288,
+          "height": 56,
           "wireID": "7d64b5b9-8f6f-4160-9fb9-8d4911dcdce4",
           "customInputs": [],
           "customOutputs": [],
-          "variable": "voltage_validation_err",
-          "value": "\"out of range\""
+          "entries": [
+            {
+              "variable": "voltage_validation_err",
+              "value": "\"out of range\""
+            }
+          ]
         },
         {
           "type": "SwitchActionComponent",
           "left": -113,
           "top": 462,
-          "width": 131,
-          "height": 54,
+          "width": 143,
+          "height": 55,
           "wireID": "883108d0-64da-43c6-ced9-c76ddcf4802e",
           "customInputs": [],
           "customOutputs": [],
@@ -521,37 +571,49 @@
           "type": "SetVariableActionComponent",
           "left": 62,
           "top": 580,
-          "width": 267,
-          "height": 58,
+          "width": 276,
+          "height": 56,
           "wireID": "eac742f8-0307-4e4e-e9e8-ab765a79a914",
           "customInputs": [],
           "customOutputs": [],
-          "variable": "delay_validation_err",
-          "value": "\"out of range\""
+          "entries": [
+            {
+              "variable": "delay_validation_err",
+              "value": "\"out of range\""
+            }
+          ]
         },
         {
           "type": "SetVariableActionComponent",
           "left": 527,
           "top": 20,
-          "width": 206,
-          "height": 58,
+          "width": 214,
+          "height": 56,
           "wireID": "2957ec8c-bfcf-4c6d-a5cc-5c37d2258f98",
           "customInputs": [],
           "customOutputs": [],
-          "variable": "voltage_validation_err",
-          "value": "\"\""
+          "entries": [
+            {
+              "variable": "voltage_validation_err",
+              "value": "\"\""
+            }
+          ]
         },
         {
           "type": "SetVariableActionComponent",
           "left": 527,
           "top": 99,
-          "width": 193,
-          "height": 58,
+          "width": 202,
+          "height": 56,
           "wireID": "15267566-ee60-431c-fb52-c35b8a7d61d2",
           "customInputs": [],
           "customOutputs": [],
-          "variable": "delay_validation_err",
-          "value": "\"\""
+          "entries": [
+            {
+              "variable": "delay_validation_err",
+              "value": "\"\""
+            }
+          ]
         },
         {
           "type": "Container",
@@ -565,6 +627,7 @@
           "style": {
             "inheritFrom": "status_bgnd"
           },
+          "timeline": [],
           "widgets": [
             {
               "type": "Text",
@@ -581,7 +644,8 @@
               "data": "\"E\"",
               "style": {
                 "inheritFrom": "status_icon_enabled"
-              }
+              },
+              "timeline": []
             },
             {
               "type": "Text",
@@ -598,9 +662,11 @@
               "data": "\"i\"",
               "style": {
                 "inheritFrom": "status_icon_enabled"
-              }
+              },
+              "timeline": []
             }
-          ]
+          ],
+          "layout": "static"
         },
         {
           "type": "EndActionComponent",
@@ -616,8 +682,8 @@
           "type": "SCPIActionComponent",
           "left": 154,
           "top": -138,
-          "width": 241,
-          "height": 54,
+          "width": 235,
+          "height": 55,
           "wireID": "c1ad607a-0b87-4495-c87b-2c0e3a6fcaab",
           "customInputs": [],
           "customOutputs": [
@@ -632,8 +698,8 @@
           "type": "SCPIActionComponent",
           "left": 775,
           "top": -248,
-          "width": 164,
-          "height": 157,
+          "width": 158,
+          "height": 159,
           "wireID": "042975a8-8470-49b2-ce0c-62f1aece82b4",
           "customInputs": [],
           "customOutputs": [],
@@ -643,8 +709,8 @@
           "type": "SCPIActionComponent",
           "left": 1148,
           "top": 693,
-          "width": 145,
-          "height": 66,
+          "width": 139,
+          "height": 68,
           "wireID": "8be03711-fa6b-4e8f-d143-01c3c1b43e1a",
           "customInputs": [],
           "customOutputs": [],
@@ -654,8 +720,8 @@
           "type": "SCPIActionComponent",
           "left": 916,
           "top": 453,
-          "width": 245,
-          "height": 92,
+          "width": 239,
+          "height": 94,
           "wireID": "a11e8785-8ec4-4931-d3dc-d855c9ab6003",
           "customInputs": [],
           "customOutputs": [
@@ -670,8 +736,8 @@
           "type": "SwitchActionComponent",
           "left": 471,
           "top": -138,
-          "width": 224,
-          "height": 73,
+          "width": 237,
+          "height": 74,
           "wireID": "e89a7667-6527-4c84-9578-495a64f02221",
           "customInputs": [
             {
@@ -695,8 +761,8 @@
           "type": "SwitchActionComponent",
           "left": 87,
           "top": 462,
-          "width": 347,
-          "height": 54,
+          "width": 359,
+          "height": 55,
           "wireID": "252e56c7-d24b-4997-bf69-2bb24da7f51f",
           "customInputs": [],
           "customOutputs": [],
@@ -711,8 +777,8 @@
           "type": "SwitchActionComponent",
           "left": 729,
           "top": 462,
-          "width": 102,
-          "height": 54,
+          "width": 114,
+          "height": 55,
           "wireID": "41ffae03-3dc7-450c-9322-ec65fe1d057f",
           "customInputs": [],
           "customOutputs": [],
@@ -749,8 +815,8 @@
           "type": "SCPIActionComponent",
           "left": 782,
           "top": 693,
-          "width": 145,
-          "height": 79,
+          "width": 139,
+          "height": 81,
           "wireID": "70294b9f-3da4-46d4-d6d7-2ea1f84bc498",
           "customInputs": [],
           "customOutputs": [],
@@ -761,7 +827,7 @@
           "left": 527,
           "top": 272,
           "width": 97,
-          "height": 53,
+          "height": 55,
           "wireID": "09af32f8-c10c-450b-c344-080e94f1d568",
           "customInputs": [],
           "customOutputs": [],
@@ -1027,6 +1093,7 @@
           "style": {
             "inheritFrom": "default"
           },
+          "timeline": [],
           "bitmap": "wiring"
         },
         {
@@ -1041,6 +1108,7 @@
           "style": {
             "inheritFrom": "status_bgnd"
           },
+          "timeline": [],
           "widgets": [
             {
               "type": "Text",
@@ -1057,7 +1125,8 @@
               "data": "\"E\"",
               "style": {
                 "inheritFrom": "status_icon_enabled"
-              }
+              },
+              "timeline": []
             },
             {
               "type": "TextWidget",
@@ -1071,9 +1140,11 @@
               "data": "\"Relay tester wiring\"",
               "style": {
                 "inheritFrom": "status_bgnd"
-              }
+              },
+              "timeline": []
             }
-          ]
+          ],
+          "layout": "static"
         },
         {
           "type": "ShowPageActionComponent",
