@@ -147,6 +147,10 @@ FlowState *getFlowState(Assets *assets, int flowStateIndex) {
 }
 
 FlowState *getFlowState(Assets *assets, int16_t pageIndex, const WidgetCursor &widgetCursor) {
+	if (!assets->flowDefinition) {
+		return nullptr;
+	}
+
 	if (!isFlowRunningHook()) {
 		return nullptr;
 	}
