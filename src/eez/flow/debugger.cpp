@@ -309,6 +309,7 @@ void writeHex(char *dst, uint8_t *src, size_t srcLength) {
         *dst++ = toHexDigit(src[i] / 16);
         *dst++ = toHexDigit(src[i] % 16);
     }
+    *dst++ = 0;
 }
 
 void writeValue(const Value &value) {
