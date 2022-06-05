@@ -277,6 +277,9 @@ struct Response {
             float reactivePower;
             float voltRMS;
             float currRMS;
+            float Ah;
+            float Wh;
+            float runningTime;
             DlogState dlogState;
         } getState;
 
@@ -2190,6 +2193,10 @@ public:
     float reactivePower = 0;
     float voltRMS = 0;
     float currRMS = 0;
+    float Ah = 0;
+    float Wh = 0;
+    float runningTime = 0;
+
     float apparentPower;
     float powerFactor;
 
@@ -2342,6 +2349,9 @@ public:
 	        currRMS = data.currRMS;
 	        apparentPower = voltRMS * currRMS;
 	        powerFactor = activePower / apparentPower;
+            Ah = data.Ah;
+            Wh = data.Wh;
+            runningTime = data.runningTime;
 
             if (data.flags & GET_STATE_COMMAND_FLAG_SD_CARD_PRESENT) {
                 if (!fs_driver::isDriverLinked(slotIndex)) {
@@ -6916,6 +6926,106 @@ void data_dib_mio168_ain_power_factor(DataOperationEnum operation, const WidgetC
 			roundPrec(mio168Module->powerFactor, 1E-3f),
 			UNIT_NONE,
 			FLOAT_OPTIONS_SET_NUM_FIXED_DECIMALS(3)
+		);
+	}
+}
+
+void data_dib_mio168_ain_wh(DataOperationEnum operation, const WidgetCursor &widgetCursor, Value &value) {
+    auto cursor = widgetCursor.cursor;
+	if (operation == DATA_OPERATION_GET) {
+		int slotIndex;
+		if (getActivePageId() == PAGE_ID_MAIN) {
+			slotIndex = cursor;
+		} else {
+			slotIndex = hmi::g_selectedSlotIndex;
+		}
+
+		auto mio168Module = (Mio168Module *)g_slots[slotIndex];
+
+		value = MakeValue(
+			roundPrec(mio168Module->Wh, 1E-4f),
+			UNIT_NONE,
+			FLOAT_OPTIONS_SET_NUM_FIXED_DECIMALS(4)
+		);
+	}
+}
+
+void data_dib_mio168_ain_ah(DataOperationEnum operation, const WidgetCursor &widgetCursor, Value &value) {
+    auto cursor = widgetCursor.cursor;
+	if (operation == DATA_OPERATION_GET) {
+		int slotIndex;
+		if (getActivePageId() == PAGE_ID_MAIN) {
+			slotIndex = cursor;
+		} else {
+			slotIndex = hmi::g_selectedSlotIndex;
+		}
+
+		auto mio168Module = (Mio168Module *)g_slots[slotIndex];
+
+		value = MakeValue(
+			roundPrec(mio168Module->Ah, 1E-4f),
+			UNIT_NONE,
+			FLOAT_OPTIONS_SET_NUM_FIXED_DECIMALS(4)
+		);
+	}
+}
+
+void data_dib_mio168_ac_analysis_runningtime_h(DataOperationEnum operation, const WidgetCursor &widgetCursor, Value &value) {
+    auto cursor = widgetCursor.cursor;
+	if (operation == DATA_OPERATION_GET) {
+		int slotIndex;
+		if (getActivePageId() == PAGE_ID_MAIN) {
+			slotIndex = cursor;
+		} else {
+			slotIndex = hmi::g_selectedSlotIndex;
+		}
+
+		auto mio168Module = (Mio168Module *)g_slots[slotIndex];
+
+		value = MakeValue(
+			floor((mio168Module->runningTime/3600)),
+			UNIT_NONE,
+			FLOAT_OPTIONS_SET_NUM_FIXED_DECIMALS(0)
+		);
+	}
+}
+
+void data_dib_mio168_ac_analysis_runningtime_m(DataOperationEnum operation, const WidgetCursor &widgetCursor, Value &value) {
+    auto cursor = widgetCursor.cursor;
+	if (operation == DATA_OPERATION_GET) {
+		int slotIndex;
+		if (getActivePageId() == PAGE_ID_MAIN) {
+			slotIndex = cursor;
+		} else {
+			slotIndex = hmi::g_selectedSlotIndex;
+		}
+
+		auto mio168Module = (Mio168Module *)g_slots[slotIndex];
+
+		value = MakeValue(
+			floor(fmod(mio168Module->runningTime, 3600)/60),
+			UNIT_NONE,
+			FLOAT_OPTIONS_SET_NUM_FIXED_DECIMALS(0)
+		);
+	}
+}
+
+void data_dib_mio168_ac_analysis_runningtime_s(DataOperationEnum operation, const WidgetCursor &widgetCursor, Value &value) {
+    auto cursor = widgetCursor.cursor;
+	if (operation == DATA_OPERATION_GET) {
+		int slotIndex;
+		if (getActivePageId() == PAGE_ID_MAIN) {
+			slotIndex = cursor;
+		} else {
+			slotIndex = hmi::g_selectedSlotIndex;
+		}
+
+		auto mio168Module = (Mio168Module *)g_slots[slotIndex];
+
+		value = MakeValue(
+			floor(fmod(mio168Module->runningTime, 60)),
+			UNIT_NONE,
+			FLOAT_OPTIONS_SET_NUM_FIXED_DECIMALS(0)
 		);
 	}
 }
