@@ -90,6 +90,19 @@ enum {
 	EFFICIENCY_FORMULA_P2_OVER_P1
 };
 
+enum {
+    AC_ANALYSIS_CHANNEL_P1,
+    AC_ANALYSIS_CHANNEL_P2
+};
+
+enum {
+    AC_EFFICIENCY_FORMULA_NONE,
+    AC_EFFICIENCY_FORMULA_P2DC_OVER_P1AC,
+    AC_EFFICIENCY_FORMULA_P2AC_OVER_P1DC,
+    AC_EFFICIENCY_FORMULA_P1DC_OVER_P2AC,
+    AC_EFFICIENCY_FORMULA_P1AC_OVER_P2DC
+};
+
 static const int DIN_SUBCHANNEL_INDEX = 0;
 static const int DOUT_SUBCHANNEL_INDEX = 1;
 static const int AIN_1_SUBCHANNEL_INDEX = 2;
@@ -191,6 +204,7 @@ struct SetParams {
 	} ain[4];
 
 	uint8_t acAnalysisEnabled;
+    uint8_t acChannel;
 
 	uint8_t powerLineFrequency; // 50 or 60
 
@@ -2214,6 +2228,8 @@ public:
 
 	uint8_t efficiencyFormula = EFFICIENCY_FORMULA_P1_OVER_P2;
 	uint8_t acAnalysisEnabled;
+    uint8_t acChannel = AC_ANALYSIS_CHANNEL_P1;
+    uint8_t acEfficiencyFormula = AC_EFFICIENCY_FORMULA_NONE;
 
     Mio168Module() {
 		assert(sizeof(Request) == sizeof(Response));
@@ -2433,7 +2449,7 @@ public:
         }
 
 		params.acAnalysisEnabled = acAnalysisEnabled && !(dlog_record::isExecuting() && dlog_record::isModuleAtSlotRecording(slotIndex));
-
+        params.acChannel = acChannel;
         params.powerLineFrequency = persist_conf::getPowerLineFrequency();
 
         for (int i = 0; i < 2; i++) {
@@ -6553,11 +6569,11 @@ void data_dib_mio168_ain_p1(DataOperationEnum operation, const WidgetCursor &wid
 		value = MakeValue(
 			roundPrec(
                 mio168Module->afeVersion == 1 ?
-                    (mio168Module->ainChannels[0].m_value * mio168Module->ainChannels[2].m_value) :
+                    (mio168Module->ainChannels[0].getValue() * mio168Module->ainChannels[2].getValue()) :
                 mio168Module->afeVersion == 2 ?
-                    (mio168Module->ainChannels[0].m_value * mio168Module->ainChannels[2].m_value) :
+                    (mio168Module->ainChannels[0].getValue() * mio168Module->ainChannels[2].getValue()) :
                 mio168Module->afeVersion == 3 ?
-                    (mio168Module->ainChannels[0].m_value * mio168Module->ainChannels[1].m_value) :
+                    (mio168Module->ainChannels[0].getValue() * mio168Module->ainChannels[1].getValue()) :
                 NAN, 1E-4f),
 			UNIT_WATT,
 			FLOAT_OPTIONS_SET_NUM_FIXED_DECIMALS(4)
@@ -6603,11 +6619,11 @@ void data_dib_mio168_ain_p2(DataOperationEnum operation, const WidgetCursor &wid
 		value = MakeValue(
 			roundPrec(
                 mio168Module->afeVersion == 1 ?
-                    (mio168Module->ainChannels[1].m_value * mio168Module->ainChannels[3].m_value) :
+                    (mio168Module->ainChannels[1].getValue() * mio168Module->ainChannels[3].getValue()) :
                 mio168Module->afeVersion == 2 ?
-                    (mio168Module->ainChannels[1].m_value * mio168Module->ainChannels[3].m_value) :
+                    (mio168Module->ainChannels[1].getValue() * mio168Module->ainChannels[3].getValue()) :
                 mio168Module->afeVersion == 3 ?
-                    (mio168Module->ainChannels[2].m_value * mio168Module->ainChannels[3].m_value) :
+                    (mio168Module->ainChannels[2].getValue() * mio168Module->ainChannels[3].getValue()) :
                 NAN, 1E-4f),
 			UNIT_WATT,
 			FLOAT_OPTIONS_SET_NUM_FIXED_DECIMALS(4)
@@ -6702,20 +6718,20 @@ void data_dib_mio168_ain_efficiency(DataOperationEnum operation, const WidgetCur
 
 		auto p1 = roundPrec(
             mio168Module->afeVersion == 1 ?
-                (mio168Module->ainChannels[0].m_value * mio168Module->ainChannels[2].m_value) :
+                (mio168Module->ainChannels[0].getValue() * mio168Module->ainChannels[2].getValue()) :
             mio168Module->afeVersion == 2 ?
-                (mio168Module->ainChannels[0].m_value * mio168Module->ainChannels[2].m_value) :
+                (mio168Module->ainChannels[0].getValue() * mio168Module->ainChannels[2].getValue()) :
             mio168Module->afeVersion == 3 ?
-                (mio168Module->ainChannels[0].m_value * mio168Module->ainChannels[1].m_value) :
+                (mio168Module->ainChannels[0].getValue() * mio168Module->ainChannels[1].getValue()) :
             NAN, 1E-4f);
 
 		auto p2 = roundPrec(
             mio168Module->afeVersion == 1 ?
-                (mio168Module->ainChannels[1].m_value * mio168Module->ainChannels[3].m_value) :
+                (mio168Module->ainChannels[1].getValue() * mio168Module->ainChannels[3].getValue()) :
             mio168Module->afeVersion == 2 ?
-                (mio168Module->ainChannels[1].m_value * mio168Module->ainChannels[3].m_value) :
+                (mio168Module->ainChannels[1].getValue() * mio168Module->ainChannels[3].getValue()) :
             mio168Module->afeVersion == 3 ?
-                (mio168Module->ainChannels[2].m_value * mio168Module->ainChannels[3].m_value) :
+                (mio168Module->ainChannels[2].getValue() * mio168Module->ainChannels[3].getValue()) :
             NAN, 1E-4f);
 
 		auto efficiency = roundPrec((mio168Module->efficiencyFormula == EFFICIENCY_FORMULA_P1_OVER_P2 ? p1 / p2 : p2 / p1) * 100.0f, 0.01f);
@@ -7755,6 +7771,150 @@ void action_dib_mio168_ain_toggle_ac_analysis() {
     auto module = (Mio168Module *)g_slots[slotIndex];
     module->acAnalysisEnabled = !module->acAnalysisEnabled;
 }
+
+void action_dib_mio168_ain_ac_analysis_toggle_channel() {
+	auto slotIndex = getFoundWidgetAtDown().cursor;
+    auto module = (Mio168Module *)g_slots[slotIndex];
+    module->acChannel = (module->acChannel + 1) % 2;
+    module->acEfficiencyFormula = AC_EFFICIENCY_FORMULA_NONE;
+}
+
+void data_dib_mio168_ac_analysis_channel(DataOperationEnum operation, const WidgetCursor &widgetCursor, Value &value) {
+    auto cursor = widgetCursor.cursor;
+	if (operation == DATA_OPERATION_GET) {
+		int slotIndex;
+		if (getActivePageId() == PAGE_ID_MAIN) {
+			slotIndex = cursor;
+		} else {
+			slotIndex = hmi::g_selectedSlotIndex;
+		}
+
+		auto mio168Module = (Mio168Module *)g_slots[slotIndex];
+
+		value = mio168Module->acChannel == AC_ANALYSIS_CHANNEL_P1 ? "P1" : "P2";
+	}
+}
+
+void action_dib_mio168_ain_ac_analysis_toggle_efficiency() {
+	auto slotIndex = getFoundWidgetAtDown().cursor;
+    auto module = (Mio168Module *)g_slots[slotIndex];
+    while(true) {
+        module->acEfficiencyFormula = (module->acEfficiencyFormula + 1) % 5;
+        if (module->acEfficiencyFormula == AC_EFFICIENCY_FORMULA_NONE) {
+            break;
+        }
+        if (module->acChannel == AC_ANALYSIS_CHANNEL_P1 && 
+            (module->acEfficiencyFormula == AC_EFFICIENCY_FORMULA_P2DC_OVER_P1AC ||
+             module->acEfficiencyFormula == AC_EFFICIENCY_FORMULA_P1AC_OVER_P2DC)) {
+            break;
+        }
+        if (module->acChannel == AC_ANALYSIS_CHANNEL_P2 && 
+            (module->acEfficiencyFormula == AC_EFFICIENCY_FORMULA_P2AC_OVER_P1DC ||
+             module->acEfficiencyFormula == AC_EFFICIENCY_FORMULA_P1DC_OVER_P2AC)) {
+            break;
+        }
+    }
+}
+
+void data_dib_mio168_ac_analysis_efficiency_formula(DataOperationEnum operation, const WidgetCursor &widgetCursor, Value &value) {
+    auto cursor = widgetCursor.cursor;
+	if (operation == DATA_OPERATION_GET) {
+		int slotIndex;
+		if (getActivePageId() == PAGE_ID_MAIN) {
+			slotIndex = cursor;
+		} else {
+			slotIndex = hmi::g_selectedSlotIndex;
+		}
+
+		auto mio168Module = (Mio168Module *)g_slots[slotIndex];
+
+		value = 
+            mio168Module->acEfficiencyFormula == AC_EFFICIENCY_FORMULA_P1AC_OVER_P2DC ? "P1 AC / P2 DC" : 
+            mio168Module->acEfficiencyFormula == AC_EFFICIENCY_FORMULA_P1DC_OVER_P2AC ? "P1 DC / P2 AC" : 
+            mio168Module->acEfficiencyFormula == AC_EFFICIENCY_FORMULA_P2AC_OVER_P1DC ? "P2 AC / P1 DC" : 
+            mio168Module->acEfficiencyFormula == AC_EFFICIENCY_FORMULA_P2DC_OVER_P1AC ? "P2 DC / P1 AC" : 
+            "Off";
+	}
+}
+
+void data_dib_mio168_ac_analysis_calc_efficiency(DataOperationEnum operation, const WidgetCursor &widgetCursor, Value &value) {
+    auto cursor = widgetCursor.cursor;
+	if (operation == DATA_OPERATION_GET) {
+		auto module = (Mio168Module *)g_slots[cursor];
+		value = module->acAnalysisEnabled && (module->acEfficiencyFormula != AC_EFFICIENCY_FORMULA_NONE); 
+    }
+}
+
+void data_dib_mio168_ac_analysis_efficiency(DataOperationEnum operation, const WidgetCursor &widgetCursor, Value &value) {
+    auto cursor = widgetCursor.cursor;
+	if (operation == DATA_OPERATION_GET) {
+		int slotIndex;
+		if (getActivePageId() == PAGE_ID_MAIN) {
+			slotIndex = cursor;
+		} else {
+			slotIndex = hmi::g_selectedSlotIndex;
+		}
+
+		auto mio168Module = (Mio168Module *)g_slots[slotIndex];
+
+        int pDCvoltIndex = 
+            (mio168Module->afeVersion == 1 &&
+             (mio168Module->acEfficiencyFormula == AC_EFFICIENCY_FORMULA_P1AC_OVER_P2DC ||
+              mio168Module->acEfficiencyFormula == AC_EFFICIENCY_FORMULA_P2DC_OVER_P1AC)) ? 1 :
+            (mio168Module->afeVersion == 1 &&
+             (mio168Module->acEfficiencyFormula == AC_EFFICIENCY_FORMULA_P1DC_OVER_P2AC ||
+             mio168Module->acEfficiencyFormula == AC_EFFICIENCY_FORMULA_P2AC_OVER_P1DC)) ? 0 :
+            (mio168Module->afeVersion == 2 &&
+             (mio168Module->acEfficiencyFormula == AC_EFFICIENCY_FORMULA_P1AC_OVER_P2DC ||
+              mio168Module->acEfficiencyFormula == AC_EFFICIENCY_FORMULA_P2DC_OVER_P1AC)) ? 1 :
+            (mio168Module->afeVersion == 2 &&
+             (mio168Module->acEfficiencyFormula == AC_EFFICIENCY_FORMULA_P1DC_OVER_P2AC ||
+             mio168Module->acEfficiencyFormula == AC_EFFICIENCY_FORMULA_P2AC_OVER_P1DC)) ? 0 :
+            (mio168Module->afeVersion == 3 &&
+             (mio168Module->acEfficiencyFormula == AC_EFFICIENCY_FORMULA_P1AC_OVER_P2DC ||
+              mio168Module->acEfficiencyFormula == AC_EFFICIENCY_FORMULA_P2DC_OVER_P1AC)) ? 2 :
+            (mio168Module->afeVersion == 3 &&
+             (mio168Module->acEfficiencyFormula == AC_EFFICIENCY_FORMULA_P1DC_OVER_P2AC ||
+             mio168Module->acEfficiencyFormula == AC_EFFICIENCY_FORMULA_P2AC_OVER_P1DC)) ? 0 : 2;
+
+        int pDCcurrIndex = 
+            (mio168Module->afeVersion == 1 &&
+             (mio168Module->acEfficiencyFormula == AC_EFFICIENCY_FORMULA_P1AC_OVER_P2DC ||
+              mio168Module->acEfficiencyFormula == AC_EFFICIENCY_FORMULA_P2DC_OVER_P1AC)) ? 3 :
+            (mio168Module->afeVersion == 1 &&
+             (mio168Module->acEfficiencyFormula == AC_EFFICIENCY_FORMULA_P1DC_OVER_P2AC ||
+             mio168Module->acEfficiencyFormula == AC_EFFICIENCY_FORMULA_P2AC_OVER_P1DC)) ? 2 :
+            (mio168Module->afeVersion == 2 &&
+             (mio168Module->acEfficiencyFormula == AC_EFFICIENCY_FORMULA_P1AC_OVER_P2DC ||
+              mio168Module->acEfficiencyFormula == AC_EFFICIENCY_FORMULA_P2DC_OVER_P1AC)) ? 3 :
+            (mio168Module->afeVersion == 2 &&
+             (mio168Module->acEfficiencyFormula == AC_EFFICIENCY_FORMULA_P1DC_OVER_P2AC ||
+             mio168Module->acEfficiencyFormula == AC_EFFICIENCY_FORMULA_P2AC_OVER_P1DC)) ? 2 :
+            (mio168Module->afeVersion == 3 &&
+             (mio168Module->acEfficiencyFormula == AC_EFFICIENCY_FORMULA_P1AC_OVER_P2DC ||
+              mio168Module->acEfficiencyFormula == AC_EFFICIENCY_FORMULA_P2DC_OVER_P1AC)) ? 3 :
+            (mio168Module->afeVersion == 3 &&
+             (mio168Module->acEfficiencyFormula == AC_EFFICIENCY_FORMULA_P1DC_OVER_P2AC ||
+             mio168Module->acEfficiencyFormula == AC_EFFICIENCY_FORMULA_P2AC_OVER_P1DC)) ? 1 : 3;
+
+		auto pDC = roundPrec(
+                mio168Module->ainChannels[pDCvoltIndex].getValue() * 
+                mio168Module->ainChannels[pDCcurrIndex].getValue(), 1E-4f);
+
+
+		auto efficiency = roundPrec((
+            (mio168Module->acEfficiencyFormula == AC_EFFICIENCY_FORMULA_P1AC_OVER_P2DC ||
+             mio168Module->acEfficiencyFormula == AC_EFFICIENCY_FORMULA_P2AC_OVER_P1DC)  ? 
+             mio168Module->activePower / pDC : pDC / mio168Module->activePower  ) * 100.0f, 0.01f);
+
+		if (isNaN(efficiency)) {
+			value = "   -";
+		} else {
+			value = MakeValue(efficiency, UNIT_NONE, FLOAT_OPTIONS_SET_NUM_FIXED_DECIMALS(2));
+		}
+	}
+}
+
 
 #if defined(EEZ_PLATFORM_SIMULATOR)
 

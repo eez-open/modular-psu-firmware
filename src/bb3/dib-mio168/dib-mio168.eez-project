@@ -304,6 +304,12 @@
         "defaultValue": "1"
       },
       {
+        "name": "ac_analysis_channel",
+        "type": "string",
+        "defaultValue": "P1",
+        "persistent": false
+      },
+      {
         "name": "ac_analysis_runningtime_h",
         "type": "float",
         "defaultValue": "8",
@@ -319,6 +325,24 @@
         "name": "ac_analysis_runningtime_s",
         "type": "float",
         "defaultValue": "55",
+        "persistent": false
+      },
+      {
+        "name": "ac_analysis_efficiency",
+        "type": "float",
+        "defaultValue": "95.3",
+        "persistent": false
+      },
+      {
+        "name": "ac_analysis_calc_efficiency",
+        "type": "boolean",
+        "defaultValue": "1",
+        "persistent": false
+      },
+      {
+        "name": "ac_analysis_efficiency_formula",
+        "type": "string",
+        "defaultValue": "P2 DC / P1 AC",
         "persistent": false
       },
       {
@@ -877,6 +901,18 @@
       "connectionLines": [],
       "localVariables": [],
       "name": "ain_toggle_ac_analysis"
+    },
+    {
+      "components": [],
+      "connectionLines": [],
+      "localVariables": [],
+      "name": "ain_ac_analysis_toggle_channel"
+    },
+    {
+      "components": [],
+      "connectionLines": [],
+      "localVariables": [],
+      "name": "ain_ac_analysis_toggle_efficiency"
     }
   ],
   "pages": [
@@ -16660,6 +16696,264 @@
                   "text": "AC & Power"
                 },
                 {
+                  "type": "SelectWidget",
+                  "left": 0,
+                  "top": 0,
+                  "width": 168,
+                  "height": 32,
+                  "wireID": "3be2eb11-0822-4180-f87a-b3b9f1106c55",
+                  "customInputs": [],
+                  "customOutputs": [],
+                  "data": "is_no_afe",
+                  "style": {
+                    "inheritFrom": "default"
+                  },
+                  "timeline": [],
+                  "widgets": [
+                    {
+                      "type": "SelectWidget",
+                      "left": 0,
+                      "top": 0,
+                      "width": 168,
+                      "height": 32,
+                      "wireID": "de39304c-afc4-427d-f180-7199e5a3e440",
+                      "customInputs": [],
+                      "customOutputs": [],
+                      "data": "ac_analysis_enabled",
+                      "style": {
+                        "inheritFrom": "default"
+                      },
+                      "timeline": [],
+                      "widgets": [
+                        {
+                          "type": "ContainerWidget",
+                          "left": 0,
+                          "top": 0,
+                          "width": 168,
+                          "height": 32,
+                          "wireID": "3641b551-5d16-4a41-c228-af9daea8fe62",
+                          "customInputs": [],
+                          "customOutputs": [],
+                          "style": {
+                            "inheritFrom": "default"
+                          },
+                          "timeline": [],
+                          "widgets": [
+                            {
+                              "type": "SelectWidget",
+                              "left": 0,
+                              "top": 0,
+                              "width": 168,
+                              "height": 32,
+                              "wireID": "ead0c09d-3724-4a20-b410-2422f1d84c88",
+                              "customInputs": [],
+                              "customOutputs": [],
+                              "data": "ac_analysis_allowed",
+                              "style": {
+                                "inheritFrom": "default"
+                              },
+                              "timeline": [],
+                              "widgets": [
+                                {
+                                  "type": "Text",
+                                  "left": 0,
+                                  "top": 0,
+                                  "width": 168,
+                                  "height": 32,
+                                  "wireID": "cb389cce-b61d-4000-d78e-02a49255438d",
+                                  "customInputs": [],
+                                  "customOutputs": [],
+                                  "action": "",
+                                  "style": {
+                                    "inheritFrom": "edit_value_active_S_left",
+                                    "font": "Oswald14",
+                                    "alignHorizontal": "center",
+                                    "color": "text_disabled",
+                                    "backgroundColor": "text_disabled_background",
+                                    "activeColor": "text_disabled_background",
+                                    "activeBackgroundColor": "text_disabled",
+                                    "margin": "0"
+                                  },
+                                  "timeline": [],
+                                  "text": "Enable Analysis"
+                                },
+                                {
+                                  "type": "Text",
+                                  "left": 0,
+                                  "top": 0,
+                                  "width": 168,
+                                  "height": 32,
+                                  "wireID": "ea78cc2b-9248-45ff-da0c-1385f90e4b1b",
+                                  "customInputs": [],
+                                  "customOutputs": [],
+                                  "action": "ain_toggle_ac_analysis",
+                                  "style": {
+                                    "inheritFrom": "edit_value_active_S_left",
+                                    "font": "Oswald14",
+                                    "alignHorizontal": "center",
+                                    "color": "action_color",
+                                    "backgroundColor": "text_enable_background",
+                                    "activeColor": "text_enable_background",
+                                    "activeBackgroundColor": "action_color",
+                                    "margin": "0"
+                                  },
+                                  "timeline": [],
+                                  "text": "Enable Analysis"
+                                }
+                              ]
+                            }
+                          ],
+                          "layout": "static"
+                        },
+                        {
+                          "type": "ContainerWidget",
+                          "left": 0,
+                          "top": 0,
+                          "width": 168,
+                          "height": 32,
+                          "wireID": "60f65dcc-bffc-4e03-8f0c-1f404d7e7643",
+                          "customInputs": [],
+                          "customOutputs": [],
+                          "style": {
+                            "inheritFrom": "default"
+                          },
+                          "timeline": [],
+                          "widgets": [
+                            {
+                              "type": "Text",
+                              "left": 0,
+                              "top": 0,
+                              "width": 168,
+                              "height": 32,
+                              "wireID": "96db845c-4531-4ed8-a186-066d54fb65c4",
+                              "customInputs": [],
+                              "customOutputs": [],
+                              "action": "ain_toggle_ac_analysis",
+                              "style": {
+                                "inheritFrom": "edit_value_active_S_left",
+                                "font": "Oswald14",
+                                "alignHorizontal": "center",
+                                "color": "action_color",
+                                "backgroundColor": "text_enable_background",
+                                "activeColor": "text_enable_background",
+                                "activeBackgroundColor": "action_color",
+                                "margin": "0"
+                              },
+                              "timeline": [],
+                              "text": "Disable Analysis"
+                            }
+                          ],
+                          "layout": "static"
+                        }
+                      ]
+                    },
+                    {
+                      "type": "ContainerWidget",
+                      "left": 0,
+                      "top": 0,
+                      "width": 168,
+                      "height": 32,
+                      "wireID": "8aa9dd7c-f300-46da-b2c8-af32f42af65a",
+                      "customInputs": [],
+                      "customOutputs": [],
+                      "style": {
+                        "inheritFrom": "default"
+                      },
+                      "timeline": [],
+                      "widgets": [],
+                      "layout": "static"
+                    }
+                  ]
+                },
+                {
+                  "type": "SelectWidget",
+                  "left": 312,
+                  "top": 0,
+                  "width": 168,
+                  "height": 32,
+                  "wireID": "7da1360a-af53-4213-8b4b-9dc4ead0a749",
+                  "customInputs": [],
+                  "customOutputs": [],
+                  "data": "is_no_afe",
+                  "style": {
+                    "inheritFrom": "default"
+                  },
+                  "timeline": [],
+                  "widgets": [
+                    {
+                      "type": "ContainerWidget",
+                      "left": 0,
+                      "top": 0,
+                      "width": 168,
+                      "height": 32,
+                      "wireID": "e95aa236-4444-4456-8c0e-992c181b5eb2",
+                      "customInputs": [],
+                      "customOutputs": [],
+                      "style": {
+                        "inheritFrom": "default"
+                      },
+                      "timeline": [],
+                      "widgets": [
+                        {
+                          "type": "TextWidget",
+                          "left": 0,
+                          "top": 0,
+                          "width": 112,
+                          "height": 32,
+                          "wireID": "ba3f40cb-513b-4216-ac2a-a311f8257197",
+                          "customInputs": [],
+                          "customOutputs": [],
+                          "style": {
+                            "inheritFrom": "default",
+                            "font": "Oswald14",
+                            "alignHorizontal": "right",
+                            "alignVertical": "center"
+                          },
+                          "timeline": [],
+                          "text": "Channel: "
+                        },
+                        {
+                          "type": "Text",
+                          "left": 112,
+                          "top": 1,
+                          "width": 55,
+                          "height": 30,
+                          "wireID": "6a9ebfd8-1459-4650-efd0-35bc9fb24d07",
+                          "customInputs": [],
+                          "customOutputs": [],
+                          "data": "ac_analysis_channel",
+                          "action": "ain_ac_analysis_toggle_channel",
+                          "style": {
+                            "inheritFrom": "edit_value_active_S_left",
+                            "font": "Oswald14",
+                            "alignHorizontal": "center",
+                            "margin": "0"
+                          },
+                          "timeline": [],
+                          "text": ""
+                        }
+                      ],
+                      "layout": "static"
+                    },
+                    {
+                      "type": "ContainerWidget",
+                      "left": 0,
+                      "top": 0,
+                      "width": 168,
+                      "height": 32,
+                      "wireID": "ebefed91-a947-4a8e-b7f0-3878c3a5bfba",
+                      "customInputs": [],
+                      "customOutputs": [],
+                      "style": {
+                        "inheritFrom": "default"
+                      },
+                      "timeline": [],
+                      "widgets": [],
+                      "layout": "static"
+                    }
+                  ]
+                },
+                {
                   "type": "Select",
                   "left": 0,
                   "top": 32,
@@ -16702,71 +16996,7 @@
                             "inheritFrom": "default"
                           },
                           "timeline": [],
-                          "widgets": [
-                            {
-                              "type": "Select",
-                              "left": 154,
-                              "top": 0,
-                              "width": 172,
-                              "height": 36,
-                              "wireID": "718469b9-6b1e-429f-c547-d83c66b07a6c",
-                              "customInputs": [],
-                              "customOutputs": [],
-                              "data": "ac_analysis_allowed",
-                              "style": {
-                                "inheritFrom": "default"
-                              },
-                              "timeline": [],
-                              "widgets": [
-                                {
-                                  "type": "Text",
-                                  "left": 0,
-                                  "top": 0,
-                                  "width": 172,
-                                  "height": 36,
-                                  "wireID": "c7f22368-dd9f-403a-a8d6-cc3a1eb9565c",
-                                  "customInputs": [],
-                                  "customOutputs": [],
-                                  "action": "",
-                                  "style": {
-                                    "inheritFrom": "edit_value_active_S_left",
-                                    "font": "Oswald17",
-                                    "alignHorizontal": "center",
-                                    "color": "text_disabled",
-                                    "backgroundColor": "text_disabled_background",
-                                    "activeColor": "text_disabled_background",
-                                    "activeBackgroundColor": "text_disabled",
-                                    "margin": "0"
-                                  },
-                                  "timeline": [],
-                                  "text": "Enable Analysis"
-                                },
-                                {
-                                  "type": "Text",
-                                  "left": 0,
-                                  "top": 0,
-                                  "width": 172,
-                                  "height": 36,
-                                  "wireID": "0372cd35-3028-4cc1-8904-16dfc2566d7b",
-                                  "customInputs": [],
-                                  "customOutputs": [],
-                                  "action": "ain_toggle_ac_analysis",
-                                  "style": {
-                                    "inheritFrom": "edit_value_active_S_left",
-                                    "font": "Oswald17",
-                                    "alignHorizontal": "center",
-                                    "color": "action_color",
-                                    "backgroundColor": "text_enable_background",
-                                    "activeColor": "text_enable_background",
-                                    "activeBackgroundColor": "action_color",
-                                    "margin": "0"
-                                  },
-                                  "timeline": [],
-                                  "text": "Enable Analysis"
-                                }
-                              ]
-                            }
-                          ],
+                          "widgets": [],
                           "layout": "static"
                         },
                         {
@@ -16784,34 +17014,67 @@
                           "timeline": [],
                           "widgets": [
                             {
-                              "type": "Text",
-                              "left": 154,
+                              "type": "RectangleWidget",
+                              "left": 0,
                               "top": 0,
-                              "width": 172,
-                              "height": 36,
-                              "wireID": "c7f22368-dd9f-403a-a8d6-cc3a1eb9565c",
+                              "width": 480,
+                              "height": 1,
+                              "wireID": "e75efdcf-9728-430f-d612-df802a9cedce",
                               "customInputs": [],
                               "customOutputs": [],
-                              "action": "ain_toggle_ac_analysis",
                               "style": {
-                                "inheritFrom": "edit_value_active_S_left",
-                                "font": "Oswald17",
-                                "alignHorizontal": "center",
-                                "color": "action_color",
-                                "backgroundColor": "text_enable_background",
-                                "activeColor": "text_enable_background",
-                                "activeBackgroundColor": "action_color",
-                                "margin": "0"
+                                "inheritFrom": "default_inverse"
                               },
-                              "timeline": [],
-                              "text": "Disable Analysis"
+                              "timeline": []
+                            },
+                            {
+                              "type": "RectangleWidget",
+                              "left": 0,
+                              "top": 59,
+                              "width": 480,
+                              "height": 1,
+                              "wireID": "cd9988ac-1210-454e-94f9-88c00e615149",
+                              "customInputs": [],
+                              "customOutputs": [],
+                              "style": {
+                                "inheritFrom": "default_inverse"
+                              },
+                              "timeline": []
+                            },
+                            {
+                              "type": "RectangleWidget",
+                              "left": 0,
+                              "top": 119,
+                              "width": 238,
+                              "height": 1,
+                              "wireID": "0cb5e2a4-ffbf-4202-8041-71b69c1847df",
+                              "customInputs": [],
+                              "customOutputs": [],
+                              "style": {
+                                "inheritFrom": "default_inverse"
+                              },
+                              "timeline": []
+                            },
+                            {
+                              "type": "RectangleWidget",
+                              "left": 237,
+                              "top": 60,
+                              "width": 1,
+                              "height": 116,
+                              "wireID": "24c3c3a6-d752-41c1-c3cd-9b00835dd5fc",
+                              "customInputs": [],
+                              "customOutputs": [],
+                              "style": {
+                                "inheritFrom": "default_inverse"
+                              },
+                              "timeline": []
                             },
                             {
                               "type": "TextWidget",
                               "left": 0,
-                              "top": 36,
+                              "top": 2,
                               "width": 115,
-                              "height": 35,
+                              "height": 22,
                               "wireID": "fd355896-61d7-420a-a40f-c574a7254e5b",
                               "customInputs": [],
                               "customOutputs": [],
@@ -16820,14 +17083,14 @@
                                 "font": "Oswald14"
                               },
                               "timeline": [],
-                              "text": "Apparent:"
+                              "text": "S:"
                             },
                             {
                               "type": "DisplayData",
                               "left": 0,
-                              "top": 71,
+                              "top": 26,
                               "width": 40,
-                              "height": 35,
+                              "height": 32,
                               "wireID": "d89aa79c-b562-47ad-b91c-baff99a362f0",
                               "customInputs": [],
                               "customOutputs": [],
@@ -16845,9 +17108,9 @@
                             {
                               "type": "DisplayData",
                               "left": 40,
-                              "top": 71,
+                              "top": 26,
                               "width": 48,
-                              "height": 35,
+                              "height": 32,
                               "wireID": "e3a1544f-9e05-4f7f-be1d-b771ba14b8c7",
                               "customInputs": [],
                               "customOutputs": [],
@@ -16860,7 +17123,7 @@
                                 "alignVertical": "bottom",
                                 "backgroundColor": "text_enable_background",
                                 "activeColor": "text_enable_background",
-                                "padding": "3 0 2 2"
+                                "padding": "3 0 1 2"
                               },
                               "timeline": [],
                               "displayOption": 3
@@ -16868,9 +17131,9 @@
                             {
                               "type": "DisplayData",
                               "left": 88,
-                              "top": 71,
+                              "top": 26,
                               "width": 27,
-                              "height": 35,
+                              "height": 32,
                               "wireID": "e3a1544f-9e05-4f7f-be1d-b771ba14b8c7",
                               "customInputs": [],
                               "customOutputs": [],
@@ -16880,7 +17143,6 @@
                                 "inheritFrom": "mon_value_48_right",
                                 "font": "Oswald17",
                                 "alignHorizontal": "left",
-                                "alignVertical": "top",
                                 "backgroundColor": "text_enable_background",
                                 "activeColor": "text_enable_background",
                                 "padding": "3 0 0 1"
@@ -16891,9 +17153,9 @@
                             {
                               "type": "TextWidget",
                               "left": 120,
-                              "top": 36,
+                              "top": 2,
                               "width": 115,
-                              "height": 35,
+                              "height": 22,
                               "wireID": "436d9919-5608-4f92-9695-a66dceb6b1ae",
                               "customInputs": [],
                               "customOutputs": [],
@@ -16902,14 +17164,14 @@
                                 "font": "Oswald14"
                               },
                               "timeline": [],
-                              "text": "Active:"
+                              "text": "P:"
                             },
                             {
                               "type": "DisplayData",
                               "left": 120,
-                              "top": 71,
+                              "top": 26,
                               "width": 40,
-                              "height": 35,
+                              "height": 32,
                               "wireID": "05b4f817-0178-4fb2-95fb-53a5363176ec",
                               "customInputs": [],
                               "customOutputs": [],
@@ -16927,9 +17189,9 @@
                             {
                               "type": "DisplayData",
                               "left": 160,
-                              "top": 71,
+                              "top": 26,
                               "width": 48,
-                              "height": 35,
+                              "height": 32,
                               "wireID": "05b4f817-0178-4fb2-95fb-53a5363176ec",
                               "customInputs": [],
                               "customOutputs": [],
@@ -16942,7 +17204,7 @@
                                 "alignVertical": "bottom",
                                 "backgroundColor": "text_enable_background",
                                 "activeColor": "text_enable_background",
-                                "padding": "3 0 2 2"
+                                "padding": "3 0 1 2"
                               },
                               "timeline": [],
                               "displayOption": 3
@@ -16950,9 +17212,9 @@
                             {
                               "type": "DisplayData",
                               "left": 208,
-                              "top": 71,
+                              "top": 26,
                               "width": 27,
-                              "height": 35,
+                              "height": 32,
                               "wireID": "05b4f817-0178-4fb2-95fb-53a5363176ec",
                               "customInputs": [],
                               "customOutputs": [],
@@ -16962,7 +17224,6 @@
                                 "inheritFrom": "mon_value_48_right",
                                 "font": "Oswald17",
                                 "alignHorizontal": "left",
-                                "alignVertical": "top",
                                 "backgroundColor": "text_enable_background",
                                 "activeColor": "text_enable_background",
                                 "padding": "3 0 0 1"
@@ -16973,9 +17234,9 @@
                             {
                               "type": "TextWidget",
                               "left": 240,
-                              "top": 36,
+                              "top": 2,
                               "width": 120,
-                              "height": 35,
+                              "height": 22,
                               "wireID": "15780ac5-7494-4c7e-d083-b86c2f61470e",
                               "customInputs": [],
                               "customOutputs": [],
@@ -16984,14 +17245,14 @@
                                 "font": "Oswald14"
                               },
                               "timeline": [],
-                              "text": "Reactive:"
+                              "text": "Q:"
                             },
                             {
                               "type": "DisplayData",
                               "left": 240,
-                              "top": 71,
+                              "top": 26,
                               "width": 40,
-                              "height": 35,
+                              "height": 32,
                               "wireID": "4b1b83d1-efbe-4922-8aac-99c86eba41e7",
                               "customInputs": [],
                               "customOutputs": [],
@@ -17009,9 +17270,9 @@
                             {
                               "type": "DisplayData",
                               "left": 280,
-                              "top": 71,
+                              "top": 26,
                               "width": 48,
-                              "height": 35,
+                              "height": 32,
                               "wireID": "3d818d7b-6830-4fac-bdfb-321081db86d8",
                               "customInputs": [],
                               "customOutputs": [],
@@ -17024,7 +17285,7 @@
                                 "alignVertical": "bottom",
                                 "backgroundColor": "text_enable_background",
                                 "activeColor": "text_enable_background",
-                                "padding": "3 0 2 2"
+                                "padding": "3 0 1 2"
                               },
                               "timeline": [],
                               "displayOption": 3
@@ -17032,9 +17293,9 @@
                             {
                               "type": "DisplayData",
                               "left": 328,
-                              "top": 71,
+                              "top": 26,
                               "width": 32,
-                              "height": 35,
+                              "height": 32,
                               "wireID": "4b1b83d1-efbe-4922-8aac-99c86eba41e7",
                               "customInputs": [],
                               "customOutputs": [],
@@ -17055,9 +17316,9 @@
                             {
                               "type": "TextWidget",
                               "left": 0,
-                              "top": 106,
+                              "top": 62,
                               "width": 115,
-                              "height": 35,
+                              "height": 22,
                               "wireID": "16b49f8e-5849-4d5c-e0dc-cf763736cd4b",
                               "customInputs": [],
                               "customOutputs": [],
@@ -17071,9 +17332,9 @@
                             {
                               "type": "DisplayData",
                               "left": 0,
-                              "top": 141,
+                              "top": 86,
                               "width": 40,
-                              "height": 35,
+                              "height": 32,
                               "wireID": "40219f5b-74e6-4781-c071-d4599b469c45",
                               "customInputs": [],
                               "customOutputs": [],
@@ -17091,9 +17352,9 @@
                             {
                               "type": "DisplayData",
                               "left": 40,
-                              "top": 141,
+                              "top": 86,
                               "width": 48,
-                              "height": 35,
+                              "height": 32,
                               "wireID": "3d818d7b-6830-4fac-bdfb-321081db86d8",
                               "customInputs": [],
                               "customOutputs": [],
@@ -17106,7 +17367,7 @@
                                 "alignVertical": "bottom",
                                 "backgroundColor": "text_enable_background",
                                 "activeColor": "text_enable_background",
-                                "padding": "3 0 2 2"
+                                "padding": "3 0 1 2"
                               },
                               "timeline": [],
                               "displayOption": 3
@@ -17114,9 +17375,9 @@
                             {
                               "type": "DisplayData",
                               "left": 88,
-                              "top": 141,
+                              "top": 86,
                               "width": 27,
-                              "height": 35,
+                              "height": 32,
                               "wireID": "40219f5b-74e6-4781-c071-d4599b469c45",
                               "customInputs": [],
                               "customOutputs": [],
@@ -17126,7 +17387,6 @@
                                 "inheritFrom": "mon_value_48_right",
                                 "font": "Oswald17",
                                 "alignHorizontal": "left",
-                                "alignVertical": "top",
                                 "backgroundColor": "text_enable_background",
                                 "activeColor": "text_enable_background",
                                 "padding": "3 0 0 1"
@@ -17137,9 +17397,9 @@
                             {
                               "type": "TextWidget",
                               "left": 120,
-                              "top": 106,
+                              "top": 62,
                               "width": 115,
-                              "height": 35,
+                              "height": 22,
                               "wireID": "16b49f8e-5849-4d5c-e0dc-cf763736cd4b",
                               "customInputs": [],
                               "customOutputs": [],
@@ -17153,9 +17413,9 @@
                             {
                               "type": "DisplayData",
                               "left": 120,
-                              "top": 141,
+                              "top": 86,
                               "width": 40,
-                              "height": 35,
+                              "height": 32,
                               "wireID": "12577dac-5b35-4cdc-9811-e30932b44c5a",
                               "customInputs": [],
                               "customOutputs": [],
@@ -17173,9 +17433,9 @@
                             {
                               "type": "DisplayData",
                               "left": 160,
-                              "top": 141,
+                              "top": 86,
                               "width": 48,
-                              "height": 35,
+                              "height": 32,
                               "wireID": "3d818d7b-6830-4fac-bdfb-321081db86d8",
                               "customInputs": [],
                               "customOutputs": [],
@@ -17188,7 +17448,7 @@
                                 "alignVertical": "bottom",
                                 "backgroundColor": "text_enable_background",
                                 "activeColor": "text_enable_background",
-                                "padding": "3 0 2 2"
+                                "padding": "3 0 1 2"
                               },
                               "timeline": [],
                               "displayOption": 3
@@ -17196,9 +17456,9 @@
                             {
                               "type": "DisplayData",
                               "left": 208,
-                              "top": 141,
+                              "top": 86,
                               "width": 27,
-                              "height": 35,
+                              "height": 32,
                               "wireID": "12577dac-5b35-4cdc-9811-e30932b44c5a",
                               "customInputs": [],
                               "customOutputs": [],
@@ -17208,7 +17468,6 @@
                                 "inheritFrom": "mon_value_48_right",
                                 "font": "Oswald17",
                                 "alignHorizontal": "left",
-                                "alignVertical": "top",
                                 "backgroundColor": "text_enable_background",
                                 "activeColor": "text_enable_background",
                                 "padding": "3 0 0 1"
@@ -17219,9 +17478,9 @@
                             {
                               "type": "TextWidget",
                               "left": 365,
-                              "top": 36,
+                              "top": 2,
                               "width": 115,
-                              "height": 35,
+                              "height": 22,
                               "wireID": "02c4d22d-17b5-463a-9ffa-6482fab5af0f",
                               "customInputs": [],
                               "customOutputs": [],
@@ -17230,14 +17489,14 @@
                                 "font": "Oswald14"
                               },
                               "timeline": [],
-                              "text": "Power factor:"
+                              "text": "PF:"
                             },
                             {
                               "type": "DisplayData",
                               "left": 365,
-                              "top": 71,
+                              "top": 26,
                               "width": 48,
-                              "height": 35,
+                              "height": 32,
                               "wireID": "fab2b5fd-33bc-4702-e28a-7e237899d735",
                               "customInputs": [],
                               "customOutputs": [],
@@ -17256,9 +17515,9 @@
                             {
                               "type": "DisplayData",
                               "left": 413,
-                              "top": 71,
+                              "top": 26,
                               "width": 67,
-                              "height": 35,
+                              "height": 32,
                               "wireID": "6038d936-8d02-4cd1-8264-26e91a76eba6",
                               "customInputs": [],
                               "customOutputs": [],
@@ -17278,9 +17537,9 @@
                             {
                               "type": "TextWidget",
                               "left": 365,
-                              "top": 106,
+                              "top": 62,
                               "width": 115,
-                              "height": 35,
+                              "height": 22,
                               "wireID": "d1817993-b604-4f25-872f-bd9e88de83e0",
                               "customInputs": [],
                               "customOutputs": [],
@@ -17294,9 +17553,9 @@
                             {
                               "type": "DisplayData",
                               "left": 365,
-                              "top": 141,
+                              "top": 86,
                               "width": 40,
-                              "height": 35,
+                              "height": 32,
                               "wireID": "bd7338f0-ca01-47e9-f27a-5d983a69dc77",
                               "customInputs": [],
                               "customOutputs": [],
@@ -17314,9 +17573,9 @@
                             {
                               "type": "DisplayData",
                               "left": 405,
-                              "top": 141,
+                              "top": 86,
                               "width": 48,
-                              "height": 35,
+                              "height": 32,
                               "wireID": "21d297c1-ee9d-4741-cdda-e0d73299d2a3",
                               "customInputs": [],
                               "customOutputs": [],
@@ -17329,7 +17588,7 @@
                                 "alignVertical": "bottom",
                                 "backgroundColor": "text_enable_background",
                                 "activeColor": "text_enable_background",
-                                "padding": "3 0 2 2"
+                                "padding": "3 0 1 2"
                               },
                               "timeline": [],
                               "displayOption": 3
@@ -17337,9 +17596,9 @@
                             {
                               "type": "TextWidget",
                               "left": 453,
-                              "top": 141,
+                              "top": 86,
                               "width": 27,
-                              "height": 35,
+                              "height": 32,
                               "wireID": "7b2e9765-60ff-4d03-8a43-188d7dc5f9f4",
                               "customInputs": [],
                               "customOutputs": [],
@@ -17355,9 +17614,9 @@
                             {
                               "type": "TextWidget",
                               "left": 240,
-                              "top": 106,
+                              "top": 62,
                               "width": 120,
-                              "height": 35,
+                              "height": 22,
                               "wireID": "dff88208-433c-48c2-bfa3-c24070b5f6f1",
                               "customInputs": [],
                               "customOutputs": [],
@@ -17371,9 +17630,9 @@
                             {
                               "type": "DisplayData",
                               "left": 240,
-                              "top": 141,
+                              "top": 86,
                               "width": 40,
-                              "height": 35,
+                              "height": 32,
                               "wireID": "d7ac873c-cb18-464a-a98d-2dab44c36066",
                               "customInputs": [],
                               "customOutputs": [],
@@ -17391,9 +17650,9 @@
                             {
                               "type": "DisplayData",
                               "left": 280,
-                              "top": 141,
+                              "top": 86,
                               "width": 48,
-                              "height": 35,
+                              "height": 32,
                               "wireID": "4327c551-6b93-43e6-a513-94503a68544f",
                               "customInputs": [],
                               "customOutputs": [],
@@ -17406,7 +17665,7 @@
                                 "alignVertical": "bottom",
                                 "backgroundColor": "text_enable_background",
                                 "activeColor": "text_enable_background",
-                                "padding": "3 0 2 2"
+                                "padding": "3 0 1 2"
                               },
                               "timeline": [],
                               "displayOption": 3
@@ -17414,9 +17673,9 @@
                             {
                               "type": "TextWidget",
                               "left": 328,
-                              "top": 141,
+                              "top": 86,
                               "width": 32,
-                              "height": 35,
+                              "height": 32,
                               "wireID": "538bd5f4-43b5-4f9f-fb94-c76513cd5ed4",
                               "customInputs": [],
                               "customOutputs": [],
@@ -17430,11 +17689,27 @@
                               "text": "Wh"
                             },
                             {
+                              "type": "TextWidget",
+                              "left": 380,
+                              "top": 122,
+                              "width": 100,
+                              "height": 22,
+                              "wireID": "3a231db8-4c01-4d76-a66a-010b656800ca",
+                              "customInputs": [],
+                              "customOutputs": [],
+                              "style": {
+                                "inheritFrom": "default",
+                                "font": "Oswald14"
+                              },
+                              "timeline": [],
+                              "text": "Logged:"
+                            },
+                            {
                               "type": "DisplayData",
                               "left": 450,
-                              "top": 0,
+                              "top": 144,
                               "width": 30,
-                              "height": 35,
+                              "height": 32,
                               "wireID": "c17b288a-6bc5-49aa-b385-4541de2f6b03",
                               "customInputs": [],
                               "customOutputs": [],
@@ -17442,7 +17717,7 @@
                               "action": "",
                               "style": {
                                 "inheritFrom": "mon_value_48_right",
-                                "font": "Oswald17",
+                                "font": "Oswald14",
                                 "alignHorizontal": "center",
                                 "backgroundColor": "text_enable_background",
                                 "activeColor": "text_enable_background"
@@ -17453,15 +17728,15 @@
                             {
                               "type": "TextWidget",
                               "left": 445,
-                              "top": 0,
+                              "top": 144,
                               "width": 5,
-                              "height": 35,
+                              "height": 32,
                               "wireID": "44b76742-a826-4eae-8ad6-c1a76eb72038",
                               "customInputs": [],
                               "customOutputs": [],
                               "style": {
                                 "inheritFrom": "default",
-                                "font": "Oswald17",
+                                "font": "Oswald14",
                                 "alignHorizontal": "center",
                                 "backgroundColor": "text_enable_background"
                               },
@@ -17471,9 +17746,9 @@
                             {
                               "type": "DisplayData",
                               "left": 415,
-                              "top": 0,
+                              "top": 144,
                               "width": 30,
-                              "height": 35,
+                              "height": 32,
                               "wireID": "0f6756ac-d96a-4477-ce40-f788d35e0afb",
                               "customInputs": [],
                               "customOutputs": [],
@@ -17481,7 +17756,7 @@
                               "action": "",
                               "style": {
                                 "inheritFrom": "mon_value_48_right",
-                                "font": "Oswald17",
+                                "font": "Oswald14",
                                 "alignHorizontal": "center",
                                 "backgroundColor": "text_enable_background",
                                 "activeColor": "text_enable_background"
@@ -17492,15 +17767,15 @@
                             {
                               "type": "TextWidget",
                               "left": 410,
-                              "top": 0,
+                              "top": 144,
                               "width": 5,
-                              "height": 35,
+                              "height": 32,
                               "wireID": "e218e3d5-d30a-46f8-a104-f60575b1bd7e",
                               "customInputs": [],
                               "customOutputs": [],
                               "style": {
                                 "inheritFrom": "default",
-                                "font": "Oswald17",
+                                "font": "Oswald14",
                                 "alignHorizontal": "center",
                                 "backgroundColor": "text_enable_background"
                               },
@@ -17510,9 +17785,9 @@
                             {
                               "type": "DisplayData",
                               "left": 380,
-                              "top": 0,
+                              "top": 144,
                               "width": 30,
-                              "height": 35,
+                              "height": 32,
                               "wireID": "083b1eaf-6f14-4af9-a7d3-d057d9085380",
                               "customInputs": [],
                               "customOutputs": [],
@@ -17520,13 +17795,151 @@
                               "action": "",
                               "style": {
                                 "inheritFrom": "mon_value_48_right",
-                                "font": "Oswald17",
+                                "font": "Oswald14",
                                 "alignHorizontal": "right",
                                 "backgroundColor": "text_enable_background",
                                 "activeColor": "text_enable_background"
                               },
                               "timeline": [],
                               "displayOption": 1
+                            },
+                            {
+                              "type": "TextWidget",
+                              "left": 0,
+                              "top": 122,
+                              "width": 235,
+                              "height": 22,
+                              "wireID": "80f548aa-1a1e-4c08-e044-f6e3d233ca40",
+                              "customInputs": [],
+                              "customOutputs": [],
+                              "style": {
+                                "inheritFrom": "default",
+                                "font": "Oswald14"
+                              },
+                              "timeline": [],
+                              "text": "Efficiency:"
+                            },
+                            {
+                              "type": "Text",
+                              "left": 0,
+                              "top": 144,
+                              "width": 115,
+                              "height": 32,
+                              "wireID": "b2405370-08e5-49c6-e918-3295db38a68e",
+                              "customInputs": [],
+                              "customOutputs": [],
+                              "data": "ac_analysis_efficiency_formula",
+                              "action": "ain_ac_analysis_toggle_efficiency",
+                              "style": {
+                                "inheritFrom": "edit_value_active_S_left",
+                                "font": "Oswald14",
+                                "alignHorizontal": "center",
+                                "margin": "0"
+                              },
+                              "timeline": [],
+                              "text": ""
+                            },
+                            {
+                              "type": "SelectWidget",
+                              "left": 120,
+                              "top": 144,
+                              "width": 115,
+                              "height": 32,
+                              "wireID": "7f573607-888d-4de2-8032-b3b228f35f4a",
+                              "customInputs": [],
+                              "customOutputs": [],
+                              "data": "ac_analysis_calc_efficiency",
+                              "style": {
+                                "inheritFrom": "default"
+                              },
+                              "timeline": [],
+                              "widgets": [
+                                {
+                                  "type": "ContainerWidget",
+                                  "left": 0,
+                                  "top": 0,
+                                  "width": 115,
+                                  "height": 32,
+                                  "wireID": "15c5cb98-73f8-49d2-b465-4858a7316b7e",
+                                  "customInputs": [],
+                                  "customOutputs": [],
+                                  "style": {
+                                    "inheritFrom": "default"
+                                  },
+                                  "timeline": [],
+                                  "widgets": [],
+                                  "layout": "static"
+                                },
+                                {
+                                  "type": "ContainerWidget",
+                                  "left": 0,
+                                  "top": 0,
+                                  "width": 115,
+                                  "height": 32,
+                                  "wireID": "28c01256-55f1-42b3-f0fc-ef41b3864afc",
+                                  "customInputs": [],
+                                  "customOutputs": [],
+                                  "style": {
+                                    "inheritFrom": "default"
+                                  },
+                                  "timeline": [],
+                                  "widgets": [
+                                    {
+                                      "type": "Text",
+                                      "left": 11,
+                                      "top": 0,
+                                      "width": 29,
+                                      "height": 32,
+                                      "wireID": "335d1414-d05e-42b1-8bc8-778f2f4e73fb",
+                                      "customInputs": [],
+                                      "customOutputs": [],
+                                      "data": "",
+                                      "style": {
+                                        "inheritFrom": "default_S_left",
+                                        "font": "Oswald14"
+                                      },
+                                      "timeline": [],
+                                      "text": "\\u00c1 ="
+                                    },
+                                    {
+                                      "type": "DisplayData",
+                                      "left": 40,
+                                      "top": 0,
+                                      "width": 45,
+                                      "height": 32,
+                                      "wireID": "7d549ae0-a4d8-4a00-b12a-95667293737e",
+                                      "customInputs": [],
+                                      "customOutputs": [],
+                                      "data": "ac_analysis_efficiency",
+                                      "action": "",
+                                      "style": {
+                                        "inheritFrom": "default_S",
+                                        "alignHorizontal": "left"
+                                      },
+                                      "timeline": [],
+                                      "displayOption": 0
+                                    },
+                                    {
+                                      "type": "Text",
+                                      "left": 85,
+                                      "top": 0,
+                                      "width": 19,
+                                      "height": 32,
+                                      "wireID": "5a8ec839-78b7-46c8-d56a-d54c377608c3",
+                                      "customInputs": [],
+                                      "customOutputs": [],
+                                      "data": "",
+                                      "style": {
+                                        "inheritFrom": "default_S_left",
+                                        "font": "Oswald14"
+                                      },
+                                      "timeline": [],
+                                      "text": "%"
+                                    }
+                                  ],
+                                  "layout": "static"
+                                }
+                              ]
                             }
                           ],
                           "layout": "static"
