@@ -32,10 +32,14 @@ namespace flow {
 EEZ_MUTEX_DECLARE(flowDebugger);
 static bool g_mutexInitialized = false;
 
-char *g_toDebuggerMessage = (char *)FLOW_TO_DEBUGGER_MESSAGE_BUFFER;
+char *g_toDebuggerMessage;
 uint32_t g_toDebuggerMessagePosition = 0;
 
 void startToDebuggerMessage() {
+	if (!g_toDebuggerMessage) {
+		g_toDebuggerMessage = (char *)FLOW_TO_DEBUGGER_MESSAGE_BUFFER;
+	}
+
 	if (!g_mutexInitialized) {
 		EEZ_MUTEX_CREATE(flowDebugger);
 		g_mutexInitialized = true;
