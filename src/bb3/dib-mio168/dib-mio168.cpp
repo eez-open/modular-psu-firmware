@@ -3201,6 +3201,8 @@ public:
 		uint8_t selectedPageInDefaultView;
 		uint8_t efficiencyFormula;
         uint8_t acAnalysisEnabled;
+        uint8_t acChannel;
+        uint8_t acEfficiencyFormula;
     };
 
     void resetProfileToDefaults(uint8_t *buffer) override {
@@ -3228,6 +3230,8 @@ public:
 		
 		efficiencyFormula = EFFICIENCY_FORMULA_P1_OVER_P2;
         acAnalysisEnabled = 0;
+        acChannel = AC_ANALYSIS_CHANNEL_P1;
+        acEfficiencyFormula = AC_EFFICIENCY_FORMULA_NONE;
     }
 
     void getProfileParameters(uint8_t *buffer) override {
@@ -3257,6 +3261,8 @@ public:
 
 		parameters->efficiencyFormula = efficiencyFormula;
         parameters->acAnalysisEnabled = acAnalysisEnabled;
+        parameters->acChannel = acChannel;
+        parameters->acEfficiencyFormula = acEfficiencyFormula;
     }
     
     void setProfileParameters(uint8_t *buffer, bool mismatch, int recallOptions) override {
@@ -3284,6 +3290,8 @@ public:
 
 		efficiencyFormula = parameters->efficiencyFormula;
         acAnalysisEnabled = parameters->acAnalysisEnabled;
+        acChannel = parameters->acChannel;
+        acEfficiencyFormula = parameters->acEfficiencyFormula;
     }
     
     bool writeProfileProperties(psu::profile::WriteContext &ctx, const uint8_t *buffer) override {
@@ -3325,7 +3333,9 @@ public:
 
 		WRITE_PROPERTY("efficiencyFormula", parameters->efficiencyFormula);
         WRITE_PROPERTY("acAnalysisEnabled", parameters->acAnalysisEnabled);
-
+        WRITE_PROPERTY("acChannel", parameters->acChannel);
+        WRITE_PROPERTY("acEfficiencyFormula", parameters->acEfficiencyFormula);
+        
         return true;
     }
     
@@ -3368,6 +3378,8 @@ public:
 
 		READ_PROPERTY("efficiencyFormula", parameters->efficiencyFormula);
         READ_PROPERTY("acAnalysisEnabled", parameters->acAnalysisEnabled);
+        READ_PROPERTY("acChannel", parameters->acChannel);
+        READ_PROPERTY("acEfficiencyFormula", parameters->acEfficiencyFormula);
 
         return false;
     }
@@ -3395,6 +3407,8 @@ public:
 
 		efficiencyFormula = EFFICIENCY_FORMULA_P1_OVER_P2;
         acAnalysisEnabled = 0;
+        acChannel = AC_ANALYSIS_CHANNEL_P1;
+        acEfficiencyFormula = AC_EFFICIENCY_FORMULA_NONE;
     }
 
     size_t getChannelLabelMaxLength(int subchannelIndex) override {
