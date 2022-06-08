@@ -124,7 +124,7 @@ void initDriver() {
 }
 
 void syncBuffer() {
-#if !defined(__EMSCRIPTEN__)    
+#if !defined(__EMSCRIPTEN__)
     if (!g_mainWindow) {
 		return;
     }
@@ -190,7 +190,7 @@ void drawPixel(int x, int y, uint8_t opacity) {
     auto dest = g_renderBuffer + y * DISPLAY_WIDTH + x;
     auto destUint8 = (uint8_t *)dest;
     *dest = blendColor(
-        color16to32(g_fc, opacity), 
+        color16to32(g_fc, opacity),
         color16to32(RGB_TO_COLOR(destUint8[0], destUint8[1], destUint8[2]), 255 - opacity));
 }
 
@@ -356,7 +356,7 @@ void drawGlyph(const uint8_t *src, uint32_t srcLineOffset, int x_glyph, int y_gl
 
     for (int y = 0; y < height; y++) {
         for (int x = 0; x < width; x++) {
-            *pixelAlpha = *src;
+            *pixelAlpha = *src * g_opacity / 255;
             *dst = blendColor(pixel, *dst);
             src++;
             dst++;

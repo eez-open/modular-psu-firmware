@@ -160,15 +160,59 @@ struct Settings {
 #define WIDGET_TIMELINE_PROPERTY_HEIGHT (1 << 3)
 #define WIDGET_TIMELINE_PROPERTY_OPACITY (1 << 4)
 
+#define EASING_FUNC_LINEAR 0
+#define EASING_FUNC_IN_QUAD 1
+#define EASING_FUNC_OUT_QUAD 2
+#define EASING_FUNC_IN_OUT_QUAD 3
+#define EASING_FUNC_IN_CUBIC 4
+#define EASING_FUNC_OUT_CUBIC 5
+#define EASING_FUNC_IN_OUT_CUBIC 6
+#define EASING_FUNC_IN__QUART 7
+#define EASING_FUNC_OUT_QUART 8
+#define EASING_FUNC_IN_OUT_QUART 9
+#define EASING_FUNC_IN_QUINT 10
+#define EASING_FUNC_OUT_QUINT 11
+#define EASING_FUNC_IN_OUT_QUINT 12
+#define EASING_FUNC_IN_SINE 13
+#define EASING_FUNC_OUT_SINE 14
+#define EASING_FUNC_IN_OUT_SINE 15
+#define EASING_FUNC_IN_EXPO 16
+#define EASING_FUNC_OUT_EXPO 17
+#define EASING_FUNC_IN_OUT_EXPO 18
+#define EASING_FUNC_IN_CIRC 19
+#define EASING_FUNC_OUT_CIRC 20
+#define EASING_FUNC_IN_OUT_CIRC 21
+#define EASING_FUNC_IN_BACK 22
+#define EASING_FUNC_OUT_BACK 23
+#define EASING_FUNC_IN_OUT_BACK 24
+#define EASING_FUNC_IN_ELASTIC 25
+#define EASING_FUNC_OUT_ELASTIC 26
+#define EASING_FUNC_IN_OUT_ELASTIC 27
+#define EASING_FUNC_IN_BOUNCE 28
+#define EASING_FUNC_OUT_BOUNCE 29
+#define EASING_FUNC_IN_OUT_BOUNCE 30
+
 struct TimelineKeyframe {
     float start;
     float end;
+
     uint32_t enabledProperties;
+
 	int16_t x;
 	int16_t y;
 	int16_t width;
 	int16_t height;
     float opacity;
+
+    uint8_t xEasingFunc;
+    uint8_t yEasingFunc;
+    uint8_t widthEasingFunc;
+    uint8_t heightEasingFunc;
+    uint8_t opacityEasingFunc;
+
+    uint8_t reserved1;
+    uint8_t reserved2;
+    uint8_t reserved3;
 };
 
 struct Widget {

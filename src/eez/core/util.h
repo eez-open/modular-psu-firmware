@@ -141,6 +141,9 @@ void formatBytes(uint64_t bytes, char *text, int count);
 void getFileName(const char *path, char *fileName, unsigned fileNameSize);
 void getBaseFileName(const char *path, char *baseName, unsigned baseNameSize);
 
+typedef float (*EasingFuncType)(float x);
+extern EasingFuncType g_easingFuncs[];
+
 class Interval {
 public:
 	// Returns true when called for the first time,
@@ -180,7 +183,7 @@ public:
         }
     }
 
-    operator T() const { 
+    operator T() const {
 		if (m_numSamples < N) {
 			return m_total / m_numSamples;
 		} else {
