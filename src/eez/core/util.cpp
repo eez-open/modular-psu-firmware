@@ -692,7 +692,7 @@ static const float c1 = 1.70158f;
 static const float c2 = c1 * 1.525f;
 static const float c3 = c1 + 1.0f;
 static const float c4 = (2 * PI) / 3;
-static const float c5 = (2 * PI) / 4.5;
+static const float c5 = (2 * PI) / 4.5f;
 
 float linear(float x) {
     return x;

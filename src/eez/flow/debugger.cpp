@@ -725,7 +725,7 @@ void onPageChanged(int previousPageId, int activePageId) {
         if (flowState) {
             onEvent(flowState, FLOW_EVENT_CLOSE_PAGE);
         }
-    } else {
+    } else if (previousPageId < 0) {
         auto flowState = getFlowState(g_externalAssets, -previousPageId - 1, WidgetCursor());
         if (flowState) {
             onEvent(flowState, FLOW_EVENT_CLOSE_PAGE);
@@ -737,7 +737,7 @@ void onPageChanged(int previousPageId, int activePageId) {
         if (flowState) {
             onEvent(flowState, FLOW_EVENT_OPEN_PAGE);
         }
-    } else {
+    } else if (activePageId < 0) {
         auto flowState = getFlowState(g_externalAssets, -activePageId - 1, WidgetCursor());
         if (flowState) {
             onEvent(flowState, FLOW_EVENT_OPEN_PAGE);
