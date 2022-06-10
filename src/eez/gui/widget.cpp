@@ -214,7 +214,9 @@ void enumWidget() {
 	widgetCursor.currentState = (WidgetState *)((uint8_t *)widgetCursor.currentState + g_widgetStateSizes[widget->type]);
 
 	uint32_t stateSize = (uint8_t *)widgetCursor.currentState - (uint8_t *)g_widgetStateStart;
-	assert(stateSize <= GUI_STATE_BUFFER_SIZE);
+	if (stateSize > GUI_STATE_BUFFER_SIZE) {
+        return;        
+    }
 
 	widgetState->enumChildren();
 
@@ -406,6 +408,8 @@ WidgetCursor findWidget(int16_t x, int16_t y, bool clicked) {
 
     return g_foundWidget;
 }
+
+////////////////////////////////////////////////////////////////////////////////
 
 void resizeWidget(
     const Widget *widget,

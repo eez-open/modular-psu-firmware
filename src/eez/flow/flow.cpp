@@ -39,7 +39,7 @@ using namespace eez::gui;
 namespace eez {
 namespace flow {
 
-static const uint32_t FLOW_TICK_MAX_DURATION_MS = 20;
+static const uint32_t FLOW_TICK_MAX_DURATION_MS = 5;
 
 int g_selectedLanguage = 0;
 FlowState *g_firstFlowState;
@@ -73,8 +73,7 @@ void tick() {
 
 	uint32_t startTickCount = millis();
 
-    const size_t queueSize = getQueueSize();
-    for (size_t i = 0; i < queueSize; i++) {
+    while (true) {
 		FlowState *flowState;
 		unsigned componentIndex;
         bool continuousTask;

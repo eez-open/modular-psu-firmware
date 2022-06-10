@@ -41,7 +41,6 @@ void GridWidgetState::enumChildren() {
         auto widget = (const GridWidget *)widgetCursor.widget;
 
         const Widget *childWidget = static_cast<const Widget *>(widget->itemWidget);
-		auto savedWidget = widgetCursor.widget;
 		widgetCursor.widget = childWidget;
 
         auto savedX = widgetCursor.x;
@@ -93,7 +92,7 @@ void GridWidgetState::enumChildren() {
 
         deselect(widgetCursor, widget->data, oldValue);
 
-		widgetCursor.widget = savedWidget;
+		widgetCursor.widget = widget;
 
 		widgetCursor.x = savedX;
 		widgetCursor.y = savedY;

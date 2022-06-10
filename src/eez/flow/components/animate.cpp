@@ -39,8 +39,13 @@ struct AnimateComponenentExecutionState : public ComponenentExecutionState {
 void executeAnimateComponent(FlowState *flowState, unsigned componentIndex) {
 	auto state = (AnimateComponenentExecutionState *)flowState->componenentExecutionStates[componentIndex];
 	if (!state) {
-        Value positionValue;
-        if (!evalProperty(flowState, componentIndex, defs_v3::ANIMATE_ACTION_COMPONENT_PROPERTY_TIME, positionValue, "Failed to evaluate Time in Animate")) {
+        Value fromValue;
+        if (!evalProperty(flowState, componentIndex, defs_v3::ANIMATE_ACTION_COMPONENT_PROPERTY_FROM, fromValue, "Failed to evaluate From in Animate")) {
+            return;
+        }
+
+        Value toValue;
+        if (!evalProperty(flowState, componentIndex, defs_v3::ANIMATE_ACTION_COMPONENT_PROPERTY_TO, toValue, "Failed to evaluate To in Animate")) {
             return;
         }
 
@@ -49,16 +54,20 @@ void executeAnimateComponent(FlowState *flowState, unsigned componentIndex) {
             return;
         }
 
-        float position = positionValue.toFloat();
+        float from = fromValue.toFloat();
+        float to = toValue.toFloat();
         float speed = speedValue.toFloat();
 
-        if (flowState->timelinePosition == position) {
+        if (speed == 0) {
+            flowState->timelinePosition = to;
+            onFlowStateTimelineChanged(flowState);
+
             propagateValueThroughSeqout(flowState, componentIndex);
         } else {
 		    state = allocateComponentExecutionState<AnimateComponenentExecutionState>(flowState, componentIndex);
 
-            state->startPosition = flowState->timelinePosition;
-            state->endPosition = position;
+            state->startPosition = from;
+            state->endPosition = to;
             state->speed = speed;
             state->startTimestamp = millis();
 

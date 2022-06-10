@@ -41,7 +41,6 @@ void ListWidgetState::enumChildren() {
         auto widget = (const ListWidget *)widgetCursor.widget;
 
 		auto childWidget = static_cast<const Widget *>(widget->itemWidget);
-		auto savedWidget = widgetCursor.widget;
 		widgetCursor.widget = childWidget;
 
         auto savedX = widgetCursor.x;
@@ -87,7 +86,7 @@ void ListWidgetState::enumChildren() {
 
         deselect(widgetCursor, widget->data, oldValue);
 
-		widgetCursor.widget = savedWidget;
+		widgetCursor.widget = widget;
 
 		widgetCursor.x = savedX;
 		widgetCursor.y = savedY;

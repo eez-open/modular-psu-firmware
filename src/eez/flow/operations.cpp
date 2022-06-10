@@ -798,6 +798,54 @@ bool do_OPERATION_TYPE_FLOW_TRANSLATE(EvalStack &stack) {
     return true;
 }
 
+bool do_OPERATION_TYPE_FLOW_PARSE_INTEGER(EvalStack &stack) {
+    auto str = stack.pop();
+
+    int err;
+    auto value = str.toInt32(&err);
+    if (err) {
+        return false;
+    }
+
+    if (!stack.push(Value(value, VALUE_TYPE_INT32))) {
+        return false;
+    }
+
+    return true;
+}
+
+bool do_OPERATION_TYPE_FLOW_PARSE_FLOAT(EvalStack &stack) {
+    auto str = stack.pop();
+
+    int err;
+    auto value = str.toFloat(&err);
+    if (err) {
+        return false;
+    }
+
+    if (!stack.push(Value(value, VALUE_TYPE_FLOAT))) {
+        return false;
+    }
+
+    return true;
+}
+
+bool do_OPERATION_TYPE_FLOW_PARSE_DOUBLE(EvalStack &stack) {
+    auto str = stack.pop();
+
+    int err;
+    auto value = str.toDouble(&err);
+    if (err) {
+        return false;
+    }
+
+    if (!stack.push(Value(value, VALUE_TYPE_DOUBLE))) {
+        return false;
+    }
+
+    return true;
+}
+
 bool do_OPERATION_TYPE_DATE_NOW(EvalStack &stack) {
     using namespace std::chrono;
     milliseconds ms = duration_cast<milliseconds>(system_clock::now().time_since_epoch());
@@ -1235,8 +1283,53 @@ bool do_OPERATION_TYPE_STRING_PAD_START(EvalStack &stack) {
 }
 
 bool do_OPERATION_TYPE_STRING_SPLIT(EvalStack &stack) {
-	// TODO
-	return false;
+	auto strValue = stack.pop().getValue();
+    auto delimValue = stack.pop().getValue();
+
+    auto str = strValue.getString();
+	if (!str) {
+		return false;
+	}
+
+    auto delim = delimValue.getString();
+	if (!delim) {
+		return false;
+	}
+
+    auto strLen = strlen(str);
+
+    char *strCopy = (char *)eez::alloc(strLen + 1, 0xea9d0bc0);
+    stringCopy(strCopy, strLen + 1, str);
+
+    // get num parts
+    size_t arraySize = 0;
+    char *token = strtok(strCopy, delim);
+    while (token != NULL) {
+        arraySize++;
+        token = strtok(NULL, delim);
+    }
+
+    eez::free(strCopy);
+    strCopy = (char *)eez::alloc(strLen + 1, 0xea9d0bc1);
+    stringCopy(strCopy, strLen + 1, str);
+
+    // make array
+    auto arrayValue = Value::makeArrayRef(arraySize, VALUE_TYPE_STRING, 0xe82675d4);
+    auto array = arrayValue.getArray();
+    int i = 0;
+    token = strtok(strCopy, delim);
+    while (token != NULL) {
+        array->values[i++] = Value::makeStringRef(token, -1, 0x45209ec0);
+        token = strtok(NULL, delim);
+    }
+
+    eez::free(strCopy);
+
+    if (!stack.push(arrayValue)) {
+        return false;
+    }
+
+	return true;
 }
 
 bool do_OPERATION_TYPE_ARRAY_LENGTH(EvalStack &stack) {
@@ -1292,6 +1385,9 @@ EvalOperation g_evalOperations[] = {
     do_OPERATION_TYPE_FLOW_MAKE_ARRAY_VALUE,
     do_OPERATION_TYPE_FLOW_LANGUAGES,
     do_OPERATION_TYPE_FLOW_TRANSLATE,
+    do_OPERATION_TYPE_FLOW_PARSE_INTEGER,
+    do_OPERATION_TYPE_FLOW_PARSE_FLOAT,
+    do_OPERATION_TYPE_FLOW_PARSE_DOUBLE,
     do_OPERATION_TYPE_DATE_NOW,
     do_OPERATION_TYPE_DATE_TO_STRING,
     do_OPERATION_TYPE_DATE_FROM_STRING,
