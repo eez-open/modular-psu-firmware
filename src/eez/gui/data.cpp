@@ -430,7 +430,7 @@ bool compare_BLOB_REF_value(const Value &a, const Value &b) {
 }
 
 void BLOB_REF_value_to_text(const Value &value, char *text, int count) {
-    text[0] = 0;
+    snprintf(text, count, "blob (size=%d)", value.getInt());
 }
 
 const char *BLOB_REF_value_type_name(const Value &value) {
@@ -442,7 +442,7 @@ bool compare_STREAM_value(const Value &a, const Value &b) {
 }
 
 void STREAM_value_to_text(const Value &value, char *text, int count) {
-    text[0] = 0;
+    snprintf(text, count, "stream (id=%d)", value.getInt());
 }
 
 const char *STREAM_value_type_name(const Value &value) {
@@ -735,12 +735,8 @@ ArrayValue *Value::getArray() {
 }
 
 double Value::toDouble(int *err) const {
-	if (type == VALUE_TYPE_VALUE_PTR) {
-		return pValueValue->toDouble(err);
-	}
-
-    if (type == VALUE_TYPE_NATIVE_VARIABLE) {
-		return get(g_widgetCursor, getInt()).toDouble(err);
+	if (isIndirectValueType()) {
+		return getValue().toDouble(err);
 	}
 
 	if (err) {
@@ -798,12 +794,8 @@ double Value::toDouble(int *err) const {
 }
 
 float Value::toFloat(int *err) const {
-	if (type == VALUE_TYPE_VALUE_PTR) {
-		return pValueValue->toFloat(err);
-	}
-
-    if (type == VALUE_TYPE_NATIVE_VARIABLE) {
-		return get(g_widgetCursor, getInt()).toFloat(err);
+	if (isIndirectValueType()) {
+		return getValue().toFloat(err);
 	}
 
 	if (err) {
@@ -862,6 +854,10 @@ float Value::toFloat(int *err) const {
 }
 
 int32_t Value::toInt32(int *err) const {
+	if (isIndirectValueType()) {
+		return getValue().toInt32(err);
+	}
+
 	if (err) {
 		*err = 0;
 	}
@@ -899,10 +895,6 @@ int32_t Value::toInt32(int *err) const {
 		return pValueValue->toInt32(err);
 	}
 
-    if (type == VALUE_TYPE_NATIVE_VARIABLE) {
-		return get(g_widgetCursor, getInt()).toInt32(err);
-	}
-
 	if (type == VALUE_TYPE_DOUBLE) {
 		return (int32_t)doubleValue;
 	}
@@ -926,12 +918,8 @@ int32_t Value::toInt32(int *err) const {
 }
 
 int64_t Value::toInt64(int *err) const {
-	if (type == VALUE_TYPE_VALUE_PTR) {
-		return pValueValue->toInt64(err);
-	}
-
-    if (type == VALUE_TYPE_NATIVE_VARIABLE) {
-		return get(g_widgetCursor, getInt()).toInt64(err);
+	if (isIndirectValueType()) {
+		return getValue().toInt64(err);
 	}
 
 	if (err) {
@@ -988,12 +976,8 @@ int64_t Value::toInt64(int *err) const {
 }
 
 bool Value::toBool(int *err) const {
-	if (type == VALUE_TYPE_VALUE_PTR) {
-		return pValueValue->toBool(err);
-	}
-
-    if (type == VALUE_TYPE_NATIVE_VARIABLE) {
-		return get(g_widgetCursor, getInt()).toBool(err);
+	if (isIndirectValueType()) {
+		return getValue().toBool(err);
 	}
 
     if (err) {
@@ -1062,12 +1046,8 @@ bool Value::toBool(int *err) const {
 }
 
 Value Value::toString(uint32_t id) const {
-	if (type == VALUE_TYPE_VALUE_PTR) {
-		return pValueValue->toString(id);
-	}
-
-    if (type == VALUE_TYPE_NATIVE_VARIABLE) {
-		return get(g_widgetCursor, getInt()).toString(id);
+	if (isIndirectValueType()) {
+		return getValue().toString(id);
 	}
 
 	if (type == VALUE_TYPE_STRING || type == VALUE_TYPE_STRING_REF) {

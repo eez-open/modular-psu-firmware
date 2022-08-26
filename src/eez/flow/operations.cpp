@@ -807,7 +807,7 @@ bool do_OPERATION_TYPE_FLOW_PARSE_INTEGER(EvalStack &stack) {
         return false;
     }
 
-    if (!stack.push(Value(value, VALUE_TYPE_INT32))) {
+    if (!stack.push(Value((int)value, VALUE_TYPE_INT32))) {
         return false;
     }
 
@@ -1210,9 +1210,86 @@ bool do_OPERATION_TYPE_MATH_MAX(EvalStack &stack) {
 	return true;
 }
 
-bool do_OPERATION_TYPE_STRING_FIND(EvalStack &stack) {
-	auto b = stack.pop().getValue();
+bool do_OPERATION_TYPE_STRING_LENGTH(EvalStack &stack) {
 	auto a = stack.pop().getValue();
+
+    const char *aStr = a.getString();
+	if (!aStr) {
+		return false;
+	}
+
+    int aStrLen = strlen(aStr);
+
+    if (!stack.push(Value(aStrLen, VALUE_TYPE_INT32))) {
+        return false;
+    }
+
+	return true;
+}
+
+bool do_OPERATION_TYPE_STRING_SUBSTRING(EvalStack &stack) {
+    auto numArgs = stack.pop().getInt();
+
+    Value strValue = stack.pop().getValue();
+    Value startValue = stack.pop().getValue();
+    Value endValue;
+    if (numArgs == 3) {
+        endValue = stack.pop().getValue();
+    }
+
+    const char *str = strValue.getString();
+    if (!str) {
+        return false;
+    }
+
+    int strLen = (int)strlen(str);
+
+    int err = 0;
+
+    int start = startValue.toInt32(&err);
+    if (err != 0) {
+        return false;
+    }
+
+    int end;
+    if (endValue.getType() == VALUE_TYPE_UNDEFINED) {
+        end = strLen;
+    } else {
+        end = endValue.toInt32(&err);
+        if (err != 0) {
+            return false;
+        }
+    }
+
+    if (start < 0) {
+        start = 0;
+    } else if (start > strLen) {
+        start = strLen;
+    }
+
+    if (end < 0) {
+        end = 0;
+    } else if (end > strLen) {
+        end = strLen;
+    }
+
+    if (start < end) {
+        Value resultValue = eez::gui::Value::makeStringRef(str + start, end - start, 0x203b08a2);
+        if (!stack.push(resultValue)) {
+            return false;
+        }
+    } else {
+        if (!stack.push(Value("", VALUE_TYPE_STRING))) {
+            return false;
+        }
+    }
+
+	return true;
+}
+
+bool do_OPERATION_TYPE_STRING_FIND(EvalStack &stack) {
+	auto a = stack.pop().getValue();
+	auto b = stack.pop().getValue();
 
 	Value aStr = a.toString(0xf616bf4d);
 	Value bStr = b.toString(0x81229133);
@@ -1222,7 +1299,7 @@ bool do_OPERATION_TYPE_STRING_FIND(EvalStack &stack) {
 		}
 	} else {
 		const char *pos = strstr(aStr.getString(), bStr.getString());
-		if (!pos) {
+		if (pos) {
 			if (!stack.push(Value((int)(pos - aStr.getString()), VALUE_TYPE_INT32))) {
 				return false;
 			}
@@ -1237,9 +1314,9 @@ bool do_OPERATION_TYPE_STRING_FIND(EvalStack &stack) {
 }
 
 bool do_OPERATION_TYPE_STRING_PAD_START(EvalStack &stack) {
-	auto c = stack.pop().getValue();
+    auto a = stack.pop().getValue();
 	auto b = stack.pop().getValue();
-	auto a = stack.pop().getValue();
+    auto c = stack.pop().getValue();
 
 	auto str = a.toString(0xcf6aabe6);
 	if (!str.getString()) {
@@ -1401,6 +1478,8 @@ EvalOperation g_evalOperations[] = {
 	do_OPERATION_TYPE_MATH_ROUND,
     do_OPERATION_TYPE_MATH_MIN,
     do_OPERATION_TYPE_MATH_MAX,
+    do_OPERATION_TYPE_STRING_LENGTH,
+    do_OPERATION_TYPE_STRING_SUBSTRING,
 	do_OPERATION_TYPE_STRING_FIND,
 	do_OPERATION_TYPE_STRING_PAD_START,
 	do_OPERATION_TYPE_STRING_SPLIT,

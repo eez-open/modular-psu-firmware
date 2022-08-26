@@ -32,7 +32,10 @@
 #endif
 
 #if defined(EEZ_PLATFORM_STM32)
+#ifdef EEZ_PLATFORM_STM32F469I_DISCO
+#else
 #include <i2c.h>
+#endif
 #endif
 
 #if !USE_EEPROM
@@ -72,6 +75,9 @@ const int MAX_READ_CHUNK_SIZE = 16;
 const int MAX_WRITE_CHUNK_SIZE = 16;
 
 bool readFromEEPROM(uint8_t *buffer, uint16_t bufferSize, uint16_t address) {
+#ifdef EEZ_PLATFORM_STM32F469I_DISCO
+    return false;
+#else
     for (uint16_t i = 0; i < bufferSize; i += MAX_READ_CHUNK_SIZE) {
         uint16_t chunkAddress = address + i;
 
@@ -98,9 +104,13 @@ bool readFromEEPROM(uint8_t *buffer, uint16_t bufferSize, uint16_t address) {
     }
 
     return true;
+#endif
 }
 
 bool writeToEEPROM(const uint8_t *buffer, uint16_t bufferSize, uint16_t address) {
+#ifdef EEZ_PLATFORM_STM32F469I_DISCO
+    return false;
+#else
     for (uint16_t i = 0; i < bufferSize; i += MAX_WRITE_CHUNK_SIZE) {
         uint16_t chunkAddress = address + i;
 
@@ -146,6 +156,7 @@ bool writeToEEPROM(const uint8_t *buffer, uint16_t bufferSize, uint16_t address)
     }
 
     return true;
+#endif
 }
 
 #endif

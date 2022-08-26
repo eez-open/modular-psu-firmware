@@ -29,8 +29,12 @@
 #include <eez/gui/gui.h>
 #include <eez/gui/touch.h>
 
+#ifdef EEZ_PLATFORM_STM32F469I_DISCO
+#include "stm32469i_discovery_ts.h"
+#else
 #define TSC2007IPW
 //#define AR1021
+#endif
 
 #if defined(TSC2007IPW)
 const uint16_t TOUCH_DEVICE_ADDRESS = 0x90;
@@ -135,6 +139,19 @@ void touchMeasure() {
     if (g_lastZ1Data > CONF_TOUCH_Z1_THRESHOLD) {
         g_lastXData = ((int16_t)result[1]) | (((int16_t)result[2]) << 7);
         g_lastYData = ((int16_t)result[3]) | (((int16_t)result[4]) << 7);
+    }
+#endif
+
+#if defined(EEZ_PLATFORM_STM32F469I_DISCO)
+    TS_StateTypeDef TS_State;
+    if (BSP_TS_GetState(&TS_State) == TS_OK) {
+    	if (TS_State.touchDetected) {
+    		g_lastZ1Data = CONF_TOUCH_Z1_THRESHOLD + 1;
+    		g_lastXData = TS_State.touchX[0];
+    		g_lastYData = TS_State.touchY[0];
+    	} else {
+    		g_lastZ1Data = 0;
+    	}
     }
 #endif
 }

@@ -35,22 +35,30 @@ void executeSwitchComponent(FlowState *flowState, unsigned componentIndex) {
         snprintf(strMessage, sizeof(strMessage), "Failed to evaluate test condition no. %d in Switch", (int)(testIndex + 1));
 
         Value conditionValue;
-        if (!evalExpression(flowState, componentIndex, test->conditionInstructions, conditionValue, strMessage)) {
+        if (!evalExpression(flowState, componentIndex, test->condition, conditionValue, strMessage)) {
             return;
         }
 
         int err;
         bool result = conditionValue.toBool(&err);
-        if (err == 0) {
-            if (result) {
-                propagateValue(flowState, componentIndex, test->outputIndex);
-                break;
-            }
-        } else {
+        if (err) {
             char strMessage[256];
-            snprintf(strMessage, sizeof(strMessage), "Failed to convert Value no. %d to boolean in Switch\n", (int)(testIndex + 1));
+            snprintf(strMessage, sizeof(strMessage), "Failed to convert test condition no. %d to boolean in Switch\n", (int)(testIndex + 1));
             throwError(flowState, componentIndex, strMessage);
             return;
+        }
+
+        if (result) {
+            snprintf(strMessage, sizeof(strMessage), "Failed to evaluate test output value no. %d in Switch", (int)(testIndex + 1));
+
+            Value outputValue;
+            if (!evalExpression(flowState, componentIndex, test->outputValue, outputValue, strMessage)) {
+                return;
+            }
+
+            propagateValue(flowState, componentIndex, test->outputIndex, outputValue);
+
+            break;
         }
     }
 

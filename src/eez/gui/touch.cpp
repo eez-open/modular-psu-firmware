@@ -48,6 +48,7 @@ void tick() {
 	int y;
 	mcu::touch::read(pressed, x, y);
 
+#if defined(EEZ_PLATFORM_STM32) && !defined(EEZ_PLATFORM_STM32F469I_DISCO)
 	g_calibratedPressed = pressed;
 	g_calibratedX = x;
 	g_calibratedY = y;
@@ -57,7 +58,6 @@ void tick() {
 	g_filteredY = g_calibratedY;
 	g_filteredPressed = filter(g_calibratedPressed, g_filteredX, g_filteredY);
 
-#ifdef EEZ_PLATFORM_STM32
 	pressed = g_filteredPressed;
 	x = g_filteredX;
 	y = g_filteredY;

@@ -433,7 +433,7 @@ int getCursorXPosition(int cursorPosition, const char *text, int textLength, int
 
 ////////////////////////////////////////////////////////////////////////////////
 
-static const unsigned int CONF_MULTILINE_TEXT_MAX_LINE_LENGTH = 100;
+static const unsigned int CONF_MULTILINE_TEXT_MAX_LINE_LENGTH = 1000;
 
 enum MultilineTextRenderStep {
     MEASURE,

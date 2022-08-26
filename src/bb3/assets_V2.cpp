@@ -85,7 +85,7 @@ static uint32_t g_offsetAdjust;
 void convertV2toV3(Assets *assetsV2, Assets *assetsV3) {
 	assetsV3->projectMajorVersion = PROJECT_VERSION_V3;
 	assetsV3->projectMinorVersion = 0;
-	assetsV3->reserved = assetsV2->reserved;
+	assetsV3->assetsType = ASSETS_TYPE_FIRMWARE;
 	assetsV3->external = assetsV2->external;
 
 	g_assetsV2 = (AssetsV2 *)&assetsV2->settings;

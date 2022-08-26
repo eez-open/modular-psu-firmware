@@ -139,7 +139,7 @@ Value getInputWidgetData(const gui::WidgetCursor &widgetCursor, const Value &dat
 		auto baseUnit = getBaseUnit(unit);
     	return Value(dataValue.toFloat() * factor, baseUnit);
 	} else {
-		return dataValue;
+        return Value::makeStringRef(dataValue.getString(), -1, 0xa3d4f1d4);
 	}
 }
 

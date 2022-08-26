@@ -290,6 +290,10 @@ struct Value {
         return (ValueType)type;
     }
 
+    bool isIndirectValueType() const {
+        return type == VALUE_TYPE_VALUE_PTR || type == VALUE_TYPE_NATIVE_VARIABLE || type == VALUE_TYPE_ARRAY_ELEMENT_VALUE;
+    }
+
     Value getValue() const;
 
 	bool isInt32OrLess() const {

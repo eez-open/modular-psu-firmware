@@ -18,6 +18,8 @@
 
 #pragma once
 
+#include <eez/conf.h>
+
 namespace eez {
 namespace gui {
 
@@ -45,6 +47,7 @@ struct Hooks {
     void (*turnOffDisplayStart)();
     void (*turnOffDisplayTick)();
     void (*toastMessagePageOnEncoder)(ToastMessagePage *toast, int counter);
+#if OPTION_TOUCH_CALIBRATION
     void (*onEnterTouchCalibration)();
     void (*onTouchCalibrationOk)();
     void (*onTouchCalibrationCancel)();
@@ -59,6 +62,7 @@ struct Hooks {
         int16_t touchScreenCalBrx, int16_t touchScreenCalBry,
         int16_t touchScreenCalTrx, int16_t touchScreenCalTry
     );
+#endif
     void (*onGuiQueueMessage)(uint8_t type, int16_t param);
     void (*onArrayValueFreeHook)(ArrayValue *arrayValue);
 };

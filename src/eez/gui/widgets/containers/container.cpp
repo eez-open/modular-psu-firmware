@@ -194,7 +194,7 @@ void ContainerWidgetState::enumChildren() {
 
                 enumWidget();
 
-                if (widgetState->visible.toBool()) {
+                if (!widgetCursor.widget->visible || widgetState->isVisible.toBool()) {
                     offset += widgetCursor.w;
                 }
             }
@@ -228,7 +228,7 @@ void ContainerWidgetState::enumChildren() {
 
                 enumWidget();
 
-                if (widgetState->visible.toBool()) {
+                if (!widgetCursor.widget->visible || widgetState->isVisible.toBool()) {
                     offset += widgetCursor.h;
                 }
             }

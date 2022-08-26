@@ -42,8 +42,8 @@ int getFlowStateIndex(FlowState *flowState) {
 struct DashboardComponentExecutionState : public ComponenentExecutionState {
     ~DashboardComponentExecutionState() {
 		EM_ASM({
-            freeComponentExecutionState($0);
-        }, state);
+            freeComponentExecutionState($0, $1);
+        }, g_wasmModuleId, state);
     }
 	int32_t state;
 };
@@ -111,7 +111,7 @@ EM_PORT_API(Value *) createArrayValue(int arraySize, int arrayType) {
     return pValue;
 }
 
-EM_PORT_API(Value *) createStreamValue(double value) {
+EM_PORT_API(Value *) createStreamValue(int value) {
     auto pValue = ObjectAllocator<Value>::allocate(0x53a2e660);
     *pValue = Value(value, VALUE_TYPE_STREAM);
     return pValue;
@@ -177,6 +177,13 @@ EM_PORT_API(void) setComponentExecutionState(int flowStateIndex, int componentIn
     }
 }
 
+EM_PORT_API(uint32_t) getUint32Param(int flowStateIndex, int componentIndex, int offset) {
+    auto flowState = getFlowState(flowStateIndex);
+    auto component = flowState->flow->components[componentIndex];
+    return *(const uint32_t *)((const uint8_t *)component + sizeof(Component) + offset);
+}
+
+
 EM_PORT_API(const char *) getStringParam(int flowStateIndex, int componentIndex, int offset) {
     auto flowState = getFlowState(flowStateIndex);
     auto component = flowState->flow->components[componentIndex];
@@ -227,6 +234,38 @@ EM_PORT_API(void) freeExpressionListParam(void *ptr) {
     }
 
     ::free(ptr);
+}
+
+EM_PORT_API(int) getListParamSize(int flowStateIndex, int componentIndex, int offset) {
+    auto flowState = getFlowState(flowStateIndex);
+    auto component = flowState->flow->components[componentIndex];
+    auto list = (ListOfAssetsPtr<void> *)((const uint8_t *)component + sizeof(Component) + offset);
+    return list->count;
+}
+
+EM_PORT_API(Value *) evalListParamElementExpression(int flowStateIndex, int componentIndex, int listOffset, int elementIndex, int expressionOffset, const char *errorMessage) {
+    auto flowState = getFlowState(flowStateIndex);
+    auto component = flowState->flow->components[componentIndex];
+
+    auto list = (ListOfAssetsPtr<void> *)((const uint8_t *)component + sizeof(Component) + listOffset);
+    auto items = (uint32_t *)((uint8_t *)list->items + (uint32_t)MEMORY_BEGIN + 4);
+    auto item = (uint8_t *)((uint8_t *)items[elementIndex] + (uint32_t)MEMORY_BEGIN + 4);
+    auto expressionInstructions = (uint8_t *)((uint8_t *)(*((uint32_t *)(item + expressionOffset))) + (uint32_t)MEMORY_BEGIN + 4);
+
+    Value result;
+    if (!evalExpression(flowState, componentIndex, expressionInstructions, result, errorMessage)) {
+        return nullptr;
+    }
+
+    auto pValue = ObjectAllocator<Value>::allocate(0x15cb2009);
+    if (!pValue) {
+        throwError(flowState, componentIndex, "Out of memory\n");
+        return nullptr;
+    }
+
+    *pValue = result;
+
+    return pValue;
 }
 
 EM_PORT_API(Value*) getInputValue(int flowStateIndex, int inputIndex) {

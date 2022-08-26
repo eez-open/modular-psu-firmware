@@ -92,7 +92,9 @@ void updateScreen() {
     g_widgetCursor.w = g_rootWidget->width;
     g_widgetCursor.h = g_rootWidget->height;
 
-    enumWidget();
+    if (g_mainAssets->assetsType != ASSETS_TYPE_DASHBOARD) {
+        enumWidget();
+    }
 
 	g_widgetStateEnd = g_widgetCursor.currentState;
 	g_widgetStateStructureChanged = !g_widgetCursor.hasPreviousState;

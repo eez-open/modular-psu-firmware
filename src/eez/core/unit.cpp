@@ -152,7 +152,7 @@ static const int g_scpiUnits[] = {
     SCPI_UNIT_WATT, // UNIT_MILLI_WATT
     SCPI_UNIT_SECOND, // UNIT_SECOND
     SCPI_UNIT_SECOND, // UNIT_MILLI_SECOND
-    SCPI_UNIT_CELSIUS, // UNIT_CELSIUS 
+    SCPI_UNIT_CELSIUS, // UNIT_CELSIUS
     SCPI_UNIT_NONE, // UNIT_RPM
     SCPI_UNIT_OHM, // UNIT_OHM
     SCPI_UNIT_OHM, // UNIT_KOHM
@@ -219,7 +219,7 @@ static Unit getDerivedUnit(Unit unit, float factor) {
 		return UNIT_UNKNOWN;
 	}
 
-	for (size_t i = 0; i < sizeof(g_baseUnit); i++) {
+	for (size_t i = 0; i < sizeof(g_baseUnit) / sizeof(Unit); i++) {
 		if (g_baseUnit[i] == g_baseUnit[unit] && g_unitFactor[i] == factor) {
 			return (Unit)i;
 		}

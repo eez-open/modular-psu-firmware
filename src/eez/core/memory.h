@@ -27,6 +27,8 @@ namespace eez {
 static uint8_t * const MEMORY_BEGIN = (uint8_t *)0xc0000000u;
 #if CONF_OPTION_FPGA
 static const uint32_t MEMORY_SIZE = 32 * 1024 * 1024;
+#elif defined(EEZ_PLATFORM_STM32F469I_DISCO)
+static const uint32_t MEMORY_SIZE = 16 * 1024 * 1024;
 #else
 static const uint32_t MEMORY_SIZE = 8 * 1024 * 1024;
 #endif

@@ -29,11 +29,18 @@ static const uint32_t HEADER_TAG = 0x7A65657E;
 static const uint8_t PROJECT_VERSION_V2 = 2;
 static const uint8_t PROJECT_VERSION_V3 = 3;
 
+static const uint8_t ASSETS_TYPE_FIRMWARE = 1;
+static const uint8_t ASSETS_TYPE_FIRMWARE_MODULE = 2;
+static const uint8_t ASSETS_TYPE_RESOURCE = 3;
+static const uint8_t ASSETS_TYPE_APPLET = 4;
+static const uint8_t ASSETS_TYPE_DASHBOARD = 5;
+
 struct Header {
 	uint32_t tag; // HEADER_TAG
 	uint8_t projectMajorVersion;
 	uint8_t projectMinorVersion;
-	uint16_t assetsType;
+	uint8_t assetsType;
+    uint8_t reserved;
 	uint32_t decompressedSize;
 };
 
@@ -435,7 +442,7 @@ struct Language {
 struct Assets {
     uint8_t projectMajorVersion;
 	uint8_t projectMinorVersion;
-    uint8_t reserved;
+    uint8_t assetsType;
     uint8_t external;
 
     AssetsPtr<Settings> settings;

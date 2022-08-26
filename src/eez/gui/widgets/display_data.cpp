@@ -148,7 +148,11 @@ void DisplayDataWidgetState::render() {
         style,
         flags.active, flags.blinking, false,
         &color, &backgroundColor, &activeColor, &activeBackgroundColor,
-        data.getType() == VALUE_TYPE_FLOAT || widget->data == DATA_ID_KEYPAD_EDIT_UNIT, // useSmallerFontIfDoesNotFit
+        data.getType() == VALUE_TYPE_FLOAT
+#if OPTION_KEYPAD
+        || widget->data == DATA_ID_KEYPAD_EDIT_UNIT
+#endif
+        , // useSmallerFontIfDoesNotFit
         cursorPosition,
         xScroll
     );

@@ -720,7 +720,7 @@ void onPageChanged(int previousPageId, int activePageId) {
         return;
     }
 
-    if (previousPageId > 0) {
+    if (previousPageId > 0 && previousPageId < FIRST_INTERNAL_PAGE_ID) {
         auto flowState = getFlowState(g_mainAssets, previousPageId - 1, WidgetCursor());
         if (flowState) {
             onEvent(flowState, FLOW_EVENT_CLOSE_PAGE);
@@ -732,7 +732,7 @@ void onPageChanged(int previousPageId, int activePageId) {
         }
     }
 
-    if (activePageId > 0) {
+    if (activePageId > 0 && activePageId < FIRST_INTERNAL_PAGE_ID) {
         auto flowState = getFlowState(g_mainAssets, activePageId - 1, WidgetCursor());
         if (flowState) {
             onEvent(flowState, FLOW_EVENT_OPEN_PAGE);

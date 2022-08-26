@@ -95,11 +95,13 @@ static bool evalExpression(FlowState *flowState, const uint8_t *instructions, in
                 }
 
                 if (!g_stack.push(Value::makeArrayElementRef(arrayValue, elementIndex, 0x132e0e2f))) {
+                    throwError(flowState, g_stack.componentIndex, errorMessage, "Out of memory\n");
                     return false;
                 }
             }
 		} else if (instructionType == EXPR_EVAL_INSTRUCTION_TYPE_OPERATION) {
 			if (!g_evalOperations[instructionArg](g_stack)) {
+                throwError(flowState, g_stack.componentIndex, errorMessage, "Operation error\n");
 				return false;
 			}
 		} else {

@@ -134,8 +134,8 @@ void syncBuffer() {
     if (rgbSurface != NULL) {
         SDL_Texture *texture = SDL_CreateTextureFromSurface(g_renderer, rgbSurface);
         if (texture != NULL) {
-            SDL_Rect srcRect = { 0, 0, DISPLAY_WIDTH, DISPLAY_HEIGHT };
-            SDL_Rect dstRect = { 0, 0, DISPLAY_WIDTH, DISPLAY_HEIGHT };
+            SDL_Rect srcRect = { 0, 0, (int)DISPLAY_WIDTH, (int)DISPLAY_HEIGHT };
+            SDL_Rect dstRect = { 0, 0, (int)DISPLAY_WIDTH, (int)DISPLAY_HEIGHT };
 
             SDL_RenderCopyEx(g_renderer, texture, &srcRect, &dstRect, 0.0, NULL, SDL_FLIP_NONE);
 

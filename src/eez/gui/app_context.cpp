@@ -279,10 +279,12 @@ bool AppContext::canExecuteActionWhenTouchedOutsideOfActivePage(int pageId, int 
 
 void AppContext::onPageTouch(const WidgetCursor &foundWidget, Event &touchEvent) {
     int activePageId = getActivePageId();
+#if OPTION_TOUCH_CALIBRATION
     if (activePageId == PAGE_ID_TOUCH_CALIBRATION) {
         onTouchCalibrationPageTouch(foundWidget, touchEvent);
         return;
     }
+#endif
 
     if (activePageId != PAGE_ID_NONE && !isPageInternal(activePageId)) {
         auto page = getPageAsset(activePageId);

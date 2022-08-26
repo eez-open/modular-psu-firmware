@@ -24,8 +24,9 @@ namespace eez {
 namespace flow {
 
 struct SwitchTest {
-    uint8_t outputIndex;
-    uint8_t conditionInstructions[1];
+    uint32_t outputIndex;
+    eez::gui::AssetsPtr<uint8_t> condition;
+    eez::gui::AssetsPtr<uint8_t> outputValue;
 };
 
 struct SwitchActionComponent : public Component {

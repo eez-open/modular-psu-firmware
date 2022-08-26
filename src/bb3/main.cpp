@@ -327,6 +327,7 @@ EM_PORT_API(void) mainLoop() {
         if (!g_initialized) {
             g_initialized = true;
             eez::boot();
+            eez::gui::guiInit();
         } else {
             eez_system_tick();
 

@@ -26,6 +26,14 @@
 #include <i2c.h>
 #include <ltdc.h>
 
+#ifdef EEZ_PLATFORM_STM32F469I_DISCO
+#include "stm32469i_discovery_lcd.h"
+extern "C" LTDC_HandleTypeDef hltdc_eval;
+extern "C" DMA2D_HandleTypeDef hdma2d_eval;
+#define hltdc hltdc_eval
+#define hdma2d hdma2d_eval
+#endif
+
 #include <eez/core/util.h>
 #include <eez/core/memory.h>
 #include <eez/core/os.h>
@@ -35,13 +43,12 @@
 #include <eez/gui/display.h>
 #include <eez/gui/display-private.h>
 
-void HAL_LTDC_LineEventCallback(LTDC_HandleTypeDef *hltdc) {
+void HAL_LTDC_LineEventCallback(LTDC_HandleTypeDef *phltdc) {
     using namespace eez::gui;
     using namespace eez::gui::display;
 
-    auto layer = (LTDC_Layer_TypeDef *)((uint32_t)hltdc->Instance + 0x84U);
-    layer->CFBAR = (uint32_t)g_syncedBuffer;
-    hltdc->Instance->SRCR = LTDC_SRCR_IMR;
+    LTDC_LAYER(phltdc, 0)->CFBAR = (uint32_t)g_syncedBuffer;
+    __HAL_LTDC_RELOAD_IMMEDIATE_CONFIG(phltdc);
 
     sendMessageToGuiThread(GUI_QUEUE_MESSAGE_TYPE_DISPLAY_VSYNC, 0, 0);
 }
@@ -160,7 +167,9 @@ void bitBlt(void *src, int srcBpp, uint32_t srcLineOffset, uint16_t *dst, int x,
         hdma2d.LayerCfg[1].InputAlpha = 0;
     } else if (srcBpp == 24) {
         hdma2d.Init.Mode = DMA2D_M2M_PFC;
+#ifndef EEZ_PLATFORM_STM32F469I_DISCO
         hdma2d.Init.RedBlueSwap = DMA2D_RB_SWAP;
+#endif
 
         hdma2d.LayerCfg[1].InputOffset = srcLineOffset;
         hdma2d.LayerCfg[1].InputColorMode = DMA2D_INPUT_RGB888;
@@ -190,7 +199,9 @@ void bitBlt(void *src, int srcBpp, uint32_t srcLineOffset, uint16_t *dst, int x,
     g_waitDMA = true;
 
     if (srcBpp == 24) {
+#ifndef EEZ_PLATFORM_STM32F469I_DISCO
         hdma2d.Init.RedBlueSwap = DMA2D_RB_REGULAR;
+#endif
     }
 }
 
@@ -221,7 +232,9 @@ static void bitBltRGB888(uint16_t *src, uint8_t *dst, int x, int y, int width, i
     hdma2d.Init.Mode = DMA2D_M2M_PFC;
     hdma2d.Init.ColorMode = DMA2D_OUTPUT_RGB888;
     hdma2d.Init.OutputOffset = DISPLAY_WIDTH - width;
+#ifndef EEZ_PLATFORM_STM32F469I_DISCO
     hdma2d.Init.RedBlueSwap = DMA2D_RB_SWAP;
+#endif
 
     hdma2d.LayerCfg[1].InputOffset = DISPLAY_WIDTH - width;
     hdma2d.LayerCfg[1].InputColorMode = DMA2D_INPUT_RGB565;
@@ -235,7 +248,9 @@ static void bitBltRGB888(uint16_t *src, uint8_t *dst, int x, int y, int width, i
     HAL_DMA2D_Start(&hdma2d, vramOffset(src, x, y), vramOffsetRGB888(dst, x, y), width, height);
     g_waitDMA = true;
 
+#ifndef EEZ_PLATFORM_STM32F469I_DISCO
     hdma2d.Init.RedBlueSwap = DMA2D_RB_REGULAR;
+#endif
 }
 
 void bitBlt(void *src, void *dst, int x1, int y1, int x2, int y2) {

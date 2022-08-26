@@ -126,7 +126,15 @@ void fixOffsets(Assets *assets) {
 
                 switch (component->type) {
                 case COMPONENT_TYPE_SWITCH_ACTION:
-                    fixOffset(((SwitchActionComponent *)component)->tests, assets);
+                    {
+                        auto switchActionComponent = (SwitchActionComponent *)component;
+                        fixOffset(switchActionComponent->tests, assets);
+                        for (uint32_t testIndex = 0; testIndex < switchActionComponent->tests.count; testIndex++) {
+                            auto test = switchActionComponent->tests[testIndex];
+                            fixOffset(test->condition, assets);
+                            fixOffset(test->outputValue, assets);
+                        }
+                    }
                     break;
                 case COMPONENT_TYPE_SET_VARIABLE_ACTION:
                     {

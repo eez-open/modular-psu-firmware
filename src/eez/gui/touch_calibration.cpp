@@ -16,6 +16,10 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
+#include <eez/conf.h>
+
+#if OPTION_TOUCH_CALIBRATION
+
 #include <eez/core/os.h>
 #include <eez/core/sound.h>
 
@@ -43,6 +47,9 @@ static struct {
 static int g_currentPoint;
 
 bool isTouchCalibrated() {
+#if defined(SKIP_TOUCH_CALIBRATION) || defined(EEZ_PLATFORM_STM32F469I_DISCO)
+    return true;
+#else    
     bool success;
 
 	int16_t touchScreenCalTlx;
@@ -64,6 +71,7 @@ bool isTouchCalibrated() {
         touchScreenCalTrx, touchScreenCalTry,
         CONF_GUI_TOUCH_CALIBRATION_M, display::getDisplayWidth(), display::getDisplayHeight());
     return success;
+#endif
 }
 
 void startCalibration() {
@@ -123,13 +131,14 @@ void findActiveWidget() {
         return;
     }
 
+#if OPTION_TOUCH_CALIBRATION
     const WidgetCursor& widgetCursor = g_widgetCursor;
-
     if (widgetCursor.appContext->getActivePageId() == PAGE_ID_TOUCH_CALIBRATION) {
         if (widgetCursor.widget->type == WIDGET_TYPE_TEXT) {
             g_activeWidget = widgetCursor;
         }
-    }    
+    }
+#endif
 }
 
 void onTouchCalibrationPageTouch(const WidgetCursor &foundWidget, Event &touchEvent) {
@@ -155,3 +164,5 @@ void data_touch_calibration_point(DataOperationEnum operation, const WidgetCurso
 
 } // namespace gui
 } // namespace eez
+
+#endif

@@ -69,6 +69,13 @@ void SelectWidgetState::enumChildren() {
 		}
 	}
 
+    int containerOriginalWidth = widgetCursor.widget->width;
+    int containerOriginalHeight = widgetCursor.widget->height;
+    int containerWidth = widgetCursor.w;
+    int containerHeight = widgetCursor.h;
+
+    bool callResizeWidget = containerOriginalWidth != containerWidth || containerOriginalHeight != containerHeight;
+
 	if (widgetIndex != -1) {
 		auto widget = (const SelectWidget *)widgetCursor.widget;
 
@@ -77,19 +84,29 @@ void SelectWidgetState::enumChildren() {
 
         auto savedX = widgetCursor.x;
         auto savedY = widgetCursor.y;
+        auto savedOpacity = widgetCursor.opacity;
 
-        widgetCursor.x += widgetCursor.widget->x;
-        widgetCursor.y += widgetCursor.widget->y;
+        Rect widgetRect;
 
-        widgetCursor.w = widgetCursor.widget->width;
-        widgetCursor.h = widgetCursor.widget->height;
+        applyTimeline(widgetCursor, widgetRect);
+
+        if (callResizeWidget) {
+            resizeWidget(widgetCursor.widget, widgetRect, containerOriginalWidth, containerOriginalHeight, containerWidth, containerHeight);
+        }
+
+        widgetCursor.x += widgetRect.x;
+        widgetCursor.y += widgetRect.y;
+
+        widgetCursor.w = widgetRect.w;
+        widgetCursor.h = widgetRect.h;
 
         enumWidget();
 
+		widgetCursor.widget = savedWidget;
+
         widgetCursor.x = savedX;
         widgetCursor.y = savedY;
-
-		widgetCursor.widget = savedWidget;
+        widgetCursor.opacity = savedOpacity;
 	}
 
 	if (g_findCallback == nullptr) {

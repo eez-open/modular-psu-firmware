@@ -129,3 +129,6 @@ static const uint32_t GUI_STATE_BUFFER_SIZE = 64 * 1024;
 #if defined(EEZ_PLATFORM_SIMULATOR)
 static const uint32_t GUI_STATE_BUFFER_SIZE = 128 * 1024;
 #endif
+
+#define OPTION_TOUCH_CALIBRATION 1
+#define OPTION_KEYPAD 1

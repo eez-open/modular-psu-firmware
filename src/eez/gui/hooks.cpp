@@ -18,7 +18,9 @@
 
 #include <eez/gui/gui.h>
 #include <eez/gui/display-private.h>
+#if OPTION_KEYPAD
 #include <eez/gui/keypad.h>
+#endif
 #include <eez/gui/touch_calibration.h>
 
 #include <eez/flow/flow.h>
@@ -43,10 +45,12 @@ static void externalData(int16_t id, DataOperationEnum operation, const WidgetCu
 }
 
 static OnTouchFunctionType getWidgetTouchFunctionHook(const WidgetCursor &widgetCursor) {
+#if OPTION_KEYPAD
 	auto data = widgetCursor.widget->data < 0 ? (g_mainAssets->flowDefinition ? flow::getNativeVariableId(widgetCursor) : DATA_ID_NONE) : widgetCursor.widget->data;
 	if (data == DATA_ID_KEYPAD_TEXT) {
         return eez::gui::onKeypadTextTouch;
     }
+#endif
     return nullptr;
 }
 
@@ -126,6 +130,7 @@ static void toastMessagePageOnEncoder(ToastMessagePage *toast, int counter) {
 	toast->appContext->popPage();
 }
 
+#if OPTION_TOUCH_CALIBRATION
 static void onEnterTouchCalibration() {
 	auto appContext = getAppContextFromId(APP_CONTEXT_ID_DEVICE);
     appContext->replacePage(PAGE_ID_TOUCH_CALIBRATION);
@@ -161,6 +166,7 @@ static void setTouchScreenCalibrationParams(
     int16_t touchScreenCalTrx, int16_t touchScreenCalTry
 ) {
 }
+#endif
 
 static void onGuiQueueMessage(uint8_t type, int16_t param) {
 }
@@ -193,12 +199,14 @@ Hooks g_hooks = {
     turnOffDisplayStart,
     turnOffDisplayTick,
     toastMessagePageOnEncoder,
+#if OPTION_TOUCH_CALIBRATION
     onEnterTouchCalibration,
     onTouchCalibrationOk,
     onTouchCalibrationCancel,
     onTouchCalibrationConfirm,
     getTouchScreenCalibrationParams,
     setTouchScreenCalibrationParams,
+#endif
     onGuiQueueMessage,
     onArrayValueFree
 };

@@ -211,7 +211,7 @@ struct WidgetState {
     int y;
     int w;
     int h;
-    Value visible;
+    Value isVisible;
 
 	virtual ~WidgetState() {}
 
@@ -230,7 +230,9 @@ struct WidgetState {
     const WidgetCursor &widgetCursor = g_widgetCursor; \
 	auto widget = (const WidgetClass *)widgetCursor.widget; \
 	bool hasPreviousState = widgetCursor.hasPreviousState; \
-    WIDGET_STATE(visible, widget->visible ? get(widgetCursor, widget->visible) : true); \
+	if (widget->visible) { \
+    	WIDGET_STATE(isVisible, get(widgetCursor, widget->visible)); \
+	} \
     if (x != widgetCursor.x || y != widgetCursor.y || w != widgetCursor.w || h != widgetCursor.h) { \
         x = widgetCursor.x; \
         y = widgetCursor.y; \

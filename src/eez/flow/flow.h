@@ -23,6 +23,10 @@
 namespace eez {
 namespace flow {
 
+#if defined(__EMSCRIPTEN__)
+extern uint32_t g_wasmModuleId;
+#endif
+
 using namespace eez::gui;
 
 struct FlowState;

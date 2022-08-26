@@ -58,12 +58,14 @@ bool decompressAssetsData(const uint8_t *assetsData, uint32_t assetsDataSize, As
 	if (header->tag == HEADER_TAG) {
 		decompressedAssets->projectMajorVersion = header->projectMajorVersion;
 		decompressedAssets->projectMinorVersion = header->projectMinorVersion;
+        decompressedAssets->assetsType = header->assetsType;
 
 		compressedDataOffset = sizeof(Header);
 		decompressedSize = header->decompressedSize;
 	} else {
 		decompressedAssets->projectMajorVersion = PROJECT_VERSION_V2;
 		decompressedAssets->projectMinorVersion = 0;
+        decompressedAssets->assetsType = ASSETS_TYPE_RESOURCE;
 
 		compressedDataOffset = 4;
 		decompressedSize = header->tag;

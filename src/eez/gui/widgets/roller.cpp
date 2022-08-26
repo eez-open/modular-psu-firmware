@@ -213,7 +213,7 @@ void RollerWidgetState::onTouch(const WidgetCursor &widgetCursor, Event &touchEv
         dragStartPosition = position;
         dragPosition = dragStartPosition;
     } else if (touchEvent.type == EVENT_TYPE_TOUCH_MOVE) {
-		if (abs(touchEvent.y - dragOrigin) > 10) {
+		if (abs(touchEvent.y - dragOrigin) > (int)(DISPLAY_HEIGHT / 25)) {
 			isDragging = true;
 			isRunning = true;
 			dragPosition = dragStartPosition + (touchEvent.y - dragOrigin);

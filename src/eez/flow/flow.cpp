@@ -23,6 +23,7 @@
 #include <eez/core/os.h>
 
 #include <eez/gui/gui.h>
+#include <eez/gui/keypad.h>
 #include <eez/gui/widgets/input.h>
 
 #include <eez/gui/widgets/containers/layout_view.h>
@@ -38,6 +39,10 @@ using namespace eez::gui;
 
 namespace eez {
 namespace flow {
+
+#if defined(__EMSCRIPTEN__)
+uint32_t g_wasmModuleId = 0;
+#endif
 
 static const uint32_t FLOW_TICK_MAX_DURATION_MS = 5;
 
@@ -268,9 +273,17 @@ void dataOperation(int16_t dataId, DataOperationEnum operation, const gui::Widge
 			} else {
 				value = 0;
 			}
-		}  else if (operation == DATA_OPERATION_GET_TEXT_CURSOR_POSITION) {
-			getValue(flowDataId, operation, widgetCursor, value);
-		} else if (operation == DATA_OPERATION_GET_MIN) {
+		}  
+#if OPTION_KEYPAD
+		else if (operation == DATA_OPERATION_GET_TEXT_CURSOR_POSITION) {
+
+			Keypad *keypad = getActiveKeypad();
+			if (keypad) {
+				value = keypad->getCursorPosition();
+			}
+		} 
+#endif
+		else if (operation == DATA_OPERATION_GET_MIN) {
 			if (component->type == WIDGET_TYPE_INPUT) {
 				value = getInputWidgetMin(widgetCursor);
 			}
