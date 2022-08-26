@@ -2470,7 +2470,9 @@ void data_function_generator_frequency(DataOperationEnum operation, const Widget
 		if (g_options.isFreq) {
 			waveformParameters.frequency = value.getFloat();
 		} else {
+			float pulseWidth = waveformParameters.dutyCycle / 100.0f / waveformParameters.frequency; 
 			waveformParameters.frequency = 1.0f / value.getFloat();
+			waveformParameters.dutyCycle = MIN(pulseWidth * 100.0f * waveformParameters.frequency, 100.0f);
 		}
 		g_functionGeneratorPage.apply();
     }
