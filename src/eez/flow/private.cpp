@@ -17,10 +17,14 @@
  */
 
 #include <stdio.h>
+#include <string.h>
 
 #include <eez/core/debug.h>
 
+#if OPTION_GUI || !defined(OPTION_GUI)
 #include <eez/gui/gui.h>
+using namespace eez::gui;
+#endif
 
 #include <eez/flow/flow.h>
 #include <eez/flow/operations.h>
@@ -30,10 +34,10 @@
 #include <eez/flow/hooks.h>
 #include <eez/flow/components/call_action.h>
 
-using namespace eez::gui;
-
 namespace eez {
 namespace flow {
+
+static const unsigned NO_COMPONENT_INDEX = 0xFFFFFFFF;
 
 bool isComponentReadyToRun(FlowState *flowState, unsigned componentIndex) {
 	auto component = flowState->flow->components[componentIndex];
@@ -131,6 +135,8 @@ static FlowState *initFlowState(Assets *assets, int flowIndex, FlowState *parent
 	flowState->error = false;
 	flowState->numAsyncComponents = 0;
 	flowState->parentFlowState = parentFlowState;
+
+    flowState->executingComponentIndex = NO_COMPONENT_INDEX;
 
     flowState->timelinePosition = 0;
 
@@ -306,7 +312,28 @@ void deallocateComponentExecutionState(FlowState *flowState, unsigned componentI
     }
 }
 
-void propagateValue(FlowState *flowState, unsigned componentIndex, unsigned outputIndex, const gui::Value &value) {
+void resetSequenceInputs(FlowState *flowState) {
+    if (flowState->executingComponentIndex != NO_COMPONENT_INDEX) {
+		auto component = flowState->flow->components[flowState->executingComponentIndex];
+        flowState->executingComponentIndex = NO_COMPONENT_INDEX;
+
+		for (uint32_t i = 0; i < component->inputs.count; i++) {
+			auto inputIndex = component->inputs[i];
+			if (flowState->flow->componentInputs[inputIndex] & COMPONENT_INPUT_FLAG_IS_SEQ_INPUT) {
+                auto pValue = &flowState->values[inputIndex];
+                if (pValue->getType() != VALUE_TYPE_UNDEFINED) {
+				    *pValue = Value();
+                    onValueChanged(pValue);
+                }
+			}
+		}
+    }
+}
+
+void propagateValue(FlowState *flowState, unsigned componentIndex, unsigned outputIndex, const Value &value) {
+    // Reset sequence inputs before propagate value, in case component propagates value to itself
+    resetSequenceInputs(flowState);
+
 	auto component = flowState->flow->components[componentIndex];
 	auto componentOutput = component->outputs[outputIndex];
 
@@ -348,6 +375,7 @@ void propagateValueThroughSeqout(FlowState *flowState, unsigned componentIndex) 
 
 ////////////////////////////////////////////////////////////////////////////////
 
+#if OPTION_GUI || !defined(OPTION_GUI)
 void getValue(uint16_t dataId, DataOperationEnum operation, const WidgetCursor &widgetCursor, Value &value) {
 	if (isFlowRunningHook()) {
 		FlowState *flowState = widgetCursor.flowState;
@@ -376,6 +404,7 @@ void setValue(uint16_t dataId, const WidgetCursor &widgetCursor, const Value& va
 		}
 	}
 }
+#endif
 
 ////////////////////////////////////////////////////////////////////////////////
 
@@ -383,7 +412,9 @@ void assignValue(FlowState *flowState, int componentIndex, Value &dstValue, cons
 	if (dstValue.getType() == VALUE_TYPE_FLOW_OUTPUT) {
 		propagateValue(flowState, componentIndex, dstValue.getUInt16(), srcValue);
 	} else if (dstValue.getType() == VALUE_TYPE_NATIVE_VARIABLE) {
+#if OPTION_GUI || !defined(OPTION_GUI)
 		set(g_widgetCursor, dstValue.getInt(), srcValue);
+#endif
 	} else {
 		Value *pDstValue;
         if (dstValue.getType() == VALUE_TYPE_ARRAY_ELEMENT_VALUE) {
@@ -404,6 +435,13 @@ void assignValue(FlowState *flowState, int componentIndex, Value &dstValue, cons
 			throwError(flowState, componentIndex, errorMessage);
 		}
 	}
+}
+
+////////////////////////////////////////////////////////////////////////////////
+
+void clearInputValue(FlowState *flowState, int inputIndex) {
+    flowState->values[inputIndex] = Value();
+    onValueChanged(flowState->values + inputIndex);
 }
 
 ////////////////////////////////////////////////////////////////////////////////

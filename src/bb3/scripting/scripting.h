@@ -53,7 +53,7 @@ bool getLatestScpiResult(const char **resultText, size_t *resultTextLen, int *er
 
 bool isFlowRunning();
 void executeFlowAction(const gui::WidgetCursor &widgetCursor, int16_t actionId);
-void dataOperation(int16_t dataId, gui::DataOperationEnum operation, const gui::WidgetCursor &widgetCursor, gui::Value &value);
+void dataOperation(int16_t dataId, gui::DataOperationEnum operation, const gui::WidgetCursor &widgetCursor, Value &value);
 
 void onUncaughtScriptExceptionHook();
 

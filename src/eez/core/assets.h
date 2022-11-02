@@ -18,11 +18,12 @@
 
 #pragma once
 
-#include <eez/gui/data.h>
-#include <eez/gui/widget.h>
+#include <stdint.h>
+
+#include <eez/core/memory.h>
+#include <eez/core/value.h>
 
 namespace eez {
-namespace gui {
 
 static const uint32_t HEADER_TAG = 0x7A65657E;
 
@@ -45,24 +46,25 @@ struct Header {
 };
 
 extern bool g_isMainAssetsLoaded;
+struct Assets;
 extern Assets *g_mainAssets;
 extern Assets *g_externalAssets;
 
 ////////////////////////////////////////////////////////////////////////////////
 
-/* This template is used (on 64-bit systems) to pack asset pointers into 32-bit values.
- * All pointers are relative to MEMORY_BEGIN.
- * This way, the assets created by Studio can be used without having to fix all
- * the sizes - Studio creates 32-bit pointers that are relative to the
- * beginning of the assets, which the firmware rewrites to global pointers
- * during initialization. On a 32-bit system this works just fine, but for a
- * 64-bit system the pointers have different sizes and this breaks. By
- * inserting a 'middleman' structure that stores the pointers as a 32-bit
- * offset to MEMORY_BEGIN, we can keep the pointer sizes and initialization
- * code the same.
- */
 template<typename T>
-struct AssetsPtrImpl {
+struct AssetsPtr {
+    AssetsPtr<T>() : offset(0) {}
+    AssetsPtr<T>(const AssetsPtr<T> &rhs) = delete;
+
+	void operator=(T* ptr) {
+		if (ptr != nullptr) {
+            offset = (uint8_t *)ptr - (uint8_t *)&offset;
+		} else {
+			offset = 0;
+		}
+    }
+
     /* Conversion to a T pointer */
     operator T*() { return ptr(); }
     operator const T*() const { return ptr(); }
@@ -70,73 +72,50 @@ struct AssetsPtrImpl {
           T* operator->()       { return ptr(); }
     const T* operator->() const { return ptr(); }
 
-	void operator=(T* ptr) {
-		if (ptr != nullptr) {
-            offset = (uint8_t *)ptr - MEMORY_BEGIN;
-		} else {
-			offset = 0;
-		}
-    }
-
-    uint32_t offset = 0;
-
 private:
+    int32_t offset;
+
     T* ptr() {
-        return offset ? (T *)(MEMORY_BEGIN + offset) : nullptr;
+        return offset ? (T *)((uint8_t *)&offset + offset) : nullptr;
     }
 
 	const T* ptr() const {
-		return offset ? (const T *)(MEMORY_BEGIN + offset) : nullptr;
+		return offset ? (const T *)((uint8_t *)&offset + offset) : nullptr;
 	}
 };
-
-/* This struct chooses the type used for AssetsPtr<T> - by default it uses an AssetsPtrImpl<> */
-template<typename T, uint32_t ptrSize>
-struct AssetsPtrChooser
-{
-    using type = AssetsPtrImpl<T>;
-};
-
-/* On 32-bit systems, we can just use raw pointers */
-template<typename T>
-struct AssetsPtrChooser<T, 4>
-{
-    using type = T*;
-};
-
-/* Utility typedef that delegates to AssetsPtrChooser */
-template<typename T>
-using AssetsPtr = typename AssetsPtrChooser<T, sizeof(void*)>::type;
 
 ////////////////////////////////////////////////////////////////////////////////
 
 template<typename T>
 struct ListOfAssetsPtr {
+	uint32_t count = 0;
+
     /* Array access */
     T*       operator[](uint32_t i)       { return item(i); }
     const T* operator[](uint32_t i) const { return item(i); }
 
-	uint32_t count = 0;
+private:
     AssetsPtr<AssetsPtr<T>> items;
 
-private:
     T* item(int i) {
         return static_cast<T *>(static_cast<AssetsPtr<T> *>(items)[i]);
     }
 
     const T* item(int i) const {
-        return static_cast<const T *>(static_cast<const     AssetsPtr<T> *>(items)[i]);
+        return static_cast<const T *>(static_cast<const AssetsPtr<T> *>(items)[i]);
     }
 };
 
+////////////////////////////////////////////////////////////////////////////////
+
 template<typename T>
 struct ListOfFundamentalType {
+	uint32_t count;
+    AssetsPtr<T> items;
+
     /* Array access */
     T&       operator[](uint32_t i)       { return ptr()[i]; }
     const T& operator[](uint32_t i) const { return ptr()[i]; }
-
-	uint32_t count;
-    AssetsPtr<T> items;
 
 private:
     T *ptr() {
@@ -152,6 +131,8 @@ struct Settings {
 };
 
 ////////////////////////////////////////////////////////////////////////////////
+
+#if OPTION_GUI || !defined(OPTION_GUI)
 
 #define WIDGET_FLAG_PIN_TO_LEFT (1 << 0)
 #define WIDGET_FLAG_PIN_TO_RIGHT (1 << 1)
@@ -198,6 +179,8 @@ struct Settings {
 #define EASING_FUNC_IN_BOUNCE 28
 #define EASING_FUNC_OUT_BOUNCE 29
 #define EASING_FUNC_IN_OUT_BOUNCE 30
+
+namespace gui {
 
 struct TimelineKeyframe {
     float start;
@@ -342,6 +325,10 @@ struct Bitmap {
     const uint8_t pixels[1];
 };
 
+} // namespace gui
+
+#endif // OPTION_GUI || !defined(OPTION_GUI)
+
 ////////////////////////////////////////////////////////////////////////////////
 
 struct Theme {
@@ -446,10 +433,12 @@ struct Assets {
     uint8_t external;
 
     AssetsPtr<Settings> settings;
-	ListOfAssetsPtr<PageAsset> pages;
-	ListOfAssetsPtr<Style> styles;
-	ListOfAssetsPtr<FontData> fonts;
-	ListOfAssetsPtr<Bitmap> bitmaps;
+#if OPTION_GUI || !defined(OPTION_GUI)
+	ListOfAssetsPtr<gui::PageAsset> pages;
+	ListOfAssetsPtr<gui::Style> styles;
+	ListOfAssetsPtr<gui::FontData> fonts;
+	ListOfAssetsPtr<gui::Bitmap> bitmaps;
+#endif // OPTION_GUI || !defined(OPTION_GUI)
 	AssetsPtr<Colors> colorsDefinition;
 	ListOfAssetsPtr<const char> actionNames;
 	ListOfAssetsPtr<const char> variableNames;
@@ -469,12 +458,13 @@ void unloadExternalAssets();
 
 ////////////////////////////////////////////////////////////////////////////////
 
-const PageAsset *getPageAsset(int pageId);
-const PageAsset* getPageAsset(int pageId, WidgetCursor& widgetCursor);
-
-const Style *getStyle(int styleID);
-const FontData *getFontData(int fontID);
-const Bitmap *getBitmap(int bitmapID);
+#if OPTION_GUI || !defined(OPTION_GUI)
+const gui::PageAsset *getPageAsset(int pageId);
+const gui::PageAsset* getPageAsset(int pageId, gui::WidgetCursor& widgetCursor);
+const gui::Style *getStyle(int styleID);
+const gui::FontData *getFontData(int fontID);
+const gui::Bitmap *getBitmap(int bitmapID);
+#endif
 
 int getThemesCount();
 const char *getThemeName(int i);
@@ -484,10 +474,11 @@ const uint16_t *getColors();
 
 int getExternalAssetsMainPageId();
 
-const char *getActionName(const WidgetCursor &widgetCursor, int16_t actionId);
-int16_t getDataIdFromName(const WidgetCursor &widgetCursor, const char *name);
+#if OPTION_GUI || !defined(OPTION_GUI)
+const char *getActionName(const gui::WidgetCursor &widgetCursor, int16_t actionId);
+int16_t getDataIdFromName(const gui::WidgetCursor &widgetCursor, const char *name);
+#endif
 
 ////////////////////////////////////////////////////////////////////////////////
 
-} // namespace gui
 } // namespace eez

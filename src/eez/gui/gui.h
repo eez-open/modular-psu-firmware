@@ -36,7 +36,7 @@
 #define MAX_KEYPAD_LABEL_LENGTH 64
 #endif
 
-#include <eez/gui/assets.h>
+#include <eez/core/assets.h>
 #include <eez/gui/display.h>
 
 enum {
@@ -88,12 +88,14 @@ inline int getWidgetAction(const WidgetCursor &widgetCursor) {
 }
 
 void executeAction(const WidgetCursor &widgetCursor, int actionId, void *param = nullptr);
-void executeActionFunction(int actionId);
 void executeInternalAction(int actionId);
 
 AppContext *getAppContextFromId(int16_t id);
 
 extern const char *g_discardMessage;
+
+extern void (*loadMainAssets)(const uint8_t *assets, uint32_t assetsSize);
+extern Assets *&g_mainAssets;
 
 } // namespace gui
 } // namespace eez

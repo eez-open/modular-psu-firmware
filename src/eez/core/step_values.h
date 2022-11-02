@@ -1,6 +1,7 @@
 #pragma once
 
 #include <eez/core/unit.h>
+#include <eez/core/value.h>
 
 namespace eez {
 
@@ -26,5 +27,7 @@ struct StepValues {
 		EncoderMode mode;
 	} encoderSettings;
 };
+
+inline StepValues *getStepValues(const Value &value) { return (StepValues *)value.pVoidValue; }
 
 } // namespace eez

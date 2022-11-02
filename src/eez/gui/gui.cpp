@@ -21,8 +21,10 @@
 #include <string.h>
 
 #include <eez/conf.h>
+#include <eez/core/assets.h>
 #include <eez/core/os.h>
 #include <eez/core/debug.h>
+#include <eez/core/action.h>
 
 #if OPTION_MOUSE
 #include <eez/core/mouse.h>
@@ -39,6 +41,9 @@
 
 namespace eez {
 namespace gui {
+
+void (*loadMainAssets)(const uint8_t* assets, uint32_t assetsSize) = eez::loadMainAssets;
+Assets*& g_mainAssets = eez::g_mainAssets;
 
 bool g_isBlinkTime;
 static bool g_wasBlinkTime;
@@ -92,11 +97,6 @@ void executeAction(const WidgetCursor &widgetCursor, int actionId, void *param) 
 			g_hooks.executeExternalAction(widgetCursor, actionId, param);
         }
     }
-}
-
-void executeActionFunction(int actionId) {
-	assert(actionId > 0);
-	g_actionExecFunctions[actionId]();
 }
 
 void popPage() {

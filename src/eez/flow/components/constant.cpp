@@ -18,8 +18,6 @@
 
 #include <eez/flow/components.h>
 
-using namespace eez::gui;
-
 namespace eez {
 namespace flow {
 

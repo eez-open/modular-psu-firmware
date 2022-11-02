@@ -25,7 +25,7 @@ namespace eez {
 namespace flow {
 
 bool isFlowRunning();
-void replacePage(int16_t pageId);
+void replacePage(int16_t pageId, uint32_t animType, uint32_t speed, uint32_t delay);
 void showKeyboard(Value label, Value initialText, Value minChars, Value maxChars, bool isPassword, void(*onOk)(char *), void(*onCancel)());
 void showKeypad(Value label, Value initialValue, Value min, Value max, Unit unit, void(*onOk)(float), void(*onCancel)());
 void stopScript();

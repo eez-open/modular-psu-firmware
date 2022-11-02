@@ -16,6 +16,8 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
+#if OPTION_GUI || !defined(OPTION_GUI)
+
 #include <eez/platform/touch.h>
 
 #include <eez/platform/simulator/events.h>
@@ -44,7 +46,7 @@ void read(bool &isPressed, int &x, int &y) {
         isPressed = false;
         x = 0;
         y = 0;
-    } 
+    }
     else {
 #endif
 		isPressed = g_mouseButton1IsPressed;
@@ -87,3 +89,5 @@ void data_touch_raw_pressed(DataOperationEnum operation, const WidgetCursor &wid
 } // namespace gui
 
 } // namespace eez
+
+#endif // OPTION_GUI || !defined(OPTION_GUI)

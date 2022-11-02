@@ -475,6 +475,8 @@ void printTime(uint32_t time, char *text, int count) {
     printTime((double)time, text, count);
 }
 
+} // gui
+
 ////////////////////////////////////////////////////////////////////////////////
 
 bool compare_PASSWORD_value(const Value &a, const Value &b) {
@@ -917,8 +919,8 @@ const char *TEXT_MESSAGE_value_type_name(const Value &value) {
 }
 
 bool compare_STEP_VALUES_value(const Value &a, const Value &b) {
-    const StepValues *aStepValues = a.getStepValues();
-    const StepValues *bStepValues = b.getStepValues();
+    const StepValues *aStepValues = getStepValues(a);
+    const StepValues *bStepValues = getStepValues(b);
 
     if (aStepValues->unit != bStepValues->unit) {
         return false;
@@ -1499,6 +1501,8 @@ const char *AUTO_START_SCRIPT_CONFIRMATION_MESSAGE_value_type_name(const Value &
     return "internal";
 }
 
+namespace gui {
+
 static Cursor g_editValueCursor(-1);
 static int16_t g_editValueDataId;
 
@@ -1764,7 +1768,7 @@ void data_channel_u_edit(DataOperationEnum operation, const WidgetCursor &widget
     } else if (operation == DATA_OPERATION_GET_IS_CHANNEL_DATA) {
         value = 1;
     } else if (operation == DATA_OPERATION_GET_ENCODER_STEP_VALUES) {
-        channel.getVoltageStepValues(value.getStepValues(), false);
+        channel.getVoltageStepValues(getStepValues(value), false);
         value = 1;
     } else if (operation == DATA_OPERATION_SET_ENCODER_MODE) {
         channel.setVoltageEncoderMode((EncoderMode)value.getInt());
@@ -1885,7 +1889,7 @@ void data_channel_i_edit(DataOperationEnum operation, const WidgetCursor &widget
     } else if (operation == DATA_OPERATION_GET_IS_CHANNEL_DATA) {
         value = 1;
     } else if (operation == DATA_OPERATION_GET_ENCODER_STEP_VALUES) {
-        channel.getCurrentStepValues(value.getStepValues(), false);
+        channel.getCurrentStepValues(getStepValues(value), false);
         value = 1;
     } else if (operation == DATA_OPERATION_SET_ENCODER_MODE) {
         channel.setCurrentEncoderMode((EncoderMode)value.getInt());
@@ -2628,7 +2632,7 @@ void data_channel_protection_ovp_delay(DataOperationEnum operation, const Widget
     } else if (operation == DATA_OPERATION_GET_IS_CHANNEL_DATA) {
         value = 1;
     } else if (operation == DATA_OPERATION_GET_ENCODER_STEP_VALUES) {
-        getProtectionDelayStepValues(value.getStepValues());
+        getProtectionDelayStepValues(getStepValues(value));
         value = 1;
     } else if (operation == DATA_OPERATION_SET_ENCODER_MODE) {
         edit_mode_step::g_protectionDelayEncoderMode = (EncoderMode)value.getInt();
@@ -2668,7 +2672,7 @@ void data_channel_protection_ovp_limit(DataOperationEnum operation, const Widget
     } else if (operation == DATA_OPERATION_GET_IS_CHANNEL_DATA) {
         value = 1;
     } else if (operation == DATA_OPERATION_GET_ENCODER_STEP_VALUES) {
-        channel.getVoltageStepValues(value.getStepValues(), false);
+        channel.getVoltageStepValues(getStepValues(value), false);
         value = 1;
     } else if (operation == DATA_OPERATION_SET_ENCODER_MODE) {
         channel.setVoltageEncoderMode((EncoderMode)value.getInt());
@@ -2720,7 +2724,7 @@ void data_channel_protection_ocp_delay(DataOperationEnum operation, const Widget
     } else if (operation == DATA_OPERATION_GET_IS_CHANNEL_DATA) {
         value = 1;
     } else if (operation == DATA_OPERATION_GET_ENCODER_STEP_VALUES) {
-        getProtectionDelayStepValues(value.getStepValues());
+        getProtectionDelayStepValues(getStepValues(value));
         value = 1;
     } else if (operation == DATA_OPERATION_SET_ENCODER_MODE) {
         edit_mode_step::g_protectionDelayEncoderMode = (EncoderMode)value.getInt();
@@ -2756,7 +2760,7 @@ void data_channel_protection_ocp_limit(DataOperationEnum operation, const Widget
     } else if (operation == DATA_OPERATION_GET_IS_CHANNEL_DATA) {
         value = 1;
     } else if (operation == DATA_OPERATION_GET_ENCODER_STEP_VALUES) {
-        channel.getCurrentStepValues(value.getStepValues(), false);
+        channel.getCurrentStepValues(getStepValues(value), false);
         value = 1;
     } else if (operation == DATA_OPERATION_SET_ENCODER_MODE) {
         channel.setCurrentEncoderMode((EncoderMode)value.getInt());
@@ -2807,7 +2811,7 @@ void data_channel_protection_opp_level(DataOperationEnum operation, const Widget
     } else if (operation == DATA_OPERATION_GET_IS_CHANNEL_DATA) {
         value = 1;
     } else if (operation == DATA_OPERATION_GET_ENCODER_STEP_VALUES) {
-        channel.getPowerStepValues(value.getStepValues());
+        channel.getPowerStepValues(getStepValues(value));
         value = 1;
     } else if (operation == DATA_OPERATION_SET_ENCODER_MODE) {
         channel.setPowerEncoderMode((EncoderMode)value.getInt());
@@ -2843,7 +2847,7 @@ void data_channel_protection_opp_delay(DataOperationEnum operation, const Widget
     } else if (operation == DATA_OPERATION_GET_IS_CHANNEL_DATA) {
         value = 1;
     } else if (operation == DATA_OPERATION_GET_ENCODER_STEP_VALUES) {
-        getProtectionDelayStepValues(value.getStepValues());
+        getProtectionDelayStepValues(getStepValues(value));
         value = 1;
     } else if (operation == DATA_OPERATION_SET_ENCODER_MODE) {
         edit_mode_step::g_protectionDelayEncoderMode = (EncoderMode)value.getInt();
@@ -2883,7 +2887,7 @@ void data_channel_protection_opp_limit(DataOperationEnum operation, const Widget
     } else if (operation == DATA_OPERATION_GET_IS_CHANNEL_DATA) {
         value = 1;
     } else if (operation == DATA_OPERATION_GET_ENCODER_STEP_VALUES) {
-        channel.getPowerStepValues(value.getStepValues());
+        channel.getPowerStepValues(getStepValues(value));
         value = 1;
     } else if (operation == DATA_OPERATION_SET_ENCODER_MODE) {
         channel.setPowerEncoderMode((EncoderMode)value.getInt());
@@ -2935,7 +2939,7 @@ void data_channel_protection_otp_level(DataOperationEnum operation, const Widget
     } else if (operation == DATA_OPERATION_GET_IS_CHANNEL_DATA) {
         value = 1;
     } else if (operation == DATA_OPERATION_GET_ENCODER_STEP_VALUES) {
-        auto stepValues = value.getStepValues();
+        auto stepValues = getStepValues(value);
 
         static float values[] = { 1.0f, 2.0f, 5.0f, 10.0f };
         stepValues->values = values;
@@ -2982,7 +2986,7 @@ void data_channel_protection_otp_delay(DataOperationEnum operation, const Widget
     } else if (operation == DATA_OPERATION_GET_IS_CHANNEL_DATA) {
         value = 1;
     } else if (operation == DATA_OPERATION_GET_ENCODER_STEP_VALUES) {
-        getProtectionDelayStepValues(value.getStepValues());
+        getProtectionDelayStepValues(getStepValues(value));
         value = 1;
     } else if (operation == DATA_OPERATION_SET_ENCODER_MODE) {
         edit_mode_step::g_protectionDelayEncoderMode = (EncoderMode)value.getInt();
@@ -4346,7 +4350,7 @@ void data_channel_list_dwell(DataOperationEnum operation, const WidgetCursor &wi
     } else if (operation == DATA_OPERATION_GET_ENCODER_STEP_VALUES) {
         static float values[] = { 0.001f, 0.01f, 0.1f, 1.0f };
 
-        StepValues *stepValues = value.getStepValues();
+        StepValues *stepValues = getStepValues(value);
 
         stepValues->values = values;
         stepValues->count = sizeof(values) / sizeof(float);
@@ -4405,7 +4409,7 @@ void data_channel_list_voltage(DataOperationEnum operation, const WidgetCursor &
             value = MakeFloatListValue(page->m_voltageList);
         }
     } else if (operation == DATA_OPERATION_GET_ENCODER_STEP_VALUES) {
-        StepValues *stepValues = value.getStepValues();
+        StepValues *stepValues = getStepValues(value);
 
 		WidgetCursor uEditWidgetCursor = widgetCursor;
 		uEditWidgetCursor.cursor = g_channel->channelIndex;
@@ -4466,7 +4470,7 @@ void data_channel_list_current(DataOperationEnum operation, const WidgetCursor &
             value = MakeFloatListValue(page->m_currentList);
         }
     } else if (operation == DATA_OPERATION_GET_ENCODER_STEP_VALUES) {
-        StepValues *stepValues = value.getStepValues();
+        StepValues *stepValues = getStepValues(value);
 
         data_channel_i_edit(operation, widgetCursor, value);
 
@@ -4836,7 +4840,7 @@ void data_io_pin_pwm_frequency(DataOperationEnum operation, const WidgetCursor &
     } else if (operation == DATA_OPERATION_GET_ENCODER_STEP_VALUES) {
         static float values[] = { 1.0f, 100.0f, 1000.0f, 10000.0f };
 
-        StepValues *stepValues = value.getStepValues();
+        StepValues *stepValues = getStepValues(value);
 
         stepValues->values = values;
         stepValues->count = sizeof(values) / sizeof(float);
@@ -4893,7 +4897,7 @@ void data_io_pin_pwm_duty(DataOperationEnum operation, const WidgetCursor &widge
     } else if (operation == DATA_OPERATION_GET_ENCODER_STEP_VALUES) {
         static float values[] = { 0.1f, 0.5f, 1.0f, 5.0f };
 
-        StepValues *stepValues = value.getStepValues();
+        StepValues *stepValues = getStepValues(value);
 
         stepValues->values = values;
         stepValues->count = sizeof(values) / sizeof(float);
@@ -5915,7 +5919,7 @@ void data_channel_ramp_state(DataOperationEnum operation, const WidgetCursor &wi
 }
 
 void getRampAndDelayDurationStepValues(Value &value) {
-    auto stepValues = value.getStepValues();
+    auto stepValues = getStepValues(value);
 
     static float values[] = { 0.001f, 0.01f, 0.1f, 1.0f };
     stepValues->values = values;

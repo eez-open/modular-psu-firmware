@@ -16,6 +16,8 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
+#if !defined(EEZ_FOR_LVGL)
+
 #include <memory.h>
 
 #include <eez/core/eeprom.h>
@@ -209,3 +211,5 @@ bool test() {
 
 } // namespace eeprom
 } // namespace eez
+
+#endif // !defined(EEZ_FOR_LVGL)

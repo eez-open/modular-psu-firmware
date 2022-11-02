@@ -556,7 +556,7 @@ scpi_result_t scpi_cmd_displayWindowDialogOpen(scpi_t *context) {
     }
 
     int err;
-    if (!eez::gui::loadExternalAssets(filePath, &err) || !psu::gui::g_psuAppContext.dialogOpen(&err)) {
+    if (!eez::loadExternalAssets(filePath, &err) || !psu::gui::g_psuAppContext.dialogOpen(&err)) {
         SCPI_ErrorPush(context, err);
         return SCPI_RES_ERR;
     }

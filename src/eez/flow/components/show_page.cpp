@@ -31,7 +31,7 @@ struct ShowPageActionComponent : public Component {
 void executeShowPageComponent(FlowState *flowState, unsigned componentIndex) {
 	auto component = (ShowPageActionComponent *)flowState->flow->components[componentIndex];
 
-	replacePageHook(component->page);
+	replacePageHook(component->page, 0, 0, 0);
 
 	propagateValueThroughSeqout(flowState, componentIndex);
 }

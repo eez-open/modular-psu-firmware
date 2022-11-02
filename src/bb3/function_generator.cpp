@@ -2100,7 +2100,7 @@ void data_function_generator_channels(DataOperationEnum operation, const WidgetC
 		} else if (operation == DATA_OPERATION_GET_MAX) {
 			value = MakeValue(1.0f * (g_functionGeneratorPage.m_selectedResources.m_numResources - FunctionGeneratorPage::ITEMS_PER_PAGE), UNIT_NONE);
 		} else if (operation == DATA_OPERATION_GET_ENCODER_STEP_VALUES) {
-			auto stepValues = value.getStepValues();
+			auto stepValues = getStepValues(value);
 
 			static float values[] = { 1.0f, 1.0f * FunctionGeneratorPage::ITEMS_PER_PAGE, 2.0f * FunctionGeneratorPage::ITEMS_PER_PAGE, 5.0f * FunctionGeneratorPage::ITEMS_PER_PAGE, 10.0f * FunctionGeneratorPage::ITEMS_PER_PAGE };
 
@@ -2451,7 +2451,7 @@ void data_function_generator_frequency(DataOperationEnum operation, const Widget
     } else if (operation == DATA_OPERATION_GET_UNIT) {
         value = unit;
     } else if (operation == DATA_OPERATION_GET_ENCODER_STEP_VALUES) {
-		StepValues *stepValues = value.getStepValues();
+		StepValues *stepValues = getStepValues(value);
 		if (g_options.isFreq) {
 			g_slots[slotIndex]->getFunctionGeneratorFrequencyInfo(subchannelIndex, resourceIndex, min, max, stepValues);
 
@@ -2512,7 +2512,7 @@ void data_function_generator_phase_shift(DataOperationEnum operation, const Widg
 	} else if (operation == DATA_OPERATION_GET_UNIT) {
 		value = unit;
 	} else if (operation == DATA_OPERATION_GET_ENCODER_STEP_VALUES) {
-		StepValues *stepValues = value.getStepValues();
+		StepValues *stepValues = getStepValues(value);
 
 		if (g_options.isFreq) {
 			static float g_values[] = { 1.0f, 5.0f, 10.0f, 20.0f };
@@ -2618,7 +2618,7 @@ void data_function_generator_amplitude(DataOperationEnum operation, const Widget
 	} else if (operation == DATA_OPERATION_GET_UNIT) {
 		value = unit;
 	} else if (operation == DATA_OPERATION_GET_ENCODER_STEP_VALUES) {
-		StepValues *pStepValues = value.getStepValues();
+		StepValues *pStepValues = getStepValues(value);
 
 		memcpy(pStepValues, &stepValues, sizeof(stepValues));
 
@@ -2718,7 +2718,7 @@ void data_function_generator_offset(DataOperationEnum operation, const WidgetCur
 	} else if (operation == DATA_OPERATION_GET_UNIT) {
 		value = unit;
 	} else if (operation == DATA_OPERATION_GET_ENCODER_STEP_VALUES) {
-		StepValues *pStepValues = value.getStepValues();
+		StepValues *pStepValues = getStepValues(value);
 
 		memcpy(pStepValues, &stepValues, sizeof(stepValues));
 
@@ -2782,7 +2782,7 @@ void data_function_generator_duty_cycle(DataOperationEnum operation, const Widge
 	} else if (operation == DATA_OPERATION_GET_UNIT) {
 		value = unit;
 	} else if (operation == DATA_OPERATION_GET_ENCODER_STEP_VALUES) {
-		StepValues *stepValues = value.getStepValues();
+		StepValues *stepValues = getStepValues(value);
 
 		if (g_options.isFreq) {
 			static float values[] = { 0.1f, 0.5f, 1.0f, 5.0f };
@@ -2991,7 +2991,7 @@ void data_function_generator_preview_period(DataOperationEnum operation, const W
 	} else if (operation == DATA_OPERATION_GET_UNIT) {
 		value = UNIT_SECOND;
 	} else if (operation == DATA_OPERATION_GET_ENCODER_STEP_VALUES) {
-		StepValues *stepValues = value.getStepValues();
+		StepValues *stepValues = getStepValues(value);
 
 		if (g_options.isFreq) {
 			static float g_values[] = { PREVIEW_PERIOD_MIN, PREVIEW_PERIOD_MIN * 10.0f, PREVIEW_PERIOD_MIN * 100.0f, PREVIEW_PERIOD_MIN * 1000.0f };

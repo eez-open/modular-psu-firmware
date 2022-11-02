@@ -24,7 +24,9 @@
 #include <eez/flow/private.h>
 #include <eez/flow/hooks.h>
 
+#if OPTION_GUI || !defined(OPTION_GUI)
 #include <eez/gui/gui.h>
+#endif
 
 namespace eez {
 namespace flow {
@@ -34,6 +36,7 @@ struct ShowKeyboardActionComponent : public Component {
 };
 
 void executeShowKeypadComponent(FlowState *flowState, unsigned componentIndex) {
+#if OPTION_GUI || !defined(OPTION_GUI)
     Value labelValue;
     if (!evalProperty(flowState, componentIndex, defs_v3::SHOW_KEYBOARD_ACTION_COMPONENT_PROPERTY_LABEL, labelValue, "Failed to evaluate Label in ShowKeypad")) {
         return;
@@ -103,6 +106,7 @@ void executeShowKeypadComponent(FlowState *flowState, unsigned componentIndex) {
 	Unit unit = getUnitFromName(unitValue.getString());
 
 	showKeypadHook(labelValue, initialValue, minValue, maxValue, unit, onOk, onCancel);
+#endif
 }
 
 } // namespace flow

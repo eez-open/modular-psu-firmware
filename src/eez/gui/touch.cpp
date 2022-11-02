@@ -16,6 +16,8 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
+#if !defined(EEZ_FOR_LVGL)
+
 #include <eez/core/os.h>
 
 #include <eez/gui/gui.h>
@@ -110,3 +112,5 @@ void data_touch_filtered_pressed(DataOperationEnum operation, const WidgetCursor
 
 } // namespace gui
 } // namespace eez
+
+#endif

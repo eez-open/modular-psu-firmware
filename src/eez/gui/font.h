@@ -20,7 +20,7 @@
 
 #include <stdint.h>
 
-#include <eez/gui/assets.h>
+#include <eez/core/assets.h>
 
 namespace eez {
 namespace gui {

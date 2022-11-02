@@ -21,8 +21,6 @@
 #include <eez/flow/expression.h>
 #include <eez/flow/operations.h>
 
-using namespace eez::gui;
-
 namespace eez {
 namespace flow {
 

@@ -92,7 +92,8 @@ void DropDownListWidgetState::render() {
     aggDrawing.graphics.moveTo(x, y);
     aggDrawing.graphics.lineTo(x + w / 2, y + h);
     aggDrawing.graphics.lineTo(x + w, y);
-    aggDrawing.graphics.lineColor(COLOR_TO_R(style->color), COLOR_TO_G(style->color), COLOR_TO_B(style->color));
+    auto color = display::getColor16FromIndex(style->color);
+    aggDrawing.graphics.lineColor(COLOR_TO_R(color), COLOR_TO_G(color), COLOR_TO_B(color));
     aggDrawing.graphics.lineWidth(h / 3.0);
     aggDrawing.graphics.noFill();
     aggDrawing.graphics.drawPath();

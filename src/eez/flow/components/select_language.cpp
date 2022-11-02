@@ -16,12 +16,12 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
+#include <stdio.h>
+
 #include <eez/flow/components.h>
 #include <eez/flow/flow_defs_v3.h>
 #include <eez/flow/expression.h>
 #include <eez/flow/private.h>
-
-using namespace eez::gui;
 
 namespace eez {
 namespace flow {
@@ -34,7 +34,7 @@ void executeSelectLanguageComponent(FlowState *flowState, unsigned componentInde
 
 	const char *language = languageValue.getString();
 
-    auto languages = flowState->assets->languages;
+    auto &languages = flowState->assets->languages;
 
     for (uint32_t languageIndex = 0; languageIndex < languages.count; languageIndex++) {
         if (strcmp(languages[languageIndex]->languageID, language) == 0) {

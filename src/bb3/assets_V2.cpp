@@ -40,7 +40,8 @@
 #include <eez/gui/widgets/up_down.h>
 
 namespace eez {
-namespace gui {
+
+using namespace gui;
 
 ////////////////////////////////////////////////////////////////////////////////
 
@@ -79,6 +80,7 @@ static Assets *g_assetsV3;
 static uint32_t g_offsetV3;
 
 static uint32_t g_offsetAdjust;
+#define OFFSET_ADJUST(x) *((int32_t *)(x)) = (int32_t)((uint8_t *)(*(x) + g_offsetAdjust) - (uint8_t *)(x));
 
 ////////////////////////////////////////////////////////////////////////////////
 
@@ -234,7 +236,7 @@ struct ScrollBarWidgetV2 {
 
 static void convertWidgetList(WidgetList &widgetList, AssetsV3List *listV3);
 static uint32_t convertWidget(WidgetV2 &widgetV2);
-static uint32_t convertText(uint32_t textOffset);
+static void convertText(uint32_t textOffset, uint32_t *location);
 
 static Document *g_documentV2;
 
@@ -256,9 +258,9 @@ static void convertWidgetList(WidgetList &widgetList, AssetsV3List *listV3) {
 		list[i] = convertWidget(widgets[i]);
 	}
 
-	listV3->first += g_offsetAdjust;
+	OFFSET_ADJUST(&listV3->first);
 	for (uint32_t i = 0; i < widgetList.count; i++) {
-		list[i] += g_offsetAdjust;
+		OFFSET_ADJUST(list + i);
 	}
 }
 
@@ -348,7 +350,7 @@ static uint32_t convertWidget(WidgetV2 &widgetV2) {
 
 		ADD_V3_OFFSET(sizeof(TextWidget));
 
-		*((uint32_t *)(&widgetV3Specific.text)) = convertText(widgetV2Specific.text);
+		convertText(widgetV2Specific.text, (uint32_t *)(&widgetV3Specific.text));
 		widgetV3Specific.flags = widgetV2Specific.flags;
 	
 		return savedOffset;
@@ -360,7 +362,7 @@ static uint32_t convertWidget(WidgetV2 &widgetV2) {
 
 		ADD_V3_OFFSET(sizeof(MultilineTextWidget));
 
-		*((uint32_t *)(&widgetV3Specific.text)) = convertText(widgetV2Specific.text);
+		convertText(widgetV2Specific.text, (uint32_t *)(&widgetV3Specific.text));
 		widgetV3Specific.firstLineIndent = widgetV2Specific.firstLineIndent;
 		widgetV3Specific.hangingIndent = widgetV2Specific.hangingIndent;
 	
@@ -396,7 +398,7 @@ static uint32_t convertWidget(WidgetV2 &widgetV2) {
 
 		ADD_V3_OFFSET(sizeof(ButtonWidget));
 
-		*((uint32_t *)(&widgetV3Specific.text)) = convertText(widgetV2Specific.text);
+		convertText(widgetV2Specific.text, (uint32_t *)(&widgetV3Specific.text));
 		widgetV3Specific.enabled = widgetV2Specific.enabled;
 		widgetV3Specific.disabledStyle = widgetV2Specific.disabledStyle;
 
@@ -409,8 +411,8 @@ static uint32_t convertWidget(WidgetV2 &widgetV2) {
 
 		ADD_V3_OFFSET(sizeof(ToggleButtonWidget));
 
-		*((uint32_t *)(&widgetV3Specific.text1)) = convertText(widgetV2Specific.text1);
-		*((uint32_t *)(&widgetV3Specific.text2)) = convertText(widgetV2Specific.text2);
+		convertText(widgetV2Specific.text1, (uint32_t *)(&widgetV3Specific.text1));
+		convertText(widgetV2Specific.text2, (uint32_t *)(&widgetV3Specific.text2));
 	
 		return savedOffset;
 	}
@@ -469,8 +471,8 @@ static uint32_t convertWidget(WidgetV2 &widgetV2) {
 
 		ADD_V3_OFFSET(sizeof(UpDownWidget));
 
-		*((uint32_t *)(&widgetV3Specific.downButtonText)) = convertText(widgetV2Specific.downButtonText);
-		*((uint32_t *)(&widgetV3Specific.upButtonText)) = convertText(widgetV2Specific.upButtonText);
+		convertText(widgetV2Specific.downButtonText, (uint32_t *)(&widgetV3Specific.downButtonText));
+		convertText(widgetV2Specific.upButtonText, (uint32_t *)(&widgetV3Specific.upButtonText));
 		widgetV3Specific.buttonsStyle = widgetV2Specific.buttonsStyle;
 	
 		return savedOffset;
@@ -509,8 +511,8 @@ static uint32_t convertWidget(WidgetV2 &widgetV2) {
 
 		widgetV3Specific.thumbStyle = widgetV2Specific.thumbStyle;
 		widgetV3Specific.buttonsStyle = widgetV2Specific.buttonsStyle;
-		*((uint32_t *)(&widgetV3Specific.leftButtonText)) = convertText(widgetV2Specific.leftButtonText);
-		*((uint32_t *)(&widgetV3Specific.rightButtonText)) = convertText(widgetV2Specific.rightButtonText);
+		convertText(widgetV2Specific.leftButtonText, (uint32_t *)(&widgetV3Specific.leftButtonText));
+		convertText(widgetV2Specific.rightButtonText, (uint32_t *)(&widgetV3Specific.rightButtonText));
 
 		return savedOffset;
 	}
@@ -536,14 +538,15 @@ static uint32_t convertWidget(WidgetV2 &widgetV2) {
 	return savedOffset;
 }
 
-static uint32_t convertText(uint32_t textOffset) {
+static void convertText(uint32_t textOffset, uint32_t *location) {
 	const char *textV2 = (const char *)((uint8_t *)g_documentV2 + textOffset);
 	char *textV3 = (char *)(uint8_t *)g_assetsV3 + 4 + g_offsetV3;
 	auto length = strlen(textV2) + 1;
 	stringCopy(textV3, length, textV2);
 	auto savedOffset = g_offsetV3;
 	ADD_V3_OFFSET(length);
-	return savedOffset + g_offsetAdjust;
+	*location = savedOffset;
+    OFFSET_ADJUST(location);
 }
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -602,9 +605,9 @@ static void convertStyleList(StyleList &styleList, AssetsV3List *listV3) {
 		list[i] = convertStyle(styles[i]);
 	}
 
-	listV3->first += g_offsetAdjust;
+	OFFSET_ADJUST(&listV3->first);
 	for (uint32_t i = 0; i < styleList.count; i++) {
-		list[i] += g_offsetAdjust;
+		OFFSET_ADJUST(list + i);
 	}
 }
 
@@ -701,9 +704,9 @@ static void convertBitmaps() {
 		ADD_V3_OFFSET(size);
 	}
 
-	listV3->first += g_offsetAdjust;
+	OFFSET_ADJUST(&listV3->first);
 	for (uint32_t i = 0; i < count; i++) {
-		list[i] += g_offsetAdjust;
+		OFFSET_ADJUST(list + i);
 	}
 }
 
@@ -722,7 +725,7 @@ struct NameList {
 };
 
 static void convertNameList(NameList &styleList, AssetsV3List *listV3);
-static uint32_t convertName(uint32_t nameOffset);
+static void convertName(uint32_t nameOffset, uint32_t *location);
 
 static NameList *g_nameListV2;
 
@@ -746,20 +749,21 @@ static void convertNameList(NameList &nameList, AssetsV3List *listV3) {
 
 	uint32_t *names = (uint32_t *)((uint8_t *)g_nameListV2 + nameList.first);
 	for (uint32_t i = 0; i < nameList.count; i++) {
-		list[i] = convertName(names[i]);
+		convertName(names[i], list + i);
 	}
 
-	listV3->first += g_offsetAdjust;
+	OFFSET_ADJUST(&listV3->first);
 }
 
-static uint32_t convertName(uint32_t nameOffset) {
+static void convertName(uint32_t nameOffset, uint32_t *location) {
 	const char *nameV2 = (const char *)((uint8_t *)g_nameListV2 + nameOffset);
 	char *nameV3 = (char *)(uint8_t *)g_assetsV3 + 4 + g_offsetV3;
 	auto length = strlen(nameV2) + 1;
 	stringCopy(nameV3, length, nameV2);
 	auto savedOffset = g_offsetV3;
 	ADD_V3_OFFSET(length);
-	return savedOffset + g_offsetAdjust;
+	*location = savedOffset;
+    OFFSET_ADJUST(location);
 }
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -771,5 +775,4 @@ static void convertFlowDefinition() {
 
 ////////////////////////////////////////////////////////////////////////////////
 
-} // namespace gui
 } // namespace eez

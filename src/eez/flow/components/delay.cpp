@@ -18,13 +18,12 @@
 
 #include <eez/core/alloc.h>
 #include <eez/core/os.h>
+#include <eez/core/util.h>
 
 #include <eez/flow/components.h>
 #include <eez/flow/flow_defs_v3.h>
 #include <eez/flow/expression.h>
 #include <eez/flow/queue.h>
-
-using namespace eez::gui;
 
 namespace eez {
 namespace flow {

@@ -25,7 +25,6 @@
 #include <scpi/scpi.h>
 
 namespace eez {
-namespace gui {
 
 void convertV2toV3(Assets *assetsV2, Assets *assetsV3);
 
@@ -142,5 +141,4 @@ bool loadExternalAssets(const char *filePath, int *err) {
 	return true;
 }
 
-} // namespace gui
 } // namespace eez

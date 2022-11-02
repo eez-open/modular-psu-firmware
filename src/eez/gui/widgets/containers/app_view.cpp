@@ -29,7 +29,7 @@ bool AppViewWidgetState::updateState() {
 
     if (widgetCursor.widget->data != DATA_ID_NONE) {
         Value appContextValue = get(widgetCursor, widgetCursor.widget->data);
-        appContext = appContextValue.getAppContext();
+        appContext = (AppContext *)appContextValue.getVoidPointer();;
     } else {
         appContext = widgetCursor.appContext;
     }

@@ -21,12 +21,47 @@
 #include <assert.h>
 #include <memory.h>
 
+#if defined(EEZ_FOR_LVGL)
+#ifdef LV_LVGL_H_INCLUDE_SIMPLE
+#include "lvgl.h"
+#else
+#include "lvgl/lvgl.h"
+#endif
+#endif
+
 #include <eez/core/alloc.h>
 #include <eez/core/os.h>
 
 namespace eez {
 
-static const size_t ALIGNMENT = 8;
+#if defined(EEZ_FOR_LVGL)
+
+void initAllocHeap(uint8_t *heap, size_t heapSize) {
+}
+
+void *alloc(size_t size, uint32_t id) {
+    return lv_mem_alloc(size);
+}
+
+void free(void *ptr) {
+    lv_mem_free(ptr);
+}
+
+template<typename T> void freeObject(T *ptr) {
+	ptr->~T();
+	lv_mem_free(ptr);
+}
+
+void getAllocInfo(uint32_t &free, uint32_t &alloc) {
+    lv_mem_monitor_t mon;
+    lv_mem_monitor(&mon);
+	free = mon.free_size;
+	alloc = mon.total_size - mon.free_size;
+}
+
+#else
+
+static const size_t ALIGNMENT = 64;
 static const size_t MIN_BLOCK_SIZE = 8;
 
 struct AllocBlock {
@@ -118,7 +153,7 @@ void free(void *ptr) {
 
 		AllocBlock *prevBlock = nullptr;
 		AllocBlock *block = firstBlock;
-		
+
 		while (block && block + 1 < ptr) {
 			prevBlock = block;
 			block = block->next;
@@ -197,5 +232,7 @@ void getAllocInfo(uint32_t &free, uint32_t &alloc) {
 		EEZ_MUTEX_RELEASE(alloc);
 	}
 }
+
+#endif
 
 } // eez

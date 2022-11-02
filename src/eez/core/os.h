@@ -20,6 +20,12 @@
 
 #include <stdint.h>
 
+#if defined(EEZ_FOR_LVGL)
+
+uint32_t osKernelGetTickCount(void);
+
+#else
+
 #include "cmsis_os2.h"
 
 #if defined(EEZ_PLATFORM_STM32)
@@ -61,6 +67,8 @@
 #define EEZ_MUTEX_CREATE(NAME) g_##NAME##mutexId = osMutexNew(&g_##NAME##mutexAttr)
 #define EEZ_MUTEX_WAIT(NAME, TIMEOUT) osMutexAcquire(g_##NAME##mutexId, TIMEOUT) == osOK
 #define EEZ_MUTEX_RELEASE(NAME) osMutexRelease(g_##NAME##mutexId)
+
+#endif
 
 #if defined(__EMSCRIPTEN__)
 #ifndef EM_PORT_API

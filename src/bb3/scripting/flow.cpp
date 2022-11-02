@@ -39,7 +39,7 @@ bool loadFlowScript(int *err) {
 		err = &localErr;
 	}
 
-	if (!eez::gui::loadExternalAssets(g_scriptPath, err)) {
+	if (!eez::loadExternalAssets(g_scriptPath, err)) {
 		char scriptName[64];
 		getFileName(g_scriptPath, scriptName, sizeof(scriptName));
 		ErrorTrace("App error: %s\n", scriptName);
@@ -123,7 +123,7 @@ bool isFlowRunning() {
 	return scripting::isFlowRunning();
 }
 
-void replacePage(int16_t pageId) {
+void replacePage(int16_t pageId, uint32_t animType, uint32_t speed, uint32_t delay) {
 	eez::psu::gui::replacePage(pageId);
 }
 

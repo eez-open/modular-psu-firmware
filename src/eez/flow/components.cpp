@@ -31,8 +31,6 @@
 #include <eez/flow/dashboard_api.h>
 #endif
 
-using namespace eez::gui;
-
 namespace eez {
 namespace flow {
 
@@ -63,8 +61,10 @@ void executeSetPageDirectionComponent(FlowState *flowState, unsigned componentIn
 void executeAnimateComponent(FlowState *flowState, unsigned componentIndex);
 void executeNoopComponent(FlowState *flowState, unsigned componentIndex);
 void executeOnEventComponent(FlowState *flowState, unsigned componentIndex);
+void executeLVGLComponent(FlowState *flowState, unsigned componentIndex);
 
 void executeLayoutViewWidgetComponent(FlowState *flowState, unsigned componentIndex);
+void executeLineChartWidgetComponent(FlowState *flowState, unsigned componentIndex);
 void executeRollerWidgetComponent(FlowState *flowState, unsigned componentIndex);
 
 typedef void (*ExecuteComponentFunctionType)(FlowState *flowState, unsigned componentIndex);
@@ -98,7 +98,8 @@ static ExecuteComponentFunctionType g_executeComponentFunctions[] = {
     executeSelectLanguageComponent, // COMPONENT_TYPE_SELECT_LANGUAGE_ACTION
     executeSetPageDirectionComponent, // COMPONENT_TYPE_SET_PAGE_DIRECTION_ACTION
     executeAnimateComponent, // COMPONENT_TYPE_ANIMATE_ACTION
-    executeOnEventComponent, // COMPONENT_TYPE_ON_EVENT_ACTION
+    executeOnEventComponent, // COMPONENT_TYPE_ON_EVENT_ACTION,
+    executeLVGLComponent, // COMPONENT_TYPE_LVGLACTION
 };
 
 void registerComponent(ComponentTypes componentType, ExecuteComponentFunctionType executeComponentFunction) {
@@ -110,14 +111,14 @@ void registerComponent(ComponentTypes componentType, ExecuteComponentFunctionTyp
 void executeComponent(FlowState *flowState, unsigned componentIndex) {
 	auto component = flowState->flow->components[componentIndex];
 
-#if defined(__EMSCRIPTEN__)
 	if (component->type >= defs_v3::FIRST_DASHBOARD_COMPONENT_TYPE) {
+#if defined(__EMSCRIPTEN__)
         if (executeDashboardComponentHook) {
             executeDashboardComponentHook(component->type, getFlowStateIndex(flowState), componentIndex);
-            return;
         }
-    } else
 #endif // __EMSCRIPTEN__
+        return;
+    } else
     if (component->type >= defs_v3::COMPONENT_TYPE_START_ACTION) {
 		auto executeComponentFunction = g_executeComponentFunctions[component->type - defs_v3::COMPONENT_TYPE_START_ACTION];
 		if (executeComponentFunction != nullptr) {
@@ -127,7 +128,9 @@ void executeComponent(FlowState *flowState, unsigned componentIndex) {
 	} else if (component->type < 1000) {
 		if (component->type == defs_v3::COMPONENT_TYPE_LAYOUT_VIEW_WIDGET) {
             executeLayoutViewWidgetComponent(flowState, componentIndex);
-        } else if (component->type == defs_v3::COMPONENT_TYPE_ROLLER_WIDGET) {
+        } else if (component->type == defs_v3::COMPONENT_TYPE_LINE_CHART_EMBEDDED_WIDGET) {
+			executeLineChartWidgetComponent(flowState, componentIndex);
+		} else if (component->type == defs_v3::COMPONENT_TYPE_ROLLER_WIDGET) {
 			executeRollerWidgetComponent(flowState, componentIndex);
 		}
 		return;

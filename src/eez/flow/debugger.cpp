@@ -23,8 +23,7 @@
 
 #include <eez/core/debug.h>
 #include <eez/core/os.h>
-
-#include <eez/gui/gui.h>
+#include <eez/core/util.h>
 
 #include <eez/flow/flow.h>
 #include <eez/flow/private.h>
@@ -171,7 +170,9 @@ void processDebuggerInput(char *buffer, uint32_t length) {
 				}
 			} else if (messageFromDebugger == MESSAGE_FROM_DEBUGGER_MODE) {
                 g_debuggerMode = strtol(g_inputFromDebugger + 2, nullptr, 10);
+#if OPTION_GUI || !defined(OPTION_GUI)
                 gui::refreshScreen();
+#endif
             }
 
 			g_inputFromDebuggerPosition = 0;
@@ -496,9 +497,9 @@ void onFlowStateCreated(FlowState *flowState) {
 		snprintf(buffer, sizeof(buffer), "%d\t%d\t%d\t%d\t%d\n",
 			MESSAGE_TO_DEBUGGER_FLOW_STATE_CREATED,
 			(int)flowState->flowStateIndex,
-			flowState->flowIndex,
+			(int)flowState->flowIndex,
 			(int)(flowState->parentFlowState ? flowState->parentFlowState->flowStateIndex : -1),
-			flowState->parentComponentIndex
+			(int)flowState->parentComponentIndex
 		);
         writeDebuggerBufferHook(buffer, strlen(buffer));
 
@@ -711,6 +712,7 @@ void logScpiQueryResult(FlowState *flowState, unsigned componentIndex, const cha
     }
 }
 
+#if OPTION_GUI || !defined(OPTION_GUI)
 void onPageChanged(int previousPageId, int activePageId) {
     if (flow::isFlowStopped()) {
         return;
@@ -721,24 +723,24 @@ void onPageChanged(int previousPageId, int activePageId) {
     }
 
     if (previousPageId > 0 && previousPageId < FIRST_INTERNAL_PAGE_ID) {
-        auto flowState = getFlowState(g_mainAssets, previousPageId - 1, WidgetCursor());
+        auto flowState = getPageFlowState(g_mainAssets, previousPageId - 1, WidgetCursor());
         if (flowState) {
             onEvent(flowState, FLOW_EVENT_CLOSE_PAGE);
         }
     } else if (previousPageId < 0) {
-        auto flowState = getFlowState(g_externalAssets, -previousPageId - 1, WidgetCursor());
+        auto flowState = getPageFlowState(g_externalAssets, -previousPageId - 1, WidgetCursor());
         if (flowState) {
             onEvent(flowState, FLOW_EVENT_CLOSE_PAGE);
         }
     }
 
     if (activePageId > 0 && activePageId < FIRST_INTERNAL_PAGE_ID) {
-        auto flowState = getFlowState(g_mainAssets, activePageId - 1, WidgetCursor());
+        auto flowState = getPageFlowState(g_mainAssets, activePageId - 1, WidgetCursor());
         if (flowState) {
             onEvent(flowState, FLOW_EVENT_OPEN_PAGE);
         }
     } else if (activePageId < 0) {
-        auto flowState = getFlowState(g_externalAssets, -activePageId - 1, WidgetCursor());
+        auto flowState = getPageFlowState(g_externalAssets, -activePageId - 1, WidgetCursor());
         if (flowState) {
             onEvent(flowState, FLOW_EVENT_OPEN_PAGE);
         }
@@ -755,6 +757,42 @@ void onPageChanged(int previousPageId, int activePageId) {
         writeDebuggerBufferHook(buffer, strlen(buffer));
     }
 }
+#else
+void onPageChanged(int previousPageId, int activePageId) {
+    if (flow::isFlowStopped()) {
+        return;
+    }
+
+    if (previousPageId == activePageId) {
+        return;
+    }
+
+    if (previousPageId > 0) {
+        auto flowState = getPageFlowState(g_mainAssets, previousPageId - 1);
+        if (flowState) {
+            onEvent(flowState, FLOW_EVENT_CLOSE_PAGE);
+        }
+    }
+
+    if (activePageId > 0) {
+        auto flowState = getPageFlowState(g_mainAssets, activePageId - 1);
+        if (flowState) {
+            onEvent(flowState, FLOW_EVENT_OPEN_PAGE);
+        }
+    }
+
+    if (g_debuggerIsConnected) {
+        startToDebuggerMessageHook();
+
+        char buffer[256];
+        snprintf(buffer, sizeof(buffer), "%d\t%d\n",
+            MESSAGE_TO_DEBUGGER_PAGE_CHANGED,
+            activePageId
+        );
+        writeDebuggerBufferHook(buffer, strlen(buffer));
+    }
+}
+#endif // OPTION_GUI || !defined(OPTION_GUI)
 
 } // namespace flow
 } // namespace eez

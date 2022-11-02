@@ -23,8 +23,6 @@
 #include <eez/flow/expression.h>
 #include <eez/flow/debugger.h>
 
-using namespace eez::gui;
-
 namespace eez {
 namespace flow {
 

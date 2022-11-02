@@ -1107,9 +1107,9 @@ void data_calibration_point_set_value(DataOperationEnum operation, const WidgetC
             value = channel ? 1 : 0;
         } else if (operation == DATA_OPERATION_GET_ENCODER_STEP_VALUES) {
             if (editPage->getCalibrationValueType() == CALIBRATION_VALUE_U) {
-                channel_dispatcher::getVoltageStepValues(slotIndex, subchannelIndex, value.getStepValues(), true);
+                channel_dispatcher::getVoltageStepValues(slotIndex, subchannelIndex, getStepValues(value), true);
             } else {
-                channel_dispatcher::getCurrentStepValues(slotIndex, subchannelIndex, value.getStepValues(), true);
+                channel_dispatcher::getCurrentStepValues(slotIndex, subchannelIndex, getStepValues(value), true);
             }
             value = 1;
         } else if (operation == DATA_OPERATION_SET_ENCODER_MODE) {
@@ -1184,9 +1184,9 @@ void data_calibration_point_measured_value(DataOperationEnum operation, const Wi
             value = channel ? 1 : 0;
         } else if (operation == DATA_OPERATION_GET_ENCODER_STEP_VALUES) {
             if (editPage->getCalibrationValueType() == CALIBRATION_VALUE_U) {
-                channel_dispatcher::getVoltageStepValues(slotIndex, subchannelIndex, value.getStepValues(), true);
+                channel_dispatcher::getVoltageStepValues(slotIndex, subchannelIndex, getStepValues(value), true);
             } else {
-                channel_dispatcher::getCurrentStepValues(slotIndex, subchannelIndex, value.getStepValues(), true);
+                channel_dispatcher::getCurrentStepValues(slotIndex, subchannelIndex, getStepValues(value), true);
             }
             value = 1;
         } else if (operation == DATA_OPERATION_SET_ENCODER_MODE) {

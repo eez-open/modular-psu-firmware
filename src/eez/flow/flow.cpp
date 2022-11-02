@@ -22,12 +22,6 @@
 
 #include <eez/core/os.h>
 
-#include <eez/gui/gui.h>
-#include <eez/gui/keypad.h>
-#include <eez/gui/widgets/input.h>
-
-#include <eez/gui/widgets/containers/layout_view.h>
-
 #include <eez/flow/flow.h>
 #include <eez/flow/components.h>
 #include <eez/flow/queue.h>
@@ -35,7 +29,13 @@
 #include <eez/flow/debugger.h>
 #include <eez/flow/hooks.h>
 
+#if OPTION_GUI || !defined(OPTION_GUI)
+#include <eez/gui/gui.h>
+#include <eez/gui/keypad.h>
+#include <eez/gui/widgets/input.h>
+#include <eez/gui/widgets/containers/layout_view.h>
 using namespace eez::gui;
+#endif
 
 namespace eez {
 namespace flow {
@@ -78,7 +78,10 @@ void tick() {
 
 	uint32_t startTickCount = millis();
 
-    while (true) {
+    // remember queue size before the loop
+    size_t queueSize = getQueueSize();
+
+    for (size_t i = 0; ; i++) {
 		FlowState *flowState;
 		unsigned componentIndex;
         bool continuousTask;
@@ -86,11 +89,20 @@ void tick() {
 			break;
 		}
 
+        // if continuous task and we are above remembered queue size then stop
+        // (we don't want to exhaust flow execution because of, for example, animate block)
+        if (continuousTask && i >= queueSize) {
+            break;
+        }
+
+        // do not execute continuous task twice during same tick
 		if (!continuousTask && !canExecuteStep(flowState, componentIndex)) {
 			break;
 		}
 
 		removeNextTaskFromQueue();
+
+        flowState->executingComponentIndex = componentIndex;
 
 		executeComponent(flowState, componentIndex);
 
@@ -98,16 +110,7 @@ void tick() {
             break;
         }
 
-		auto component = flowState->flow->components[componentIndex];
-
-		for (uint32_t i = 0; i < component->inputs.count; i++) {
-			auto inputIndex = component->inputs[i];
-			if (flowState->flow->componentInputs[inputIndex] & COMPONENT_INPUT_FLAG_IS_SEQ_INPUT) {
-                auto pValue = &flowState->values[inputIndex];
-				*pValue = Value();
-                onValueChanged(pValue);
-			}
-		}
+        resetSequenceInputs(flowState);
 
         if (canFreeFlowState(flowState)) {
             freeFlowState(flowState);
@@ -146,11 +149,9 @@ bool isFlowStopped() {
     return g_isStopped;
 }
 
-FlowState *getFlowState(Assets *assets, int flowStateIndex) {
-    return (FlowState *)(ALLOC_BUFFER + flowStateIndex);
-}
+#if OPTION_GUI || !defined(OPTION_GUI)
 
-FlowState *getFlowState(Assets *assets, int16_t pageIndex, const WidgetCursor &widgetCursor) {
+FlowState *getPageFlowState(Assets *assets, int16_t pageIndex, const WidgetCursor &widgetCursor) {
 	if (!assets->flowDefinition) {
 		return nullptr;
 	}
@@ -188,11 +189,39 @@ FlowState *getFlowState(Assets *assets, int16_t pageIndex, const WidgetCursor &w
 	return nullptr;
 }
 
+#else
+
+FlowState *getPageFlowState(Assets *assets, int16_t pageIndex) {
+	if (!assets->flowDefinition) {
+		return nullptr;
+	}
+
+	if (!isFlowRunningHook()) {
+		return nullptr;
+	}
+
+    FlowState *flowState;
+    for (flowState = g_firstFlowState; flowState; flowState = flowState->nextSibling) {
+        if (flowState->flowIndex == pageIndex) {
+            break;
+        }
+    }
+
+    if (!flowState) {
+        flowState = initPageFlowState(assets, pageIndex, nullptr, 0);
+    }
+
+    return flowState;
+}
+
+#endif // OPTION_GUI || !defined(OPTION_GUI)
+
 int getPageIndex(FlowState *flowState) {
 	return flowState->flowIndex;
 }
 
-void executeFlowAction(const gui::WidgetCursor &widgetCursor, int16_t actionId, void *param) {
+#if OPTION_GUI || !defined(OPTION_GUI)
+void executeFlowAction(const WidgetCursor &widgetCursor, int16_t actionId, void *param) {
 	if (!isFlowRunningHook()) {
 		return;
 	}
@@ -245,7 +274,7 @@ void executeFlowAction(const gui::WidgetCursor &widgetCursor, int16_t actionId, 
 	}
 }
 
-void dataOperation(int16_t dataId, DataOperationEnum operation, const gui::WidgetCursor &widgetCursor, Value &value) {
+void dataOperation(int16_t dataId, DataOperationEnum operation, const WidgetCursor &widgetCursor, Value &value) {
 	if (!isFlowRunningHook()) {
 		return;
 	}
@@ -273,7 +302,7 @@ void dataOperation(int16_t dataId, DataOperationEnum operation, const gui::Widge
 			} else {
 				value = 0;
 			}
-		}  
+		}
 #if OPTION_KEYPAD
 		else if (operation == DATA_OPERATION_GET_TEXT_CURSOR_POSITION) {
 
@@ -281,7 +310,7 @@ void dataOperation(int16_t dataId, DataOperationEnum operation, const gui::Widge
 			if (keypad) {
 				value = keypad->getCursorPosition();
 			}
-		} 
+		}
 #endif
 		else if (operation == DATA_OPERATION_GET_MIN) {
 			if (component->type == WIDGET_TYPE_INPUT) {
@@ -326,6 +355,8 @@ void dataOperation(int16_t dataId, DataOperationEnum operation, const gui::Widge
 		value = Value();
 	}
 }
+
+#endif // OPTION_GUI || !defined(OPTION_GUI)
 
 } // namespace flow
 } // namespace eez

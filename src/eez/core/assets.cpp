@@ -24,12 +24,16 @@
 #include <eez/core/os.h>
 #include <eez/core/memory.h>
 #include <eez/core/debug.h>
+#include <eez/core/assets.h>
 #include <eez/flow/flow.h>
 
 #include <eez/libs/lz4/lz4.h>
 
+#if OPTION_GUI || !defined(OPTION_GUI)
 #include <eez/gui/gui.h>
 #include <eez/gui/widget.h>
+using namespace eez::gui;
+#endif
 
 #if OPTION_SCPI
 #include <scpi/scpi.h>
@@ -39,7 +43,6 @@
 #endif
 
 namespace eez {
-namespace gui {
 
 bool g_isMainAssetsLoaded;
 Assets *g_mainAssets;
@@ -114,7 +117,24 @@ bool decompressAssetsData(const uint8_t *assetsData, uint32_t assetsDataSize, As
 	return true;
 }
 
+void allocMemoryForDecompressedAssets(const uint8_t *assetsData, uint32_t assetsDataSize, uint8_t *&decompressedAssetsMemoryBuffer, uint32_t &decompressedAssetsMemoryBufferSize) {
+    auto decompressedDataOffset = offsetof(Assets, settings);
+
+    auto header = (Header *)assetsData;
+    assert (header->tag == HEADER_TAG);
+    uint32_t decompressedSize = header->decompressedSize;
+
+    decompressedAssetsMemoryBufferSize = decompressedDataOffset + decompressedSize;
+
+    decompressedAssetsMemoryBuffer = (uint8_t *)eez::alloc(decompressedAssetsMemoryBufferSize, 0x587da194);
+}
+
 void loadMainAssets(const uint8_t *assets, uint32_t assetsSize) {
+#if defined(EEZ_FOR_LVGL)
+    uint8_t *DECOMPRESSED_ASSETS_START_ADDRESS = 0;
+    uint32_t MAX_DECOMPRESSED_ASSETS_SIZE = 0;
+    allocMemoryForDecompressedAssets(assets, assetsSize, DECOMPRESSED_ASSETS_START_ADDRESS, MAX_DECOMPRESSED_ASSETS_SIZE);
+#endif
     g_mainAssets = (Assets *)DECOMPRESSED_ASSETS_START_ADDRESS;
     g_mainAssets->external = false;
     auto decompressedSize = decompressAssetsData(assets, assetsSize, g_mainAssets, MAX_DECOMPRESSED_ASSETS_SIZE, nullptr);
@@ -124,8 +144,9 @@ void loadMainAssets(const uint8_t *assets, uint32_t assetsSize) {
 
 void unloadExternalAssets() {
 	if (g_externalAssets) {
+#if OPTION_GUI || !defined(OPTION_GUI)
 		removeExternalPagesFromTheStack();
-
+#endif
 		free(g_externalAssets);
 		g_externalAssets = nullptr;
 	}
@@ -133,7 +154,9 @@ void unloadExternalAssets() {
 
 ////////////////////////////////////////////////////////////////////////////////
 
-const PageAsset* getPageAsset(int pageId) {
+#if OPTION_GUI || !defined(OPTION_GUI)
+
+const gui::PageAsset* getPageAsset(int pageId) {
 	if (pageId > 0) {
 		return g_mainAssets->pages[pageId - 1];
 	} else if (pageId < 0) {
@@ -145,20 +168,20 @@ const PageAsset* getPageAsset(int pageId) {
 	return nullptr;
 }
 
-const PageAsset* getPageAsset(int pageId, WidgetCursor& widgetCursor) {
+const gui::PageAsset *getPageAsset(int pageId, WidgetCursor& widgetCursor) {
 	if (pageId < 0) {
 		widgetCursor.assets = g_externalAssets;
-		widgetCursor.flowState = flow::getFlowState(g_externalAssets, -pageId - 1, widgetCursor);
+		widgetCursor.flowState = flow::getPageFlowState(g_externalAssets, -pageId - 1, widgetCursor);
 	} else {
 	    widgetCursor.assets = g_mainAssets;
 		if (g_mainAssets->flowDefinition) {
-			widgetCursor.flowState = flow::getFlowState(g_mainAssets, pageId - 1, widgetCursor);
+			widgetCursor.flowState = flow::getPageFlowState(g_mainAssets, pageId - 1, widgetCursor);
 		}
     }
 	return getPageAsset(pageId);
 }
 
-const Style *getStyle(int styleID) {
+const gui::Style *getStyle(int styleID) {
 	if (styleID > 0) {
 		return g_mainAssets->styles[styleID - 1];
 	} else if (styleID < 0) {
@@ -170,7 +193,7 @@ const Style *getStyle(int styleID) {
 	return getStyle(STYLE_ID_DEFAULT);
 }
 
-const FontData *getFontData(int fontID) {
+const gui::FontData *getFontData(int fontID) {
 	if (fontID > 0) {
 		return g_mainAssets->fonts[fontID - 1];
 	} else if (fontID < 0) {
@@ -182,7 +205,7 @@ const FontData *getFontData(int fontID) {
 	return nullptr;
 }
 
-const Bitmap *getBitmap(int bitmapID) {
+const gui::Bitmap *getBitmap(int bitmapID) {
 	if (bitmapID > 0) {
 		return g_mainAssets->bitmaps[bitmapID - 1];
 	} else if (bitmapID < 0) {
@@ -193,6 +216,8 @@ const Bitmap *getBitmap(int bitmapID) {
 	}
 	return nullptr;
 }
+
+#endif // OPTION_GUI || !defined(OPTION_GUI)
 
 int getThemesCount() {
 	return (int)g_mainAssets->colorsDefinition->themes.count;
@@ -221,6 +246,8 @@ const uint16_t *getColors() {
 int getExternalAssetsMainPageId() {
 	return -1;
 }
+
+#if OPTION_GUI || !defined(OPTION_GUI)
 
 const char *getActionName(const WidgetCursor &widgetCursor, int16_t actionId) {
 	if (actionId == 0) {
@@ -252,5 +279,6 @@ int16_t getDataIdFromName(const WidgetCursor &widgetCursor, const char *name) {
 	return 0;
 }
 
-} // namespace gui
+#endif // OPTION_GUI || !defined(OPTION_GUI)
+
 } // namespace eez

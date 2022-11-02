@@ -26,8 +26,6 @@
 #include <eez/flow/components/call_action.h>
 #include <eez/flow/components/input.h>
 
-using namespace eez::gui;
-
 namespace eez {
 namespace flow {
 

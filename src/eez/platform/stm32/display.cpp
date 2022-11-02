@@ -16,6 +16,8 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
+#if !defined(EEZ_FOR_LVGL)
+
 #include <assert.h>
 #include <math.h>
 #include <memory.h>
@@ -421,3 +423,5 @@ void drawGlyph(const uint8_t *src, uint32_t srcLineOffset, int x, int y, int wid
 } // namespace display
 } // namespace gui
 } // namespace eez
+
+#endif

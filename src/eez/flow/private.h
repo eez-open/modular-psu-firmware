@@ -18,19 +18,16 @@
 
 #pragma once
 
-#include <eez/gui/assets.h>
-#include <eez/flow/debugger.h>
+#include <eez/core/assets.h>
+#include <eez/core/value.h>
+
+#if OPTION_GUI || !defined(OPTION_GUI)
+#include <eez/gui/gui.h>
+using namespace eez::gui;
+#endif
 
 namespace eez {
 namespace flow {
-
-using eez::gui::Value;
-using eez::gui::Assets;
-using eez::gui::FlowDefinition;
-using eez::gui::Flow;
-using eez::gui::Component;
-using eez::gui::ComponentOutput;
-using eez::gui::WidgetCursor;
 
 static const int UNDEFINED_VALUE_INDEX = 0;
 static const int NULL_VALUE_INDEX = 1;
@@ -58,6 +55,7 @@ struct FlowState {
 	Value *values;
 	ComponenentExecutionState **componenentExecutionStates;
     bool *componenentAsyncStates;
+    unsigned executingComponentIndex;
     float timelinePosition;
 
     FlowState *firstChild;
@@ -78,6 +76,7 @@ void freeFlowState(FlowState *flowState);
 
 void deallocateComponentExecutionState(FlowState *flowState, unsigned componentIndex);
 
+extern void onComponentExecutionStateChanged(FlowState *flowState, int componentIndex);
 template<class T>
 T *allocateComponentExecutionState(FlowState *flowState, unsigned componentIndex) {
     if (flowState->componenentExecutionStates[componentIndex]) {
@@ -89,14 +88,20 @@ T *allocateComponentExecutionState(FlowState *flowState, unsigned componentIndex
     return executionState;
 }
 
-void propagateValue(FlowState *flowState, unsigned componentIndex, unsigned outputIndex, const gui::Value &value);
+void resetSequenceInputs(FlowState *flowState);
+
+void propagateValue(FlowState *flowState, unsigned componentIndex, unsigned outputIndex, const Value &value);
 void propagateValue(FlowState *flowState, unsigned componentIndex, unsigned outputIndex); // propagates null value
 void propagateValueThroughSeqout(FlowState *flowState, unsigned componentIndex); // propagates null value through @seqout (0-th output)
 
-void getValue(uint16_t dataId, eez::gui::DataOperationEnum operation, const WidgetCursor &widgetCursor, Value &value);
+#if OPTION_GUI || !defined(OPTION_GUI)
+void getValue(uint16_t dataId, DataOperationEnum operation, const WidgetCursor &widgetCursor, Value &value);
 void setValue(uint16_t dataId, const WidgetCursor &widgetCursor, const Value& value);
+#endif
 
 void assignValue(FlowState *flowState, int componentIndex, Value &dstValue, const Value &srcValue);
+
+void clearInputValue(FlowState *flowState, int inputIndex);
 
 void startAsyncExecution(FlowState *flowState, int componentIndex);
 void endAsyncExecution(FlowState *flowState, int componentIndex);

@@ -25,12 +25,12 @@ namespace flow {
 
 struct SwitchTest {
     uint32_t outputIndex;
-    eez::gui::AssetsPtr<uint8_t> condition;
-    eez::gui::AssetsPtr<uint8_t> outputValue;
+    AssetsPtr<uint8_t> condition;
+    AssetsPtr<uint8_t> outputValue;
 };
 
 struct SwitchActionComponent : public Component {
-    eez::gui::ListOfAssetsPtr<SwitchTest> tests;
+    ListOfAssetsPtr<SwitchTest> tests;
 };
 
 } // flow

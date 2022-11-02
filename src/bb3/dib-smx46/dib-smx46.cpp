@@ -1642,7 +1642,7 @@ void data_dib_smx46_aout_value(DataOperationEnum operation, const WidgetCursor &
     }  else if (operation == DATA_OPERATION_GET_UNIT) {
         value = UNIT_VOLT;
     } else if (operation == DATA_OPERATION_GET_ENCODER_STEP_VALUES) {
-        StepValues *stepValues = value.getStepValues();
+        StepValues *stepValues = getStepValues(value);
 
         stepValues->values = DAC_ENCODER_STEP_VALUES;
         stepValues->count = sizeof(DAC_ENCODER_STEP_VALUES) / sizeof(float);

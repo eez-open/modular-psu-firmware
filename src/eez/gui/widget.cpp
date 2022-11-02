@@ -25,7 +25,7 @@
 #include <eez/core/util.h>
 
 #include <eez/gui/gui.h>
-#include <eez/gui/assets.h>
+#include <eez/core/assets.h>
 
 #include <eez/gui/widgets/containers/app_view.h>
 #include <eez/gui/widgets/containers/container.h>
@@ -55,6 +55,8 @@
 #include <eez/gui/widgets/toggle_button.h>
 #include <eez/gui/widgets/up_down.h>
 #include <eez/gui/widgets/yt_graph.h>
+#include <eez/gui/widgets/line_chart.h>
+#include <eez/gui/widgets/qr_code.h>
 
 namespace eez {
 namespace gui {
@@ -378,7 +380,7 @@ static void findWidgetStep() {
                 if (widget->type == WIDGET_TYPE_APP_VIEW) {
                     if (widget->data != DATA_ID_NONE) {
                         Value appContextValue = get(widgetCursor, widget->data);
-                        g_foundWidget.appContext = appContextValue.getAppContext();
+                        g_foundWidget.appContext = (AppContext *)appContextValue.getVoidPointer();
                     }
                 }
             }

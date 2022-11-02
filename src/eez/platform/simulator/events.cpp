@@ -16,6 +16,8 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
+#if OPTION_GUI || !defined(OPTION_GUI)
+
 #include <math.h>
 
 #if !defined(__EMSCRIPTEN__)
@@ -40,7 +42,7 @@ int g_mouseY;
 bool g_mouseButton1IsPressed;
 
 void readEvents() {
-#if !defined(__EMSCRIPTEN__)    
+#if !defined(__EMSCRIPTEN__)
     int yMouseWheel = 0;
     bool mouseButton2IsUp = false;
 
@@ -121,5 +123,7 @@ EM_PORT_API(void) onMouseWheelEvent(double yMouseWheel, int clicked) {
     eez::mcu::encoder::write(round(yMouseWheel), clicked);
 #endif
 }
+
+#endif
 
 #endif

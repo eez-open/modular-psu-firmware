@@ -1199,7 +1199,7 @@ void data_dib_dcm224_pwm_frequency(DataOperationEnum operation, const WidgetCurs
     } else if (operation == DATA_OPERATION_GET_ENCODER_STEP_VALUES) {
         static float values[] = { 1.0f, 100.0f, 500.0f, 1000.0f };
 
-        StepValues *stepValues = value.getStepValues();
+        StepValues *stepValues = getStepValues(value);
 
         stepValues->values = values;
         stepValues->count = sizeof(values) / sizeof(float);
@@ -1259,7 +1259,7 @@ void data_dib_dcm224_pwm_duty(DataOperationEnum operation, const WidgetCursor &w
     } else if (operation == DATA_OPERATION_GET_ENCODER_STEP_VALUES) {
         static float values[] = { 0.1f, 0.5f, 1.0f, 5.0f };
 
-        StepValues *stepValues = value.getStepValues();
+        StepValues *stepValues = getStepValues(value);
 
         stepValues->values = values;
         stepValues->count = sizeof(values) / sizeof(float);
@@ -1316,7 +1316,7 @@ void data_dib_dcm224_counterphase_frequency(DataOperationEnum operation, const W
     } else if (operation == DATA_OPERATION_GET_ENCODER_STEP_VALUES) {
         static float values[] = { 1.0f, 100.0f, 1000.0f, 10000.0f };
 
-        StepValues *stepValues = value.getStepValues();
+        StepValues *stepValues = getStepValues(value);
 
         stepValues->values = values;
         stepValues->count = sizeof(values) / sizeof(float);

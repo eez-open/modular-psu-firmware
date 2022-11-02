@@ -24,7 +24,9 @@
 #include <eez/flow/private.h>
 #include <eez/flow/hooks.h>
 
+#if OPTION_GUI || !defined(OPTION_GUI)
 #include <eez/gui/gui.h>
+#endif
 
 namespace eez {
 namespace flow {
@@ -34,6 +36,7 @@ struct ShowKeyboardActionComponent : public Component {
 };
 
 void executeShowKeyboardComponent(FlowState *flowState, unsigned componentIndex) {
+#if OPTION_GUI || !defined(OPTION_GUI)
 	auto component = (ShowKeyboardActionComponent *)flowState->flow->components[componentIndex];
 
     Value labelValue;
@@ -82,6 +85,7 @@ void executeShowKeyboardComponent(FlowState *flowState, unsigned componentIndex)
 	}
 
 	showKeyboardHook(labelValue, initialTextValue, minCharsValue, maxCharsValue, component->password, onOk, onCancel);
+#endif
 }
 
 } // namespace flow

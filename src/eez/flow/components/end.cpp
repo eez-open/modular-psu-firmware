@@ -20,8 +20,6 @@
 #include <eez/flow/components.h>
 #include <eez/flow/hooks.h>
 
-using namespace eez::gui;
-
 namespace eez {
 namespace flow {
 

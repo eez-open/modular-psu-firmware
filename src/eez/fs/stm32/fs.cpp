@@ -16,7 +16,7 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#if defined(EEZ_PLATFORM_STM32)
+#if defined(EEZ_PLATFORM_STM32) && !defined(EEZ_FOR_LVGL)
 
 #include <stdio.h>
 #include <string.h>
@@ -236,7 +236,7 @@ size_t File::read(void *buf, uint32_t size) {
             return brTotal;
         }
     }
-    
+
     while (brTotal < size) {
         uint32_t btr = MIN(CHUNK_SIZE, size - brTotal);
 
@@ -254,7 +254,7 @@ size_t File::read(void *buf, uint32_t size) {
         }
     }
 
-    return brTotal;    
+    return brTotal;
 }
 
 size_t File::write(const void *buf, size_t size) {
@@ -283,7 +283,7 @@ size_t File::write(const void *buf, size_t size) {
 
         if (bw < unalignedLength) {
             return bwTotal;
-        }        
+        }
 	}
 
 	while (bwTotal < size) {

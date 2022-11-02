@@ -20,16 +20,22 @@
 
 #include <stdint.h>
 
+#include <eez/core/value.h>
 #include <eez/flow/private.h>
-#include <eez/gui/data.h>
+
+#if defined(EEZ_FOR_LVGL)
+#ifdef LV_LVGL_H_INCLUDE_SIMPLE
+#include "lvgl.h"
+#else
+#include "lvgl/lvgl.h"
+#endif
+#endif
 
 namespace eez {
 namespace flow {
 
-using eez::gui::Value;
-
 extern bool (*isFlowRunningHook)();
-extern void (*replacePageHook)(int16_t pageId);
+extern void (*replacePageHook)(int16_t pageId, uint32_t animType, uint32_t speed, uint32_t delay);
 extern void (*showKeyboardHook)(Value label, Value initialText, Value minChars, Value maxChars, bool isPassword, void(*onOk)(char *), void(*onCancel)());
 extern void (*showKeypadHook)(Value label, Value initialValue, Value min, Value max, Unit unit, void(*onOk)(float), void(*onCancel)());
 extern void (*stopScriptHook)();
@@ -42,6 +48,13 @@ extern void (*finishToDebuggerMessageHook)();
 extern void (*onDebuggerInputAvailableHook)();
 
 extern void (*executeDashboardComponentHook)(uint16_t componentType, int flowStateIndex, int componentIndex);
+
+extern void (*onArrayValueFreeHook)(ArrayValue *arrayValue);
+
+#if defined(EEZ_FOR_LVGL)
+extern lv_obj_t *(*getLvglObjectFromIndexHook)(int32_t index);
+extern const void *(*getLvglImageByNameHook)(const char *name);
+#endif
 
 } // flow
 } // eez

@@ -64,7 +64,6 @@ struct Hooks {
     );
 #endif
     void (*onGuiQueueMessage)(uint8_t type, int16_t param);
-    void (*onArrayValueFreeHook)(ArrayValue *arrayValue);
 };
 
 extern Hooks g_hooks;

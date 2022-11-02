@@ -18,10 +18,17 @@
 
 #pragma once
 
-#include <eez/gui/geometry.h>
 #include <eez/core/memory.h>
 
+#include <eez/gui/geometry.h>
+#include <eez/gui/event.h>
+
 namespace eez {
+
+struct Assets;
+
+template<typename T>
+struct ListOfAssetsPtr;
 
 namespace flow {
 	struct FlowState;
@@ -59,6 +66,8 @@ namespace gui {
 	WIDGET_TYPE(Switch,        SWITCH,         26) \
 	WIDGET_TYPE(Slider,        SLIDER,         27) \
 	WIDGET_TYPE(DropDownList,  DROP_DOWN_LIST, 28) \
+    WIDGET_TYPE(LineChart,     LINE_CHART,     29) \
+    WIDGET_TYPE(QRCode,        QR_CODE,        30) \
 
 #define WIDGET_TYPE(NAME_PASCAL_CASE, NAME, ID) WIDGET_TYPE_##NAME = ID,
 enum WidgetTypes {
@@ -67,15 +76,12 @@ enum WidgetTypes {
 #undef WIDGET_TYPE
 
 struct Widget;
-struct Assets;
 
 ////////////////////////////////////////////////////////////////////////////////
 
 struct WidgetState;
 class AppContext;
 typedef int Cursor;
-
-static const size_t MAX_ITERATORS = 4;
 
 struct BackgroundStyle {
 	int x;
@@ -289,9 +295,6 @@ void applyTimeline(
     WidgetCursor& widgetCursor,
     Rect &widgetRect
 );
-
-template<typename T>
-struct ListOfAssetsPtr;
 
 void doStaticLayout(
     WidgetCursor& widgetCursor,

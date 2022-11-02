@@ -24,12 +24,12 @@ namespace eez {
 namespace flow {
 
 struct SetVariableEntry {
-    eez::gui::AssetsPtr<uint8_t> variable;
-    eez::gui::AssetsPtr<uint8_t> value;
+    AssetsPtr<uint8_t> variable;
+    AssetsPtr<uint8_t> value;
 };
 
 struct SetVariableActionComponent : public Component {
-    eez::gui::ListOfAssetsPtr<SetVariableEntry> entries;
+    ListOfAssetsPtr<SetVariableEntry> entries;
 };
 
 } // flow

@@ -18,7 +18,6 @@
 
 #include <eez/flow/components.h>
 #include <eez/flow/components/call_action.h>
-using namespace eez::gui;
 
 namespace eez {
 namespace flow {

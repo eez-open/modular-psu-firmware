@@ -16,7 +16,7 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#if defined(EEZ_PLATFORM_STM32)
+#if defined(EEZ_PLATFORM_STM32) && !defined(EEZ_FOR_LVGL)
 
 #include <memory.h>
 #include <stdint.h>
@@ -132,7 +132,7 @@ void touchMeasure() {
     uint8_t result[5];
     memset(result, 0, 5);
     HAL_I2C_Master_Receive(&hi2c1, TOUCH_DEVICE_ADDRESS, result, 5, 5);
-    
+
     taskEXIT_CRITICAL();
 
     g_lastZ1Data = result[0] & 1 ? CONF_TOUCH_Z1_THRESHOLD + 1 : 0;

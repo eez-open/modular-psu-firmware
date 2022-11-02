@@ -2406,7 +2406,7 @@ void data_recording(DataOperationEnum operation, const WidgetCursor &widgetCurso
         values[2] = recording.parameters.xAxis.step * 100;
         values[3] = recording.parameters.xAxis.step * 1000;
 
-        StepValues *stepValues = value.getStepValues();
+        StepValues *stepValues = getStepValues(value);
 
         stepValues->values = values;
         stepValues->count = COUNT;
@@ -2601,7 +2601,7 @@ void data_dlog_value_div(DataOperationEnum operation, const WidgetCursor &widget
 	} else if (operation == DATA_OPERATION_GET_IS_CHANNEL_DATA) {
 		value = 0;
 	} else if (operation == DATA_OPERATION_GET_ENCODER_STEP_VALUES) {
-		StepValues *stepValues = value.getStepValues();
+		StepValues *stepValues = getStepValues(value);
 
         stepValues->values = nullptr;
         stepValues->count = 0;
@@ -2678,7 +2678,7 @@ void data_dlog_value_offset(DataOperationEnum operation, const WidgetCursor &wid
 	} else if (operation == DATA_OPERATION_GET_IS_CHANNEL_DATA) {
 		value = 0;
 	} else if (operation == DATA_OPERATION_GET_ENCODER_STEP_VALUES) {
-		StepValues *stepValues = value.getStepValues();
+		StepValues *stepValues = getStepValues(value);
 		
         stepValues->values = nullptr;
         stepValues->count = 0;
@@ -2722,7 +2722,7 @@ void data_dlog_x_axis_offset(DataOperationEnum operation, const WidgetCursor &wi
     } else if (operation == DATA_OPERATION_GET_IS_CHANNEL_DATA) {
         value = 0;
     } else if (operation == DATA_OPERATION_GET_ENCODER_STEP_VALUES) {
-        StepValues *stepValues = value.getStepValues();
+        StepValues *stepValues = getStepValues(value);
         guessStepValues(stepValues, dlog_view::getXAxisUnit(recording));
         stepValues->encoderSettings.mode = edit_mode_step::g_xAxisOffsetEncoderMode;
         value = 1;
@@ -2754,7 +2754,7 @@ void data_dlog_x_axis_div(DataOperationEnum operation, const WidgetCursor &widge
     } else if (operation == DATA_OPERATION_GET_IS_CHANNEL_DATA) {
         value = 0;
     } else if (operation == DATA_OPERATION_GET_ENCODER_STEP_VALUES) {
-        StepValues *stepValues = value.getStepValues();
+        StepValues *stepValues = getStepValues(value);
 		
         stepValues->values = nullptr;
         stepValues->count = 0;
@@ -2927,7 +2927,7 @@ void data_dlog_bookmarks(DataOperationEnum operation, const WidgetCursor &widget
 	} else if (operation == DATA_OPERATION_GET_MAX) {
 		value = MakeValue(1.0f * (bookmarksSize - BOOKMARKS_PER_PAGE), UNIT_NONE);
 	} else if (operation == DATA_OPERATION_GET_ENCODER_STEP_VALUES) {
- 		auto stepValues = value.getStepValues();
+ 		auto stepValues = getStepValues(value);
 
 		static float values[] = { 1.0f, 1.0f * BOOKMARKS_PER_PAGE, 2.0f * BOOKMARKS_PER_PAGE, 5.0f * BOOKMARKS_PER_PAGE, 10.0f * BOOKMARKS_PER_PAGE };
 
@@ -3064,7 +3064,7 @@ void data_dlog_y_values(DataOperationEnum operation, const WidgetCursor &widgetC
 	} else if (operation == DATA_OPERATION_GET_MAX) {
 		value = MakeValue(1.0f * (recording.parameters.numYAxes - Y_VALUES_PER_PAGE), UNIT_NONE);
 	} else if (operation == DATA_OPERATION_GET_ENCODER_STEP_VALUES) {
- 		auto stepValues = value.getStepValues();
+ 		auto stepValues = getStepValues(value);
 
 		static float values[] = { 1.0f, 1.0f * Y_VALUES_PER_PAGE, 2.0f * Y_VALUES_PER_PAGE, 5.0f * Y_VALUES_PER_PAGE, 10.0f * Y_VALUES_PER_PAGE };
 

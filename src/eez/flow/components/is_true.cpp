@@ -20,8 +20,6 @@
 #include <eez/flow/flow_defs_v3.h>
 #include <eez/flow/expression.h>
 
-using namespace eez::gui;
-
 namespace eez {
 namespace flow {
 

@@ -39,7 +39,7 @@ void ToggleButtonWidgetState::render() {
     auto widget = (const ToggleButtonWidget *)widgetCursor.widget;
     const Style* style = getStyle(widget->style);
 
-    auto text = flags.enabled ? widget->text2 : widget->text1;
+    auto &text = flags.enabled ? widget->text2 : widget->text1;
     if (text) {
         drawText(
             static_cast<const char *>(text),

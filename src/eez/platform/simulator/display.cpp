@@ -16,6 +16,8 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
+#if OPTION_GUI || !defined(OPTION_GUI)
+
 #include <math.h>
 #include <memory.h>
 #include <stdio.h>
@@ -379,3 +381,5 @@ EM_PORT_API(uint8_t*) getSyncedBuffer() {
 }
 
 #endif
+
+#endif // OPTION_GUI || !defined(OPTION_GUI)

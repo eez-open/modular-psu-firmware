@@ -22,13 +22,11 @@
 #include <eez/flow/components/call_action.h>
 #include <eez/flow/flow_defs_v3.h>
 
-using namespace eez::gui;
-
 namespace eez {
 namespace flow {
 
 bool getCallActionValue(FlowState *flowState, unsigned componentIndex, Value &value) {
-	auto component = (InputActionComponent *)flowState->flow->components[componentIndex];
+	auto component = flowState->flow->components[componentIndex];
 
 	if (!flowState->parentFlowState) {
 		throwError(flowState, componentIndex, "No parentFlowState in Input\n");
@@ -42,28 +40,27 @@ bool getCallActionValue(FlowState *flowState, unsigned componentIndex, Value &va
 
     auto callActionComponent = (CallActionActionComponent *)flowState->parentComponent;
 
-    uint8_t parentComponentInputIndex = callActionComponent->inputsStartIndex + component->inputIndex;
+    uint8_t callActionComponentInputIndex = callActionComponent->inputsStartIndex;
     if (component->type == defs_v3::COMPONENT_TYPE_INPUT_ACTION) {
-        parentComponentInputIndex = callActionComponent->inputsStartIndex + component->inputIndex;
-    } else {
-        parentComponentInputIndex = 0;
+        auto inputActionComponent = (InputActionComponent *)component;
+        callActionComponentInputIndex += inputActionComponent->inputIndex;
     }
 
-    if (parentComponentInputIndex >= flowState->parentComponent->inputs.count) {
+    if (callActionComponentInputIndex >= callActionComponent->inputs.count) {
         throwError(flowState, componentIndex, "Invalid input index in Input\n");
         return false;
     }
 
-    auto parentComponentInputs = flowState->parentComponent->inputs;
-    auto flowInputIndex = parentComponentInputs[parentComponentInputIndex];
+    auto &parentComponentInputs = callActionComponent->inputs;
+    auto parentFlowInputIndex = parentComponentInputs[callActionComponentInputIndex];
 
     auto parentFlow = flowState->flowDefinition->flows[flowState->parentFlowState->flowIndex];
-    if (flowInputIndex >= parentFlow->componentInputs.count) {
+    if (parentFlowInputIndex >= parentFlow->componentInputs.count) {
         throwError(flowState, componentIndex, "Invalid input index of parent component in Input\n");
         return false;
     }
 
-    value = flowState->parentFlowState->values[flowInputIndex];
+    value = flowState->parentFlowState->values[parentFlowInputIndex];
     return true;
 }
 

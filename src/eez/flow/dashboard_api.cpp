@@ -23,13 +23,17 @@
 
 #include <stdlib.h>
 #include <stdio.h>
+#include <string.h>
+
+#include <eez/core/os.h>
 
 #include <eez/flow/flow.h>
 #include <eez/flow/expression.h>
 #include <eez/flow/dashboard_api.h>
+#include <eez/flow/private.h>
+#include <eez/flow/debugger.h>
 
 using namespace eez;
-using namespace eez::gui;
 using namespace eez::flow;
 
 namespace eez {
@@ -37,6 +41,10 @@ namespace flow {
 
 int getFlowStateIndex(FlowState *flowState) {
     return (int)((uint8_t *)flowState - ALLOC_BUFFER);
+}
+
+FlowState *getFlowStateFromFlowStateIndex(int flowStateIndex) {
+    return (FlowState *)(ALLOC_BUFFER + flowStateIndex);
 }
 
 struct DashboardComponentExecutionState : public ComponenentExecutionState {
@@ -50,10 +58,6 @@ struct DashboardComponentExecutionState : public ComponenentExecutionState {
 
 } // flow
 } // eez
-
-static inline FlowState *getFlowState(int flowStateIndex) {
-    return (FlowState *)(ALLOC_BUFFER + flowStateIndex);
-}
 
 static void updateArrayValue(ArrayValue *arrayValue1, ArrayValue *arrayValue2) {
     for (uint32_t i = 0; i < arrayValue1->arraySize; i++) {
@@ -133,24 +137,25 @@ EM_PORT_API(void) valueFree(Value *valuePtr) {
 }
 
 EM_PORT_API(void) setGlobalVariable(int globalVariableIndex, Value *valuePtr) {
-    auto flowDefinition = static_cast<FlowDefinition *>(g_mainAssets->flowDefinition);
+    auto flowDefinition = static_cast<FlowDefinition *>(eez::g_mainAssets->flowDefinition);
     Value *globalVariableValuePtr = flowDefinition->globalVariables[globalVariableIndex];
     *globalVariableValuePtr = *valuePtr;
+    onValueChanged(globalVariableValuePtr);
 }
 
 EM_PORT_API(void) updateGlobalVariable(int globalVariableIndex, Value *valuePtr) {
-    auto flowDefinition = static_cast<FlowDefinition *>(g_mainAssets->flowDefinition);
+    auto flowDefinition = static_cast<FlowDefinition *>(eez::g_mainAssets->flowDefinition);
     Value *globalVariableValuePtr = flowDefinition->globalVariables[globalVariableIndex];
     updateArrayValue(globalVariableValuePtr->getArray(), valuePtr->getArray());
 }
 
 EM_PORT_API(int) getFlowIndex(int flowStateIndex) {
-    auto flowState = getFlowState(flowStateIndex);
+    auto flowState = getFlowStateFromFlowStateIndex(flowStateIndex);
     return flowState->flowIndex;
 }
 
 EM_PORT_API(int) getComponentExecutionState(int flowStateIndex, int componentIndex) {
-    auto flowState = getFlowState(flowStateIndex);
+    auto flowState = getFlowStateFromFlowStateIndex(flowStateIndex);
     auto component = flowState->flow->components[componentIndex];
     auto executionState = (DashboardComponentExecutionState *)flowState->componenentExecutionStates[componentIndex];
     if (executionState) {
@@ -160,7 +165,7 @@ EM_PORT_API(int) getComponentExecutionState(int flowStateIndex, int componentInd
 }
 
 EM_PORT_API(void) setComponentExecutionState(int flowStateIndex, int componentIndex, int state) {
-    auto flowState = getFlowState(flowStateIndex);
+    auto flowState = getFlowStateFromFlowStateIndex(flowStateIndex);
     auto component = flowState->flow->components[componentIndex];
     auto executionState = (DashboardComponentExecutionState *)flowState->componenentExecutionStates[componentIndex];
     if (executionState) {
@@ -178,17 +183,17 @@ EM_PORT_API(void) setComponentExecutionState(int flowStateIndex, int componentIn
 }
 
 EM_PORT_API(uint32_t) getUint32Param(int flowStateIndex, int componentIndex, int offset) {
-    auto flowState = getFlowState(flowStateIndex);
+    auto flowState = getFlowStateFromFlowStateIndex(flowStateIndex);
     auto component = flowState->flow->components[componentIndex];
     return *(const uint32_t *)((const uint8_t *)component + sizeof(Component) + offset);
 }
 
 
 EM_PORT_API(const char *) getStringParam(int flowStateIndex, int componentIndex, int offset) {
-    auto flowState = getFlowState(flowStateIndex);
+    auto flowState = getFlowStateFromFlowStateIndex(flowStateIndex);
     auto component = flowState->flow->components[componentIndex];
-    auto ptr = (const uint32_t *)((const uint8_t *)component + sizeof(Component) + offset);
-    return (const char *)(MEMORY_BEGIN + 4 + *ptr);
+    auto ptr = (AssetsPtr<const char> *)((const uint8_t *)component + sizeof(Component) + offset);
+    return *ptr;
 }
 
 struct ExpressionList {
@@ -197,26 +202,20 @@ struct ExpressionList {
 };
 
 EM_PORT_API(void *) getExpressionListParam(int flowStateIndex, int componentIndex, int offset) {
-    auto flowState = getFlowState(flowStateIndex);
+    auto flowState = getFlowStateFromFlowStateIndex(flowStateIndex);
     auto component = flowState->flow->components[componentIndex];
 
-    struct List {
-        uint32_t count;
-        uint32_t items;
-    };
-    auto list = (const List *)((const uint8_t *)component + sizeof(Component) + offset);
+    auto &list = *(ListOfAssetsPtr<uint8_t> *)((const uint8_t *)component + sizeof(Component) + offset);
 
-    auto expressionList = (ExpressionList *)::malloc((list->count + 1) * sizeof(Value));
+    auto expressionList = (ExpressionList *)::malloc(sizeof(ExpressionList) + (list.count - 1) * sizeof(Value));
 
-    expressionList->count = list->count;
+    expressionList->count = list.count;
 
-    auto items = (const uint32_t *)(MEMORY_BEGIN + 4 + list->items);
-
-    for (uint32_t i = 0; i < list->count; i++) {
+    for (uint32_t i = 0; i < list.count; i++) {
         // call Value constructor
         new (expressionList->values + i) Value();
 
-        auto valueExpression = (const uint8_t *)(MEMORY_BEGIN + 4 + items[i]);
+        auto valueExpression = list[i];
         if (!evalExpression(flowState, componentIndex, valueExpression, expressionList->values[i], "Failed to evaluate expression")) {
             return nullptr;
         }
@@ -236,21 +235,23 @@ EM_PORT_API(void) freeExpressionListParam(void *ptr) {
     ::free(ptr);
 }
 
+struct Expressions {
+    AssetsPtr<uint8_t> expressions[1];
+};
+
 EM_PORT_API(int) getListParamSize(int flowStateIndex, int componentIndex, int offset) {
-    auto flowState = getFlowState(flowStateIndex);
+    auto flowState = getFlowStateFromFlowStateIndex(flowStateIndex);
     auto component = flowState->flow->components[componentIndex];
-    auto list = (ListOfAssetsPtr<void> *)((const uint8_t *)component + sizeof(Component) + offset);
+    auto list = (ListOfAssetsPtr<Expressions> *)((const uint8_t *)component + sizeof(Component) + offset);
     return list->count;
 }
 
 EM_PORT_API(Value *) evalListParamElementExpression(int flowStateIndex, int componentIndex, int listOffset, int elementIndex, int expressionOffset, const char *errorMessage) {
-    auto flowState = getFlowState(flowStateIndex);
+    auto flowState = getFlowStateFromFlowStateIndex(flowStateIndex);
     auto component = flowState->flow->components[componentIndex];
 
-    auto list = (ListOfAssetsPtr<void> *)((const uint8_t *)component + sizeof(Component) + listOffset);
-    auto items = (uint32_t *)((uint8_t *)list->items + (uint32_t)MEMORY_BEGIN + 4);
-    auto item = (uint8_t *)((uint8_t *)items[elementIndex] + (uint32_t)MEMORY_BEGIN + 4);
-    auto expressionInstructions = (uint8_t *)((uint8_t *)(*((uint32_t *)(item + expressionOffset))) + (uint32_t)MEMORY_BEGIN + 4);
+    ListOfAssetsPtr<Expressions> &list = *(ListOfAssetsPtr<Expressions> *)((const uint8_t *)component + sizeof(Component) + listOffset);
+    auto &expressionInstructions = list[elementIndex]->expressions[expressionOffset / 4];
 
     Value result;
     if (!evalExpression(flowState, componentIndex, expressionInstructions, result, errorMessage)) {
@@ -269,18 +270,17 @@ EM_PORT_API(Value *) evalListParamElementExpression(int flowStateIndex, int comp
 }
 
 EM_PORT_API(Value*) getInputValue(int flowStateIndex, int inputIndex) {
-    auto flowState = getFlowState(g_mainAssets, flowStateIndex);
+    auto flowState = getFlowStateFromFlowStateIndex(flowStateIndex);
     return flowState->values + inputIndex;
 }
 
 EM_PORT_API(void) clearInputValue(int flowStateIndex, int inputIndex) {
-    auto flowState = getFlowState(g_mainAssets, flowStateIndex);
-    flowState->values[inputIndex] = Value();
-    onValueChanged(flowState->values + inputIndex);
+    auto flowState = getFlowStateFromFlowStateIndex(flowStateIndex);
+    clearInputValue(flowState, inputIndex);
 }
 
 EM_PORT_API(Value *) evalProperty(int flowStateIndex, int componentIndex, int propertyIndex, int32_t *iterators) {
-    auto flowState = getFlowState(g_mainAssets, flowStateIndex);
+    auto flowState = getFlowStateFromFlowStateIndex(flowStateIndex);
 
     Value result;
     if (!eez::flow::evalProperty(flowState, componentIndex, propertyIndex, result, "Failed to evaluate property", nullptr, iterators)) {
@@ -299,7 +299,7 @@ EM_PORT_API(Value *) evalProperty(int flowStateIndex, int componentIndex, int pr
 }
 
 EM_PORT_API(void) assignProperty(int flowStateIndex, int componentIndex, int propertyIndex, int32_t *iterators, Value *srcValuePtr) {
-    auto flowState = getFlowState(g_mainAssets, flowStateIndex);
+    auto flowState = getFlowStateFromFlowStateIndex(flowStateIndex);
 
     Value dstValue;
     if (evalAssignableProperty(flowState, componentIndex, propertyIndex, dstValue, nullptr, nullptr, iterators)) {
@@ -308,7 +308,7 @@ EM_PORT_API(void) assignProperty(int flowStateIndex, int componentIndex, int pro
 }
 
 EM_PORT_API(void) setPropertyField(int flowStateIndex, int componentIndex, int propertyIndex, int fieldIndex, Value *valuePtr) {
-    auto flowState = getFlowState(g_mainAssets, flowStateIndex);
+    auto flowState = getFlowStateFromFlowStateIndex(flowStateIndex);
 
     Value result;
     if (!eez::flow::evalProperty(flowState, componentIndex, propertyIndex, result, "Failed to evaluate property")) {
@@ -336,37 +336,37 @@ EM_PORT_API(void) setPropertyField(int flowStateIndex, int componentIndex, int p
 }
 
 EM_PORT_API(void) propagateValue(int flowStateIndex, int componentIndex, int outputIndex, Value *valuePtr) {
-    auto flowState = getFlowState(g_mainAssets, flowStateIndex);
+    auto flowState = getFlowStateFromFlowStateIndex(flowStateIndex);
     eez::flow::propagateValue(flowState, componentIndex, outputIndex, *valuePtr);
 }
 
 EM_PORT_API(void) propagateValueThroughSeqout(int flowStateIndex, int componentIndex) {
-    auto flowState = getFlowState(flowStateIndex);
+    auto flowState = getFlowStateFromFlowStateIndex(flowStateIndex);
 	eez::flow::propagateValueThroughSeqout(flowState, componentIndex);
 }
 
 EM_PORT_API(void) startAsyncExecution(int flowStateIndex, int componentIndex) {
-    auto flowState = getFlowState(flowStateIndex);
+    auto flowState = getFlowStateFromFlowStateIndex(flowStateIndex);
     eez::flow::startAsyncExecution(flowState, componentIndex);
 }
 
 EM_PORT_API(void) endAsyncExecution(int flowStateIndex, int componentIndex) {
-    auto flowState = getFlowState(flowStateIndex);
+    auto flowState = getFlowStateFromFlowStateIndex(flowStateIndex);
     eez::flow::endAsyncExecution(flowState, componentIndex);
 }
 
 EM_PORT_API(void) executeCallAction(int flowStateIndex, int componentIndex, int flowIndex) {
-    auto flowState = getFlowState(flowStateIndex);
+    auto flowState = getFlowStateFromFlowStateIndex(flowStateIndex);
     eez::flow::executeCallAction(flowState, componentIndex, flowIndex);
 }
 
 EM_PORT_API(void) logInfo(int flowStateIndex, int componentIndex, const char *infoMessage) {
-    auto flowState = getFlowState(flowStateIndex);
+    auto flowState = getFlowStateFromFlowStateIndex(flowStateIndex);
     eez::flow::logInfo(flowState, componentIndex, infoMessage);
 }
 
 EM_PORT_API(void) throwError(int flowStateIndex, int componentIndex, const char *errorMessage) {
-    auto flowState = getFlowState(flowStateIndex);
+    auto flowState = getFlowStateFromFlowStateIndex(flowStateIndex);
 	eez::flow::throwError(flowState, componentIndex, errorMessage);
 }
 
@@ -381,7 +381,7 @@ EM_PORT_API(int) getFirstChildFlowState(int flowStateIndex) {
     if (flowStateIndex == -1) {
         return -1;
     }
-    auto flowState = getFlowState(flowStateIndex);
+    auto flowState = getFlowStateFromFlowStateIndex(flowStateIndex);
     auto firstChildFlowState = flowState->firstChild;
     if (!firstChildFlowState) {
         return -1;
@@ -393,7 +393,7 @@ EM_PORT_API(int) getNextSiblingFlowState(int flowStateIndex) {
     if (flowStateIndex == -1) {
         return -1;
     }
-    auto flowState = getFlowState(flowStateIndex);
+    auto flowState = getFlowStateFromFlowStateIndex(flowStateIndex);
     auto nextSiblingFlowState = flowState->nextSibling;
     if (!nextSiblingFlowState) {
         return -1;
@@ -405,13 +405,14 @@ EM_PORT_API(int) getFlowStateFlowIndex(int flowStateIndex) {
     if (flowStateIndex == -1) {
         return -1;
     }
-    auto flowState = getFlowState(flowStateIndex);
+    auto flowState = getFlowStateFromFlowStateIndex(flowStateIndex);
     return flowState->flowIndex;
 }
 
+#if OPTION_GUI || !defined(OPTION_GUI)
 EM_PORT_API(bool) isRTL() {
     return g_isRTL;
 }
-
+#endif
 
 #endif // __EMSCRIPTEN__

@@ -314,8 +314,8 @@ void GaugeWidgetState::render() {
 	char valueText[50];
 	snprintf(valueText, sizeof(valueText), "%g", value);
 	if (unit && *unit) {
-			stringAppendString(valueText, sizeof(valueText), " ");
-			stringAppendString(valueText, sizeof(valueText), unit);
+        stringAppendString(valueText, sizeof(valueText), " ");
+        stringAppendString(valueText, sizeof(valueText), unit);
 	}
 	auto valueTextWidth = display::measureStr(valueText, -1, valueFont);
 	drawText(

@@ -21,7 +21,9 @@
 #include <eez/flow/flow_defs_v3.h>
 #include <eez/flow/expression.h>
 
+#if OPTION_GUI || !defined(OPTION_GUI)
 #include <eez/gui/gui.h>
+#endif
 
 namespace eez {
 namespace flow {
@@ -34,6 +36,7 @@ struct ShowMessagePageActionComponent : public Component {
 };
 
 void executeShowMessageBoxComponent(FlowState *flowState, unsigned componentIndex) {
+#if OPTION_GUI || !defined(OPTION_GUI)
 	auto component = (ShowMessagePageActionComponent *)flowState->flow->components[componentIndex];
 
     Value messageValue;
@@ -46,6 +49,7 @@ void executeShowMessageBoxComponent(FlowState *flowState, unsigned componentInde
 	} else if (component->type == MESSAGE_BOX_TYPE_ERROR) {
 		getAppContextFromId(APP_CONTEXT_ID_DEVICE)->errorMessage(messageValue);
 	}
+#endif
 }
 
 } // namespace flow

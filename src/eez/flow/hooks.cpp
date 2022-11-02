@@ -16,10 +16,14 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
+#include <assert.h>
 #include <math.h>
 
 #include <eez/flow/hooks.h>
+
+#if OPTION_GUI || !defined(OPTION_GUI)
 #include <eez/gui/gui.h>
+#endif
 
 namespace eez {
 namespace flow {
@@ -28,8 +32,10 @@ static bool isFlowRunning() {
 	return true;
 }
 
-static void replacePage(int16_t pageId) {
+static void replacePage(int16_t pageId, uint32_t animType, uint32_t speed, uint32_t delay) {
+#if OPTION_GUI || !defined(OPTION_GUI)
 	eez::gui::getAppContextFromId(APP_CONTEXT_ID_DEVICE)->replacePage(pageId);
+#endif
 }
 
 static void showKeyboard(Value label, Value initialText, Value minChars, Value maxChars, bool isPassword, void(*onOk)(char *), void(*onCancel)()) {
@@ -58,7 +64,7 @@ static void onDebuggerInputAvailable() {
 }
 
 bool (*isFlowRunningHook)() = isFlowRunning;
-void (*replacePageHook)(int16_t pageId) = replacePage;
+void (*replacePageHook)(int16_t pageId, uint32_t animType, uint32_t speed, uint32_t delay) = replacePage;
 void (*showKeyboardHook)(Value label, Value initialText, Value minChars, Value maxChars, bool isPassword, void(*onOk)(char *), void(*onCancel)()) = showKeyboard;
 void (*showKeypadHook)(Value label, Value initialValue, Value min, Value max, Unit unit, void(*onOk)(float), void(*onCancel)()) = showKeypad;
 void (*stopScriptHook)() = stopScript;
@@ -71,6 +77,21 @@ void (*finishToDebuggerMessageHook)() = finishToDebuggerMessage;
 void (*onDebuggerInputAvailableHook)() = onDebuggerInputAvailable;
 
 void (*executeDashboardComponentHook)(uint16_t componentType, int flowStateIndex, int componentIndex) = nullptr;
+
+void (*onArrayValueFreeHook)(ArrayValue *arrayValue) = nullptr;
+
+#if defined(EEZ_FOR_LVGL)
+static lv_obj_t *getLvglObjectFromIndex(int32_t index) {
+    return 0;
+}
+
+static const void *getLvglImageByName(const char *name) {
+    return 0;
+}
+
+lv_obj_t *(*getLvglObjectFromIndexHook)(int32_t index) = getLvglObjectFromIndex;
+const void *(*getLvglImageByNameHook)(const char *name) = getLvglImageByName;
+#endif
 
 } // namespace flow
 } // namespace eez

@@ -16,6 +16,8 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
+#include <stdio.h>
+
 #include <eez/flow/components.h>
 #include <eez/flow/flow_defs_v3.h>
 #include <eez/flow/expression.h>

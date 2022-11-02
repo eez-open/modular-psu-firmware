@@ -24,7 +24,7 @@
 #include <ctype.h>
 #include <string.h>
 
-#if defined(EEZ_PLATFORM_STM32)
+#if defined(EEZ_PLATFORM_STM32) && !defined(EEZ_FOR_LVGL)
 #include <crc.h>
 #endif
 
@@ -194,7 +194,7 @@ void stringAppendLoad(char *str, size_t maxStrLength, float value) {
     }
 }
 
-#if defined(EEZ_PLATFORM_STM32)
+#if defined(EEZ_PLATFORM_STM32) && !defined(EEZ_FOR_LVGL)
 uint32_t crc32(const uint8_t *mem_block, size_t block_size) {
 	return HAL_CRC_Calculate(&hcrc, (uint32_t *)mem_block, block_size);
 }

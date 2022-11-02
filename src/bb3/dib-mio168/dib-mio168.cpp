@@ -6497,7 +6497,7 @@ void data_dib_mio168_ain_nplc(DataOperationEnum operation, const WidgetCursor &w
     } else if (operation == DATA_OPERATION_GET_ENCODER_STEP_VALUES) {
         static float values[] = { 0.1f, 0.2f, 0.5f, 1.0f };
 
-        StepValues *stepValues = value.getStepValues();
+        StepValues *stepValues = getStepValues(value);
 
         stepValues->values = values;
         stepValues->count = sizeof(values) / sizeof(float);
@@ -7185,7 +7185,7 @@ void data_dib_mio168_aout_value(DataOperationEnum operation, const WidgetCursor 
             value = UNIT_VOLT;
         }
     } else if (operation == DATA_OPERATION_GET_ENCODER_STEP_VALUES) {
-        StepValues *stepValues = value.getStepValues();
+        StepValues *stepValues = getStepValues(value);
 
         if (aoutChannelIndex < 2) {
             auto &channel = ((Mio168Module *)g_slots[slotIndex])->aoutDac7760Channels[aoutChannelIndex];
@@ -7538,7 +7538,7 @@ void data_dib_mio168_pwm_freq(DataOperationEnum operation, const WidgetCursor &w
     } else if (operation == DATA_OPERATION_GET_ENCODER_STEP_VALUES) {
         static float values[] = { 1.0f, 100.0f, 1000.0f, 10000.0f };
 
-        StepValues *stepValues = value.getStepValues();
+        StepValues *stepValues = getStepValues(value);
 
         stepValues->values = values;
         stepValues->count = sizeof(values) / sizeof(float);
@@ -7587,7 +7587,7 @@ void data_dib_mio168_pwm_duty(DataOperationEnum operation, const WidgetCursor &w
     } else if (operation == DATA_OPERATION_GET_ENCODER_STEP_VALUES) {
         static float values[] = { 0.1f, 0.5f, 1.0f, 5.0f };
 
-        StepValues *stepValues = value.getStepValues();
+        StepValues *stepValues = getStepValues(value);
 
         stepValues->values = values;
         stepValues->count = sizeof(values) / sizeof(float);
