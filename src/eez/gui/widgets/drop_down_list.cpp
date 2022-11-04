@@ -54,7 +54,7 @@ void DropDownListWidgetState::render() {
 
 	char text[64] = { 0 };
 
-	if (options.type == VALUE_TYPE_ARRAY || options.type == VALUE_TYPE_ARRAY_REF) {
+	if (options.isArray()) {
         auto array = options.getArray();
 		if (data.getInt() >= 0 && data.getInt() < (int)array->arraySize) {
             const Value &value = array->values[data.getInt()];
@@ -109,7 +109,7 @@ static void enumDefinitionFunc(DataOperationEnum operation, const WidgetCursor &
 	auto widget = (const DropDownListWidget *)g_dropDownListWidgetCursor.widget;
 	auto options = get(g_dropDownListWidgetCursor, widget->options);
 
-	if (options.type == VALUE_TYPE_ARRAY || options.type == VALUE_TYPE_ARRAY_REF) {
+	if (options.isArray()) {
         auto array = options.getArray();
 		if (widgetCursor.cursor >= 0 && widgetCursor.cursor < (int)options.getArray()->arraySize) {
 			if (operation == DATA_OPERATION_GET_LABEL) {

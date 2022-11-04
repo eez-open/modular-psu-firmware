@@ -61,7 +61,7 @@ struct DashboardComponentExecutionState : public ComponenentExecutionState {
 
 static void updateArrayValue(ArrayValue *arrayValue1, ArrayValue *arrayValue2) {
     for (uint32_t i = 0; i < arrayValue1->arraySize; i++) {
-        if (arrayValue1->values[i].getType() == VALUE_TYPE_ARRAY || arrayValue1->values[i].getType() == VALUE_TYPE_ARRAY_REF) {
+        if (arrayValue1->values[i].isArray()) {
             updateArrayValue(arrayValue1->values[i].getArray(), arrayValue2->values[i].getArray());
         } else {
             arrayValue1->values[i] = arrayValue2->values[i];
@@ -319,7 +319,7 @@ EM_PORT_API(void) setPropertyField(int flowStateIndex, int componentIndex, int p
 		result = *result.pValueValue;
 	}
 
-    if (result.getType() != VALUE_TYPE_ARRAY && result.getType() != VALUE_TYPE_ARRAY_REF) {
+    if (!result.isArray()) {
         throwError(flowState, componentIndex, "Property is not an array");
         return;
     }

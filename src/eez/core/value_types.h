@@ -36,23 +36,25 @@
     VALUE_TYPE(FLOAT)                              /* 11 */ \
 	VALUE_TYPE(DOUBLE)                             /* 12 */ \
     VALUE_TYPE(STRING)                             /* 13 */ \
-    VALUE_TYPE(ARRAY)                              /* 14 */ \
-	VALUE_TYPE(STRING_REF)                         /* 15 */ \
-    VALUE_TYPE(ARRAY_REF)                          /* 16 */ \
-    VALUE_TYPE(BLOB_REF)                           /* 17 */ \
-    VALUE_TYPE(STREAM)                             /* 18 */ \
-    VALUE_TYPE(DATE)                               /* 19 */ \
-	VALUE_TYPE(VERSIONED_STRING)                   /* 20 */ \
-	VALUE_TYPE(VALUE_PTR)                          /* 21 */ \
-    VALUE_TYPE(ARRAY_ELEMENT_VALUE)                /* 22 */ \
-    VALUE_TYPE(FLOW_OUTPUT)                        /* 23 */ \
-    VALUE_TYPE(NATIVE_VARIABLE)                    /* 24 */ \
-    VALUE_TYPE(RANGE)                              /* 25 */ \
-    VALUE_TYPE(POINTER)                            /* 26 */ \
-    VALUE_TYPE(ENUM)                               /* 27 */ \
-    VALUE_TYPE(IP_ADDRESS)                         /* 28 */ \
-    VALUE_TYPE(TIME_ZONE)                          /* 29 */ \
-    VALUE_TYPE(YT_DATA_GET_VALUE_FUNCTION_POINTER) /* 30 */ \
+    VALUE_TYPE(STRING_ASSET)                       /* 14 */ \
+    VALUE_TYPE(ARRAY)                              /* 15 */ \
+    VALUE_TYPE(ARRAY_ASSET)                        /* 16 */ \
+	VALUE_TYPE(STRING_REF)                         /* 17 */ \
+    VALUE_TYPE(ARRAY_REF)                          /* 18 */ \
+    VALUE_TYPE(BLOB_REF)                           /* 19 */ \
+    VALUE_TYPE(STREAM)                             /* 20 */ \
+    VALUE_TYPE(DATE)                               /* 21 */ \
+	VALUE_TYPE(VERSIONED_STRING)                   /* 22 */ \
+	VALUE_TYPE(VALUE_PTR)                          /* 23 */ \
+    VALUE_TYPE(ARRAY_ELEMENT_VALUE)                /* 24 */ \
+    VALUE_TYPE(FLOW_OUTPUT)                        /* 25 */ \
+    VALUE_TYPE(NATIVE_VARIABLE)                    /* 26 */ \
+    VALUE_TYPE(RANGE)                              /* 27 */ \
+    VALUE_TYPE(POINTER)                            /* 28 */ \
+    VALUE_TYPE(ENUM)                               /* 29 */ \
+    VALUE_TYPE(IP_ADDRESS)                         /* 30 */ \
+    VALUE_TYPE(TIME_ZONE)                          /* 31 */ \
+    VALUE_TYPE(YT_DATA_GET_VALUE_FUNCTION_POINTER) /* 32 */ \
     CUSTOM_VALUE_TYPES
 
 namespace eez {

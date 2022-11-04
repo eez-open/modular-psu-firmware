@@ -124,7 +124,7 @@ Unit getInputWidgetUnit(const gui::WidgetCursor &widgetCursor) {
 
 	auto unitValue = get(widgetCursor, widget->unit);
 	if (unitValue.isString()) {
-		return getUnitFromName(unitValue.toString(0x5049bd52).getString());
+		return getUnitFromName(unitValue.getString());
 	} else {
 		return UNIT_NONE;
 	}

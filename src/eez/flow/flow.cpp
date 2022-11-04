@@ -297,7 +297,7 @@ void dataOperation(int16_t dataId, DataOperationEnum operation, const WidgetCurs
 		} else if (operation == DATA_OPERATION_COUNT) {
 			Value arrayValue;
 			getValue(flowDataId, operation, widgetCursor, arrayValue);
-			if (arrayValue.getType() == VALUE_TYPE_ARRAY || arrayValue.getType() == VALUE_TYPE_ARRAY_REF) {
+			if (arrayValue.isArray()) {
 				value = arrayValue.getArray()->arraySize;
 			} else {
 				value = 0;

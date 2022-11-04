@@ -47,7 +47,7 @@ Value op_add(const Value& a1, const Value& b1) {
 	auto a = a1.getValue();
 	auto b = b1.getValue();
 
-	if (a.isAnyStringType() || b.isAnyStringType()) {
+	if (a.isString() || b.isString()) {
 		Value value1 = a.toString(0x84eafaa8);
 		Value value2 = b.toString(0xd273cab6);
 		auto res = Value::concatenateString(value1, value2);
@@ -201,7 +201,7 @@ bool is_equal(const Value& a1, const Value& b1) {
         return false;
     }
 
-	if (a.isAnyStringType() && b.isAnyStringType()) {
+	if (a.isString() && b.isString()) {
 		const char *aStr = a.getString();
 		const char *bStr = b.getString();
 		if (!aStr && !aStr) {
@@ -220,7 +220,7 @@ bool is_less(const Value& a1, const Value& b1) {
 	auto a = a1.getValue();
 	auto b = b1.getValue();
 
-	if (a.isAnyStringType() && b.isAnyStringType()) {
+	if (a.isString() && b.isString()) {
 		const char *aStr = a.getString();
 		const char *bStr = b.getString();
 		if (!aStr || !bStr) {
@@ -1421,7 +1421,7 @@ bool do_OPERATION_TYPE_STRING_SPLIT(EvalStack &stack) {
 bool do_OPERATION_TYPE_ARRAY_LENGTH(EvalStack &stack) {
     auto a = stack.pop().getValue();
 
-    if (a.getType() == VALUE_TYPE_ARRAY || a.getType() == VALUE_TYPE_ARRAY_REF) {
+    if (a.isArray()) {
         auto array = a.getArray();
 
         if (!stack.push(Value(array->arraySize, VALUE_TYPE_UINT32))) {

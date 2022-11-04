@@ -76,7 +76,7 @@ static bool evalExpression(FlowState *flowState, const uint8_t *instructions, in
 				    return false;
 			    }
             } else {
-                if (arrayValue.type != VALUE_TYPE_ARRAY && arrayValue.type != VALUE_TYPE_ARRAY_REF) {
+                if (!arrayValue.isArray()) {
                     throwError(flowState, g_stack.componentIndex, errorMessage, "Array value expected\n");
                     return false;
                 }

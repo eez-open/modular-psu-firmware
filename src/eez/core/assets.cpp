@@ -110,15 +110,22 @@ bool decompressAssetsData(const uint8_t *assetsData, uint32_t assetsDataSize, As
 		return false;
 	}
 
-    if (decompressedAssets->projectMajorVersion >= PROJECT_VERSION_V3) {
-        fixOffsets(decompressedAssets);
-    }
-
 	return true;
 }
 
 void allocMemoryForDecompressedAssets(const uint8_t *assetsData, uint32_t assetsDataSize, uint8_t *&decompressedAssetsMemoryBuffer, uint32_t &decompressedAssetsMemoryBufferSize) {
-    auto decompressedDataOffset = offsetof(Assets, settings);
+// disable warning: offsetof within non-standard-layout type ... is conditionally-supported [-Winvalid-offsetof]
+#ifdef __GNUC__
+#pragma GCC diagnostic push
+#pragma GCC diagnostic ignored "-Winvalid-offsetof"
+#endif
+
+	auto decompressedDataOffset = offsetof(Assets, settings);
+
+#ifdef __GNUC__
+#pragma GCC diagnostic pop
+#endif
+
 
     auto header = (Header *)assetsData;
     assert (header->tag == HEADER_TAG);

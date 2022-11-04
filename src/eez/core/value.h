@@ -247,21 +247,32 @@ struct Value {
     }
 
     Value& operator = (const Value &value) {
-		freeRef();
+        if (value.type == VALUE_TYPE_STRING_ASSET) {
+            type = VALUE_TYPE_STRING;
+            unit = 0;
+            options = 0;
+            strValue = (const char *)((uint8_t *)&value.int32Value + value.int32Value);
+        } else if (value.type == VALUE_TYPE_ARRAY_ASSET) {
+            type = VALUE_TYPE_ARRAY;
+            unit = 0;
+            options = 0;
+            arrayValue = (ArrayValue *)((uint8_t *)&value.int32Value + value.int32Value);
+        } else {
+            freeRef();
 
-		type = value.type;
-		unit = value.unit;
-		options = value.options;
-        memcpy((void *)&int64Value, (const void *)&value.int64Value, sizeof(int64_t));
+            type = value.type;
+            unit = value.unit;
+            options = value.options;
+            memcpy((void *)&int64Value, (const void *)&value.int64Value, sizeof(int64_t));
 
-		if (options & VALUE_OPTIONS_REF) {
-			refValue->refCounter++;
-		}/* else if (type == VALUE_TYPE_VALUE_PTR) {
-            if (pValueValue->options & VALUE_OPTIONS_REF) {
-			    pValueValue->refValue->refCounter++;
-		    }
-        }*/
-
+            if (options & VALUE_OPTIONS_REF) {
+                refValue->refCounter++;
+            }/* else if (type == VALUE_TYPE_VALUE_PTR) {
+                if (pValueValue->options & VALUE_OPTIONS_REF) {
+                    pValueValue->refValue->refCounter++;
+                }
+            }*/
+        }
         return *this;
     }
 
@@ -317,11 +328,11 @@ struct Value {
 	}
 
 	bool isString() const {
-        return type == VALUE_TYPE_STRING;
+        return type == VALUE_TYPE_STRING || type == VALUE_TYPE_STRING_ASSET || type == VALUE_TYPE_STRING_REF;
     }
 
-	bool isAnyStringType() const {
-        return type == VALUE_TYPE_STRING || type == VALUE_TYPE_STRING_REF;
+    bool isArray() const {
+        return type == VALUE_TYPE_ARRAY || type == VALUE_TYPE_ARRAY_ASSET || type == VALUE_TYPE_ARRAY_REF;
     }
 
     Unit getUnit() const {
