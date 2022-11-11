@@ -23,7 +23,7 @@
 namespace eez {
 namespace flow {
 
-typedef bool (*EvalOperation)(EvalStack &);
+typedef void (*EvalOperation)(EvalStack &);
 
 extern EvalOperation g_evalOperations[];
 

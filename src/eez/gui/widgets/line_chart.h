@@ -37,13 +37,12 @@ struct LineChartWidget : public Widget {
     int16_t marginRight;
     int16_t marginBottom;
 
+    int16_t titleStyle;
     int16_t legendStyle;
 	int16_t xAxisStyle;
     int16_t yAxisStyle;
 
     uint16_t componentIndex;
-
-    uint16_t reserved;
 };
 
 struct LineChartWidgetState : public WidgetState {

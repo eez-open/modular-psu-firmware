@@ -16,15 +16,15 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
+#if OPTION_GUI || !defined(OPTION_GUI)
+
 #include <eez/flow/components.h>
 #include <eez/flow/flow_defs_v3.h>
 #include <eez/flow/expression.h>
 #include <eez/flow/private.h>
 
-#if OPTION_GUI || !defined(OPTION_GUI)
 #include <eez/gui/gui.h>
 using namespace eez::gui;
-#endif
 
 namespace eez {
 namespace flow {
@@ -37,13 +37,13 @@ struct SetPageDirectionComponent : public Component {
 };
 
 void executeSetPageDirectionComponent(FlowState *flowState, unsigned componentIndex) {
-#if OPTION_GUI || !defined(OPTION_GUI)
 	auto component = (SetPageDirectionComponent *)flowState->flow->components[componentIndex];
     gui::g_isRTL = component->direction == PAGE_DIRECTION_RTL;
     gui::refreshScreen();
     propagateValueThroughSeqout(flowState, componentIndex);
-#endif
 }
 
 } // namespace flow
 } // namespace eez
+
+#endif // OPTION_GUI || !defined(OPTION_GUI)

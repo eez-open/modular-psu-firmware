@@ -69,7 +69,7 @@ void drawLineInBarGraphWidget(const BarGraphWidget *barGraphWidget, int p, uint1
 bool BarGraphWidgetState::updateState() {
     WIDGET_STATE_START(BarGraphWidget);
 
-    const Style* style = getStyle(g_hooks.overrideStyle(widgetCursor, widget->style));
+    const Style* style = getStyle(overrideStyle(widgetCursor, widget->style));
 
     WIDGET_STATE(flags.active, g_isActiveWidget);
     WIDGET_STATE(flags.blinking, g_isBlinkTime && isBlinking(widgetCursor, widget->data));
@@ -101,7 +101,7 @@ void BarGraphWidgetState::render() {
     const WidgetCursor &widgetCursor = g_widgetCursor;
 
     auto widget = (const BarGraphWidget *)widgetCursor.widget;
-    const Style* style = getStyle(g_hooks.overrideStyle(widgetCursor, widget->style));
+    const Style* style = getStyle(overrideStyle(widgetCursor, widget->style));
 
     int x = widgetCursor.x;
     int y = widgetCursor.y;

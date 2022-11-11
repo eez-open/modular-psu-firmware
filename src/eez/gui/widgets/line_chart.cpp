@@ -71,8 +71,8 @@ void calcAutoTicks(Axis &axis) {
 
     auto range = axis.max - axis.min;
 
-    auto min = axis.min - 0.1 * range;
-    auto max = axis.max + 0.1 * range;
+    auto min = axis.min - 0.05 * range;
+    auto max = axis.max + 0.05 * range;
 
     range = max - min;
 
@@ -132,6 +132,7 @@ void LineChartWidgetState::render() {
     auto component = (flow::LineChartWidgetComponenent *)widgetCursor.flowState->flow->components[widget->componentIndex];
 
 	const Style* style = getStyle(widget->style);
+    const Style* titleStyle = getStyle(widget->titleStyle);
 	const Style* legendStyle = getStyle(widget->legendStyle);
 	const Style* xAxisStyle = getStyle(widget->xAxisStyle);
 	const Style* yAxisStyle = getStyle(widget->yAxisStyle);
@@ -182,8 +183,13 @@ void LineChartWidgetState::render() {
     } else {
         chart.xAxis.min = 0;
         chart.xAxis.max = 0;
-        chart.yAxis.min = 0;
-        chart.yAxis.max = 0;
+        if (widget->yAxisRangeOption == Y_AXIS_RANGE_OPTION_FLOATING) {
+            chart.yAxis.min = 0;
+            chart.yAxis.max = 0;
+        } else {
+            chart.yAxis.min = yAxisRangeFrom.toDouble();
+            chart.yAxis.max = yAxisRangeTo.toDouble();
+        }
     }
 
     if (chart.xAxis.min >= chart.xAxis.max) {
@@ -203,10 +209,10 @@ void LineChartWidgetState::render() {
         widgetCursor.h
     };
 
-    int16_t marginLeft = widget->marginLeft;
-    int16_t marginTop = widget->marginTop;
-    int16_t marginRight = widget->marginRight;
-    int16_t marginBottom = widget->marginBottom;
+    int16_t marginLeft = widget->marginLeft + style->borderSizeLeft + MAX(style->borderRadiusTLX, style->borderRadiusBLX);
+    int16_t marginTop = widget->marginTop + style->borderSizeTop + MAX(style->borderRadiusTLY, style->borderRadiusTRY);
+    int16_t marginRight = widget->marginRight + style->borderSizeRight + MAX(style->borderRadiusTRX, style->borderRadiusBRX);
+    int16_t marginBottom = widget->marginBottom + style->borderSizeBottom + MAX(style->borderRadiusBLY, style->borderRadiusBRY);
 
     // measure legend width
     static const unsigned LEGEND_ICON_WIDTH = 32;
@@ -251,18 +257,25 @@ void LineChartWidgetState::render() {
     gridRect.w = widgetRect.w - (marginLeft + marginRight);
     gridRect.h = widgetRect.h - (marginTop + marginBottom);
 
-    chart.xAxis.maxTicks = chart.xAxis.valueType == AXIS_VALUE_TYPE_DATE ? 4 : 8;
+    auto xAxisFont = styleGetFont(xAxisStyle);
+    auto xAxisLabelWidth = measureStr("12345", -1, xAxisFont, gridRect.w);
+    chart.xAxis.maxTicks = (int)round(gridRect.w / xAxisLabelWidth);
+    if (chart.xAxis.valueType == AXIS_VALUE_TYPE_DATE) {
+        chart.xAxis.maxTicks /= 2;
+    }
 
     chart.xAxis.rect.x = gridRect.x;
     chart.xAxis.rect.y = gridRect.y + gridRect.h;
     chart.xAxis.rect.w = gridRect.w;
-    chart.xAxis.rect.h = marginBottom;
+    chart.xAxis.rect.h = widget->marginBottom;
 
-    chart.yAxis.maxTicks = 8;
+    auto yAxisFont = styleGetFont(yAxisStyle);
+    auto yAxisLabelHeight = yAxisFont.getHeight() * 1.25;
+    chart.yAxis.maxTicks = (int)round(gridRect.h / yAxisLabelHeight);
 
-    chart.yAxis.rect.x = widgetRect.x;
+    chart.yAxis.rect.x = widgetRect.x + marginLeft - widget->marginLeft;
     chart.yAxis.rect.y = gridRect.y;
-    chart.yAxis.rect.w = marginLeft;
+    chart.yAxis.rect.w = widget->marginLeft;
     chart.yAxis.rect.h = gridRect.h;
 
     calcAutoTicks(chart.xAxis);
@@ -277,19 +290,20 @@ void LineChartWidgetState::render() {
 	graphics.translate(widgetCursor.x, widgetCursor.y);
 
 	// clear background
-	setColor(isActive ? style->activeBackgroundColor : style->backgroundColor);
-	fillRect(widgetCursor.x, widgetCursor.y, widgetCursor.x + widgetCursor.w - 1, widgetCursor.y + widgetCursor.h - 1);
+    drawRectangle(widgetCursor.x, widgetCursor.y, widgetCursor.w, widgetCursor.h, style, isActive, false, true);
 
     // draw title
     static const size_t MAX_TITLE_LEN = 128;
     char text[MAX_TITLE_LEN + 1];
     title.toText(text, sizeof(text));
-    drawText(
-        text, -1,
-        widgetCursor.x, widgetCursor.y, widgetCursor.w, marginTop,
-        style,
-        flags.active
-    );
+    if (*text) {
+        drawText(
+            text, -1,
+            widgetCursor.x, widgetCursor.y, widgetCursor.w, marginTop,
+            titleStyle,
+            flags.active
+        );
+    }
 
     // draw legend
     if (showLegend) {
@@ -352,7 +366,7 @@ void LineChartWidgetState::render() {
         auto from = ceil(chart.xAxis.min / chart.xAxis.ticksDelta) * chart.xAxis.ticksDelta;
         auto to = floor(chart.xAxis.max / chart.xAxis.ticksDelta) * chart.xAxis.ticksDelta;
 
-        auto w = chart.xAxis.ticksDelta * chart.xAxis.scale;
+        auto maxTextWidth = chart.xAxis.ticksDelta * chart.xAxis.scale;
 
         auto &axis = chart.xAxis;
         auto &rect = axis.rect;
@@ -371,10 +385,16 @@ void LineChartWidgetState::render() {
             char *textDate = nullptr;
             int textDateLength = -1;
 
+            int textWidth;
             if (axis.valueType == AXIS_VALUE_TYPE_NUMBER) {
                 snprintf(textBuffer, sizeof(textBuffer), "%g", tick);
                 text = textBuffer;
                 textLength = -1;
+                textWidth = measureStr(
+                    text, textLength,
+                    xAxisFont,
+                    maxTextWidth
+                );
             } else {
                 Value value(tick, VALUE_TYPE_DATE);
                 value.toText(textBuffer, sizeof(textBuffer));
@@ -400,22 +420,35 @@ void LineChartWidgetState::render() {
                 // get date part
                 textDate = textBuffer;
                 textDateLength = text - textBuffer - 1;
+
+                textWidth = measureStr(
+                    text, textLength,
+                    xAxisFont,
+                    maxTextWidth
+                );
+
+                int textDateWidth = measureStr(
+                    textDate, textDateLength,
+                    xAxisFont,
+                    maxTextWidth
+                );
+
+                textWidth = MAX(textWidth, textDateWidth);
             }
 
-            auto xText = widgetCursor.x + (int)round(x - w / 2);
-            auto wText = (int)round(w);
-            if (xText < rect.x) {
-                xText = rect.x;
+            auto xText = widgetCursor.x + (int)round(x - textWidth / 2);
+            if (xText < widgetCursor.x) {
+                xText = widgetCursor.x;
             }
-            if (xText + wText > rect.x + rect.w) {
-                wText = rect.x + rect.w - xText;
+            if (xText + textWidth > widgetCursor.x + widgetCursor.w) {
+                textWidth = widgetCursor.x + widgetCursor.w - xText;
             }
 
             drawText(
                 text, textLength,
                 xText,
                 widgetCursor.y + rect.y,
-                wText,
+                textWidth,
                 rect.h / (textDate ? 2 : 1),
                 xAxisStyle,
                 flags.active
@@ -426,7 +459,7 @@ void LineChartWidgetState::render() {
                     textDate, textDateLength,
                     xText,
                     widgetCursor.y + rect.y + rect.h / 2,
-                    wText,
+                    textWidth,
                     rect.h / 2,
                     xAxisStyle,
                     flags.active
@@ -440,8 +473,6 @@ void LineChartWidgetState::render() {
         auto from = ceil(chart.yAxis.min / chart.yAxis.ticksDelta) * chart.yAxis.ticksDelta;
         auto to = floor(chart.yAxis.max / chart.yAxis.ticksDelta) * chart.yAxis.ticksDelta;
 
-        auto h = abs(chart.yAxis.ticksDelta * chart.yAxis.scale);
-
         auto &axis = chart.yAxis;
         auto &rect = axis.rect;
 
@@ -454,13 +485,15 @@ void LineChartWidgetState::render() {
             char text[128];
             snprintf(text, sizeof(text), "%g", tick);
 
-            auto yText = widgetCursor.y + (int)roundf(y - h / 2);
-            auto hText = (int)round(h);
-            if (yText < rect.y) {
-                yText = rect.y;
+            auto yAxisFont = styleGetFont(yAxisStyle);
+
+            auto yText = widgetCursor.y + (int)roundf(y - yAxisFont.getHeight() / 2);
+            auto hText = yAxisFont.getHeight();
+            if (yText < widgetCursor.y) {
+                yText = widgetCursor.y;
             }
-            if (yText + hText > rect.y + rect.h) {
-                hText = rect.y + rect.h - yText;
+            if (yText + hText > widgetCursor.y + widgetCursor.h) {
+                hText = widgetCursor.y + widgetCursor.h - yText;
             }
 
             drawText(
@@ -506,7 +539,9 @@ void LineChartWidgetState::render() {
 
     // draw lines
     {
-        graphics.clipBox(widgetCursor.x + gridRect.x, widgetCursor.x + gridRect.y, widgetCursor.x + gridRect.x + gridRect.w, widgetCursor.x + gridRect.y + gridRect.h);
+	    // graphics.translate(-widgetCursor.x, -widgetCursor.y);
+        // graphics.clipBox(widgetCursor.x + gridRect.x, widgetCursor.x + gridRect.y, widgetCursor.x + gridRect.x + gridRect.w, widgetCursor.x + gridRect.y + gridRect.h);
+	    // graphics.translate(widgetCursor.x, widgetCursor.y);
 
         for (uint32_t lineIndex = 0; lineIndex < executionState->numLines; lineIndex++) {
             graphics.resetPath();
@@ -528,7 +563,7 @@ void LineChartWidgetState::render() {
 
             auto color16 = getColor16FromIndex(component->lines[lineIndex]->color);
             graphics.lineColor(COLOR_TO_R(color16), COLOR_TO_G(color16), COLOR_TO_B(color16));
-            graphics.lineWidth(1.5);
+            graphics.lineWidth(component->lines[lineIndex]->width);
             graphics.noFill();
             graphics.drawPath();
         }

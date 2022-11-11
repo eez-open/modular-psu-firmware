@@ -28,8 +28,16 @@ namespace gui {
 bool ListWidgetState::updateState() {
     WIDGET_STATE_START(ListWidget);
 
-    startPosition = ytDataGetPosition(widgetCursor, widget->data);
-    count = eez::gui::count(widgetCursor, widget->data);
+    auto newStartPosition = ytDataGetPosition(widgetCursor, widget->data);
+    if ((int)newStartPosition != startPosition) {
+        startPosition = newStartPosition;
+        hasPreviousState = false;
+    }
+    auto newCount = eez::gui::count(widgetCursor, widget->data);
+    if (newCount != count) {
+        count = newCount;
+        hasPreviousState = false;
+    }
 
     WIDGET_STATE_END()
 }
@@ -37,25 +45,26 @@ bool ListWidgetState::updateState() {
 void ListWidgetState::enumChildren() {
     WidgetCursor &widgetCursor = g_widgetCursor;
 
-    if (count > 0) {
-        auto widget = (const ListWidget *)widgetCursor.widget;
+    auto widget = (const ListWidget *)widgetCursor.widget;
+    const Style *trackStyle = getStyle(widget->style);
 
-		auto childWidget = static_cast<const Widget *>(widget->itemWidget);
-		widgetCursor.widget = childWidget;
+    auto childWidget = static_cast<const Widget *>(widget->itemWidget);
+    widgetCursor.widget = childWidget;
 
-        auto savedX = widgetCursor.x;
-        auto savedY = widgetCursor.y;
+    auto savedX = widgetCursor.x;
+    auto savedY = widgetCursor.y;
 
-        auto savedCursor = widgetCursor.cursor;
+    auto savedCursor = widgetCursor.cursor;
 
-        int offset = 0;
+    int offset = 0;
 
-        Value oldValue;
+    Value oldValue;
 
-        auto width = widgetCursor.w;
-        auto height = widgetCursor.h;
+    auto width = widgetCursor.w;
+    auto height = widgetCursor.h;
 
-        for (int index = startPosition; index < count; ++index) {
+    for (int index = startPosition; ; ++index) {
+        if (index >= 0 && index < count) {
             select(widgetCursor, widget->data, index, oldValue);
 
             widgetCursor.w = childWidget->width;
@@ -63,36 +72,57 @@ void ListWidgetState::enumChildren() {
 
             if (widget->listType == LIST_TYPE_VERTICAL) {
                 if (offset < height) {
-					widgetCursor.y = savedY + offset;
-					widgetCursor.pushIterator(index);
+                    widgetCursor.y = savedY + offset;
+                    widgetCursor.pushIterator(index);
                     enumWidget();
-					widgetCursor.popIterator();
+                    widgetCursor.popIterator();
                     offset += childWidget->height + widget->gap;
                 } else {
                     break;
                 }
             } else {
                 if (offset < width) {
-					widgetCursor.x = savedX + offset;
-					widgetCursor.pushIterator(index);
+                    widgetCursor.x = savedX + offset;
+                    widgetCursor.pushIterator(index);
                     enumWidget();
-					widgetCursor.popIterator();
+                    widgetCursor.popIterator();
+                    offset += childWidget->width + widget->gap;
+                } else {
+                    break;
+                }
+            }
+        } else {
+            widgetCursor.w = childWidget->width;
+            widgetCursor.h = childWidget->height;
+
+            if (widget->listType == LIST_TYPE_VERTICAL) {
+                if (offset < height) {
+                    widgetCursor.y = savedY + offset;
+                    drawRectangle(widgetCursor.x, widgetCursor.y, widgetCursor.w, widgetCursor.h, trackStyle, false, false, true);
+                    offset += childWidget->height + widget->gap;
+                } else {
+                    break;
+                }
+            } else {
+                if (offset < width) {
+                    widgetCursor.x = savedX + offset;
+                    drawRectangle(widgetCursor.x, widgetCursor.y, widgetCursor.w, widgetCursor.h, trackStyle, false, false, true);
                     offset += childWidget->width + widget->gap;
                 } else {
                     break;
                 }
             }
         }
+    }
 
-        deselect(widgetCursor, widget->data, oldValue);
+    deselect(widgetCursor, widget->data, oldValue);
 
-		widgetCursor.widget = widget;
+    widgetCursor.widget = widget;
 
-		widgetCursor.x = savedX;
-		widgetCursor.y = savedY;
+    widgetCursor.x = savedX;
+    widgetCursor.y = savedY;
 
-        widgetCursor.cursor = savedCursor;
-	}
+    widgetCursor.cursor = savedCursor;
 }
 
 } // namespace gui

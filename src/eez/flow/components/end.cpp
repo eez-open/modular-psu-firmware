@@ -25,7 +25,9 @@ namespace flow {
 
 void executeEndComponent(FlowState *flowState, unsigned componentIndex) {
 	if (flowState->parentFlowState && flowState->isAction) {
-		propagateValueThroughSeqout(flowState->parentFlowState, flowState->parentComponentIndex);
+        if (flowState->parentComponentIndex != -1) {
+		    propagateValueThroughSeqout(flowState->parentFlowState, flowState->parentComponentIndex);
+        }
 	} else {
 		stopScriptHook();
 	}

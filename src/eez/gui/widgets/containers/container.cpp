@@ -30,7 +30,7 @@ namespace gui {
 bool ContainerWidgetState::updateState() {
     WIDGET_STATE_START(ContainerWidget);
 
-	WIDGET_STATE(styleId, g_hooks.overrideStyle(widgetCursor, widget->style));
+	WIDGET_STATE(styleId, overrideStyle(widgetCursor, widget->style));
 	WIDGET_STATE(flags.active, g_isActiveWidget);
 
 	overlay = getOverlay(widgetCursor);

@@ -279,12 +279,20 @@ EM_PORT_API(void) clearInputValue(int flowStateIndex, int inputIndex) {
     clearInputValue(flowState, inputIndex);
 }
 
-EM_PORT_API(Value *) evalProperty(int flowStateIndex, int componentIndex, int propertyIndex, int32_t *iterators) {
+EM_PORT_API(Value *) evalProperty(int flowStateIndex, int componentIndex, int propertyIndex, int32_t *iterators, bool disableThrowError) {
     auto flowState = getFlowStateFromFlowStateIndex(flowStateIndex);
+
+    if (disableThrowError) {
+        eez::flow::enableThrowError(false);
+    }
 
     Value result;
     if (!eez::flow::evalProperty(flowState, componentIndex, propertyIndex, result, "Failed to evaluate property", nullptr, iterators)) {
         return nullptr;
+    }
+
+    if (disableThrowError) {
+        eez::flow::enableThrowError(true);
     }
 
     auto pValue = ObjectAllocator<Value>::allocate(0xb7e697b8);

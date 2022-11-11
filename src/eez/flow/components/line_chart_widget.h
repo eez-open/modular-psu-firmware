@@ -27,6 +27,7 @@ struct LineChartLine {
     AssetsPtr<uint8_t> label;
     uint16_t color;
     uint16_t reserved;
+    float width;
     AssetsPtr<uint8_t> value;
 };
 
@@ -57,6 +58,8 @@ struct LineChartWidgetComponenentExecutionState : public ComponenentExecutionSta
     Value *lineLabels;
 
     bool updated;
+
+    bool onInputValue(FlowState *flowState, unsigned componentIndex);
 
     Value getX(int pointIndex);
     void setX(int pointIndex, Value& value);

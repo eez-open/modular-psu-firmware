@@ -247,6 +247,8 @@ struct Value {
     }
 
     Value& operator = (const Value &value) {
+        freeRef();
+
         if (value.type == VALUE_TYPE_STRING_ASSET) {
             type = VALUE_TYPE_STRING;
             unit = 0;
@@ -258,8 +260,6 @@ struct Value {
             options = 0;
             arrayValue = (ArrayValue *)((uint8_t *)&value.int32Value + value.int32Value);
         } else {
-            freeRef();
-
             type = value.type;
             unit = value.unit;
             options = value.options;
@@ -267,12 +267,13 @@ struct Value {
 
             if (options & VALUE_OPTIONS_REF) {
                 refValue->refCounter++;
-            }/* else if (type == VALUE_TYPE_VALUE_PTR) {
+            } /* else if (type == VALUE_TYPE_VALUE_PTR) {
                 if (pValueValue->options & VALUE_OPTIONS_REF) {
                     pValueValue->refValue->refCounter++;
                 }
             }*/
         }
+
         return *this;
     }
 
@@ -333,6 +334,10 @@ struct Value {
 
     bool isArray() const {
         return type == VALUE_TYPE_ARRAY || type == VALUE_TYPE_ARRAY_ASSET || type == VALUE_TYPE_ARRAY_REF;
+    }
+
+    bool isError() const {
+        return type == VALUE_TYPE_ERROR;
     }
 
     Unit getUnit() const {
@@ -475,6 +480,10 @@ struct Value {
 
     static Value makeBlobRef(const uint8_t *blob, uint32_t len, uint32_t id);
 
+    static Value makeError() { return Value(0, VALUE_TYPE_ERROR); }
+
+    Value clone();
+
 	//////////
 
   public:
@@ -554,6 +563,9 @@ namespace gui {
     extern gui::WidgetCursor g_widgetCursor;
     extern Value get(const gui::WidgetCursor &widgetCursor, int16_t id);
 }
+#else
+Value getVar(int16_t id);
+void setVar(int16_t id, const Value& value);
 #endif
 
 inline Value Value::getValue() const {
@@ -565,7 +577,7 @@ inline Value Value::getValue() const {
         using namespace gui;
         return get(g_widgetCursor, int32Value);
 #else
-        return Value();
+        return getVar(int32Value);
 #endif
     }
     if (type == VALUE_TYPE_ARRAY_ELEMENT_VALUE) {

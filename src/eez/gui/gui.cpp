@@ -119,7 +119,10 @@ static ActionExecFunc g_internalActionExecFunctions[] = {
     ToastMessagePage::executeActionWithoutParam,
 
     // ACTION_ID_INTERNAL_MENU_WITH_BUTTONS
-    MenuWithButtonsPage::executeAction
+    MenuWithButtonsPage::executeAction,
+
+    // ACTION_ID_INTERNAL_QUESTION_PAGE_BUTTON
+    QuestionPage::executeAction
 };
 
 void executeInternalAction(int actionId) {
@@ -136,6 +139,42 @@ bool isExternalPageOnStack() {
 
 void removeExternalPagesFromTheStack() {
 	return getAppContextFromId(APP_CONTEXT_ID_DEVICE)->removeExternalPagesFromTheStack();
+}
+
+struct OverrideStyleRule {
+    int16_t fromStyle;
+    int16_t toStyle;
+};
+static OverrideStyleRule g_overrideStyleRules[10];
+
+void setOverrideStyleRule(int16_t fromStyle, int16_t toStyle) {
+    for (size_t i = 0; i < sizeof(g_overrideStyleRules) / sizeof(OverrideStyleRule); i++) {
+        if (g_overrideStyleRules[i].fromStyle == STYLE_ID_NONE) {
+            g_overrideStyleRules[i].fromStyle = fromStyle;
+            g_overrideStyleRules[i].toStyle = toStyle;
+        } else if (g_overrideStyleRules[i].fromStyle == fromStyle) {
+            g_overrideStyleRules[i].toStyle = toStyle;
+            break;
+        }
+    }
+}
+
+int overrideStyle(const WidgetCursor &widgetCursor, int styleId) {
+    if (g_overrideStyleRules[0].fromStyle != STYLE_ID_NONE) {
+        for (size_t i = 0; i < sizeof(g_overrideStyleRules) / sizeof(OverrideStyleRule); i++) {
+            if (g_overrideStyleRules[i].fromStyle == STYLE_ID_NONE) {
+                break;
+            }
+            if (g_overrideStyleRules[i].fromStyle == styleId) {
+                styleId = g_overrideStyleRules[i].toStyle;
+                break;
+            }
+        }
+    }
+    if (g_hooks.overrideStyle) {
+        return g_hooks.overrideStyle(widgetCursor, styleId);
+    }
+    return styleId;
 }
 
 } // namespace gui

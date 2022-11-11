@@ -74,6 +74,9 @@ void mainLoop(void *) {
 }
 
 void processGuiQueue(uint32_t timeout) {
+#ifdef __EMSCRIPTEN__
+    while (true) {
+#endif
     guiMessageQueueObject obj;
     if (!EEZ_MESSAGE_QUEUE_GET(gui, obj, timeout)) {
         return;
@@ -102,6 +105,9 @@ void processGuiQueue(uint32_t timeout) {
     } else {
         g_hooks.onGuiQueueMessage(type, obj.param);
     }
+#ifdef __EMSCRIPTEN__
+    }
+#endif
 }
 
 void oneIter() {

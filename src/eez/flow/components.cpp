@@ -53,19 +53,24 @@ void executeCatchErrorComponent(FlowState *flowState, unsigned componentIndex);
 void executeCounterComponent(FlowState *flowState, unsigned componentIndex);
 void executeLoopComponent(FlowState *flowState, unsigned componentIndex);
 void executeShowPageComponent(FlowState *flowState, unsigned componentIndex);
+#if OPTION_GUI || !defined(OPTION_GUI)
 void executeShowMessageBoxComponent(FlowState *flowState, unsigned componentIndex);
 void executeShowKeyboardComponent(FlowState *flowState, unsigned componentIndex);
 void executeShowKeypadComponent(FlowState *flowState, unsigned componentIndex);
-void executeSelectLanguageComponent(FlowState *flowState, unsigned componentIndex);
 void executeSetPageDirectionComponent(FlowState *flowState, unsigned componentIndex);
+void executeOverrideStyleComponent(FlowState *flowState, unsigned componentIndex);
+#endif
+void executeSelectLanguageComponent(FlowState *flowState, unsigned componentIndex);
 void executeAnimateComponent(FlowState *flowState, unsigned componentIndex);
 void executeNoopComponent(FlowState *flowState, unsigned componentIndex);
 void executeOnEventComponent(FlowState *flowState, unsigned componentIndex);
 void executeLVGLComponent(FlowState *flowState, unsigned componentIndex);
 
+#if OPTION_GUI || !defined(OPTION_GUI)
 void executeLayoutViewWidgetComponent(FlowState *flowState, unsigned componentIndex);
 void executeLineChartWidgetComponent(FlowState *flowState, unsigned componentIndex);
 void executeRollerWidgetComponent(FlowState *flowState, unsigned componentIndex);
+#endif
 
 typedef void (*ExecuteComponentFunctionType)(FlowState *flowState, unsigned componentIndex);
 
@@ -90,16 +95,31 @@ static ExecuteComponentFunctionType g_executeComponentFunctions[] = {
 	executeLoopComponent,
 	executeShowPageComponent,
 	nullptr, // COMPONENT_TYPE_SCPIACTION
+#if OPTION_GUI || !defined(OPTION_GUI)
 	executeShowMessageBoxComponent,
 	executeShowKeyboardComponent,
 	executeShowKeypadComponent,
+#else
+    nullptr,
+    nullptr,
+    nullptr,
+#endif
 	executeNoopComponent, // COMPONENT_TYPE_NOOP_ACTION
 	nullptr, // COMPONENT_TYPE_COMMENT_ACTION
     executeSelectLanguageComponent, // COMPONENT_TYPE_SELECT_LANGUAGE_ACTION
+#if OPTION_GUI || !defined(OPTION_GUI)
     executeSetPageDirectionComponent, // COMPONENT_TYPE_SET_PAGE_DIRECTION_ACTION
+#else
+    nullptr,
+#endif
     executeAnimateComponent, // COMPONENT_TYPE_ANIMATE_ACTION
     executeOnEventComponent, // COMPONENT_TYPE_ON_EVENT_ACTION,
     executeLVGLComponent, // COMPONENT_TYPE_LVGLACTION
+#if OPTION_GUI || !defined(OPTION_GUI)
+    executeOverrideStyleComponent, // COMPONENT_TYPE_OVERRIDE_STYLE
+#else
+    nullptr,
+#endif
 };
 
 void registerComponent(ComponentTypes componentType, ExecuteComponentFunctionType executeComponentFunction) {
@@ -125,7 +145,9 @@ void executeComponent(FlowState *flowState, unsigned componentIndex) {
 			executeComponentFunction(flowState, componentIndex);
 			return;
 		}
-	} else if (component->type < 1000) {
+	}
+#if OPTION_GUI || !defined(OPTION_GUI)
+    else if (component->type < 1000) {
 		if (component->type == defs_v3::COMPONENT_TYPE_LAYOUT_VIEW_WIDGET) {
             executeLayoutViewWidgetComponent(flowState, componentIndex);
         } else if (component->type == defs_v3::COMPONENT_TYPE_LINE_CHART_EMBEDDED_WIDGET) {
@@ -135,6 +157,7 @@ void executeComponent(FlowState *flowState, unsigned componentIndex) {
 		}
 		return;
 	}
+#endif
 
 	char errorMessage[100];
 	snprintf(errorMessage, sizeof(errorMessage), "Unknown component at index = %d, type = %d\n", componentIndex, component->type);

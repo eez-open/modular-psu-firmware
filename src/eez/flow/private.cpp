@@ -39,6 +39,8 @@ namespace flow {
 
 static const unsigned NO_COMPONENT_INDEX = 0xFFFFFFFF;
 
+static bool g_enableThrowError = true;
+
 bool isComponentReadyToRun(FlowState *flowState, unsigned componentIndex) {
 	auto component = flowState->flow->components[componentIndex];
 
@@ -56,9 +58,8 @@ bool isComponentReadyToRun(FlowState *flowState, unsigned componentIndex) {
     }
 
     if (component->type == defs_v3::COMPONENT_TYPE_START_ACTION) {
-        auto parentComponent = flowState->parentComponent;
-        if (parentComponent) {
-            auto flowInputIndex = parentComponent->inputs[0];
+        if (flowState->parentComponent && flowState->parentComponentIndex != -1) {
+            auto flowInputIndex = flowState->parentComponent->inputs[0];
             auto value = flowState->parentFlowState->values[flowInputIndex];
             return value.getType() != VALUE_TYPE_UNDEFINED;
         } else {
@@ -331,6 +332,12 @@ void resetSequenceInputs(FlowState *flowState) {
 }
 
 void propagateValue(FlowState *flowState, unsigned componentIndex, unsigned outputIndex, const Value &value) {
+    if ((int)componentIndex == -1) {
+        auto flowIndex = outputIndex;
+        executeCallAction(flowState, -1, flowIndex);
+        return;
+    }
+
     // Reset sequence inputs before propagate value, in case component propagates value to itself
     resetSequenceInputs(flowState);
 
@@ -414,6 +421,8 @@ void assignValue(FlowState *flowState, int componentIndex, Value &dstValue, cons
 	} else if (dstValue.getType() == VALUE_TYPE_NATIVE_VARIABLE) {
 #if OPTION_GUI || !defined(OPTION_GUI)
 		set(g_widgetCursor, dstValue.getInt(), srcValue);
+#else
+		setVar(dstValue.getInt(), srcValue);
 #endif
 	} else {
 		Value *pDstValue;
@@ -516,6 +525,10 @@ void throwError(FlowState *flowState, int componentIndex, const char *errorMessa
     printf("throwError: %s\n", errorMessage);
 #endif
 
+    if (!g_enableThrowError) {
+        return;
+    }
+
 	if (component->errorCatchOutput != -1) {
 		propagateValue(
 			flowState,
@@ -557,6 +570,10 @@ void throwError(FlowState *flowState, int componentIndex, const char *errorMessa
     } else {
         throwError(flowState, componentIndex, errorMessageDescription);
     }
+}
+
+void enableThrowError(bool enable) {
+    g_enableThrowError = enable;
 }
 
 } // namespace flow

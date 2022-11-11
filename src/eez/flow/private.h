@@ -118,5 +118,7 @@ void onEvent(FlowState *flowState, FlowEvent flowEvent);
 void throwError(FlowState *flowState, int componentIndex, const char *errorMessage);
 void throwError(FlowState *flowState, int componentIndex, const char *errorMessage, const char *errorMessageDescription);
 
+void enableThrowError(bool enable);
+
 } // flow
 } // eez

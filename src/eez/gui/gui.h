@@ -43,7 +43,8 @@ enum {
     FIRST_INTERNAL_PAGE_ID = 32000,
     INTERNAL_PAGE_ID_SELECT_FROM_ENUM,
     INTERNAL_PAGE_ID_TOAST_MESSAGE,
-    INTERNAL_PAGE_ID_MENU_WITH_BUTTONS
+    INTERNAL_PAGE_ID_MENU_WITH_BUTTONS,
+    INTERNAL_PAGE_ID_QUESTION
 };
 
 enum InternalActionsEnum {
@@ -52,7 +53,8 @@ enum InternalActionsEnum {
     ACTION_ID_INTERNAL_DIALOG_CLOSE,
     ACTION_ID_INTERNAL_TOAST_ACTION,
     ACTION_ID_INTERNAL_TOAST_ACTION_WITHOUT_PARAM,
-    ACTION_ID_INTERNAL_MENU_WITH_BUTTONS
+    ACTION_ID_INTERNAL_MENU_WITH_BUTTONS,
+    ACTION_ID_INTERNAL_QUESTION_PAGE_BUTTON
 };
 
 namespace eez {
@@ -96,6 +98,9 @@ extern const char *g_discardMessage;
 
 extern void (*loadMainAssets)(const uint8_t *assets, uint32_t assetsSize);
 extern Assets *&g_mainAssets;
+
+void setOverrideStyleRule(int16_t fromStyle, int16_t toStyle);
+int overrideStyle(const WidgetCursor &widgetCursor, int styleId);
 
 } // namespace gui
 } // namespace eez

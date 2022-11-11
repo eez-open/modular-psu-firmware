@@ -84,10 +84,6 @@ static bool isEventHandlingDisabled() {
     return false;
 }
 
-static int overrideStyle(const WidgetCursor &widgetCursor, int styleId) {
-    return styleId;
-}
-
 static uint16_t overrideStyleColor(const WidgetCursor &widgetCursor, const Style *style) {
     return style->color;
 }
@@ -185,7 +181,7 @@ Hooks g_hooks = {
     activePageHasBackdrop,
     executeActionThread,
     isEventHandlingDisabled,
-    overrideStyle,
+    nullptr,
     overrideStyleColor,
     overrideActiveStyleColor,
     transformColor,

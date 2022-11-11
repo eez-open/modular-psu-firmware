@@ -73,6 +73,10 @@ bool ScrollBarWidgetState::updateState() {
     WIDGET_STATE(position, getPosition(widgetCursor));
     WIDGET_STATE(pageSize, getPageSize(widgetCursor));
 
+    if (!widget->visible) {
+        WIDGET_STATE(isVisible, Value(size > pageSize, VALUE_TYPE_BOOLEAN));
+    }
+
     WIDGET_STATE_END()
 }
 
@@ -117,20 +121,18 @@ void ScrollBarWidgetState::render() {
         }
 
         const Style *trackStyle = getStyle(widget->style);
-        display::setColor(trackStyle->color);
-        display::fillRect(xTrack, yTrack, xTrack + wTrack - 1, yTrack + hTrack - 1);
+        drawRectangle(xTrack, yTrack, wTrack, hTrack, trackStyle, false, false, false);
 
         // draw thumb
         const Style *thumbStyle = getStyle(widget->thumbStyle);
-        display::setColor(thumbStyle->color);
         if (isHorizontal) {
             int xThumb, wThumb;
             getThumbGeometry(size, position, pageSize, xTrack, wTrack, buttonSize, xThumb, wThumb);
-            display::fillRect(xThumb, yTrack, xThumb + wThumb - 1, yTrack + hTrack - 1);
+            drawRectangle(xThumb, yTrack, wThumb, hTrack, thumbStyle, false, false, false);
         } else {
             int yThumb, hThumb;
             getThumbGeometry(size, position, pageSize, yTrack, hTrack, buttonSize, yThumb, hThumb);
-            display::fillRect(xTrack, yThumb, xTrack + wTrack - 1, yThumb + hThumb - 1);
+            drawRectangle(xTrack, yThumb, wTrack, hThumb, thumbStyle, false, false, false);
         }
 
         // draw right button
@@ -156,8 +158,7 @@ void ScrollBarWidgetState::render() {
     } else {
         // scroll bar is hidden
         const Style *trackStyle = getStyle(widget->style);
-        display::setColor(trackStyle->color);
-        display::fillRect(widgetCursor.x, widgetCursor.y, widgetCursor.x + widgetCursor.w - 1, widgetCursor.y + widgetCursor.h - 1);
+        drawRectangle(widgetCursor.x, widgetCursor.y, widgetCursor.w, widgetCursor.h, trackStyle, false, false, false);
     }
 }
 

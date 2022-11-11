@@ -50,7 +50,7 @@ int findStartOfUnit(char *text, int i) {
 bool DisplayDataWidgetState::updateState() {
     WIDGET_STATE_START(DisplayDataWidget);
 
-    const Style *style = getStyle(g_hooks.overrideStyle(widgetCursor, widget->style));
+    const Style *style = getStyle(overrideStyle(widgetCursor, widget->style));
 
     WIDGET_STATE(flags.active, g_isActiveWidget);
     WIDGET_STATE(flags.focused, isFocusWidget(widgetCursor));
@@ -87,7 +87,7 @@ void DisplayDataWidgetState::render() {
     const WidgetCursor &widgetCursor = g_widgetCursor;
 
     auto widget = (const DisplayDataWidget *)widgetCursor.widget;
-    const Style *style = getStyle(g_hooks.overrideStyle(widgetCursor, widget->style));
+    const Style *style = getStyle(overrideStyle(widgetCursor, widget->style));
 
     char text[64];
     data.toText(text, sizeof(text));
@@ -161,7 +161,7 @@ void DisplayDataWidgetState::render() {
 int DISPLAY_DATA_getCharIndexAtPosition(int xPos, const WidgetCursor &widgetCursor) {
     auto widget = (const DisplayDataWidget *)widgetCursor.widget;
 
-	const Style *style = getStyle(g_hooks.overrideStyle(widgetCursor, widget->style));
+	const Style *style = getStyle(overrideStyle(widgetCursor, widget->style));
 
     char text[64];
     Value data = get(widgetCursor, widget->data);
@@ -211,7 +211,7 @@ int DISPLAY_DATA_getCharIndexAtPosition(int xPos, const WidgetCursor &widgetCurs
 int DISPLAY_DATA_getCursorXPosition(int cursorPosition, const WidgetCursor &widgetCursor) {
     auto widget = (const DisplayDataWidget *)widgetCursor.widget;
 
-	const Style *style = getStyle(g_hooks.overrideStyle(widgetCursor, widget->style));
+	const Style *style = getStyle(overrideStyle(widgetCursor, widget->style));
 
     char text[64];
     Value data = get(widgetCursor, widget->data);

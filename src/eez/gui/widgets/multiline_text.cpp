@@ -27,7 +27,7 @@ namespace gui {
 bool MultilineTextWidgetState::updateState() {
     WIDGET_STATE_START(MultilineTextWidget);
 
-    const Style *style = getStyle(g_hooks.overrideStyle(widgetCursor, widget->style));
+    const Style *style = getStyle(overrideStyle(widgetCursor, widget->style));
 
     WIDGET_STATE(flags.blinking, g_isBlinkTime && styleIsBlink(style));
     WIDGET_STATE(flags.active, g_isActiveWidget);

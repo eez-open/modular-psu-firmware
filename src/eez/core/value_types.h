@@ -49,12 +49,13 @@
     VALUE_TYPE(ARRAY_ELEMENT_VALUE)                /* 24 */ \
     VALUE_TYPE(FLOW_OUTPUT)                        /* 25 */ \
     VALUE_TYPE(NATIVE_VARIABLE)                    /* 26 */ \
-    VALUE_TYPE(RANGE)                              /* 27 */ \
-    VALUE_TYPE(POINTER)                            /* 28 */ \
-    VALUE_TYPE(ENUM)                               /* 29 */ \
-    VALUE_TYPE(IP_ADDRESS)                         /* 30 */ \
-    VALUE_TYPE(TIME_ZONE)                          /* 31 */ \
-    VALUE_TYPE(YT_DATA_GET_VALUE_FUNCTION_POINTER) /* 32 */ \
+    VALUE_TYPE(ERROR)                              /* 27 */ \
+    VALUE_TYPE(RANGE)                              /* 28 */ \
+    VALUE_TYPE(POINTER)                            /* 29 */ \
+    VALUE_TYPE(ENUM)                               /* 30 */ \
+    VALUE_TYPE(IP_ADDRESS)                         /* 31 */ \
+    VALUE_TYPE(TIME_ZONE)                          /* 32 */ \
+    VALUE_TYPE(YT_DATA_GET_VALUE_FUNCTION_POINTER) /* 33 */ \
     CUSTOM_VALUE_TYPES
 
 namespace eez {

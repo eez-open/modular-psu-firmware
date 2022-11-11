@@ -23,6 +23,7 @@
 #include <eez/flow/components.h>
 #include <eez/flow/components/call_action.h>
 #include <eez/flow/debugger.h>
+#include <eez/flow/queue.h>
 
 namespace eez {
 namespace flow {
@@ -38,24 +39,32 @@ void executeCallAction(FlowState *flowState, unsigned componentIndex, int flowIn
 		return;
 	}
 
-	auto callActionComponenentExecutionState = (CallActionComponenentExecutionState *)flowState->componenentExecutionStates[componentIndex];
-	if (callActionComponenentExecutionState) {
-        if (canFreeFlowState(callActionComponenentExecutionState->flowState)) {
-            freeFlowState(callActionComponenentExecutionState->flowState);
-        } else {
-		    throwError(flowState, componentIndex, "CallAction is already running\n");
-		    return;
+    if ((int)componentIndex != -1) {
+        auto callActionComponenentExecutionState = (CallActionComponenentExecutionState *)flowState->componenentExecutionStates[componentIndex];
+        if (callActionComponenentExecutionState) {
+            if (canFreeFlowState(callActionComponenentExecutionState->flowState)) {
+                freeFlowState(callActionComponenentExecutionState->flowState);
+            } else {
+                if (!addToQueue(flowState, componentIndex, -1, -1, -1, true)) {
+			        throwError(flowState, componentIndex, "Execution queue is full\n");
+		        }
+                return;
+            }
         }
-	}
+    }
 
 	FlowState *actionFlowState = initActionFlowState(flowIndex, flowState, componentIndex);
 
 	if (canFreeFlowState(actionFlowState)) {
 		freeFlowState(actionFlowState);
-		propagateValueThroughSeqout(flowState, componentIndex);
+        if ((int)componentIndex != -1) {
+		    propagateValueThroughSeqout(flowState, componentIndex);
+        }
 	} else {
-		callActionComponenentExecutionState = allocateComponentExecutionState<CallActionComponenentExecutionState>(flowState, componentIndex);
-		callActionComponenentExecutionState->flowState = actionFlowState;
+        if ((int)componentIndex != -1) {
+		    auto callActionComponenentExecutionState = allocateComponentExecutionState<CallActionComponenentExecutionState>(flowState, componentIndex);
+		    callActionComponenentExecutionState->flowState = actionFlowState;
+        }
 	}
 }
 

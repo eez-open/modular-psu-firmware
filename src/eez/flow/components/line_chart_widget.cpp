@@ -16,18 +16,17 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
+#if OPTION_GUI || !defined(OPTION_GUI)
+
 #include <eez/core/alloc.h>
 
 #include <eez/flow/components.h>
-#include <eez/flow/flow_defs_v3.h>
 #include <eez/flow/expression.h>
 #include <eez/flow/private.h>
 #include <eez/flow/components/line_chart_widget.h>
 
 namespace eez {
 namespace flow {
-
-#if OPTION_GUI || !defined(OPTION_GUI)
 
 LineChartWidgetComponenentExecutionState::LineChartWidgetComponenentExecutionState()
     : data(nullptr)
@@ -91,6 +90,54 @@ void LineChartWidgetComponenentExecutionState::setY(int pointIndex, int lineInde
     *(yValues + pointIndex * numLines + lineIndex) = value;
 }
 
+bool LineChartWidgetComponenentExecutionState::onInputValue(FlowState *flowState, unsigned componentIndex) {
+    auto component = (LineChartWidgetComponenent *)flowState->flow->components[componentIndex];
+
+    uint32_t pointIndex;
+
+    if (numPoints < component->maxPoints) {
+        pointIndex = numPoints++;
+    } else {
+        startPointIndex = (startPointIndex + 1) % component->maxPoints;
+        pointIndex = (startPointIndex + component->maxPoints - 1) % component->maxPoints;
+    }
+
+    Value value;
+    if (!evalExpression(flowState, componentIndex, component->xValue, value, "Failed to evaluate x value in LineChartWidget")) {
+        return false;
+    }
+
+    int err;
+    value.toDouble(&err);
+    if (err) {
+        throwError(flowState, componentIndex, "X value not an number or date");
+        return false;
+    }
+
+    setX(pointIndex, value);
+
+    for (uint32_t lineIndex = 0; lineIndex < numLines; lineIndex++) {
+        char errorMessage[256];
+        snprintf(errorMessage, sizeof(errorMessage), "Failed to evaluate line value no. %d in LineChartWidget", (int)(lineIndex + 1));
+        Value value;
+        if (!evalExpression(flowState, componentIndex, component->lines[lineIndex]->value, value, errorMessage)) {
+            return false;
+        }
+
+        int err;
+        auto y = value.toFloat(&err);
+        if (err) {
+            snprintf(errorMessage, sizeof(errorMessage), "Can't convert line value no. %d to float", (int)(lineIndex + 1));
+            throwError(flowState, componentIndex, errorMessage);
+            return false;
+        }
+
+        setY(pointIndex, lineIndex, y);
+    }
+
+    return true;
+}
+
 void executeLineChartWidgetComponent(FlowState *flowState, unsigned componentIndex) {
     auto component = (LineChartWidgetComponenent *)flowState->flow->components[componentIndex];
 
@@ -100,7 +147,6 @@ void executeLineChartWidgetComponent(FlowState *flowState, unsigned componentInd
         executionState->init(component->lines.count, component->maxPoints);
 
         for (uint32_t lineIndex = 0; lineIndex < component->lines.count; lineIndex++) {
-
             char errorMessage[256];
             snprintf(errorMessage, sizeof(errorMessage), "Failed to evaluate line label no. %d in LineChartWidget", (int)(lineIndex + 1));
 
@@ -119,63 +165,35 @@ void executeLineChartWidgetComponent(FlowState *flowState, unsigned componentInd
         clearInputValue(flowState, component->inputs[1]);
     }
 
-    if (flowState->values[component->inputs[0]].type != VALUE_TYPE_UNDEFINED) {
+    auto inputIndex = component->inputs[0];
+    auto inputValue = flowState->values[inputIndex];
+    if (inputValue.type != VALUE_TYPE_UNDEFINED) {
         // data
-
-        uint32_t pointIndex;
-
-        if (executionState->numPoints < component->maxPoints) {
-            pointIndex = executionState->numPoints++;
+        if (inputValue.isArray() && inputValue.getArray()->arrayType == defs_v3::ARRAY_TYPE_ANY) {
+            auto array = inputValue.getArray();
+            bool updated = false;
+            for (uint32_t elementIndex = 0; elementIndex < array->arraySize; elementIndex++) {
+                flowState->values[inputIndex] = array->values[elementIndex];
+                if (executionState->onInputValue(flowState, componentIndex)) {
+                    updated = true;
+                } else {
+                    break;
+                }
+            }
+            if (updated) {
+                executionState->updated = true;
+            }
         } else {
-            executionState->startPointIndex = (executionState->startPointIndex + 1) % component->maxPoints;
-            pointIndex = (executionState->startPointIndex + component->maxPoints - 1) % component->maxPoints;
-        }
-
-        Value value;
-        if (!evalExpression(flowState, componentIndex, component->xValue, value, "Failed to evaluate x value in LineChartWidget")) {
-            return;
-        }
-
-        int err;
-        value.toDouble(&err);
-        if (err) {
-            throwError(flowState, componentIndex, "X value not an number or date");
-            return;
-        }
-
-        executionState->setX(pointIndex, value);
-
-        for (uint32_t lineIndex = 0; lineIndex < executionState->numLines; lineIndex++) {
-            char errorMessage[256];
-            snprintf(errorMessage, sizeof(errorMessage), "Failed to evaluate line value no. %d in LineChartWidget", (int)(lineIndex + 1));
-            Value value;
-            if (!evalExpression(flowState, componentIndex, component->lines[lineIndex]->value, value, errorMessage)) {
-                return;
+            if (executionState->onInputValue(flowState, componentIndex)) {
+                executionState->updated = true;
             }
-
-            int err;
-            auto y = value.toFloat(&err);
-            if (err) {
-                snprintf(errorMessage, sizeof(errorMessage), "Can't convert line value no. %d to float", (int)(lineIndex + 1));
-                throwError(flowState, componentIndex, errorMessage);
-                return;
-            }
-
-            executionState->setY(pointIndex, lineIndex, y);
         }
 
-        executionState->updated = true;
-
-        clearInputValue(flowState, component->inputs[0]);
+        clearInputValue(flowState, inputIndex);
     }
 }
 
-#else
-
-void executeLineChartWidgetComponent(FlowState *flowState, unsigned componentIndex) {
-}
-
-#endif // OPTION_GUI || !defined(OPTION_GUI)
-
 } // namespace flow
 } // namespace eez
+
+#endif // OPTION_GUI || !defined(OPTION_GUI)

@@ -19,26 +19,25 @@
 #if OPTION_GUI || !defined(OPTION_GUI)
 
 #include <eez/flow/components.h>
-#include <eez/flow/components/roller_widget.h>
+#include <eez/flow/flow_defs_v3.h>
+#include <eez/flow/expression.h>
+#include <eez/flow/private.h>
 
-#include <eez/gui/widgets/roller.h>
+#include <eez/gui/gui.h>
 using namespace eez::gui;
 
 namespace eez {
 namespace flow {
 
-void executeRollerWidgetComponent(FlowState *flowState, unsigned componentIndex) {
-	auto component = flowState->flow->components[componentIndex];
+struct OverrideStyleComponent : public Component {
+	int16_t fromStyle;
+    int16_t toStyle;
+};
 
-	static const unsigned START_INPUT_INDEX = 0;
-	auto startInputIndex = component->inputs[START_INPUT_INDEX];
-	if (flowState->values[startInputIndex].type != VALUE_TYPE_UNDEFINED) {
-        auto executionState = (RollerWidgetComponenentExecutionState *)flowState->componenentExecutionStates[componentIndex];
-        if (!executionState) {
-            executionState = allocateComponentExecutionState<RollerWidgetComponenentExecutionState>(flowState, componentIndex);
-		}
-		executionState->clear = true;
-	}
+void executeOverrideStyleComponent(FlowState *flowState, unsigned componentIndex) {
+	auto component = (OverrideStyleComponent *)flowState->flow->components[componentIndex];
+    setOverrideStyleRule(component->fromStyle, component->toStyle);
+    propagateValueThroughSeqout(flowState, componentIndex);
 }
 
 } // namespace flow

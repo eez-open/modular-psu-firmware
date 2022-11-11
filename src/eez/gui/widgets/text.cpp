@@ -41,7 +41,7 @@ void TextWidget_autoSize(TextWidget& widget) {
 bool TextWidgetState::updateState() {
     WIDGET_STATE_START(TextWidget);
 
-    const Style *style = getStyle(g_hooks.overrideStyle(widgetCursor, widget->style));
+    const Style *style = getStyle(overrideStyle(widgetCursor, widget->style));
 
     WIDGET_STATE(flags.active, g_isActiveWidget);
     WIDGET_STATE(flags.focused, isFocusWidget(widgetCursor));
@@ -58,7 +58,7 @@ void TextWidgetState::render() {
     const WidgetCursor &widgetCursor = g_widgetCursor;
 
     auto widget = (const TextWidget *)widgetCursor.widget;
-    const Style *style = getStyle(g_hooks.overrideStyle(widgetCursor, widget->style));
+    const Style *style = getStyle(overrideStyle(widgetCursor, widget->style));
     const char *text = widget->text ? static_cast<const char *>(widget->text) : nullptr;
 
     uint16_t overrideColor                 = flags.focused ? style->focusColor           : g_hooks.overrideStyleColor(widgetCursor, style);

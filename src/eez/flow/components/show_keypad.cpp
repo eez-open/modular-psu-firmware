@@ -16,6 +16,8 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
+#if OPTION_GUI || !defined(OPTION_GUI)
+
 #include <eez/flow/flow.h>
 #include <eez/flow/components.h>
 #include <eez/flow/flow_defs_v3.h>
@@ -24,9 +26,7 @@
 #include <eez/flow/private.h>
 #include <eez/flow/hooks.h>
 
-#if OPTION_GUI || !defined(OPTION_GUI)
 #include <eez/gui/gui.h>
-#endif
 
 namespace eez {
 namespace flow {
@@ -36,7 +36,6 @@ struct ShowKeyboardActionComponent : public Component {
 };
 
 void executeShowKeypadComponent(FlowState *flowState, unsigned componentIndex) {
-#if OPTION_GUI || !defined(OPTION_GUI)
     Value labelValue;
     if (!evalProperty(flowState, componentIndex, defs_v3::SHOW_KEYBOARD_ACTION_COMPONENT_PROPERTY_LABEL, labelValue, "Failed to evaluate Label in ShowKeypad")) {
         return;
@@ -93,7 +92,7 @@ void executeShowKeypadComponent(FlowState *flowState, unsigned componentIndex) {
 	};
 
 	auto onCancel = []() {
-		propagateValue(g_showKeyboardFlowState, g_showKeyboardComponentIndex, 1, Value());
+		propagateValue(g_showKeyboardFlowState, g_showKeyboardComponentIndex, 1);
 		getAppContextFromId(APP_CONTEXT_ID_DEVICE)->popPage();
 		endAsyncExecution(g_showKeyboardFlowState, g_showKeyboardComponentIndex);
 	};
@@ -106,8 +105,9 @@ void executeShowKeypadComponent(FlowState *flowState, unsigned componentIndex) {
 	Unit unit = getUnitFromName(unitValue.getString());
 
 	showKeypadHook(labelValue, initialValue, minValue, maxValue, unit, onOk, onCancel);
-#endif
 }
 
 } // namespace flow
 } // namespace eez
+
+#endif // OPTION_GUI || !defined(OPTION_GUI)

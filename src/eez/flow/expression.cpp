@@ -101,10 +101,7 @@ static bool evalExpression(FlowState *flowState, const uint8_t *instructions, in
                 }
             }
 		} else if (instructionType == EXPR_EVAL_INSTRUCTION_TYPE_OPERATION) {
-			if (!g_evalOperations[instructionArg](g_stack)) {
-                throwError(flowState, g_stack.componentIndex, errorMessage, "Operation error\n");
-				return false;
-			}
+			g_evalOperations[instructionArg](g_stack);
 		} else {
 			i += 2;
 			break;
@@ -133,6 +130,10 @@ bool evalExpression(FlowState *flowState, int componentIndex, const uint8_t *ins
 	if (evalExpression(flowState, instructions, numInstructionBytes, errorMessage)) {
 		if (g_stack.sp == 1) {
 			result = g_stack.pop().getValue();
+            if (result.isError()) {
+                throwError(flowState, componentIndex, errorMessage);
+                return false;
+            }
 			return true;
 		} else {
             throwError(flowState, componentIndex, errorMessage);
@@ -158,6 +159,8 @@ bool evalAssignableExpression(FlowState *flowState, int componentIndex, const ui
 			}
 		}
 	}
+
+    throwError(flowState, componentIndex, errorMessage);
 
 	return false;
 }
@@ -223,10 +226,9 @@ int16_t getNativeVariableId(const WidgetCursor &widgetCursor) {
 			if (evalExpression(flowState, property->evalInstructions, nullptr, nullptr)) {
 				if (g_stack.sp == 1) {
 					auto finalResult = g_stack.pop();
-
-					if (finalResult.getType() == VALUE_TYPE_NATIVE_VARIABLE) {
-						return finalResult.getInt();
-					}
+                    if (finalResult.getType() == VALUE_TYPE_NATIVE_VARIABLE) {
+                        return finalResult.getInt();
+                    }
 				}
 			}
 		}

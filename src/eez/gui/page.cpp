@@ -105,7 +105,7 @@ void ToastMessagePage::pageFree() {
 
 ToastMessagePage *ToastMessagePage::create(AppContext *appContext, ToastType type, const char *message, bool autoDismiss) {
     ToastMessagePage *page = ToastMessagePage::findFreePage();
-    
+
     page->actionLabel = type == ERROR_TOAST && !autoDismiss ? "Close" : nullptr;
     page->actionWidget.action = type == ERROR_TOAST && !autoDismiss ? ACTION_ID_INTERNAL_TOAST_ACTION_WITHOUT_PARAM : 0;
     page->actionWithoutParam = nullptr;
@@ -192,7 +192,7 @@ void ToastMessagePage::init(AppContext *appContext, ToastType type, const Value&
     int line3Width = line3 ? display::measureStr(line3, -1, font, 0) : 0;
     int actionLabelWidth = actionLabel ? (actionStyle->paddingLeft + display::measureStr(actionLabel, -1, font, 0) + actionStyle->paddingRight) : 0;
     int textWidth = MAX(MAX(MAX(MAX(minTextWidth, line1Width), line2Width), line3Width), actionLabelWidth);
-  
+
     int textHeight = font.getHeight();
 
     width = style->borderSizeLeft + style->paddingLeft +
@@ -372,7 +372,7 @@ WidgetCursor ToastMessagePage::findWidgetInternalPage(int x, int y, bool clicked
         auto yActionWidget = this->y + actionWidget.y;
 
         if (
-            x >= xActionWidget && x < xActionWidget + actionWidget.width && 
+            x >= xActionWidget && x < xActionWidget + actionWidget.width &&
             y >= yActionWidget && y < yActionWidget + actionWidget.height
         ) {
 			WidgetCursor widgetCursor = g_widgetCursor;
@@ -383,7 +383,7 @@ WidgetCursor ToastMessagePage::findWidgetInternalPage(int x, int y, bool clicked
             return widgetCursor;
         }
     }
-   
+
     return WidgetCursor();
 }
 
@@ -532,7 +532,7 @@ uint16_t SelectFromEnumPage::getValue(int i) {
         enumDefinitionFunc(DATA_OPERATION_GET_VALUE, widgetCursor, value);
         return value.getUInt8();
     }
-    
+
     return enumDefinition[i].value;
 }
 
@@ -677,7 +677,7 @@ WidgetCursor SelectFromEnumPage::findWidgetInternalPage(int x, int y, bool click
         getItemPosition(i, xItem, yItem);
         if (!isDisabled(i)) {
         	if (x >= xItem && x < xItem + itemWidth && y >= yItem && y < yItem + itemHeight) {
-                
+
                 if (clicked) {
                     activeItemIndex = i;
                     currentValue = getValue(i);
@@ -802,7 +802,7 @@ void MenuWithButtonsPage::init(AppContext *appContext, const char *message, cons
 
     Rect rect;
     m_appContext->getBoundingRect(rect);
-    
+
     x = rect.x + (rect.w - width) / 2;
     y = rect.y + (rect.h - height) / 2;
 
@@ -903,6 +903,174 @@ WidgetCursor MenuWithButtonsPage::findWidgetInternalPage(int x, int y, bool clic
 
 void MenuWithButtonsPage::executeAction() {
     (*g_menuWithButtonsPage.m_callback)(getFoundWidgetAtDown().cursor);
+}
+
+////////////////////////////////////////////////////////////////////////////////
+
+static QuestionPage g_questionPage;
+
+QuestionPage *QuestionPage::create(AppContext *appContext, const Value &message, const Value &buttons, void *userParam, void (*callback)(void *userParam, unsigned buttonIndex)) {
+    QuestionPage *page = &g_questionPage;
+
+    page->init(appContext, message, buttons, userParam, callback);
+
+    return page;
+}
+
+void QuestionPage::init(AppContext *appContext, const Value &message, const Value &buttons, void *userParam, void (*callback)(void *userParam, unsigned buttonIndex)) {
+    m_appContext = appContext;
+    m_userParam = userParam;
+    m_callback = callback;
+
+    m_containerRectangleWidget.type = WIDGET_TYPE_RECTANGLE;
+    m_containerRectangleWidget.data = DATA_ID_NONE;
+    m_containerRectangleWidget.action = ACTION_ID_NONE;
+    m_containerRectangleWidget.style = STYLE_ID_MENU_WITH_BUTTONS_CONTAINER;
+    m_containerRectangleWidget.flags.ignoreLuminosity = 0;
+	m_containerRectangleWidget.flags.invertColors = 1;
+
+    m_messageTextWidget.type = WIDGET_TYPE_TEXT;
+    m_messageTextWidget.data = DATA_ID_NONE;
+    m_messageTextWidget.action = ACTION_ID_NONE;
+    m_messageTextWidget.style = STYLE_ID_MENU_WITH_BUTTONS_MESSAGE;
+    m_messageTextWidget.text = message.getString();
+    m_messageTextWidget.flags = 0;
+    TextWidget_autoSize(m_messageTextWidget);
+
+    auto buttonsArray = buttons.getArray();
+
+    for (uint32_t i = 0; i < buttonsArray->arraySize; i++) {
+        m_buttonTextWidgets[i].type = WIDGET_TYPE_TEXT;
+        m_buttonTextWidgets[i].data = DATA_ID_NONE;
+        m_buttonTextWidgets[i].action = ACTION_ID_INTERNAL_QUESTION_PAGE_BUTTON;
+        m_buttonTextWidgets[i].style = STYLE_ID_MENU_WITH_BUTTONS_BUTTON;
+        m_buttonTextWidgets[i].text = buttonsArray->values[i].getString();
+        m_buttonTextWidgets[i].flags = 0;
+        TextWidget_autoSize(m_buttonTextWidgets[i]);
+        m_buttonTextWidgets[i].height = m_buttonTextWidgets[i].height * 3 / 2;
+    }
+
+    m_numButtonTextWidgets = buttonsArray->arraySize;
+
+    const Style *styleContainer = getStyle(STYLE_ID_MENU_WITH_BUTTONS_CONTAINER);
+    const Style *styleButton = getStyle(STYLE_ID_MENU_WITH_BUTTONS_BUTTON);
+
+    int maxMenuItemWidth = 0;
+    for (size_t i = 0; i < m_numButtonTextWidgets; i++) {
+        maxMenuItemWidth = MAX(maxMenuItemWidth, m_buttonTextWidgets[i].width);
+    }
+
+    int menuItemsWidth = maxMenuItemWidth * m_numButtonTextWidgets + (m_numButtonTextWidgets - 1) * styleButton->paddingLeft;
+
+    int contentWidth = MAX(m_messageTextWidget.width, menuItemsWidth);
+    int contentHeight = m_messageTextWidget.height + m_buttonTextWidgets[0].height;
+
+    width = styleContainer->borderSizeLeft + styleContainer->paddingLeft + contentWidth + styleContainer->paddingRight + styleContainer->borderSizeRight;
+    height = styleContainer->borderSizeTop + styleContainer->paddingTop + contentHeight + styleContainer->paddingBottom + styleContainer->borderSizeBottom;
+
+    Rect rect;
+    m_appContext->getBoundingRect(rect);
+
+    x = rect.x + (rect.w - width) / 2;
+    y = rect.y + (rect.h - height) / 2;
+
+    m_containerRectangleWidget.x = 0;
+    m_containerRectangleWidget.y = 0;
+    m_containerRectangleWidget.width = width;
+    m_containerRectangleWidget.height = height;
+
+    m_messageTextWidget.x = styleContainer->borderSizeLeft + styleContainer->paddingLeft + (contentWidth - m_messageTextWidget.width) / 2;
+    m_messageTextWidget.y = styleContainer->borderSizeTop + styleContainer->paddingTop;
+
+    int xButtonTextWidget = styleContainer->borderSizeLeft + styleContainer->paddingLeft + (contentWidth - menuItemsWidth) / 2;
+    int yButtonTextWidget = styleContainer->borderSizeTop + styleContainer->paddingTop + m_messageTextWidget.height;
+    for (size_t i = 0; i < m_numButtonTextWidgets; i++) {
+        m_buttonTextWidgets[i].x = xButtonTextWidget;
+        m_buttonTextWidgets[i].y = yButtonTextWidget;
+        m_buttonTextWidgets[i].width = maxMenuItemWidth;
+        xButtonTextWidget += maxMenuItemWidth + styleButton->paddingLeft;
+    }
+}
+
+void QuestionPage::updateInternalPage() {
+    WidgetCursor &widgetCursor = g_widgetCursor;
+
+    auto savedWidgetCursor = widgetCursor;
+
+    widgetCursor.widget = &m_containerRectangleWidget;
+    widgetCursor.x = x + m_containerRectangleWidget.x;
+    widgetCursor.y = y + m_containerRectangleWidget.y;
+    widgetCursor.w = m_containerRectangleWidget.width;
+    widgetCursor.h = m_containerRectangleWidget.height;
+    RectangleWidgetState rectangleWidgetState;
+    rectangleWidgetState.flags.active = 0;
+    rectangleWidgetState.render();
+
+    if (g_findCallback == nullptr && !widgetCursor.refreshed) {
+	    widgetCursor.pushBackground(widgetCursor.x, widgetCursor.y, getStyle(m_containerRectangleWidget.style), false);
+    }
+
+    widgetCursor.widget = &m_messageTextWidget;
+    widgetCursor.x = x + m_messageTextWidget.x;
+    widgetCursor.y = y + m_messageTextWidget.y;
+    widgetCursor.w = m_messageTextWidget.width;
+    widgetCursor.h = m_messageTextWidget.height;
+    TextWidgetState textWidgetState;
+    textWidgetState.flags.active = 0;
+	textWidgetState.flags.blinking = 0;
+	textWidgetState.flags.focused = 0;
+    textWidgetState.render();
+
+    for (size_t i = 0; i < m_numButtonTextWidgets; i++) {
+        widgetCursor.widget = &m_buttonTextWidgets[i];
+        widgetCursor.x = x + m_buttonTextWidgets[i].x;
+        widgetCursor.y = y + m_buttonTextWidgets[i].y;
+        widgetCursor.w = m_buttonTextWidgets[i].width;
+        widgetCursor.h = m_buttonTextWidgets[i].height;
+        widgetCursor.cursor = i;
+		TextWidgetState textWidgetState;
+		textWidgetState.flags.active = widgetCursor == g_activeWidget;
+		textWidgetState.flags.blinking = 0;
+		textWidgetState.flags.focused = 0;
+		textWidgetState.render();
+    }
+
+    if (g_findCallback == nullptr && !widgetCursor.refreshed) {
+	    widgetCursor.popBackground();
+    }
+
+    widgetCursor = savedWidgetCursor;
+}
+
+WidgetCursor QuestionPage::findWidgetInternalPage(int x, int y, bool clicked) {
+    WidgetCursor widgetCursor = g_widgetCursor;
+    widgetCursor.appContext = m_appContext;
+
+    for (size_t i = 0; i < m_numButtonTextWidgets; i++) {
+        widgetCursor.widget = &m_buttonTextWidgets[i];
+        widgetCursor.x = this->x + m_buttonTextWidgets[i].x;
+        widgetCursor.y = this->y + m_buttonTextWidgets[i].y;
+        widgetCursor.w = m_buttonTextWidgets[i].width;
+        widgetCursor.h = m_buttonTextWidgets[i].height;
+        widgetCursor.cursor = i;
+        if (
+            x >= widgetCursor.x && x < widgetCursor.x + widgetCursor.w &&
+            y >= widgetCursor.y && y < widgetCursor.y + widgetCursor.h
+        ) {
+            return widgetCursor;
+        }
+    }
+
+    widgetCursor.widget = &m_containerRectangleWidget;
+    widgetCursor.x = this->x + m_containerRectangleWidget.x;
+    widgetCursor.y = this->y + m_containerRectangleWidget.y;
+
+    return widgetCursor;
+}
+
+void QuestionPage::executeAction() {
+    g_questionPage.m_appContext->popPage();
+    (*g_questionPage.m_callback)(g_questionPage.m_userParam, (unsigned)getFoundWidgetAtDown().cursor);
 }
 
 } // namespace gui

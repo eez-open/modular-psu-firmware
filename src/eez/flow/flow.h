@@ -47,9 +47,8 @@ FlowState *getPageFlowState(Assets *assets, int16_t pageIndex);
 #endif
 int getPageIndex(FlowState *flowState);
 
-FlowState *getLayoutViewFlowState(FlowState *flowState, uint16_t layoutViewWidgetComponentIndex, int16_t pageId);
-
 #if OPTION_GUI || !defined(OPTION_GUI)
+FlowState *getLayoutViewFlowState(FlowState *flowState, uint16_t layoutViewWidgetComponentIndex, int16_t pageId);
 void executeFlowAction(const WidgetCursor &widgetCursor, int16_t actionId, void *param);
 void dataOperation(int16_t dataId, DataOperationEnum operation, const WidgetCursor &widgetCursor, Value &value);
 int16_t getNativeVariableId(const WidgetCursor &widgetCursor);

@@ -501,6 +501,10 @@ void AppContext::pushToastMessage(ToastMessagePage *toastMessage) {
     pushPage(INTERNAL_PAGE_ID_TOAST_MESSAGE, toastMessage);
 }
 
+void AppContext::questionDialog(Value message, Value buttons, void *userParam, void (*callback)(void *userParam, unsigned buttonIndex)) {
+    pushPage(INTERNAL_PAGE_ID_QUESTION, QuestionPage::create(this, message, buttons, userParam, callback));
+}
+
 void AppContext::getBoundingRect(Rect &rectBounding) {
     if (m_pageNavigationStackPointer >= 0) {
         int x1 = rect.x + rect.w;

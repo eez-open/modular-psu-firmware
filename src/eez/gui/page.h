@@ -148,8 +148,8 @@ public:
     static void pushSelectFromEnumPage(
         AppContext *appContext,
         const EnumItem *enumItems,
-        uint16_t currentValue, 
-        bool (*disabledCallback)(uint16_t value), 
+        uint16_t currentValue,
+        bool (*disabledCallback)(uint16_t value),
         void (*onSet)(uint16_t),
         bool smallFont = false,
         bool showRadioButtonIcon = true
@@ -178,7 +178,7 @@ public:
         bool smallFont_,
         bool showRadioButtonIcon_
     );
-    
+
     void init(
         AppContext *appContext_,
         void (*enumDefinitionFunc)(DataOperationEnum operation, const WidgetCursor &widgetCursor, Value &value),
@@ -262,6 +262,32 @@ private:
     void (*m_callback)(int);
 
     void init(AppContext *appContext, const char *message, const char **menuItems, void(*callback)(int));
+};
+
+////////////////////////////////////////////////////////////////////////////////
+
+class QuestionPage : public InternalPage {
+public:
+    static QuestionPage *create(AppContext *appContext, const Value &message, const Value &buttons, void *userParam, void (*callback)(void *userParam, unsigned buttonIndex));
+
+    void updateInternalPage();
+    WidgetCursor findWidgetInternalPage(int x, int y, bool clicked);
+
+    static void executeAction();
+
+private:
+    AppContext *m_appContext;
+    Value m_message;
+    Value m_buttons;
+    void *m_userParam;
+    void (*m_callback)(void *userParam, unsigned buttonIndex);
+
+    RectangleWidget m_containerRectangleWidget;
+    TextWidget m_messageTextWidget;
+    TextWidget m_buttonTextWidgets[MAX_MENU_ITEMS];
+    size_t m_numButtonTextWidgets;
+
+    void init(AppContext *appContext, const Value &message, const Value &buttons, void *userParam, void (*callback)(void *userParam, unsigned buttonIndex));
 };
 
 } // namespace gui
