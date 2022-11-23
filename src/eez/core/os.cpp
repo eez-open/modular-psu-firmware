@@ -20,6 +20,10 @@
 #include <main.h>
 #endif
 
+#if defined(EEZ_PLATFORM_ESP32)
+#include <esp_timer.h>
+#endif
+
 #include <eez/core/os.h>
 
 namespace eez {
@@ -31,6 +35,10 @@ uint32_t millis() {
 
 #if defined(EEZ_PLATFORM_SIMULATOR)
 	return osKernelGetTickCount();
+#endif
+
+#if defined(EEZ_PLATFORM_ESP32)
+	return (unsigned long) (esp_timer_get_time() / 1000ULL);
 #endif
 }
 

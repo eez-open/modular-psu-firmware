@@ -16,6 +16,8 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
+#if EEZ_OPTION_GUI || !defined(EEZ_OPTION_GUI)
+
 #include <stdio.h>
 
 #include <eez/conf.h>
@@ -197,7 +199,7 @@ static void onWidgetDefaultTouch(const WidgetCursor &widgetCursor, Event &touchE
         return;
     }
 
-    auto action = getWidgetAction(widgetCursor);        
+    auto action = getWidgetAction(widgetCursor);
 
     if (touchEvent.type == EVENT_TYPE_TOUCH_DOWN) {
         g_touchActionExecuted = false;
@@ -271,3 +273,5 @@ void clearFoundWidgetAtDown() {
 
 } // namespace gui
 } // namespace eez
+
+#endif // EEZ_OPTION_GUI || !defined(EEZ_OPTION_GUI)

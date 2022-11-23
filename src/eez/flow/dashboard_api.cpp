@@ -417,7 +417,7 @@ EM_PORT_API(int) getFlowStateFlowIndex(int flowStateIndex) {
     return flowState->flowIndex;
 }
 
-#if OPTION_GUI || !defined(OPTION_GUI)
+#if EEZ_OPTION_GUI || !defined(EEZ_OPTION_GUI)
 EM_PORT_API(bool) isRTL() {
     return g_isRTL;
 }

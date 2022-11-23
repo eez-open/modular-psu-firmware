@@ -434,8 +434,8 @@ bool isChSettingsSubPage(int pageId) {
         pageId == PAGE_ID_CH_SETTINGS_INFO;
 }
 
-void PsuAppContext::onPageChanged(int previousPageId, int activePageId) {
-    AppContext::onPageChanged(previousPageId, activePageId);
+void PsuAppContext::onPageChanged(int previousPageId, int activePageId, bool activePageIsFromStack, bool previousPageIsStillOnStack) {
+    AppContext::onPageChanged(previousPageId, activePageId, activePageIsFromStack, previousPageIsStillOnStack);
 
     g_focusEditValue = Value();
 

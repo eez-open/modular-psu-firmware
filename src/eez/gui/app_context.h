@@ -125,9 +125,9 @@ protected:
 
     uint32_t m_showPageTime;
 
-    virtual void onPageChanged(int previousPageId, int activePageId);
+    virtual void onPageChanged(int previousPageId, int activePageId, bool activePageIsFromStack, bool previousPageIsStillOnStack);
 
-    void doShowPage(int index, Page *page, int previousPageId);
+    void doShowPage(int index, Page *page, int previousPageId, bool activePageIsFromStack, bool previousPageIsStillOnStack);
     void setPage(int pageId);
 
     void updatePage(int i, WidgetCursor &widgetCursor);

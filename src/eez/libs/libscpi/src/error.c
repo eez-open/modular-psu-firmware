@@ -34,6 +34,8 @@
  *
  */
 
+#if !defined(EEZ_FOR_LVGL)
+
 #include <stdint.h>
 
 #include "scpi/parser.h"
@@ -130,7 +132,7 @@ int32_t SCPI_ErrorCount(scpi_t * context) {
 
 static scpi_bool_t SCPI_ErrorAddInternal(scpi_t * context, int16_t err, char * info, size_t info_len) {
     scpi_error_t error_value;
-    /* SCPIDEFINE_strndup is sometimes a dumy that does not reference it's arguments. 
+    /* SCPIDEFINE_strndup is sometimes a dumy that does not reference it's arguments.
        Since info_len is not referenced elsewhere caoing to void prevents unusd argument warnings */
     (void) info_len;
     char * info_ptr = info ? SCPIDEFINE_strndup(&context->error_info_heap, info, info_len) : NULL;
@@ -232,3 +234,4 @@ const char * SCPI_ErrorTranslate(int16_t err) {
 }
 
 
+#endif // !defined(EEZ_FOR_LVGL)

@@ -35,6 +35,8 @@
  *
  */
 
+#if !defined(EEZ_FOR_LVGL)
+
 #include <ctype.h>
 #include <string.h>
 
@@ -1832,3 +1834,5 @@ scpi_bool_t SCPI_ParamArrayFloat(scpi_t * context, float *data, size_t i_count, 
 scpi_bool_t SCPI_ParamArrayDouble(scpi_t * context, double *data, size_t i_count, size_t *o_count, scpi_array_format_t format, scpi_bool_t mandatory) {
     PARAM_ARRAY_TEMPLATE(SCPI_ParamDouble);
 }
+
+#endif // !defined(EEZ_FOR_LVGL)

@@ -65,9 +65,11 @@ class Keypad : public Page {
     KeypadMode m_keypadMode;
 
     virtual int getCursorPosition();
-    void setCursorPosition(int cursorPosition);
+    virtual void setCursorPosition(int cursorPosition);
 
     int getXScroll(const WidgetCursor &widgetCursor);
+
+    const char *getKeypadLabel();
 
 protected:
     AppContext *m_appContext;
@@ -119,6 +121,7 @@ struct NumericKeypadOptions {
         unsigned checkWhileTyping : 1;
         unsigned signButtonEnabled : 1;
         unsigned dotButtonEnabled : 1;
+        unsigned unitChangeEnabled: 1;
     } flags;
 
     int option1Action;
@@ -165,7 +168,7 @@ public:
     bool isEditing();
 
     Unit getEditUnit();
-    
+
     void getKeypadText(char *text, size_t count) override;
     virtual bool getText(char *text, size_t count);
 
@@ -193,6 +196,7 @@ public:
 	virtual void showGreaterThanMaxErrorMessage();
 
     virtual int getCursorPosition() override;
+    virtual void setCursorPosition(int cursorPosition) override;
 
     virtual float getPrecision();
 

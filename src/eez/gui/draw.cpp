@@ -16,6 +16,8 @@
 * along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
+#if EEZ_OPTION_GUI || !defined(EEZ_OPTION_GUI)
+
 #include <string.h>
 #define _USE_MATH_DEFINES
 #include <math.h>
@@ -494,7 +496,7 @@ struct MultilineTextRender {
 
     int executeStep(MultilineTextRenderStep step) {
         textHeight = 0;
-        
+
         int y = y1;
 
         line[0] = 0;
@@ -516,7 +518,7 @@ struct MultilineTextRender {
 				}
 
                 flushLine(y, step);
-                
+
                 y += lineHeight;
                 if (y + lineHeight - 1 > y2) {
                     break;
@@ -540,7 +542,7 @@ struct MultilineTextRender {
 
             if (text[i] == 0 || text[i] == '\n') {
                 flushLine(y, step);
-                
+
                 y += lineHeight;
 
                 if (text[i] == 0) {
@@ -570,7 +572,7 @@ struct MultilineTextRender {
         y2 -= style->borderSizeBottom;
 
         font = styleGetFont(style);
-        
+
         lineHeight = (int)(0.9 * font.getHeight());
         if (lineHeight <= 0) {
             return 0;
@@ -592,7 +594,7 @@ struct MultilineTextRender {
 
         //
         font = styleGetFont(style);
-        
+
         lineHeight = (int)(0.9 * font.getHeight());
         if (lineHeight <= 0) {
             return;
@@ -854,3 +856,5 @@ void drawAntialiasedLine(int x0, int y0, int x1, int y1) {
 
 } // namespace gui
 } // namespace eez
+
+#endif // EEZ_OPTION_GUI || !defined(EEZ_OPTION_GUI)

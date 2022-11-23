@@ -16,6 +16,8 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
+#if EEZ_OPTION_GUI || !defined(EEZ_OPTION_GUI)
+
 #include <eez/gui/gui.h>
 
 namespace eez {
@@ -179,12 +181,12 @@ void animateRectsStep(float t, VideoBuffer bufferOld, VideoBuffer bufferNew, Vid
 				y = (int)roundf(animRect.srcRect.y + t1 * (animRect.dstRect.y - animRect.srcRect.y));
 			else
 				y = (int)floorf(animRect.srcRect.y + t1 * (animRect.dstRect.y - animRect.srcRect.y));
-			
+
 			if (animRect.dstRect.w > animRect.srcRect.w)
 				w = (int)ceilf(animRect.srcRect.w + t1 * (animRect.dstRect.w - animRect.srcRect.w));
 			else
 				w = (int)floorf(animRect.srcRect.w + t1 * (animRect.dstRect.w - animRect.srcRect.w));
-			
+
 			if (animRect.dstRect.h > animRect.srcRect.h)
 				h = (int)ceilf(animRect.srcRect.h + t1 * (animRect.dstRect.h - animRect.srcRect.h));
 			else
@@ -367,3 +369,5 @@ void animateRects(AppContext *appContext, Buffer startBuffer, int numRects, floa
 
 } // gui
 } // eez
+
+#endif // EEZ_OPTION_GUI || !defined(EEZ_OPTION_GUI)

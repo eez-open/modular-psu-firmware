@@ -37,7 +37,7 @@ struct LineChartWidgetComponenent : public Component {
     ListOfAssetsPtr<LineChartLine> lines;
 };
 
-#if OPTION_GUI || !defined(OPTION_GUI)
+#if EEZ_OPTION_GUI || !defined(EEZ_OPTION_GUI)
 
 struct Point {
     float x;
@@ -79,7 +79,7 @@ private:
     void *data;
 };
 
-#endif // OPTION_GUI || !defined(OPTION_GUI)
+#endif // EEZ_OPTION_GUI || !defined(EEZ_OPTION_GUI)
 
 } // flow
 } // eez

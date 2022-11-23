@@ -16,6 +16,8 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
+#if EEZ_OPTION_GUI || !defined(EEZ_OPTION_GUI)
+
 #include <stdio.h>
 #include <string.h>
 #include <memory.h>
@@ -985,3 +987,5 @@ int getCursorXPosition(int cursorPosition, const char *text, int textLength, int
 } // namespace display
 } // namespace gui
 } // namespace eez
+
+#endif // EEZ_OPTION_GUI || !defined(EEZ_OPTION_GUI)

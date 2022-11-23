@@ -1,3 +1,5 @@
+#if defined(EEZ_PLATFORM_SIMULATOR)
+
 #include "cmsis_os2.h"
 
 #include <assert.h>
@@ -175,3 +177,5 @@ osStatus osMessageQueuePut(osMessageQueueId_t queue, const void *msg_ptr, uint8_
 
     return osOK;
 }
+
+#endif // defined(EEZ_PLATFORM_SIMULATOR)

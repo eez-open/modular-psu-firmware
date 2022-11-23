@@ -21,7 +21,7 @@
 #include <eez/core/assets.h>
 #include <eez/core/value.h>
 
-#if OPTION_GUI || !defined(OPTION_GUI)
+#if EEZ_OPTION_GUI || !defined(EEZ_OPTION_GUI)
 #include <eez/gui/gui.h>
 using namespace eez::gui;
 #endif
@@ -94,7 +94,7 @@ void propagateValue(FlowState *flowState, unsigned componentIndex, unsigned outp
 void propagateValue(FlowState *flowState, unsigned componentIndex, unsigned outputIndex); // propagates null value
 void propagateValueThroughSeqout(FlowState *flowState, unsigned componentIndex); // propagates null value through @seqout (0-th output)
 
-#if OPTION_GUI || !defined(OPTION_GUI)
+#if EEZ_OPTION_GUI || !defined(EEZ_OPTION_GUI)
 void getValue(uint16_t dataId, DataOperationEnum operation, const WidgetCursor &widgetCursor, Value &value);
 void setValue(uint16_t dataId, const WidgetCursor &widgetCursor, const Value& value);
 #endif

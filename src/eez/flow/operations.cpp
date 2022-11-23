@@ -36,7 +36,7 @@
 #include <eez/flow/operations.h>
 #include <eez/flow/flow_defs_v3.h>
 
-#if OPTION_GUI || !defined(OPTION_GUI)
+#if EEZ_OPTION_GUI || !defined(EEZ_OPTION_GUI)
 #include <eez/gui/gui.h>
 using namespace eez::gui;
 #endif
@@ -760,7 +760,7 @@ void do_OPERATION_TYPE_FLOW_INDEX(EvalStack &stack) {
 }
 
 void do_OPERATION_TYPE_FLOW_IS_PAGE_ACTIVE(EvalStack &stack) {
-#if OPTION_GUI || !defined(OPTION_GUI)
+#if EEZ_OPTION_GUI || !defined(EEZ_OPTION_GUI)
 	bool isActive = false;
 
 	auto pageIndex = getPageIndex(stack.flowState);
@@ -786,7 +786,7 @@ void do_OPERATION_TYPE_FLOW_IS_PAGE_ACTIVE(EvalStack &stack) {
 	stack.push(Value(isActive, VALUE_TYPE_BOOLEAN));
 #else
     stack.push(Value::makeError());
-#endif // OPTION_GUI || !defined(OPTION_GUI)
+#endif // EEZ_OPTION_GUI || !defined(EEZ_OPTION_GUI)
 }
 
 void do_OPERATION_TYPE_FLOW_PAGE_TIMELINE_POSITION(EvalStack &stack) {
@@ -1123,6 +1123,11 @@ void do_OPERATION_TYPE_MATH_FLOOR(EvalStack &stack) {
         return;
     }
 
+	if (a.isInt32OrLess()) {
+		stack.push(a);
+		return;
+	}
+
 	if (a.isDouble()) {
 		stack.push(Value(floor(a.getDouble()), VALUE_TYPE_DOUBLE));
 		return;
@@ -1142,6 +1147,11 @@ void do_OPERATION_TYPE_MATH_CEIL(EvalStack &stack) {
         stack.push(a);
         return;
     }
+
+	if (a.isInt32OrLess()) {
+		stack.push(a);
+		return;
+	}
 
 	if (a.isDouble()) {
 		stack.push(Value(ceil(a.getDouble()), VALUE_TYPE_DOUBLE));
@@ -1181,6 +1191,11 @@ void do_OPERATION_TYPE_MATH_ROUND(EvalStack &stack) {
     } else {
         numDigits = 0;
     }
+
+	if (a.isInt32OrLess()) {
+		stack.push(a);
+		return;
+	}
 
 	if (a.isDouble()) {
 		stack.push(Value(roundN(a.getDouble(), numDigits), VALUE_TYPE_DOUBLE));

@@ -28,7 +28,7 @@ static const size_t MAX_ITERATORS = 4;
 
 ////////////////////////////////////////////////////////////////////////////////
 
-#if OPTION_GUI || !defined(OPTION_GUI)
+#if EEZ_OPTION_GUI || !defined(EEZ_OPTION_GUI)
 namespace gui {
     class AppContext;
 }
@@ -221,7 +221,7 @@ struct Value {
 		*this = value;
 	}
 
-#if OPTION_GUI || !defined(OPTION_GUI)
+#if EEZ_OPTION_GUI || !defined(EEZ_OPTION_GUI)
     Value(AppContext *appContext)
         : type(VALUE_TYPE_POINTER), unit(UNIT_UNKNOWN), options(0), pVoidValue(appContext)
     {
@@ -557,7 +557,7 @@ struct ArrayElementValue : public Ref {
     int elementIndex;
 };
 
-#if OPTION_GUI || !defined(OPTION_GUI)
+#if EEZ_OPTION_GUI || !defined(EEZ_OPTION_GUI)
 namespace gui {
     struct WidgetCursor;
     extern gui::WidgetCursor g_widgetCursor;
@@ -573,7 +573,7 @@ inline Value Value::getValue() const {
         return *pValueValue;
     }
     if (type == VALUE_TYPE_NATIVE_VARIABLE) {
-#if OPTION_GUI || !defined(OPTION_GUI)
+#if EEZ_OPTION_GUI || !defined(EEZ_OPTION_GUI)
         using namespace gui;
         return get(g_widgetCursor, int32Value);
 #else

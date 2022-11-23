@@ -233,7 +233,7 @@ protected:
     bool m_inputReady;
 
     int getMainPageId() override;
-    void onPageChanged(int previousPageId, int activePageId) override;
+    void onPageChanged(int previousPageId, int activePageId, bool activePageIsFromStack, bool previousPageIsStillOnStack) override;
     bool isAutoRepeatAction(int action) override;
     void onPageTouch(const WidgetCursor &foundWidget, Event &touchEvent) override;
     bool testExecuteActionOnTouchDown(int action) override;

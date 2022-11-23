@@ -16,12 +16,14 @@
 //----------------------------------------------------------------------------
 //
 // 2007-01-25 Jerry Evans (jerry@novadsp.com)
-//   Ported to AGG 2.4 
+//   Ported to AGG 2.4
 //
 // 2008-09-25 Jim Barry (jim@mvps.org)
-//   Fixed errors in kerning 
+//   Fixed errors in kerning
 //
 //----------------------------------------------------------------------------
+
+#if EEZ_OPTION_GUI || !defined(EEZ_OPTION_GUI)
 
 #include "agg2d.h"
 
@@ -1222,3 +1224,5 @@ void Agg2D::updateRasterizerGamma()
 {
     m_rasterizer.gamma(Agg2DRasterizerGamma(m_masterAlpha, m_antiAliasGamma));
 }
+
+#endif // EEZ_OPTION_GUI || !defined(EEZ_OPTION_GUI)

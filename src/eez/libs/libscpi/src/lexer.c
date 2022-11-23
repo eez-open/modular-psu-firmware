@@ -29,11 +29,13 @@
 /**
  * @file   lexer.c
  * @date   Wed Mar 20 19:35:19 UTC 2013
- * 
+ *
  * @brief  SCPI Lexer
- * 
- * 
+ *
+ *
  */
+
+#if !defined(EEZ_FOR_LVGL)
 
 #include <ctype.h>
 #include <stdio.h>
@@ -45,7 +47,7 @@
 /**
  * Is white space
  * @param c
- * @return 
+ * @return
  */
 static int isws(int c) {
     if ((c == ' ') || (c == '\t')) {
@@ -57,7 +59,7 @@ static int isws(int c) {
 /**
  * Is binary digit
  * @param c
- * @return 
+ * @return
  */
 static int isbdigit(int c) {
     if ((c == '0') || (c == '1')) {
@@ -69,7 +71,7 @@ static int isbdigit(int c) {
 /**
  * Is hexadecimal digit
  * @param c
- * @return 
+ * @return
  */
 static int isqdigit(int c) {
     if ((c == '0') || (c == '1') || (c == '2') || (c == '3') || (c == '4') || (c == '5') || (c == '6') || (c == '7')) {
@@ -81,7 +83,7 @@ static int isqdigit(int c) {
 /**
  * Is end of string
  * @param state
- * @return 
+ * @return
  */
 static int iseos(lex_state_t * state) {
     if ((state->buffer + state->len) <= (state->pos)) {
@@ -94,7 +96,7 @@ static int iseos(lex_state_t * state) {
 /**
  * Private export of iseos
  * @param state
- * @return 
+ * @return
  */
 int scpiLex_IsEos(lex_state_t * state) {
     return iseos(state);
@@ -104,7 +106,7 @@ int scpiLex_IsEos(lex_state_t * state) {
  * Test current character
  * @param state
  * @param chr
- * @return 
+ * @return
  */
 static int ischr(lex_state_t * state, char chr) {
     return (state->pos[0] == chr);
@@ -113,7 +115,7 @@ static int ischr(lex_state_t * state, char chr) {
 /**
  * Is plus or minus
  * @param c
- * @return 
+ * @return
  */
 static int isplusmn(int c) {
     return c == '+' || c == '-';
@@ -122,7 +124,7 @@ static int isplusmn(int c) {
 /**
  * Is letter H
  * @param c
- * @return 
+ * @return
  */
 static int isH(int c) {
     return c == 'h' || c == 'H';
@@ -131,7 +133,7 @@ static int isH(int c) {
 /**
  * Is letter B
  * @param c
- * @return 
+ * @return
  */
 static int isB(int c) {
     return c == 'b' || c == 'B';
@@ -140,7 +142,7 @@ static int isB(int c) {
 /**
  * Is letter Q
  * @param c
- * @return 
+ * @return
  */
 static int isQ(int c) {
     return c == 'q' || c == 'Q';
@@ -149,7 +151,7 @@ static int isQ(int c) {
 /**
  * Is letter E
  * @param c
- * @return 
+ * @return
  */
 static int isE(int c) {
     return c == 'e' || c == 'E';
@@ -166,7 +168,7 @@ static int isE(int c) {
 /**
  * Skip all whitespaces
  * @param state
- * @return 
+ * @return
  */
 static int skipWs(lex_state_t * state) {
     int someSpace = 0;
@@ -187,7 +189,7 @@ static int skipWs(lex_state_t * state) {
 /**
  * Skip decimal digit
  * @param state
- * @return 
+ * @return
  */
 static int skipDigit(lex_state_t * state) {
     if (!iseos(state) && isdigit((uint8_t)(state->pos[0]))) {
@@ -201,7 +203,7 @@ static int skipDigit(lex_state_t * state) {
 /**
  * Skip multiple decimal digits
  * @param state
- * @return 
+ * @return
  */
 static int skipNumbers(lex_state_t * state) {
     int someNumbers = 0;
@@ -215,7 +217,7 @@ static int skipNumbers(lex_state_t * state) {
 /**
  * Skip plus or minus
  * @param state
- * @return 
+ * @return
  */
 static int skipPlusmn(lex_state_t * state) {
     if (!iseos(state) && isplusmn(state->pos[0])) {
@@ -229,7 +231,7 @@ static int skipPlusmn(lex_state_t * state) {
 /**
  * Skip any character from 'a'-'Z'
  * @param state
- * @return 
+ * @return
  */
 static int skipAlpha(lex_state_t * state) {
     int someLetters = 0;
@@ -244,7 +246,7 @@ static int skipAlpha(lex_state_t * state) {
  * Skip exact character chr or nothing
  * @param state
  * @param chr
- * @return 
+ * @return
  */
 static int skipChr(lex_state_t * state, char chr) {
     if (!iseos(state) && ischr(state, chr)) {
@@ -258,7 +260,7 @@ static int skipChr(lex_state_t * state, char chr) {
 /**
  * Skip slash or dot
  * @param state
- * @return 
+ * @return
  */
 static int skipSlashDot(lex_state_t * state) {
     if (!iseos(state) && (ischr(state, '/') | ischr(state, '.'))) {
@@ -272,7 +274,7 @@ static int skipSlashDot(lex_state_t * state) {
 /**
  * Skip star
  * @param state
- * @return 
+ * @return
  */
 static int skipStar(lex_state_t * state) {
     if (!iseos(state) && ischr(state, '*')) {
@@ -286,7 +288,7 @@ static int skipStar(lex_state_t * state) {
 /**
  * Skip colon
  * @param state
- * @return 
+ * @return
  */
 static int skipColon(lex_state_t * state) {
     if (!iseos(state) && ischr(state, ':')) {
@@ -302,7 +304,7 @@ static int skipColon(lex_state_t * state) {
 /**
  * Skip program mnemonic [a-z][a-z0-9_]*
  * @param state
- * @return 
+ * @return
  */
 static int skipProgramMnemonic(lex_state_t * state) {
     const char * startPos = state->pos;
@@ -326,7 +328,7 @@ static int skipProgramMnemonic(lex_state_t * state) {
  * Detect token white space
  * @param state
  * @param token
- * @return 
+ * @return
  */
 int scpiLex_WhiteSpace(lex_state_t * state, scpi_token_t * token) {
     token->ptr = state->pos;
@@ -349,7 +351,7 @@ int scpiLex_WhiteSpace(lex_state_t * state, scpi_token_t * token) {
 /**
  * Skip command program header \*<PROGRAM MNEMONIC>
  * @param state
- * @return 
+ * @return
  */
 static int skipCommonProgramHeader(lex_state_t * state) {
     int res;
@@ -371,7 +373,7 @@ static int skipCommonProgramHeader(lex_state_t * state) {
 /**
  * Skip compound program header :<PROGRAM MNEMONIC>:<PROGRAM MNEMONIC>...
  * @param state
- * @return 
+ * @return
  */
 static int skipCompoundProgramHeader(lex_state_t * state) {
     int res;
@@ -401,7 +403,7 @@ static int skipCompoundProgramHeader(lex_state_t * state) {
  * Detect token command or compound program header
  * @param state
  * @param token
- * @return 
+ * @return
  */
 int scpiLex_ProgramHeader(lex_state_t * state, scpi_token_t * token) {
     int res;
@@ -447,7 +449,7 @@ int scpiLex_ProgramHeader(lex_state_t * state, scpi_token_t * token) {
  * Detect token "Character program data"
  * @param state
  * @param token
- * @return 
+ * @return
  */
 int scpiLex_CharacterProgramData(lex_state_t * state, scpi_token_t * token) {
     token->ptr = state->pos;
@@ -504,7 +506,7 @@ static int skipExponent(lex_state_t * state) {
  * Detect token Decimal number
  * @param state
  * @param token
- * @return 
+ * @return
  */
 int scpiLex_DecimalNumericProgramData(lex_state_t * state, scpi_token_t * token) {
     char * rollback;
@@ -592,7 +594,7 @@ static int skipBinNum(lex_state_t * state) {
  * Detect token nondecimal number
  * @param state
  * @param token
- * @return 
+ * @return
  */
 int scpiLex_NondecimalNumericData(lex_state_t * state, scpi_token_t * token) {
     int someNumbers = 0;
@@ -661,7 +663,7 @@ static void skipSingleQuoteProgramData(lex_state_t * state) {
  * Detect token String data
  * @param state
  * @param token
- * @return 
+ * @return
  */
 int scpiLex_StringProgramData(lex_state_t * state, scpi_token_t * token) {
     token->ptr = state->pos;
@@ -713,7 +715,7 @@ static int isNonzeroDigit(int c) {
  * Detect token Block Data
  * @param state
  * @param token
- * @return 
+ * @return
  */
 int scpiLex_ArbitraryBlockProgramData(lex_state_t * state, scpi_token_t * token) {
     int i;
@@ -801,7 +803,7 @@ static void skipProgramExpression(lex_state_t * state) {
  * Detect token Expression
  * @param state
  * @param token
- * @return 
+ * @return
  */
 int scpiLex_ProgramExpression(lex_state_t * state, scpi_token_t * token) {
     token->ptr = state->pos;
@@ -833,7 +835,7 @@ int scpiLex_ProgramExpression(lex_state_t * state, scpi_token_t * token) {
  * Detect token comma
  * @param state
  * @param token
- * @return 
+ * @return
  */
 int scpiLex_Comma(lex_state_t * state, scpi_token_t * token) {
     token->ptr = state->pos;
@@ -853,7 +855,7 @@ int scpiLex_Comma(lex_state_t * state, scpi_token_t * token) {
  * Detect token semicolon
  * @param state
  * @param token
- * @return 
+ * @return
  */
 int scpiLex_Semicolon(lex_state_t * state, scpi_token_t * token) {
     token->ptr = state->pos;
@@ -873,7 +875,7 @@ int scpiLex_Semicolon(lex_state_t * state, scpi_token_t * token) {
  * Detect token colon
  * @param state
  * @param token
- * @return 
+ * @return
  */
 int scpiLex_Colon(lex_state_t * state, scpi_token_t * token) {
     token->ptr = state->pos;
@@ -893,7 +895,7 @@ int scpiLex_Colon(lex_state_t * state, scpi_token_t * token) {
  * Detect specified character
  * @param state
  * @param token
- * @return 
+ * @return
  */
 int scpiLex_SpecificCharacter(lex_state_t * state, scpi_token_t * token, char chr) {
     token->ptr = state->pos;
@@ -913,7 +915,7 @@ int scpiLex_SpecificCharacter(lex_state_t * state, scpi_token_t * token, char ch
  * Detect token New line
  * @param state
  * @param token
- * @return 
+ * @return
  */
 int scpiLex_NewLine(lex_state_t * state, scpi_token_t * token) {
     token->ptr = state->pos;
@@ -933,3 +935,5 @@ int scpiLex_NewLine(lex_state_t * state, scpi_token_t * token) {
 
     return token->len;
 }
+
+#endif // !defined(EEZ_FOR_LVGL)

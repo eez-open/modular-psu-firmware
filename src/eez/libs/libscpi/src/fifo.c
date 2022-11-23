@@ -26,6 +26,8 @@
  * OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
+#if !defined(EEZ_FOR_LVGL)
+
 #include "fifo_private.h"
 
 /**
@@ -144,3 +146,5 @@ scpi_bool_t fifo_count(scpi_fifo_t * fifo, int16_t * value) {
     *value = fifo->count;
     return TRUE;
 }
+
+#endif // !defined(EEZ_FOR_LVGL)

@@ -16,6 +16,8 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
+#if EEZ_OPTION_GUI || !defined(EEZ_OPTION_GUI)
+
 #include <eez/core/util.h>
 
 #include <eez/gui/touch_filter.h>
@@ -29,7 +31,7 @@
 // #define CONF_GUI_TOUCH_FILTER_P 5
 
 #define CONF_GUI_TOUCH_FILTER_N 5   // level of smoothing in the form of a fraction N / D
-#define CONF_GUI_TOUCH_FILTER_D 10 
+#define CONF_GUI_TOUCH_FILTER_D 10
 #define CONF_GUI_TOUCH_FILTER_P 5   // debounce
 
 namespace eez {
@@ -276,3 +278,5 @@ void transform(int &x, int &y) {
 } // namespace touch
 } // namespace gui
 } // namespace eez
+
+#endif // EEZ_OPTION_GUI || !defined(EEZ_OPTION_GUI)

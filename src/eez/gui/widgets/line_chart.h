@@ -26,7 +26,12 @@ namespace gui {
 
 struct LineChartWidget : public Widget {
     int16_t title;
+
+    int16_t showTitle;
     int16_t showLegend;
+    int16_t showXAxis;
+    int16_t showYAxis;
+    int16_t showGrid;
 
     int16_t yAxisRangeOption;
     int16_t yAxisRangeFrom;
@@ -37,10 +42,13 @@ struct LineChartWidget : public Widget {
     int16_t marginRight;
     int16_t marginBottom;
 
+    int16_t marker;
+
     int16_t titleStyle;
     int16_t legendStyle;
 	int16_t xAxisStyle;
     int16_t yAxisStyle;
+    int16_t markerStyle;
 
     uint16_t componentIndex;
 };
@@ -48,9 +56,14 @@ struct LineChartWidget : public Widget {
 struct LineChartWidgetState : public WidgetState {
     WidgetStateFlags flags;
     Value title;
+    Value showTitleValue;
     Value showLegendValue;
+    Value showXAxisValue;
+    Value showYAxisValue;
+    Value showGridValue;
     Value yAxisRangeFrom;
     Value yAxisRangeTo;
+    Value markerValue;
 
     bool updateState() override;
 	void render() override;

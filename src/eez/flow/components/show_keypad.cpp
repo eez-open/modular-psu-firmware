@@ -16,7 +16,7 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#if OPTION_GUI || !defined(OPTION_GUI)
+#if EEZ_OPTION_GUI || !defined(EEZ_OPTION_GUI)
 
 #include <eez/flow/flow.h>
 #include <eez/flow/components.h>
@@ -97,12 +97,10 @@ void executeShowKeypadComponent(FlowState *flowState, unsigned componentIndex) {
 		endAsyncExecution(g_showKeyboardFlowState, g_showKeyboardComponentIndex);
 	};
 
-	const char *label = labelValue.getString();
-	if (label && *label) {
-		labelValue = op_add(labelValue, Value(": "));
-	}
 
 	Unit unit = getUnitFromName(unitValue.getString());
+
+    initialValue.unit = unit;
 
 	showKeypadHook(labelValue, initialValue, minValue, maxValue, unit, onOk, onCancel);
 }
@@ -110,4 +108,4 @@ void executeShowKeypadComponent(FlowState *flowState, unsigned componentIndex) {
 } // namespace flow
 } // namespace eez
 
-#endif // OPTION_GUI || !defined(OPTION_GUI)
+#endif // EEZ_OPTION_GUI || !defined(EEZ_OPTION_GUI)

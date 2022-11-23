@@ -16,6 +16,8 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
+#if EEZ_OPTION_GUI || !defined(EEZ_OPTION_GUI)
+
 #include <eez/core/sound.h>
 #include <eez/core/util.h>
 
@@ -139,3 +141,5 @@ void DropDownListWidgetState::onTouch(const WidgetCursor &widgetCursor, Event &t
 
 } // namespace gui
 } // namespace eez
+
+#endif // EEZ_OPTION_GUI || !defined(EEZ_OPTION_GUI)

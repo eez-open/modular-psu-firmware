@@ -132,7 +132,7 @@ struct Settings {
 
 ////////////////////////////////////////////////////////////////////////////////
 
-#if OPTION_GUI || !defined(OPTION_GUI)
+#if EEZ_OPTION_GUI || !defined(EEZ_OPTION_GUI)
 
 #define WIDGET_FLAG_PIN_TO_LEFT (1 << 0)
 #define WIDGET_FLAG_PIN_TO_RIGHT (1 << 1)
@@ -327,7 +327,7 @@ struct Bitmap {
 
 } // namespace gui
 
-#endif // OPTION_GUI || !defined(OPTION_GUI)
+#endif // EEZ_OPTION_GUI || !defined(EEZ_OPTION_GUI)
 
 ////////////////////////////////////////////////////////////////////////////////
 
@@ -433,12 +433,12 @@ struct Assets {
     uint8_t external;
 
     AssetsPtr<Settings> settings;
-#if OPTION_GUI || !defined(OPTION_GUI)
+#if EEZ_OPTION_GUI || !defined(EEZ_OPTION_GUI)
 	ListOfAssetsPtr<gui::PageAsset> pages;
 	ListOfAssetsPtr<gui::Style> styles;
 	ListOfAssetsPtr<gui::FontData> fonts;
 	ListOfAssetsPtr<gui::Bitmap> bitmaps;
-#endif // OPTION_GUI || !defined(OPTION_GUI)
+#endif // EEZ_OPTION_GUI || !defined(EEZ_OPTION_GUI)
 	AssetsPtr<Colors> colorsDefinition;
 	ListOfAssetsPtr<const char> actionNames;
 	ListOfAssetsPtr<const char> variableNames;
@@ -458,7 +458,7 @@ void unloadExternalAssets();
 
 ////////////////////////////////////////////////////////////////////////////////
 
-#if OPTION_GUI || !defined(OPTION_GUI)
+#if EEZ_OPTION_GUI || !defined(EEZ_OPTION_GUI)
 const gui::PageAsset *getPageAsset(int pageId);
 const gui::PageAsset* getPageAsset(int pageId, gui::WidgetCursor& widgetCursor);
 const gui::Style *getStyle(int styleID);
@@ -474,7 +474,7 @@ const uint16_t *getColors();
 
 int getExternalAssetsMainPageId();
 
-#if OPTION_GUI || !defined(OPTION_GUI)
+#if EEZ_OPTION_GUI || !defined(EEZ_OPTION_GUI)
 const char *getActionName(const gui::WidgetCursor &widgetCursor, int16_t actionId);
 int16_t getDataIdFromName(const gui::WidgetCursor &widgetCursor, const char *name);
 #endif

@@ -114,7 +114,9 @@ enum PropertyCode {
 
     ROLLER_SELECTED,
 
-    SLIDER_VALUE
+    SLIDER_VALUE,
+
+    KEYBOARD_TEXTAREA
 };
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -152,86 +154,91 @@ void executeLVGLComponent(FlowState *flowState, unsigned componentIndex) {
         } else if (general->action == SET_PROPERTY) {
             auto specific = (LVGLComponent_SetProperty_ActionType *)general;
 
-            Value value;
-            snprintf(errorMessage, sizeof(errorMessage), "Failed to evaluate Value in LVGL Set Property action #%d", (int)(actionIndex + 1));
-            if (!evalExpression(flowState, componentIndex, specific->value, value, errorMessage)) {
-                return;
-            }
-
             auto target = getLvglObjectFromIndexHook(specific->target);
 
-            if (specific->property == IMAGE_IMAGE || specific->property == LABEL_TEXT) {
-                const char *strValue = value.toString(0xe42b3ca2).getString();
-                if (specific->property == IMAGE_IMAGE) {
-                    const void *src = getLvglImageByNameHook(strValue);
-                    if (src) {
-                        lv_img_set_src(target, src);
-                    } else {
-                        snprintf(errorMessage, sizeof(errorMessage), "Image \"%s\" not found in LVGL Set Property action #%d", strValue, (int)(actionIndex + 1));
-                        throwError(flowState, componentIndex, errorMessage);
-                    }
-                } else {
-                    lv_label_set_text(target, strValue);
-                }
-            } else if (specific->property == BASIC_HIDDEN) {
-                int err;
-                bool booleanValue = value.toBool(&err);
-                if (err) {
-                    snprintf(errorMessage, sizeof(errorMessage), "Failed to convert value to boolean in LVGL Set Property action #%d", (int)(actionIndex + 1));
-                    throwError(flowState, componentIndex, errorMessage);
-                    return;
-                }
-
-                lv_state_t flag = LV_OBJ_FLAG_HIDDEN;
-
-                if (booleanValue) lv_obj_add_flag(target, flag);
-                else lv_obj_clear_flag(target, flag);
-            } else if (specific->property == BASIC_CHECKED || specific->property == BASIC_DISABLED) {
-                int err;
-                bool booleanValue = value.toBool(&err);
-                if (err) {
-                    snprintf(errorMessage, sizeof(errorMessage), "Failed to convert value to boolean in LVGL Set Property action #%d", (int)(actionIndex + 1));
-                    throwError(flowState, componentIndex, errorMessage);
-                    return;
-                }
-
-                lv_state_t state = specific->property == BASIC_CHECKED ? LV_STATE_CHECKED : LV_STATE_DISABLED;
-
-                if (booleanValue) lv_obj_add_state(target, state);
-                else lv_obj_clear_state(target, state);
+            if (specific->property == KEYBOARD_TEXTAREA) {
+                auto textarea = specific->textarea != -1 ? getLvglObjectFromIndexHook(specific->textarea) : nullptr;
+                lv_keyboard_set_textarea(target, textarea);
             } else {
-                int err;
-                int32_t intValue = value.toInt32(&err);
-                if (err) {
-                    snprintf(errorMessage, sizeof(errorMessage), "Failed to convert value to integer in LVGL Set Property action #%d", (int)(actionIndex + 1));
-                    throwError(flowState, componentIndex, errorMessage);
+                Value value;
+                snprintf(errorMessage, sizeof(errorMessage), "Failed to evaluate Value in LVGL Set Property action #%d", (int)(actionIndex + 1));
+                if (!evalExpression(flowState, componentIndex, specific->value, value, errorMessage)) {
                     return;
                 }
 
-                if (specific->property == ARC_VALUE) {
-                    lv_arc_set_value(target, intValue);
-                } else if (specific->property == BAR_VALUE) {
-                    lv_bar_set_value(target, intValue, specific->animated ? LV_ANIM_ON : LV_ANIM_OFF);
-                } else if (specific->property == BASIC_X) {
-                    lv_obj_set_x(target, intValue);
-                } else if (specific->property == BASIC_Y) {
-                    lv_obj_set_y(target, intValue);
-                } else if (specific->property == BASIC_WIDTH) {
-                    lv_obj_set_width(target, intValue);
-                } else if (specific->property == BASIC_HEIGHT) {
-                    lv_obj_set_height(target, intValue);
-                } else if (specific->property == BASIC_OPACITY) {
-                    lv_obj_set_style_opa(target, intValue, 0);
-                } else if (specific->property == DROPDOWN_SELECTED) {
-                    lv_dropdown_set_selected(target, intValue);
-                } else if (specific->property == IMAGE_ANGLE) {
-                    lv_img_set_angle(target, intValue);
-                } else if (specific->property == IMAGE_ZOOM) {
-                    lv_img_set_zoom(target, intValue);
-                } else if (specific->property == ROLLER_SELECTED) {
-                    lv_roller_set_selected(target, intValue, specific->animated ? LV_ANIM_ON : LV_ANIM_OFF);
-                } else if (specific->property == SLIDER_VALUE) {
-                    lv_slider_set_value(target, intValue, specific->animated ? LV_ANIM_ON : LV_ANIM_OFF);
+                if (specific->property == IMAGE_IMAGE || specific->property == LABEL_TEXT) {
+                    const char *strValue = value.toString(0xe42b3ca2).getString();
+                    if (specific->property == IMAGE_IMAGE) {
+                        const void *src = getLvglImageByNameHook(strValue);
+                        if (src) {
+                            lv_img_set_src(target, src);
+                        } else {
+                            snprintf(errorMessage, sizeof(errorMessage), "Image \"%s\" not found in LVGL Set Property action #%d", strValue, (int)(actionIndex + 1));
+                            throwError(flowState, componentIndex, errorMessage);
+                        }
+                    } else {
+                        lv_label_set_text(target, strValue);
+                    }
+                } else if (specific->property == BASIC_HIDDEN) {
+                    int err;
+                    bool booleanValue = value.toBool(&err);
+                    if (err) {
+                        snprintf(errorMessage, sizeof(errorMessage), "Failed to convert value to boolean in LVGL Set Property action #%d", (int)(actionIndex + 1));
+                        throwError(flowState, componentIndex, errorMessage);
+                        return;
+                    }
+
+                    lv_state_t flag = LV_OBJ_FLAG_HIDDEN;
+
+                    if (booleanValue) lv_obj_add_flag(target, flag);
+                    else lv_obj_clear_flag(target, flag);
+                } else if (specific->property == BASIC_CHECKED || specific->property == BASIC_DISABLED) {
+                    int err;
+                    bool booleanValue = value.toBool(&err);
+                    if (err) {
+                        snprintf(errorMessage, sizeof(errorMessage), "Failed to convert value to boolean in LVGL Set Property action #%d", (int)(actionIndex + 1));
+                        throwError(flowState, componentIndex, errorMessage);
+                        return;
+                    }
+
+                    lv_state_t state = specific->property == BASIC_CHECKED ? LV_STATE_CHECKED : LV_STATE_DISABLED;
+
+                    if (booleanValue) lv_obj_add_state(target, state);
+                    else lv_obj_clear_state(target, state);
+                } else {
+                    int err;
+                    int32_t intValue = value.toInt32(&err);
+                    if (err) {
+                        snprintf(errorMessage, sizeof(errorMessage), "Failed to convert value to integer in LVGL Set Property action #%d", (int)(actionIndex + 1));
+                        throwError(flowState, componentIndex, errorMessage);
+                        return;
+                    }
+
+                    if (specific->property == ARC_VALUE) {
+                        lv_arc_set_value(target, intValue);
+                    } else if (specific->property == BAR_VALUE) {
+                        lv_bar_set_value(target, intValue, specific->animated ? LV_ANIM_ON : LV_ANIM_OFF);
+                    } else if (specific->property == BASIC_X) {
+                        lv_obj_set_x(target, intValue);
+                    } else if (specific->property == BASIC_Y) {
+                        lv_obj_set_y(target, intValue);
+                    } else if (specific->property == BASIC_WIDTH) {
+                        lv_obj_set_width(target, intValue);
+                    } else if (specific->property == BASIC_HEIGHT) {
+                        lv_obj_set_height(target, intValue);
+                    } else if (specific->property == BASIC_OPACITY) {
+                        lv_obj_set_style_opa(target, intValue, 0);
+                    } else if (specific->property == DROPDOWN_SELECTED) {
+                        lv_dropdown_set_selected(target, intValue);
+                    } else if (specific->property == IMAGE_ANGLE) {
+                        lv_img_set_angle(target, intValue);
+                    } else if (specific->property == IMAGE_ZOOM) {
+                        lv_img_set_zoom(target, intValue);
+                    } else if (specific->property == ROLLER_SELECTED) {
+                        lv_roller_set_selected(target, intValue, specific->animated ? LV_ANIM_ON : LV_ANIM_OFF);
+                    } else if (specific->property == SLIDER_VALUE) {
+                        lv_slider_set_value(target, intValue, specific->animated ? LV_ANIM_ON : LV_ANIM_OFF);
+                    }
                 }
             }
         }

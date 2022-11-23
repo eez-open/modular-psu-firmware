@@ -16,7 +16,9 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#if OPTION_GUI || !defined(OPTION_GUI)
+#if defined(EEZ_PLATFORM_SIMULATOR)
+
+#if EEZ_OPTION_GUI || !defined(EEZ_OPTION_GUI)
 
 #include <eez/platform/touch.h>
 
@@ -90,4 +92,6 @@ void data_touch_raw_pressed(DataOperationEnum operation, const WidgetCursor &wid
 
 } // namespace eez
 
-#endif // OPTION_GUI || !defined(OPTION_GUI)
+#endif // EEZ_OPTION_GUI || !defined(EEZ_OPTION_GUI)
+
+#endif // defined(EEZ_PLATFORM_SIMULATOR)

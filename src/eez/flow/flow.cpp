@@ -29,7 +29,7 @@
 #include <eez/flow/debugger.h>
 #include <eez/flow/hooks.h>
 
-#if OPTION_GUI || !defined(OPTION_GUI)
+#if EEZ_OPTION_GUI || !defined(EEZ_OPTION_GUI)
 #include <eez/gui/gui.h>
 #include <eez/gui/keypad.h>
 #include <eez/gui/widgets/input.h>
@@ -148,7 +148,7 @@ bool isFlowStopped() {
     return g_isStopped;
 }
 
-#if OPTION_GUI || !defined(OPTION_GUI)
+#if EEZ_OPTION_GUI || !defined(EEZ_OPTION_GUI)
 
 FlowState *getPageFlowState(Assets *assets, int16_t pageIndex, const WidgetCursor &widgetCursor) {
 	if (!assets->flowDefinition) {
@@ -213,13 +213,26 @@ FlowState *getPageFlowState(Assets *assets, int16_t pageIndex) {
     return flowState;
 }
 
-#endif // OPTION_GUI || !defined(OPTION_GUI)
+#endif // EEZ_OPTION_GUI || !defined(EEZ_OPTION_GUI)
 
 int getPageIndex(FlowState *flowState) {
 	return flowState->flowIndex;
 }
 
-#if OPTION_GUI || !defined(OPTION_GUI)
+Value getGlobalVariable(Assets *assets, uint32_t globalVariableIndex) {
+    if (globalVariableIndex >= 0 && globalVariableIndex < assets->flowDefinition->globalVariables.count) {
+        return *assets->flowDefinition->globalVariables[globalVariableIndex];
+    }
+    return Value();
+}
+
+void setGlobalVariable(Assets *assets, uint32_t globalVariableIndex, const Value &value) {
+    if (globalVariableIndex >= 0 && globalVariableIndex < assets->flowDefinition->globalVariables.count) {
+        *assets->flowDefinition->globalVariables[globalVariableIndex] = value;
+    }
+}
+
+#if EEZ_OPTION_GUI || !defined(EEZ_OPTION_GUI)
 void executeFlowAction(const WidgetCursor &widgetCursor, int16_t actionId, void *param) {
 	if (!isFlowRunningHook()) {
 		return;
@@ -436,7 +449,7 @@ void dataOperation(int16_t dataId, DataOperationEnum operation, const WidgetCurs
 	}
 }
 
-#endif // OPTION_GUI || !defined(OPTION_GUI)
+#endif // EEZ_OPTION_GUI || !defined(EEZ_OPTION_GUI)
 
 } // namespace flow
 } // namespace eez

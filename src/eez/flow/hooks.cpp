@@ -21,7 +21,7 @@
 
 #include <eez/flow/hooks.h>
 
-#if OPTION_GUI || !defined(OPTION_GUI)
+#if EEZ_OPTION_GUI || !defined(EEZ_OPTION_GUI)
 #include <eez/gui/gui.h>
 #endif
 
@@ -33,7 +33,7 @@ static bool isFlowRunning() {
 }
 
 static void replacePage(int16_t pageId, uint32_t animType, uint32_t speed, uint32_t delay) {
-#if OPTION_GUI || !defined(OPTION_GUI)
+#if EEZ_OPTION_GUI || !defined(EEZ_OPTION_GUI)
 	eez::gui::getAppContextFromId(APP_CONTEXT_ID_DEVICE)->replacePage(pageId);
 #endif
 }

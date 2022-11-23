@@ -16,7 +16,9 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#if OPTION_GUI || !defined(OPTION_GUI)
+#if defined(EEZ_PLATFORM_SIMULATOR)
+
+#if EEZ_OPTION_GUI || !defined(EEZ_OPTION_GUI)
 
 #include <math.h>
 
@@ -127,3 +129,5 @@ EM_PORT_API(void) onMouseWheelEvent(double yMouseWheel, int clicked) {
 #endif
 
 #endif
+
+#endif // defined(EEZ_PLATFORM_SIMULATOR)

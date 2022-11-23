@@ -18,6 +18,7 @@
 
 #pragma once
 
+#include <eez/core/util.h>
 #include <eez/flow/private.h>
 
 namespace eez {
@@ -32,6 +33,8 @@ struct EvalStack {
 
 	Value stack[STACK_SIZE];
 	size_t sp = 0;
+
+    char errorMessage[512];
 
 	bool push(const Value &value) {
 		if (sp >= STACK_SIZE) {
@@ -54,16 +57,19 @@ struct EvalStack {
 		return stack[--sp];
 	}
 
+    void setErrorMessage(const char *str) {
+        stringCopy(errorMessage, sizeof(errorMessage), str);
+    }
 };
 
-#if OPTION_GUI || !defined(OPTION_GUI)
+#if EEZ_OPTION_GUI || !defined(EEZ_OPTION_GUI)
 bool evalExpression(FlowState *flowState, int componentIndex, const uint8_t *instructions, Value &result, const char *errorMessage, int *numInstructionBytes = nullptr, const int32_t *iterators = nullptr, eez::gui::DataOperationEnum operation = eez::gui::DATA_OPERATION_GET);
 #else
 bool evalExpression(FlowState *flowState, int componentIndex, const uint8_t *instructions, Value &result, const char *errorMessage, int *numInstructionBytes = nullptr, const int32_t *iterators = nullptr);
 #endif
 bool evalAssignableExpression(FlowState *flowState, int componentIndex, const uint8_t *instructions, Value &result, const char *errorMessage, int *numInstructionBytes = nullptr, const int32_t *iterators = nullptr);
 
-#if OPTION_GUI || !defined(OPTION_GUI)
+#if EEZ_OPTION_GUI || !defined(EEZ_OPTION_GUI)
 bool evalProperty(FlowState *flowState, int componentIndex, int propertyIndex, Value &result, const char *errorMessage, int *numInstructionBytes = nullptr, const int32_t *iterators = nullptr, eez::gui::DataOperationEnum operation = eez::gui::DATA_OPERATION_GET);
 #else
 bool evalProperty(FlowState *flowState, int componentIndex, int propertyIndex, Value &result, const char *errorMessage, int *numInstructionBytes = nullptr, const int32_t *iterators = nullptr);

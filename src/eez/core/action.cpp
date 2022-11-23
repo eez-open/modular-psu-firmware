@@ -20,7 +20,7 @@
 
 namespace eez {
 
-#if OPTION_GUI || !defined(OPTION_GUI)
+#if EEZ_OPTION_GUI || !defined(EEZ_OPTION_GUI)
 namespace gui {
 #endif
 
@@ -32,7 +32,7 @@ void executeActionFunction(int actionId) {
 #endif
 }
 
-#if OPTION_GUI || !defined(OPTION_GUI)
+#if EEZ_OPTION_GUI || !defined(EEZ_OPTION_GUI)
 } // gui
 #endif
 

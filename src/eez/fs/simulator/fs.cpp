@@ -16,12 +16,14 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
+#if defined(EEZ_PLATFORM_SIMULATOR) && !defined(EEZ_FOR_LVGL)
+
 #include <eez/fs/fs.h>
 
 #include <stdio.h>
 #include <chrono>
 #include <ctime>
- 
+
 #ifdef EEZ_PLATFORM_SIMULATOR_WIN32
 
 #undef INPUT
@@ -90,7 +92,7 @@ bool pathExists(const char *path) {
         return false;
     }
 }
-    
+
 ////////////////////////////////////////////////////////////////////////////////
 
 FileInfo::FileInfo() {
@@ -344,12 +346,12 @@ bool SdFat::mount(int *err) {
 	mkdir("1:/");
 	mkdir("2:/");
 	mkdir("3:/");
-    
+
     if (!pathExists("/")) {
         *err = SCPI_ERROR_MASS_STORAGE_ERROR;
         return false;
-    } 
-    
+    }
+
     *err = SCPI_RES_OK;
     return true;
 }
@@ -426,3 +428,5 @@ bool SdFat::getInfo(int diskDriveIndex, uint64_t &usedSpace, uint64_t &freeSpace
 }
 
 } // namespace eez
+
+#endif // EEZ_PLATFORM_SIMULATOR

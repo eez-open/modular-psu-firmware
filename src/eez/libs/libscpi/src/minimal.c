@@ -35,6 +35,7 @@
  *
  */
 
+#if !defined(EEZ_FOR_LVGL)
 
 #include "scpi/parser.h"
 #include "scpi/minimal.h"
@@ -213,3 +214,5 @@ scpi_result_t SCPI_StatusPreset(scpi_t * context) {
     SCPI_RegSet(context, SCPI_REG_QUES, 0);
     return SCPI_RES_OK;
 }
+
+#endif // !defined(EEZ_FOR_LVGL)

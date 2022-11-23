@@ -29,11 +29,13 @@
 /**
  * @file   scpi_ieee488.c
  * @date   Thu Nov 15 10:58:45 UTC 2012
- * 
+ *
  * @brief  Implementation of IEEE488.2 commands and state model
- * 
- * 
+ *
+ *
  */
+
+#if !defined(EEZ_FOR_LVGL)
 
 #include "scpi/parser.h"
 #include "scpi/ieee488.h"
@@ -209,10 +211,10 @@ void SCPI_EventClear(scpi_t * context) {
 }
 
 /**
- * *CLS - This command clears all status data structures in a device. 
+ * *CLS - This command clears all status data structures in a device.
  *        For a device which minimally complies with SCPI. (SCPI std 4.1.3.2)
  * @param context
- * @return 
+ * @return
  */
 scpi_result_t SCPI_CoreCls(scpi_t * context) {
     SCPI_EventClear(context);
@@ -225,7 +227,7 @@ scpi_result_t SCPI_CoreCls(scpi_t * context) {
 /**
  * *ESE
  * @param context
- * @return 
+ * @return
  */
 scpi_result_t SCPI_CoreEse(scpi_t * context) {
     int32_t new_ESE;
@@ -239,7 +241,7 @@ scpi_result_t SCPI_CoreEse(scpi_t * context) {
 /**
  * *ESE?
  * @param context
- * @return 
+ * @return
  */
 scpi_result_t SCPI_CoreEseQ(scpi_t * context) {
     SCPI_ResultInt32(context, SCPI_RegGet(context, SCPI_REG_ESE));
@@ -249,7 +251,7 @@ scpi_result_t SCPI_CoreEseQ(scpi_t * context) {
 /**
  * *ESR?
  * @param context
- * @return 
+ * @return
  */
 scpi_result_t SCPI_CoreEsrQ(scpi_t * context) {
     SCPI_ResultInt32(context, SCPI_RegGet(context, SCPI_REG_ESR));
@@ -259,14 +261,14 @@ scpi_result_t SCPI_CoreEsrQ(scpi_t * context) {
 
 /**
  * *IDN?
- * 
+ *
  * field1: MANUFACTURE
  * field2: MODEL
  * field4: SUBSYSTEMS REVISIONS
- * 
+ *
  * example: MANUFACTURE,MODEL,0,01-02-01
  * @param context
- * @return 
+ * @return
  */
 scpi_result_t SCPI_CoreIdnQ(scpi_t * context) {
     int i;
@@ -283,7 +285,7 @@ scpi_result_t SCPI_CoreIdnQ(scpi_t * context) {
 /**
  * *OPC
  * @param context
- * @return 
+ * @return
  */
 scpi_result_t SCPI_CoreOpc(scpi_t * context) {
     SCPI_RegSetBits(context, SCPI_REG_ESR, ESR_OPC);
@@ -293,7 +295,7 @@ scpi_result_t SCPI_CoreOpc(scpi_t * context) {
 /**
  * *OPC?
  * @param context
- * @return 
+ * @return
  */
 scpi_result_t SCPI_CoreOpcQ(scpi_t * context) {
     /* Operation is always completed */
@@ -304,7 +306,7 @@ scpi_result_t SCPI_CoreOpcQ(scpi_t * context) {
 /**
  * *RST
  * @param context
- * @return 
+ * @return
  */
 scpi_result_t SCPI_CoreRst(scpi_t * context) {
     if (context && context->interface && context->interface->reset) {
@@ -316,7 +318,7 @@ scpi_result_t SCPI_CoreRst(scpi_t * context) {
 /**
  * *SRE
  * @param context
- * @return 
+ * @return
  */
 scpi_result_t SCPI_CoreSre(scpi_t * context) {
     int32_t new_SRE;
@@ -330,7 +332,7 @@ scpi_result_t SCPI_CoreSre(scpi_t * context) {
 /**
  * *SRE?
  * @param context
- * @return 
+ * @return
  */
 scpi_result_t SCPI_CoreSreQ(scpi_t * context) {
     SCPI_ResultInt32(context, SCPI_RegGet(context, SCPI_REG_SRE));
@@ -340,7 +342,7 @@ scpi_result_t SCPI_CoreSreQ(scpi_t * context) {
 /**
  * *STB?
  * @param context
- * @return 
+ * @return
  */
 scpi_result_t SCPI_CoreStbQ(scpi_t * context) {
     SCPI_ResultInt32(context, SCPI_RegGet(context, SCPI_REG_STB));
@@ -350,7 +352,7 @@ scpi_result_t SCPI_CoreStbQ(scpi_t * context) {
 /**
  * *TST?
  * @param context
- * @return 
+ * @return
  */
 scpi_result_t SCPI_CoreTstQ(scpi_t * context) {
     (void) context;
@@ -361,7 +363,7 @@ scpi_result_t SCPI_CoreTstQ(scpi_t * context) {
 /**
  * *WAI
  * @param context
- * @return 
+ * @return
  */
 scpi_result_t SCPI_CoreWai(scpi_t * context) {
     (void) context;
@@ -369,3 +371,4 @@ scpi_result_t SCPI_CoreWai(scpi_t * context) {
     return SCPI_RES_OK;
 }
 
+#endif // !defined(EEZ_FOR_LVGL)

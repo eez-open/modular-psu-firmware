@@ -16,7 +16,7 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#if !defined(EEZ_FOR_LVGL)
+#if defined(EEZ_PLATFORM_STM32) && !defined(EEZ_FOR_LVGL)
 
 #include <assert.h>
 #include <math.h>

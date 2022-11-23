@@ -56,7 +56,7 @@ void logScpiCommand(FlowState *flowState, unsigned componentIndex, const char *c
 void logScpiQuery(FlowState *flowState, unsigned componentIndex, const char *query);
 void logScpiQueryResult(FlowState *flowState, unsigned componentIndex, const char *resultText, size_t resultTextLen);
 
-void onPageChanged(int previousPageId, int activePageId);
+void onPageChanged(int previousPageId, int activePageId, bool activePageIsFromStack = false, bool previousPageIsStillOnStack = false);
 
 void processDebuggerInput(char *buffer, uint32_t length);
 

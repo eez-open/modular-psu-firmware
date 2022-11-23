@@ -21,7 +21,7 @@
 
 #include <eez/core/debug.h>
 
-#if OPTION_GUI || !defined(OPTION_GUI)
+#if EEZ_OPTION_GUI || !defined(EEZ_OPTION_GUI)
 #include <eez/gui/gui.h>
 using namespace eez::gui;
 #endif
@@ -382,7 +382,7 @@ void propagateValueThroughSeqout(FlowState *flowState, unsigned componentIndex) 
 
 ////////////////////////////////////////////////////////////////////////////////
 
-#if OPTION_GUI || !defined(OPTION_GUI)
+#if EEZ_OPTION_GUI || !defined(EEZ_OPTION_GUI)
 void getValue(uint16_t dataId, DataOperationEnum operation, const WidgetCursor &widgetCursor, Value &value) {
 	if (isFlowRunningHook()) {
 		FlowState *flowState = widgetCursor.flowState;
@@ -419,7 +419,7 @@ void assignValue(FlowState *flowState, int componentIndex, Value &dstValue, cons
 	if (dstValue.getType() == VALUE_TYPE_FLOW_OUTPUT) {
 		propagateValue(flowState, componentIndex, dstValue.getUInt16(), srcValue);
 	} else if (dstValue.getType() == VALUE_TYPE_NATIVE_VARIABLE) {
-#if OPTION_GUI || !defined(OPTION_GUI)
+#if EEZ_OPTION_GUI || !defined(EEZ_OPTION_GUI)
 		set(g_widgetCursor, dstValue.getInt(), srcValue);
 #else
 		setVar(dstValue.getInt(), srcValue);
@@ -521,13 +521,13 @@ bool findCatchErrorComponent(FlowState *flowState, FlowState *&catchErrorFlowSta
 void throwError(FlowState *flowState, int componentIndex, const char *errorMessage) {
     auto component = flowState->flow->components[componentIndex];
 
-#if defined(__EMSCRIPTEN__)
-    printf("throwError: %s\n", errorMessage);
-#endif
-
     if (!g_enableThrowError) {
         return;
     }
+
+#if defined(__EMSCRIPTEN__)
+    printf("throwError: %s\n", errorMessage);
+#endif
 
 	if (component->errorCatchOutput != -1) {
 		propagateValue(

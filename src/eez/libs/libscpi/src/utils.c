@@ -35,6 +35,8 @@
  *
  */
 
+#if !defined(EEZ_FOR_LVGL)
+
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
@@ -1140,3 +1142,5 @@ uint64_t SCPI_Swap64(uint64_t val) {
             ((val & 0x00FF000000000000ull) >> 40) |
             ((val & 0xFF00000000000000ull) >> 56);
 }
+
+#endif // !defined(EEZ_FOR_LVGL)

@@ -34,6 +34,8 @@
  *
  */
 
+#if !defined(EEZ_FOR_LVGL)
+
 #include "scpi/expression.h"
 #include "scpi/error.h"
 #include "scpi/parser.h"
@@ -314,3 +316,5 @@ scpi_expr_result_t SCPI_ExprChannelListEntry(scpi_t * context, scpi_parameter_t 
     }
     return res;
 }
+
+#endif // !defined(EEZ_FOR_LVGL)

@@ -81,6 +81,7 @@ struct LVGLComponent_SetProperty_ActionType : public LVGLComponent_ActionType {
     int32_t target;
     uint32_t property;
     AssetsPtr<uint8_t> value;
+    int32_t textarea;
     uint32_t animated;
 };
 

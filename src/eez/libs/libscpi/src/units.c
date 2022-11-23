@@ -35,6 +35,8 @@
  *
  */
 
+#if !defined(EEZ_FOR_LVGL)
+
 #include <string.h>
 #include "scpi/parser.h"
 #include "scpi/units.h"
@@ -510,3 +512,5 @@ size_t SCPI_NumberToStr(scpi_t * context, const scpi_choice_def_t * special, scp
 
     return result;
 }
+
+#endif // !defined(EEZ_FOR_LVGL)

@@ -75,7 +75,7 @@ static const uint32_t FLOW_TO_DEBUGGER_MESSAGE_BUFFER_SIZE = 1024 * 1024;
 #endif
 #endif
 
-#if OPTION_GUI || !defined(OPTION_GUI)
+#if EEZ_OPTION_GUI || !defined(EEZ_OPTION_GUI)
 extern uint8_t *VRAM_BUFFER1_START_ADDRESS;
 extern uint8_t *VRAM_BUFFER2_START_ADDRESS;
 

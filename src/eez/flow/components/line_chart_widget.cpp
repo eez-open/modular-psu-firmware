@@ -16,7 +16,7 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#if OPTION_GUI || !defined(OPTION_GUI)
+#if EEZ_OPTION_GUI || !defined(EEZ_OPTION_GUI)
 
 #include <eez/core/alloc.h>
 
@@ -156,24 +156,31 @@ void executeLineChartWidgetComponent(FlowState *flowState, unsigned componentInd
         }
     }
 
-    if (flowState->values[component->inputs[1]].type != VALUE_TYPE_UNDEFINED) {
+    // value input must be at position 0
+    int valueInputIndex = 0;
+
+    // reset input is the last input
+    int resetInputIndex = component->inputs.count - 1;
+
+    if (flowState->values[component->inputs[resetInputIndex]].type != VALUE_TYPE_UNDEFINED) {
         // reset
         executionState->numPoints = 0;
         executionState->startPointIndex = 0;
         executionState->updated = true;
 
-        clearInputValue(flowState, component->inputs[1]);
+        clearInputValue(flowState, component->inputs[resetInputIndex]);
     }
 
-    auto inputIndex = component->inputs[0];
-    auto inputValue = flowState->values[inputIndex];
+    // value input must be at position 0
+    auto valueInputIndexInFlow = component->inputs[valueInputIndex];
+    auto inputValue = flowState->values[valueInputIndexInFlow];
     if (inputValue.type != VALUE_TYPE_UNDEFINED) {
         // data
         if (inputValue.isArray() && inputValue.getArray()->arrayType == defs_v3::ARRAY_TYPE_ANY) {
             auto array = inputValue.getArray();
             bool updated = false;
             for (uint32_t elementIndex = 0; elementIndex < array->arraySize; elementIndex++) {
-                flowState->values[inputIndex] = array->values[elementIndex];
+                flowState->values[valueInputIndexInFlow] = array->values[elementIndex];
                 if (executionState->onInputValue(flowState, componentIndex)) {
                     updated = true;
                 } else {
@@ -189,11 +196,11 @@ void executeLineChartWidgetComponent(FlowState *flowState, unsigned componentInd
             }
         }
 
-        clearInputValue(flowState, inputIndex);
+        clearInputValue(flowState, valueInputIndexInFlow);
     }
 }
 
 } // namespace flow
 } // namespace eez
 
-#endif // OPTION_GUI || !defined(OPTION_GUI)
+#endif // EEZ_OPTION_GUI || !defined(EEZ_OPTION_GUI)

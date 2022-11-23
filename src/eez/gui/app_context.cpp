@@ -16,6 +16,8 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
+#if EEZ_OPTION_GUI || !defined(EEZ_OPTION_GUI)
+
 #include <math.h>
 #include <assert.h>
 #include <memory.h>
@@ -98,7 +100,7 @@ bool AppContext::isFocusWidget(const WidgetCursor &widgetCursor) {
 
 ////////////////////////////////////////////////////////////////////////////////
 
-void AppContext::onPageChanged(int previousPageId, int activePageId) {
+void AppContext::onPageChanged(int previousPageId, int activePageId, bool activePageIsFromStack, bool previousPageIsStillOnStack) {
     display::turnOn();
     hmi::noteActivity();
 
@@ -110,10 +112,10 @@ void AppContext::onPageChanged(int previousPageId, int activePageId) {
     keyboard::onPageChanged();
 #endif
 
-    flow::onPageChanged(previousPageId, activePageId);
+    flow::onPageChanged(previousPageId, activePageId, activePageIsFromStack, previousPageIsStillOnStack);
 }
 
-void AppContext::doShowPage(int pageId, Page *page, int previousPageId) {
+void AppContext::doShowPage(int pageId, Page *page, int previousPageId, bool activePageIsFromStack, bool previousPageIsStillOnStack) {
 #if CONF_OPTION_FPGA
     pageId = PAGE_ID_WELCOME_800X480;
     page = nullptr;
@@ -132,7 +134,7 @@ void AppContext::doShowPage(int pageId, Page *page, int previousPageId) {
 
     m_showPageTime = millis();
 
-    onPageChanged(previousPageId, pageId);
+    onPageChanged(previousPageId, pageId, activePageIsFromStack, previousPageIsStillOnStack);
 
     refreshScreen();
 }
@@ -149,7 +151,7 @@ void AppContext::setPage(int pageId) {
     m_pageNavigationStackPointer = 0;
 
     //
-    doShowPage(pageId, nullptr, previousPageId);
+    doShowPage(pageId, nullptr, previousPageId, false, false);
 }
 
 void AppContext::replacePage(int pageId, Page *page) {
@@ -160,7 +162,7 @@ void AppContext::replacePage(int pageId, Page *page) {
     	activePage->pageFree();
     }
 
-    doShowPage(pageId, page, previousPageId);
+    doShowPage(pageId, page, previousPageId, false, false);
 }
 
 void AppContext::pushPage(int pageId, Page *page) {
@@ -176,7 +178,7 @@ void AppContext::pushPage(int pageId, Page *page) {
         assert (m_pageNavigationStackPointer < CONF_GUI_PAGE_NAVIGATION_STACK_SIZE);
     }
 
-    doShowPage(pageId, page, previousPageId);
+    doShowPage(pageId, page, previousPageId, false, true);
 }
 
 void AppContext::popPage() {
@@ -189,7 +191,7 @@ void AppContext::popPage() {
         }
         --m_pageNavigationStackPointer;
 
-        doShowPage(m_pageNavigationStack[m_pageNavigationStackPointer].pageId, m_pageNavigationStack[m_pageNavigationStackPointer].page, previousPageId);
+        doShowPage(m_pageNavigationStack[m_pageNavigationStackPointer].pageId, m_pageNavigationStack[m_pageNavigationStackPointer].page, previousPageId, true, false);
     }
 }
 
@@ -545,3 +547,5 @@ AppContext *getRootAppContext() {
 
 } // namespace gui
 } // namespace eez
+
+#endif // EEZ_OPTION_GUI || !defined(EEZ_OPTION_GUI)

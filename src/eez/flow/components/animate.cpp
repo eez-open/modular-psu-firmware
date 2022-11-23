@@ -25,7 +25,7 @@
 #include <eez/flow/queue.h>
 #include <eez/flow/debugger.h>
 
-#if OPTION_GUI || !defined(OPTION_GUI)
+#if EEZ_OPTION_GUI || !defined(EEZ_OPTION_GUI)
 #include <eez/gui/gui.h>
 using namespace eez::gui;
 #endif

@@ -47,8 +47,8 @@ void Trace(TraceType traceType, const char *format, ...);
 
 #else // NO DEBUG
 
-#define InfoTrace(...) 0
-#define ErrorTrace(...) 0
-#define DebugTrace(...) 0
+#define InfoTrace(...) (void)0
+#define ErrorTrace(...) (void)0
+#define DebugTrace(...) (void)0
 
 #endif

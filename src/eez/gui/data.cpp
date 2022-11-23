@@ -16,6 +16,8 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
+#if EEZ_OPTION_GUI || !defined(EEZ_OPTION_GUI)
+
 #include <math.h>
 #include <stdio.h>
 #include <string.h>
@@ -493,3 +495,5 @@ Value getCanvasRefreshState(const WidgetCursor &widgetCursor, int16_t id) {
 
 } // namespace gui
 } // namespace eez
+
+#endif // EEZ_OPTION_GUI || !defined(EEZ_OPTION_GUI)
