@@ -77,6 +77,7 @@ using namespace eez::scpi;
 
 #define CONF_CONNECT_TIMEOUT 30000
 #define ACCEPT_CLIENT_TIMEOUT 1000
+#define STALE_CONNECTION_TIMEOUT 10000
 
 namespace eez {
 namespace mcu {
@@ -139,6 +140,8 @@ static ConnectionState g_connectionState = CONNECTION_STATE_INITIALIZED;
 static uint16_t g_port;
 struct netconn *g_tcpListenConnection;
 struct netconn *g_tcpClientConnection;
+static uint32_t g_tcpClientConnectionLastActivity;
+static uint32_t g_numRefusedIncomingConnections;
 static netbuf *g_inbuf;
 static bool g_checkLinkWhileIdle = false;
 static bool g_acceptClientIsDone;
@@ -156,6 +159,7 @@ static void netconnCallback(struct netconn *conn, enum netconn_evt evt, u16_t le
                 osDelay(1);
             }
 		} else if (conn == g_tcpClientConnection) {
+            g_tcpClientConnectionLastActivity = millis();
 			sendMessageToLowPriorityThread(ETHERNET_INPUT_AVAILABLE);
 		}
 		break;
@@ -290,7 +294,19 @@ static void onEvent(uint8_t eventType) {
 		{
 			struct netconn *newConnection;
 			if (netconn_accept(g_tcpListenConnection, &newConnection) == ERR_OK) {
+                netconn *existingConnection = nullptr;
 				if (g_tcpClientConnection) {
+                    auto stale = (millis() - g_tcpClientConnectionLastActivity) > STALE_CONNECTION_TIMEOUT;
+                    if (stale || g_numRefusedIncomingConnections >= 2) {
+                        existingConnection = g_tcpClientConnection;
+                        g_tcpClientConnection = nullptr;
+                        sendMessageToLowPriorityThread(ETHERNET_CLIENT_DISCONNECTED);
+                    } else {
+                        g_numRefusedIncomingConnections++;
+                    }
+                }
+
+                if (g_tcpClientConnection) {
 					// there is a client already connected, close this connection
                     g_acceptClientIsDone = true;
                     osDelay(10);
@@ -298,9 +314,15 @@ static void onEvent(uint8_t eventType) {
 				} else {
 					// connection with the client established
 					g_tcpClientConnection = newConnection;
+                    g_tcpClientConnectionLastActivity = millis();
 					sendMessageToLowPriorityThread(ETHERNET_CLIENT_CONNECTED);
                     g_acceptClientIsDone = true;
+                    g_numRefusedIncomingConnections = 0;
 				}
+
+                if (existingConnection) {
+                    netconn_delete(existingConnection);
+                }
 			}  else {
                 g_acceptClientIsDone = true;
             }
