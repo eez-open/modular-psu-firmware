@@ -16,6 +16,8 @@
 * along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
+#include <eez/conf-internal.h>
+
 #if defined(EEZ_PLATFORM_STM32)
 #include <gpio.h>
 #include <usb_device.h>

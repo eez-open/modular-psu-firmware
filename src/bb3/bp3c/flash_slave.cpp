@@ -18,6 +18,8 @@
 
 #include <assert.h>
 
+#include <eez/conf-internal.h>
+
 #include <bb3/firmware.h>
 #include <bb3/system.h>
 #include <bb3/uart.h>

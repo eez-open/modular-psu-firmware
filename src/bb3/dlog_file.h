@@ -49,10 +49,11 @@ OFFSET    TYPE    WIDTH    DESCRIPTION
 28+(n*N+m)*4    Float   4        n-th row and m-th column value, N - number of columns
 */
 
+#include <eez/conf-internal.h>
+
 #include <stdint.h>
 
 #include <eez/core/unit.h>
-#include <eez/conf.h>
 
 namespace eez {
 namespace dlog_file {

@@ -18,6 +18,8 @@
 
 #if OPTION_DISPLAY
 
+#include <eez/conf-internal.h>
+
 #include <string.h>
 #include <stdio.h>
 

@@ -41,7 +41,7 @@
 		<link>
 			<name>eez</name>
 			<type>2</type>
-			<locationURI>PARENT-2-PROJECT_LOC/eez</locationURI>
+			<locationURI>PARENT-2-PROJECT_LOC/eez-framework/src/eez</locationURI>
 		</link>
 		<link>
 			<name>micropython</name>

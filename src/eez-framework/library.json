@@ -1,0 +1,17 @@
+{
+    "name": "eez-framework",
+    "description": "eez-framework",
+    "keywords": "eez-framework",
+    "authors": {
+        "name": "Envox d.o.o.",
+        "url": "https://www.envox.eu/"
+    },
+    "repository": {
+        "type": "git",
+        "url": "https://github.com/eez-open/eez-framework.git"
+    },
+    "version": "0.0.1",
+    "framework": "arduino",
+    "platforms": "espressif32, raspberrypi, espressif32, ststm32",
+    "headers": "eez-framework.h"
+}
