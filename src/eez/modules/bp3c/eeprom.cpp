@@ -69,16 +69,16 @@ TestResult g_testResult = TEST_FAILED;
 ////////////////////////////////////////////////////////////////////////////////
 
 #ifdef EEZ_PLATFORM_STM32
-const int PAGE_SIZE = 32;
+const int EEPROM_PAGE_SIZE = 32;
 #endif
 
 bool read(uint8_t slotIndex, uint8_t *buffer, uint16_t bufferSize, uint16_t address) {
 
 #ifdef EEZ_PLATFORM_STM32
-    for (uint16_t i = 0; i < bufferSize; i += PAGE_SIZE) {
+    for (uint16_t i = 0; i < bufferSize; i += EEPROM_PAGE_SIZE) {
         uint16_t chunkAddress = address + i;
 
-        uint16_t chunkSize = MIN(PAGE_SIZE, bufferSize - i);
+        uint16_t chunkSize = MIN(EEPROM_PAGE_SIZE, bufferSize - i);
 
         uint8_t data[2];
         data[0] = I2C_MEM_ADD_MSB(chunkAddress);
@@ -135,10 +135,10 @@ bool read(uint8_t slotIndex, uint8_t *buffer, uint16_t bufferSize, uint16_t addr
 bool write(uint8_t slotIndex, const uint8_t *buffer, uint16_t bufferSize, uint16_t address) {
 
 #ifdef EEZ_PLATFORM_STM32
-    for (uint16_t i = 0; i < bufferSize; i += PAGE_SIZE) {
+    for (uint16_t i = 0; i < bufferSize; i += EEPROM_PAGE_SIZE) {
         uint16_t chunkAddress = address + i;
 
-        uint16_t chunkSize = MIN(PAGE_SIZE, bufferSize - i);
+        uint16_t chunkSize = MIN(EEPROM_PAGE_SIZE, bufferSize - i);
 
         const uint16_t eepromAddress = EEPROM_ADDRESS[slotIndex];
 
@@ -154,7 +154,7 @@ bool write(uint8_t slotIndex, const uint8_t *buffer, uint16_t bufferSize, uint16
         delay(5);
 
         // verify
-        uint8_t verify[PAGE_SIZE];
+        uint8_t verify[EEPROM_PAGE_SIZE];
 
         uint8_t data[2];
 		data[0] = I2C_MEM_ADD_MSB(chunkAddress);

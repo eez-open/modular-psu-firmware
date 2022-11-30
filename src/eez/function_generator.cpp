@@ -327,7 +327,7 @@ float getMax(WaveformParameters &waveformParameters) {
 
 class FunctionGeneratorPage : public SetPage {
 public:
-    static const int PAGE_SIZE = 4;
+    static const int FUNC_GEN_PAGE_SIZE = 4;
 
 	bool m_initialized = false;
 
@@ -698,14 +698,14 @@ public:
 	}
 
 	void setScrollPosition(int scrollPosition) {
-		if (g_selectedResources.m_numResources <= PAGE_SIZE) {
+		if (g_selectedResources.m_numResources <= FUNC_GEN_PAGE_SIZE) {
 			return;
 		}
 
 		if (scrollPosition < 0) {
 			scrollPosition = 0;
-		} else if (scrollPosition > g_selectedResources.m_numResources - PAGE_SIZE) {
-			scrollPosition = g_selectedResources.m_numResources - PAGE_SIZE;
+		} else if (scrollPosition > g_selectedResources.m_numResources - FUNC_GEN_PAGE_SIZE) {
+			scrollPosition = g_selectedResources.m_numResources - FUNC_GEN_PAGE_SIZE;
 		}
 		
 		if (scrollPosition != m_scrollPosition) {
@@ -773,7 +773,7 @@ void initWaveformParameters(WaveformParameters &waveformParameters) {
 
 class FunctionGeneratorSelectChannelsPage : public SetPage {
 public:
-    static const int PAGE_SIZE = 7;
+    static const int FUNC_GEN_PAGE_SIZE = 7;
 
     void pageAlloc() {
 		AllResources::reset();
@@ -839,14 +839,14 @@ public:
 	}
 
 	void setScrollPosition(int scrollPosition) {
-		if (AllResources::getNumResources() <= PAGE_SIZE) {
+		if (AllResources::getNumResources() <= FUNC_GEN_PAGE_SIZE) {
 			return;
 		}
 
 		if (scrollPosition < 0) {
 			scrollPosition = 0;
-		} else if (scrollPosition > AllResources::getNumResources() - PAGE_SIZE) {
-			scrollPosition = AllResources::getNumResources() - PAGE_SIZE;
+		} else if (scrollPosition > AllResources::getNumResources() - FUNC_GEN_PAGE_SIZE) {
+			scrollPosition = AllResources::getNumResources() - FUNC_GEN_PAGE_SIZE;
 		}
 		
 		if (scrollPosition != m_scrollPosition) {
@@ -1180,8 +1180,8 @@ void selectWaveformParametersForChannel(int slotIndex, int subchannelIndex, int 
 		if (tmpSlotIndex == slotIndex && tmpSubchannelIndex == subchannelIndex && (resourceIndex == -1 || tmpResourceIndex == resourceIndex)) {
 			g_functionGeneratorPage.m_selectedItem = i;
 			
-			if (i >= FunctionGeneratorPage::PAGE_SIZE) {
-				g_functionGeneratorPage.setScrollPosition(i - FunctionGeneratorPage::PAGE_SIZE + 1);
+			if (i >= FunctionGeneratorPage::FUNC_GEN_PAGE_SIZE) {
+				g_functionGeneratorPage.setScrollPosition(i - FunctionGeneratorPage::FUNC_GEN_PAGE_SIZE + 1);
 			}
 			
 			break;
@@ -2118,7 +2118,7 @@ void data_function_generator_channels(DataOperationEnum operation, Cursor cursor
 		} else if (operation == DATA_OPERATION_YT_DATA_GET_POSITION_INCREMENT) {
 			value = 1;
 		} else if (operation == DATA_OPERATION_YT_DATA_GET_PAGE_SIZE) {
-			value = FunctionGeneratorPage::PAGE_SIZE;
+			value = FunctionGeneratorPage::FUNC_GEN_PAGE_SIZE;
 		} 
 		// scrollbar encoder support
 		else if (operation == DATA_OPERATION_GET) {
@@ -2126,18 +2126,18 @@ void data_function_generator_channels(DataOperationEnum operation, Cursor cursor
 		} else if (operation == DATA_OPERATION_GET_MIN) {
 			value = MakeValue(0, UNIT_NONE);
 		} else if (operation == DATA_OPERATION_GET_MAX) {
-			value = MakeValue(1.0f * (g_functionGeneratorPage.m_selectedResources.m_numResources - FunctionGeneratorPage::PAGE_SIZE), UNIT_NONE);
+			value = MakeValue(1.0f * (g_functionGeneratorPage.m_selectedResources.m_numResources - FunctionGeneratorPage::FUNC_GEN_PAGE_SIZE), UNIT_NONE);
 		} else if (operation == DATA_OPERATION_GET_ENCODER_STEP_VALUES) {
 			auto stepValues = value.getStepValues();
 
-			static float values[] = { 1.0f, 1.0f * FunctionGeneratorPage::PAGE_SIZE, 2.0f * FunctionGeneratorPage::PAGE_SIZE, 5.0f * FunctionGeneratorPage::PAGE_SIZE, 10.0f * FunctionGeneratorPage::PAGE_SIZE };
+			static float values[] = { 1.0f, 1.0f * FunctionGeneratorPage::FUNC_GEN_PAGE_SIZE, 2.0f * FunctionGeneratorPage::FUNC_GEN_PAGE_SIZE, 5.0f * FunctionGeneratorPage::FUNC_GEN_PAGE_SIZE, 10.0f * FunctionGeneratorPage::FUNC_GEN_PAGE_SIZE };
 
 			stepValues->values = values;
 			stepValues->count = sizeof(values) / sizeof(float);
 			stepValues->unit = UNIT_NONE;
 
 			stepValues->encoderSettings.accelerationEnabled = true;
-			stepValues->encoderSettings.range = 10.0f * FunctionGeneratorPage::PAGE_SIZE;
+			stepValues->encoderSettings.range = 10.0f * FunctionGeneratorPage::FUNC_GEN_PAGE_SIZE;
 			stepValues->encoderSettings.step = 1.0f;
 			stepValues->encoderSettings.mode = edit_mode_step::g_scrollBarEncoderMode;
 
@@ -2176,7 +2176,7 @@ void data_function_generator_channels(DataOperationEnum operation, Cursor cursor
 		} else if (operation == DATA_OPERATION_YT_DATA_GET_POSITION_INCREMENT) {
 			value = 1;
 		} else if (operation == DATA_OPERATION_YT_DATA_GET_PAGE_SIZE) {
-			value = FunctionGeneratorSelectChannelsPage::PAGE_SIZE;
+			value = FunctionGeneratorSelectChannelsPage::FUNC_GEN_PAGE_SIZE;
 		}
 	}
 }
