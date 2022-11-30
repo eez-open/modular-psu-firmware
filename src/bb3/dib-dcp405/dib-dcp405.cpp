@@ -65,6 +65,8 @@
 #define SIGNIFICANT_INPUT_VOLTAGE_WHEN_CHANNEL_IS_OFF 0.1f
 #define ERROR_INPUT_VOLTAGE_WHEN_CHANNEL_IS_OFF 0.5f
 
+#define CURRENT_WHEN_CHANNEL_IS_OFF 0.002f
+
 volatile float g_uSet;
 
 namespace eez {
@@ -580,8 +582,16 @@ struct DcpChannel : public Channel {
 			// DAC
 			if (tasks & OUTPUT_ENABLE_TASK_DAC) {
 				dac.setDacVoltage(0);
-				dac.setCurrent(getCalibratedCurrent(0.0005f)); // set 0.5 mA to prevent both CC and CV leds on when channel is off
-			}
+
+                if (flags.currentRangeSelectionMode == CURRENT_RANGE_SELECTION_USE_BOTH) {
+                    setCurrentRange(CURRENT_RANGE_LOW);
+                } else if (flags.currentRangeSelectionMode == CURRENT_RANGE_SELECTION_ALWAYS_HIGH) {
+                    setCurrentRange(CURRENT_RANGE_HIGH);
+                } else {
+                    setCurrentRange(CURRENT_RANGE_LOW);
+                }
+                dac.setCurrent(getCalibratedCurrent(CURRENT_WHEN_CHANNEL_IS_OFF)); // set 1.0 mA to prevent both CC and CV leds on when channel is off
+            }
 
 			// OE
 			if (tasks & OUTPUT_ENABLE_TASK_OE) {
@@ -732,7 +742,9 @@ struct DcpChannel : public Channel {
 
 		iSet = value;
 
-		dac.setCurrent(value);
+        if (ioexp.testBit(IOExpander::IO_BIT_OUT_OUTPUT_ENABLE) || isDacTesting()) {
+		    dac.setCurrent(value);
+        }
 
         if (!valueBalancing) {
             iBeforeBalancing = NAN;
