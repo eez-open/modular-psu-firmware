@@ -6411,22 +6411,7 @@
       }
     }
   ],
-  "styles": [
-    {
-      "objID": "e59eb7ef-0784-429e-813f-996f4bb95275",
-      "name": "channel_off_button_20_not_prohibit",
-      "inheritFrom": "channel_off_button_20",
-      "font": "Oswald38"
-    },
-    {
-      "objID": "5af6df7b-dd78-4b37-9701-23c903906929",
-      "name": "channel_off_button_20_prohibit",
-      "inheritFrom": "channel_off_button_20_not_prohibit",
-      "alwaysBuild": true,
-      "color": "text_regular",
-      "activeBackgroundColor": "text_regular"
-    }
-  ],
+  "styles": [],
   "fonts": [],
   "bitmaps": [
     {

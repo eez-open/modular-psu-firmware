@@ -960,7 +960,7 @@ bool match(BufferedFileRead &file, unsigned int &result) {
     }
 }
 
-bool match(BufferedFileRead &file, float &result) {bool match(BufferedFileRead &file, float &result) {
+bool match(BufferedFileRead &file, float &result) {
     matchZeroOrMoreSpaces(file);
 
     char str[64];

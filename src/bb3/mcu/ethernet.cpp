@@ -89,6 +89,8 @@ using namespace eez::gui;
 #define CONF_CONNECT_TIMEOUT 30000
 #define ACCEPT_CLIENT_TIMEOUT 1000
 
+#define STALE_CONNECTION_TIMEOUT 10000
+
 namespace eez {
 namespace mcu {
 namespace ethernet {

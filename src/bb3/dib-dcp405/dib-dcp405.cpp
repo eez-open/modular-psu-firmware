@@ -1194,8 +1194,9 @@ namespace gui {
 using namespace dcp405;
 using namespace psu::gui;
 
-void data_dib_dcp405_channel_off_status(DataOperationEnum operation, Cursor cursor, Value &value) {
+void data_dib_dcp405_channel_off_status(DataOperationEnum operation, const WidgetCursor &widgetCursor, Value &value) {
     if (operation == DATA_OPERATION_GET) {
+        auto cursor = widgetCursor.cursor;
         int iChannel = cursor >= 0 ? cursor : (g_channel ? g_channel->channelIndex : 0);
         auto &channel = (DcpChannel &)Channel::get(iChannel);
         value =

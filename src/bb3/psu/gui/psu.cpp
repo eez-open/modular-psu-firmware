@@ -2261,9 +2261,9 @@ int overrideStyleHook(const WidgetCursor &widgetCursor, int styleId) {
         } else if (styleId == STYLE_ID_EDIT_VALUE_ACTIVE_M_CENTER) {
             return STYLE_ID_DEFAULT_M_LEFT;
         }
-    } else if (styleId == STYLE_ID_DIB_DCP405_CHANNEL_OFF_BUTTON_20_NOT_PROHIBIT) {
+    } else if (styleId == STYLE_ID_CHANNEL_OFF_BUTTON_20_NOT_PROHIBIT) {
         if (persist_conf::isOutputProtectionMeasureEnabled()) {
-            return STYLE_ID_DIB_DCP405_CHANNEL_OFF_BUTTON_20_PROHIBIT;
+            return STYLE_ID_CHANNEL_OFF_BUTTON_20_PROHIBIT;
         }
     }
     return styleId;
