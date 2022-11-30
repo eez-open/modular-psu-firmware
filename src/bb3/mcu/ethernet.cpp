@@ -160,6 +160,9 @@ static bool g_acceptDebuggerClientIsDone;
 
 static bool g_checkLinkWhileIdle = false;
 
+static uint32_t g_scpiClientConnectionLastActivity;
+static uint32_t g_numRefusedIncomingConnections;
+
 static void netconnCallback(struct netconn *conn, enum netconn_evt evt, u16_t len) {
 	switch (evt) {
 	case NETCONN_EVT_RCVPLUS:
@@ -177,6 +180,7 @@ static void netconnCallback(struct netconn *conn, enum netconn_evt evt, u16_t le
                 osDelay(1);
             }
 		} else if (conn == g_scpiClientConnection) {
+			g_scpiClientConnectionLastActivity = millis();
 			sendMessageToLowPriorityThread(ETHERNET_INPUT_AVAILABLE);
 		} else if (conn == g_debuggerListenConnection) {
             g_acceptDebuggerClientIsDone = false;
@@ -360,6 +364,18 @@ static void onEvent(uint8_t eventType) {
 		{
 			struct netconn *newConnection;
 			if (netconn_accept(g_scpiListenConnection, &newConnection) == ERR_OK) {
+                netconn *existingConnection = nullptr;
+                if (g_scpiClientConnection) {
+                    auto stale = (millis() - g_scpiClientConnectionLastActivity) > STALE_CONNECTION_TIMEOUT;
+                    if (stale || g_numRefusedIncomingConnections >= 2) {
+                        existingConnection = g_scpiClientConnection;
+                        g_scpiClientConnection = nullptr;
+                        sendMessageToLowPriorityThread(ETHERNET_CLIENT_DISCONNECTED);
+                    } else {
+                        g_numRefusedIncomingConnections++;
+                    }
+                }
+				
 				if (g_scpiClientConnection) {
 					// there is a client already connected, close this connection
                     g_acceptScpiClientIsDone = true;
@@ -368,9 +384,15 @@ static void onEvent(uint8_t eventType) {
 				} else {
 					// connection with the client established
 					g_scpiClientConnection = newConnection;
+                    g_scpiClientConnectionLastActivity = millis();
 					sendMessageToLowPriorityThread(ETHERNET_CLIENT_CONNECTED);
                     g_acceptScpiClientIsDone = true;
+                    g_numRefusedIncomingConnections = 0;                    
 				}
+				
+                if (existingConnection) {
+                    netconn_delete(existingConnection);
+                }				
 			}  else {
                 g_acceptScpiClientIsDone = true;
             }
