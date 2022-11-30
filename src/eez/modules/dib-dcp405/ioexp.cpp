@@ -87,8 +87,6 @@ static const uint8_t REG_VALUE_GPIOB = 0B00000001; // DP is OFF
 static const uint8_t R3B1_REG_VALUE_GPIOB = 0B00010001; // DP is OFF, OVP is OFF
 
 static const uint8_t REG_VALUES[] = {
-    REG_IODIRA,   REG_VALUE_IODIRA, 1,
-    REG_IODIRB,   REG_VALUE_IODIRB, 1,
     REG_IPOLA,    REG_VALUE_IPOLA,    1,
     REG_IPOLB,    REG_VALUE_IPOLB,    1,
     REG_GPINTENA, REG_VALUE_GPINTENA, 1,
@@ -102,6 +100,8 @@ static const uint8_t REG_VALUES[] = {
     REG_GPPUB,    REG_VALUE_GPPUB,    1,
     REG_GPIOA,    REG_VALUE_GPIOA, 0,
     REG_GPIOB,    REG_VALUE_GPIOB, 0,
+    REG_IODIRA,   REG_VALUE_IODIRA, 1,
+    REG_IODIRB,   REG_VALUE_IODIRB, 1,
 };
 
 static const int REG_IODIRA_INDEX = 0;
@@ -178,7 +178,7 @@ void IOExpander::init() {
     	write(reg, value);
     }
 
-#if defined(EEZ_PLATFORM_STM32)
+#if 0 && defined(EEZ_PLATFORM_STM32)
     HAL_GPIO_WritePin(OE_SYNC_GPIO_Port, OE_SYNC_Pin, GPIO_PIN_RESET);
     delay(1);
     HAL_GPIO_WritePin(OE_SYNC_GPIO_Port, OE_SYNC_Pin, GPIO_PIN_SET);
