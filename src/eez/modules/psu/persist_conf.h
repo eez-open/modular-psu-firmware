@@ -115,6 +115,8 @@ struct DeviceConfiguration {
     unsigned shutdownWhenProtectionTripped : 1;
     unsigned forceDisablingAllOutputsOnPowerUp : 1;
 
+    unsigned outputProtectionMeasureDisabled : 1;
+
     // block 4
     uint8_t startOfBlock4; // was serialBaud
     uint8_t reserved40; // was uartMode
@@ -272,6 +274,9 @@ bool writeTotalOnTime(int type, uint32_t time);
 
 void enableOutputProtectionCouple(bool enable);
 bool isOutputProtectionCoupleEnabled();
+
+void enableOutputProtectionMeasure(bool enable);
+bool isOutputProtectionMeasureEnabled();
 
 void enableShutdownWhenProtectionTripped(bool enable);
 bool isShutdownWhenProtectionTrippedEnabled();

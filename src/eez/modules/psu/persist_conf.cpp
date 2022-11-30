@@ -169,6 +169,8 @@ void initDefaultDevConf() {
 
     g_defaultDevConf.profileAutoRecallLocation = 0;
 
+    g_defaultDevConf.outputProtectionMeasureDisabled = 0;
+
     // block 4
     g_defaultDevConf.usbMode = USB_MODE_DEVICE;
 
@@ -882,6 +884,24 @@ void enableOutputProtectionCouple(bool enable) {
 
 bool isOutputProtectionCoupleEnabled() {
     return g_devConf.outputProtectionCouple ? true : false;
+}
+
+void enableOutputProtectionMeasure(bool enable) {
+    unsigned outputProtectionMeasureDisabled = enable ? 0 : 1;
+
+    if (g_devConf.outputProtectionMeasureDisabled != outputProtectionMeasureDisabled) {
+        g_devConf.outputProtectionMeasureDisabled = outputProtectionMeasureDisabled;
+
+        if (g_devConf.outputProtectionMeasureDisabled) {
+            event_queue::pushEvent(event_queue::EVENT_INFO_OUTPUT_PROTECTION_MEASURE_OFF);
+        } else {
+            event_queue::pushEvent(event_queue::EVENT_INFO_OUTPUT_PROTECTION_MEASURE_ON);
+        }
+    }
+}
+
+bool isOutputProtectionMeasureEnabled() {
+    return g_devConf.outputProtectionMeasureDisabled ? false : true;
 }
 
 void enableShutdownWhenProtectionTripped(bool enable) {

@@ -2054,7 +2054,10 @@ void doChannelToggleOutput() {
             trigger::abort();
         }
 
-        channel_dispatcher::outputEnable(channel, false);
+        int err;
+        if (!channel_dispatcher::outputEnable(channel, false, &err)) {
+            psuErrorMessage(channel.channelIndex, MakeScpiErrorValue(err));
+        }
     } else {
         if (triggerModeEnabled) {
             if (trigger::isIdle()) {
@@ -2066,7 +2069,14 @@ void doChannelToggleOutput() {
                 yesNoDialog(PAGE_ID_YES_NO_L, "Trigger is active. Re-initiate trigger?", channelReinitiateTrigger, 0, 0);
             }
         } else {
-            channel_dispatcher::outputEnable(channel, true);
+            int err;
+            if (!channel_dispatcher::outputEnable(channel, true, &err)) {
+                if (err >= SCPI_ERROR_EXTERNAL_VOLTAGE_ON_CH1_DETECTED && err <= SCPI_ERROR_EXTERNAL_VOLTAGE_ON_CH6_DETECTED && persist_conf::isOutputProtectionMeasureEnabled()) {
+                    // do not show error
+                } else {
+                    psuErrorMessage(channel.channelIndex, MakeScpiErrorValue(err));
+                }
+            }
         }
     }
 }
@@ -2474,6 +2484,10 @@ uint16_t overrideStyleHook(const WidgetCursor &widgetCursor, uint16_t styleId) {
             return STYLE_ID_ENCODER_CURSOR_14_RIGHT_DISABLED;
         } else if (styleId == STYLE_ID_EDIT_VALUE_ACTIVE_M_CENTER) {
             return STYLE_ID_DEFAULT_M_LEFT;
+        }
+    } else if (styleId == STYLE_ID_DIB_DCP405_CHANNEL_OFF_BUTTON_20_NOT_PROHIBIT) {
+        if (persist_conf::isOutputProtectionMeasureEnabled()) {
+            return STYLE_ID_DIB_DCP405_CHANNEL_OFF_BUTTON_20_PROHIBIT;
         }
     }
     return styleId;

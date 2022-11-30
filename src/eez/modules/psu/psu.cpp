@@ -224,7 +224,7 @@ void PsuModule::setEnabled(bool value) {
 
                     channel.setVoltage(channel.params.U_MIN);
                     channel.setCurrent(channel.params.I_MIN);
-                    channel_dispatcher::outputEnable(channel, false);
+                    channel_dispatcher::outputEnable(channel, false, nullptr);
                     channel.onPowerDown();
                 }
             }
@@ -242,7 +242,7 @@ void PsuModule::setEnabled(bool value) {
                 if (channel.isOk()) {
                     channel.setVoltage(channel.params.U_MIN);
                     channel.setCurrent(channel.params.I_MIN);
-                    channel_dispatcher::outputEnable(channel, false);
+                    channel_dispatcher::outputEnable(channel, false, nullptr);
                 }
             }
         }
@@ -428,7 +428,13 @@ void PsuModule::setPowerChannelProfileParameters(int channelIndex, uint8_t *buff
     channel.simulator.voltProgExt = parameters->voltProgExt;
 #endif
 
-    channel.flags.outputEnabled = channel.isTripped() || mismatch || (recallOptions & profile::RECALL_OPTION_FORCE_DISABLE_OUTPUT) ? 0 : parameters->flags.output_enabled;
+    channel.flags.outputEnabled = 
+        channel.isTripped() ||
+        (!persist_conf::devConf.outputProtectionMeasureDisabled && channel.isErrorInputVoltageDetectedWhenChannellIsOff()) ||
+        mismatch ||
+        (recallOptions & profile::RECALL_OPTION_FORCE_DISABLE_OUTPUT) ? 
+            0 : 
+            parameters->flags.output_enabled;
     channel.flags.senseEnabled = parameters->flags.sense_enabled;
 
     if (channel.params.features & CH_FEATURE_RPROG) {
@@ -1153,6 +1159,7 @@ bool autoRecall(int recallOptions) {
 				return true;
 			}
 			if (err != SCPI_ERROR_FILE_NOT_FOUND) {
+                DebugTrace("Recall from profile error %d\n", err);
 				generateError(SCPI_ERROR_RECALL_FROM_PROFILE);
 			}
 		}

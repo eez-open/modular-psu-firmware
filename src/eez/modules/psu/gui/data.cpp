@@ -3740,6 +3740,12 @@ void data_sys_output_protection_coupled(DataOperationEnum operation, Cursor curs
     }
 }
 
+void data_sys_prohibit_output_enable_if_external_voltage_detected(DataOperationEnum operation, Cursor cursor, Value &value) {
+    if (operation == DATA_OPERATION_GET) {
+        value = persist_conf::isOutputProtectionMeasureEnabled();
+    }
+}
+
 void data_sys_shutdown_when_protection_tripped(DataOperationEnum operation, Cursor cursor, Value &value) {
     if (operation == DATA_OPERATION_GET) {
         value = persist_conf::isShutdownWhenProtectionTrippedEnabled();

@@ -1593,7 +1593,7 @@ public:
     }
 
     bool writeProfileProperties(psu::profile::WriteContext &ctx, int i, ProfileParameters &parameters) {
-        char propName[32];
+        char propName[128];
 
         snprintf(propName, sizeof(propName), "aout_dac7760_%d_outputEnabled", i+1);
         WRITE_PROPERTY(propName, parameters.outputEnabled);
@@ -1623,7 +1623,7 @@ public:
     }
 
     bool readProfileProperties(psu::profile::ReadContext &ctx, int i, ProfileParameters &parameters) {
-        char propName[32];
+        char propName[128];
 
         snprintf(propName, sizeof(propName), "aout_dac7760_%d_outputEnabled", i+1);
         READ_PROPERTY(propName, parameters.outputEnabled);

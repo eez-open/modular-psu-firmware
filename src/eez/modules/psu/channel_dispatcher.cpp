@@ -1365,9 +1365,17 @@ void setOutputDelayDuration(Channel &channel, float duration) {
     }
 }
 
-void outputEnable(Channel &channel, bool enable) {
+bool testOutputEnable(Channel &channel, bool enable, bool &callTriggerAbort, int *err);
+
+bool outputEnable(Channel &channel, bool enable, int *err) {
+    bool callTriggerAbort;
+    if (!testOutputEnable(channel, enable, callTriggerAbort, err)) {
+        return false;
+    }
+
     outputEnableOnNextSync(channel, enable);
     syncOutputEnable();
+    return true;
 }
 
 void outputEnableOnNextSync(Channel &channel, bool enable) {
@@ -1416,9 +1424,17 @@ bool testOutputEnable(Channel &channel, bool enable, bool &callTriggerAbort, int
             }
         } else {
             int channelIndex;
+
             if (isTripped(channel, channelIndex)) {
                 if (err) {
                     *err = SCPI_ERROR_CANNOT_EXECUTE_BEFORE_CLEARING_PROTECTION;
+                }
+                return false;
+            }
+
+            if (!persist_conf::devConf.outputProtectionMeasureDisabled && isErrorInputVoltageDetectedWhenChannellIsOff(channel, channelIndex)) {
+                if (err) {
+                    *err = SCPI_ERROR_EXTERNAL_VOLTAGE_ON_CH1_DETECTED + channelIndex;
                 }
                 return false;
             }
@@ -1540,6 +1556,46 @@ bool isTripped(Channel &channel, int &channelIndex) {
                     Channel &otherChannel = Channel::get(i);
                     bool triggerModeEnabled = getVoltageTriggerMode(otherChannel) != TRIGGER_MODE_FIXED || getCurrentTriggerMode(otherChannel) != TRIGGER_MODE_FIXED;
                     if (triggerModeEnabled && otherChannel.isTripped()) {
+                        channelIndex = i;
+                        return true;
+                    }
+                }
+            }
+        }
+        return false;
+    }
+}
+
+bool isErrorInputVoltageDetectedWhenChannellIsOff(Channel &channel, int &channelIndex) {
+    if (channel.channelIndex < 2 && (g_couplingType == COUPLING_TYPE_SERIES || g_couplingType == COUPLING_TYPE_PARALLEL)) {
+        if (Channel::get(0).isErrorInputVoltageDetectedWhenChannellIsOff()) {
+            channelIndex = 0;
+            return true;
+        }
+        channelIndex = 1;
+        return Channel::get(1).isErrorInputVoltageDetectedWhenChannellIsOff();
+    } else if (channel.flags.trackingEnabled) {
+        for (int i = 0; i < CH_NUM; ++i) {
+            Channel &trackingChannel = Channel::get(i);
+            if (trackingChannel.flags.trackingEnabled && trackingChannel.isErrorInputVoltageDetectedWhenChannellIsOff()) {
+                channelIndex = i;
+                return true;
+            }
+        }
+        return false;
+    } else {
+        if (channel.isErrorInputVoltageDetectedWhenChannellIsOff()) {
+            channelIndex = channel.channelIndex;
+            return true;
+        }
+
+        bool triggerModeEnabled = getVoltageTriggerMode(channel) != TRIGGER_MODE_FIXED || getCurrentTriggerMode(channel) != TRIGGER_MODE_FIXED;
+        if (triggerModeEnabled) {
+            for (int i = 0; i < CH_NUM; ++i) {
+                if (i != channel.channelIndex) {
+                    Channel &otherChannel = Channel::get(i);
+                    bool triggerModeEnabled = getVoltageTriggerMode(otherChannel) != TRIGGER_MODE_FIXED || getCurrentTriggerMode(otherChannel) != TRIGGER_MODE_FIXED;
+                    if (triggerModeEnabled && otherChannel.isErrorInputVoltageDetectedWhenChannellIsOff()) {
                         channelIndex = i;
                         return true;
                     }
@@ -2217,7 +2273,7 @@ const char *copyChannelToChannel(int srcChannelIndex, int dstChannelIndex) {
         return nullptr;
     }
 
-    channel_dispatcher::outputEnable(dstChannel, false);
+    channel_dispatcher::outputEnable(dstChannel, false, nullptr);
 
     channel_dispatcher::setVoltage(dstChannel, srcChannel.getUSet());
     channel_dispatcher::setVoltageStep(dstChannel, srcChannel.u.step);

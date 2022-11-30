@@ -275,7 +275,7 @@ void TempSensorTemperature::protection_enter() {
 
     Channel *channel = temp_sensor::sensors[sensorIndex].getChannel();
     if (channel) {
-        channel_dispatcher::outputEnable(*channel, false);
+        channel_dispatcher::outputEnable(*channel, false, nullptr);
 
         event_queue::pushChannelEvent(event_queue::EVENT_ERROR_CH_OTP_TRIPPED, channel->channelIndex);
     } else {

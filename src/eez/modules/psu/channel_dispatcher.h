@@ -117,7 +117,7 @@ void setCurrentRampDuration(Channel &channel, float duration);
 
 void setOutputDelayDuration(Channel &channel, float duration);
 
-void outputEnable(Channel &channel, bool enable);
+bool outputEnable(Channel &channel, bool enable, int *err);
 void outputEnableOnNextSync(Channel &channel, bool enable);
 void syncOutputEnable();
 bool outputEnable(int numChannels, uint8_t *channels, bool enable, int *err);
@@ -129,6 +129,7 @@ void calibrationEnable(Channel &channel, bool enable);
 void remoteSensingEnable(Channel &channel, bool enable);
 
 bool isTripped(Channel &channel, int &channelIndex);
+bool isErrorInputVoltageDetectedWhenChannellIsOff(Channel &channel, int &channelIndex);
 void clearProtection(Channel &channel);
 void clearOvpProtection(Channel &channel);
 void clearOcpProtection(Channel &channel);

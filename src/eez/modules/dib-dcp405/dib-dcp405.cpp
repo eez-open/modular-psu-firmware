@@ -62,6 +62,9 @@
 #define CONF_OVP_SW_OVP_AT_START_U_SET_THRESHOLD 1.2f
 #define CONF_OVP_SW_OVP_AT_START_U_PROTECTION_LEVEL 1.55f
 
+#define SIGNIFICANT_INPUT_VOLTAGE_WHEN_CHANNEL_IS_OFF 0.1f
+#define ERROR_INPUT_VOLTAGE_WHEN_CHANNEL_IS_OFF 0.5f
+
 volatile float g_uSet;
 
 namespace eez {
@@ -294,7 +297,7 @@ struct DcpChannel : public Channel {
 		}
 #endif
 
-		if (isOutputEnabled() && ioexp.isAdcReady()) {
+		if (ioexp.isAdcReady()) {
 			auto adcDataType = adc.adcDataType;
 			float value = adc.read();
 			adc.start(getNextAdcDataType(adcDataType));
@@ -328,13 +331,13 @@ struct DcpChannel : public Channel {
 						if (dpOn) {
 							// DebugTrace("CH%d, neg. P, DP off: %f", channelIndex + 1, u.mon_last * i.mon_last);
 							dpNegMonitoringTimeMs = 0;
-							channel_dispatcher::outputEnable(*this, false);
+							channel_dispatcher::outputEnable(*this, false, nullptr);
 							generateChannelError(SCPI_ERROR_CH1_DOWN_PROGRAMMER_SWITCHED_OFF, channelIndex);
 							return;
 						} else {
 							// DebugTrace("CH%d, neg. P, output off: %f", channelIndex + 1, u.mon_last * i.mon_last);
 							generateChannelError(SCPI_ERROR_CH1_OUTPUT_FAULT_DETECTED, channelIndex);
-							channel_dispatcher::outputEnable(*this, false);
+							channel_dispatcher::outputEnable(*this, false, nullptr);
 						}
 					} else if (tickCountMs - dpNegMonitoringTimeMs > 500UL) {
 						if (dpOn && channelIndex < 2) {
@@ -397,7 +400,7 @@ struct DcpChannel : public Channel {
 			if (!fallingEdge && !isOvpEnabled() && !isRemoteProgrammingEnabled() && u.set > 1.0f && u.mon_last > u.set * 1.03f) {
 				DebugTrace("U_MON (%.4g) is more then 3%% above U_SET (%.4g), difference is: %.4g\n", u.mon_last, u.set * 1.03f, u.mon_last - u.set * 1.03f);
 				trigger::abort();
-				channel_dispatcher::outputEnable(*this, false);
+				channel_dispatcher::outputEnable(*this, false, nullptr);
 				generateChannelError(SCPI_ERROR_CH1_MODULE_FAULT_DETECTED, channelIndex);
 				return;
 			}
@@ -451,19 +454,15 @@ struct DcpChannel : public Channel {
 		waitConversionEnd();
 		onAdcData(ADC_DATA_TYPE_U_MON, adc.read());
 
-		if (isOutputEnabled()) {
 			adc.start(ADC_DATA_TYPE_U_MON);
 		}
-	}
 
 	void adcMeasureIMon() override {
 		adc.start(ADC_DATA_TYPE_U_MON);
 		waitConversionEnd();
 		onAdcData(ADC_DATA_TYPE_U_MON, adc.read());
 
-		if (isOutputEnabled()) {
 			adc.start(ADC_DATA_TYPE_U_MON);
-		}
 	}
 
 	void adcMeasureMonDac() override {
@@ -476,9 +475,7 @@ struct DcpChannel : public Channel {
 			waitConversionEnd();
 			onAdcData(ADC_DATA_TYPE_I_MON_DAC, adc.read());
 
-			if (isOutputEnabled()) {
 				adc.start(ADC_DATA_TYPE_U_MON);
-			}
 		}
 	}
 
@@ -499,9 +496,7 @@ struct DcpChannel : public Channel {
 		waitConversionEnd();
 		onAdcData(ADC_DATA_TYPE_I_MON_DAC, adc.read());
 
-		if (isOutputEnabled()) {
 			adc.start(ADC_DATA_TYPE_U_MON);
-		}
 	}
 
 	bool shouldDisableDP() {
@@ -567,9 +562,7 @@ struct DcpChannel : public Channel {
 					delayed_dp_off = false;
 					setDpEnable(true);
 				}
-			}
 
-			if (tasks & OUTPUT_ENABLE_TASK_ADC_START) {
 				adc.start(ADC_DATA_TYPE_U_MON);
 			}
 
@@ -610,6 +603,8 @@ struct DcpChannel : public Channel {
 					delayed_dp_off = true;
 					delayed_dp_off_start = millis();
 				}
+
+				adc.start(ADC_DATA_TYPE_U_MON);
 			}
 		}
 
@@ -994,6 +989,14 @@ struct DcpChannel : public Channel {
 		snprintf(buffer, sizeof(buffer), "CH%d I_MON_DAC = %d", channelIndex + 1, (int)adc.m_iLastMonDac);
 		SCPI_ResultText(context, buffer);
 	}
+
+    bool isSignificantInputVoltageDetectedWhenChannellIsOff() {
+        return u.mon > SIGNIFICANT_INPUT_VOLTAGE_WHEN_CHANNEL_IS_OFF;
+    }
+
+    bool isErrorInputVoltageDetectedWhenChannellIsOff() {
+        return u.mon > ERROR_INPUT_VOLTAGE_WHEN_CHANNEL_IS_OFF;
+    }
 };
 
 struct DcpModule : public PsuModule {
@@ -1173,6 +1176,24 @@ void tickDacRamp() {
 }
 
 } // namespace dcp405
+
+namespace gui {
+
+using namespace dcp405;
+using namespace psu::gui;
+
+void data_dib_dcp405_channel_off_status(DataOperationEnum operation, Cursor cursor, Value &value) {
+    if (operation == DATA_OPERATION_GET) {
+        int iChannel = cursor >= 0 ? cursor : (g_channel ? g_channel->channelIndex : 0);
+        auto &channel = (DcpChannel &)Channel::get(iChannel);
+        value =
+			channel.isErrorInputVoltageDetectedWhenChannellIsOff() ? 2 :
+			channel.isSignificantInputVoltageDetectedWhenChannellIsOff() ? 1 :
+			0;
+    }
+}
+
+}
 
 #if defined(EEZ_PLATFORM_STM32)
 #if CONF_SURVIVE_MODE

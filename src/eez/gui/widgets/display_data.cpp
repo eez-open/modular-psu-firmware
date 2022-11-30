@@ -81,7 +81,7 @@ DrawFunctionType DISPLAY_DATA_draw = [](const WidgetCursor &widgetCursor) {
 
 	const Style *style = getStyle(overrideStyleHook(widgetCursor, widget->style));
 
-    widgetCursor.currentState->flags.blinking = g_isBlinkTime && isBlinking(widgetCursor, widget->data);
+    widgetCursor.currentState->flags.blinking = g_isBlinkTime && (styleIsBlink(style) || isBlinking(widgetCursor, widget->data));
     
     uint32_t currentTime = millis();
     widgetCursor.currentState->data = get(widgetCursor.cursor, widget->data);

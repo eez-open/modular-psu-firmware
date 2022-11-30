@@ -178,7 +178,7 @@ void onTriggerFinished(Channel &channel) {
         case TRIGGER_ON_LIST_STOP_OUTPUT_OFF:
             channel_dispatcher::setVoltage(channel, 0);
             channel_dispatcher::setCurrent(channel, 0);
-            channel_dispatcher::outputEnable(channel, false);
+            channel_dispatcher::outputEnable(channel, false, nullptr);
             break;
         case TRIGGER_ON_LIST_STOP_SET_TO_FIRST_STEP:
             if (!list::setListValue(channel, 0, &err)) {
@@ -193,7 +193,7 @@ void onTriggerFinished(Channel &channel) {
         case TRIGGER_ON_LIST_STOP_STANDBY:
             channel_dispatcher::setVoltage(channel, 0);
             channel_dispatcher::setCurrent(channel, 0);
-            channel_dispatcher::outputEnable(channel, false);
+            channel_dispatcher::outputEnable(channel, false, nullptr);
             changePowerState(false);
             break;
         }

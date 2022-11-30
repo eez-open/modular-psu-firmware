@@ -150,6 +150,12 @@ extern "C" {
     X(SCPI_ERROR_CH4_DOWN_PROGRAMMER_SWITCHED_OFF,           503, "Sink power limit exceeded on CH4")             \
     X(SCPI_ERROR_CH5_DOWN_PROGRAMMER_SWITCHED_OFF,           504, "Sink power limit exceeded on CH5")             \
     X(SCPI_ERROR_CH6_DOWN_PROGRAMMER_SWITCHED_OFF,           505, "Sink power limit exceeded on CH6")             \
+    X(SCPI_ERROR_EXTERNAL_VOLTAGE_ON_CH1_DETECTED,           510, "External voltage on CH1 detected")             \
+    X(SCPI_ERROR_EXTERNAL_VOLTAGE_ON_CH2_DETECTED,           511, "External voltage on CH2 detected")             \
+    X(SCPI_ERROR_EXTERNAL_VOLTAGE_ON_CH3_DETECTED,           512, "External voltage on CH3 detected")             \
+    X(SCPI_ERROR_EXTERNAL_VOLTAGE_ON_CH4_DETECTED,           513, "External voltage on CH4 detected")             \
+    X(SCPI_ERROR_EXTERNAL_VOLTAGE_ON_CH5_DETECTED,           514, "External voltage on CH5 detected")             \
+    X(SCPI_ERROR_EXTERNAL_VOLTAGE_ON_CH6_DETECTED,           515, "External voltage on CH6 detected")             \
     X(SCPI_ERROR_EXTERNAL_EEPROM_SAVE_FAILED,                615, "External EEPROM save failed")                  \
 	X(SCPI_ERROR_FAN_TEST_FAILED,                            630, "Fan test failed")                              \
 	X(SCPI_ERROR_AUX_TEMP_SENSOR_TEST_FAILED,                720, "AUX temperature sensor test failed")           \
@@ -171,7 +177,8 @@ extern "C" {
     X(SCPI_ERROR_CH4_MODULE_FAULT_DETECTED,                  763, "CH4 module fault detected!")                   \
     X(SCPI_ERROR_CH5_MODULE_FAULT_DETECTED,                  764, "CH5 module fault detected!")                   \
     X(SCPI_ERROR_CH6_MODULE_FAULT_DETECTED,                  765, "CH6 module fault detected!")                   \
-    X(SCPI_ERROR_SCRIPT_ENGINE_ALREADY_RUNNING,              770, "Script engine is already running")
+    X(SCPI_ERROR_SCRIPT_ENGINE_ALREADY_RUNNING,              770, "Script engine is already running")             \
+
 
 // clang-format on
 

@@ -376,7 +376,7 @@ void CalibrationEditor::doStart() {
     Channel *channel = Channel::getBySlotIndex(m_slotIndex, m_subchannelIndex);
 
     if (channel) {
-        channel_dispatcher::outputEnable(*channel, false);
+        channel_dispatcher::outputEnable(*channel, false, nullptr);
         channel_dispatcher::setVoltage(*channel, channel->u.min);
         channel_dispatcher::setCurrent(*channel, channel->i.min);
         m_savedCurrentRangeSelectionMode = channel->getCurrentRangeSelectionMode();
@@ -398,7 +398,7 @@ void CalibrationEditor::doStart() {
         channel_dispatcher::setOppState(*channel, 0);
 
         channel_dispatcher::calibrationEnable(*channel, false);
-        channel_dispatcher::outputEnable(*channel, true);
+        channel_dispatcher::outputEnable(*channel, true, nullptr);
         channel->setOperBits(OPER_ISUM_CALI, true);
 
         m_maxCalibrationPoints = MAX_CALIBRATION_POINTS;
@@ -459,7 +459,7 @@ void CalibrationEditor::stop() {
             channel_dispatcher::calibrationEnable(*channel, true);
         }
 
-        channel_dispatcher::outputEnable(*channel, false);
+        channel_dispatcher::outputEnable(*channel, false, nullptr);
         channel_dispatcher::setVoltage(*channel, channel->u.min);
         channel_dispatcher::setCurrent(*channel, channel->i.min);
         channel->setCurrentRangeSelectionMode(m_savedCurrentRangeSelectionMode);
