@@ -1156,10 +1156,11 @@ bool autoRecall(int recallOptions) {
 			int err;
 			auto forceDisableOutput = persist_conf::isForceDisablingAllOutputsOnPowerUpEnabled() || !g_bootTestSuccess;
 			if (profile::recallFromLocation(location, recallOptions | (forceDisableOutput ? profile::RECALL_OPTION_FORCE_DISABLE_OUTPUT : 0), false, &err)) {
+                InfoTrace("Autorecall from profile %d finished\n", location);
 				return true;
 			}
 			if (err != SCPI_ERROR_FILE_NOT_FOUND) {
-                DebugTrace("Recall from profile error %d\n", err);
+                ErrorTrace("Autorecall from profile %d error %d\n", location, err);
 				generateError(SCPI_ERROR_RECALL_FROM_PROFILE);
 			}
 		}
