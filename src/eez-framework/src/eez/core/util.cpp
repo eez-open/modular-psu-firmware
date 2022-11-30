@@ -689,12 +689,12 @@ void getBaseFileName(const char *path, char *baseName, unsigned baseNameSize) {
 
 ////////////////////////////////////////////////////////////////////////////////
 
-static const float PI = (float)M_PI;
+static const float PI_FLOAT = (float)M_PI;
 static const float c1 = 1.70158f;
 static const float c2 = c1 * 1.525f;
 static const float c3 = c1 + 1.0f;
-static const float c4 = (2 * PI) / 3;
-static const float c5 = (2 * PI) / 4.5f;
+static const float c4 = (2 * PI_FLOAT) / 3;
+static const float c5 = (2 * PI_FLOAT) / 4.5f;
 
 float linear(float x) {
     return x;
@@ -749,15 +749,15 @@ float easeInOutQuint(float x) {
 }
 
 float easeInSine(float x) {
-    return 1 - cosf((x * PI) / 2);
+    return 1 - cosf((x * PI_FLOAT) / 2);
 }
 
 float easeOutSine(float x) {
-    return sinf((x * PI) / 2);
+    return sinf((x * PI_FLOAT) / 2);
 }
 
 float easeInOutSine(float x) {
-    return -(cosf(PI * x) - 1) / 2;
+    return -(cosf(PI_FLOAT * x) - 1) / 2;
 }
 
 float easeInExpo(float x) {

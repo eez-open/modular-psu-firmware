@@ -12,7 +12,10 @@
 #endif
 
 #if ARDUINO
-    #define EEZ_FOR_LVGL
+    #define EEZ_FOR_LVGL 1
+    #ifndef LV_LVGL_H_INCLUDE_SIMPLE
+        #define LV_LVGL_H_INCLUDE_SIMPLE
+    #endif
     #include <Arduino.h>
 #endif
 

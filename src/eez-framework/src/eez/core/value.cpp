@@ -27,8 +27,11 @@
 #include <string>
 #include <iostream>
 #include <sstream>
+
+#ifndef ARDUINO
 // https://howardhinnant.github.io/date/date.html
 #include <eez/libs/date.h>
+#endif
 
 #include <eez/core/util.h>
 #include <eez/core/value.h>
@@ -482,6 +485,7 @@ bool compare_DATE_value(const Value &a, const Value &b) {
 }
 
 void DATE_value_to_text(const Value &value, char *text, int count) {
+#ifndef ARDUINO
     using namespace std;
     using namespace std::chrono;
     using namespace date;
@@ -491,6 +495,9 @@ void DATE_value_to_text(const Value &value, char *text, int count) {
     out << tp;
 
     stringCopy(text, count, out.str().c_str());
+#else
+    stringCopy(text, count, "NOT IMPLEMENTED");
+#endif
 }
 
 const char *DATE_value_type_name(const Value &value) {

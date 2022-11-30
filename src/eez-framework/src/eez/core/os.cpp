@@ -26,6 +26,10 @@
 #include <esp_timer.h>
 #endif
 
+#if defined(EEZ_PLATFORM_PICO)
+#include "pico/stdlib.h"
+#endif
+
 #include <eez/core/os.h>
 
 namespace eez {
@@ -41,6 +45,11 @@ uint32_t millis() {
 
 #if defined(EEZ_PLATFORM_ESP32)
 	return (unsigned long) (esp_timer_get_time() / 1000ULL);
+#endif
+
+#if defined(EEZ_PLATFORM_PICO)
+    auto abs_time = get_absolute_time();
+    return to_ms_since_boot(abs_time);
 #endif
 }
 

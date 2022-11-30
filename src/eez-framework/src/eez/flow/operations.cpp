@@ -27,8 +27,10 @@
 #include <iostream>
 #include <sstream>
 
+#ifndef ARDUINO
 // https://howardhinnant.github.io/date/date.html
 #include <eez/libs/date.h>
+#endif
 
 #include <eez/core/os.h>
 #include <eez/core/value.h>
@@ -914,6 +916,7 @@ void do_OPERATION_TYPE_DATE_NOW(EvalStack &stack) {
 }
 
 void do_OPERATION_TYPE_DATE_TO_STRING(EvalStack &stack) {
+#ifndef ARDUINO
 	auto a = stack.pop().getValue();
     if (a.isError()) {
         stack.push(a);
@@ -934,9 +937,13 @@ void do_OPERATION_TYPE_DATE_TO_STRING(EvalStack &stack) {
     out << tp << endl;
 
     stack.push(Value::makeStringRef(out.str().c_str(), -1, 0xbe440ec8));
+#else
+    stack.push(Value::makeError());
+#endif
 }
 
 void do_OPERATION_TYPE_DATE_FROM_STRING(EvalStack &stack) {
+#ifndef ARDUINO
 	auto a = stack.pop().getValue();
     if (a.isError()) {
         stack.push(a);
@@ -956,6 +963,9 @@ void do_OPERATION_TYPE_DATE_FROM_STRING(EvalStack &stack) {
 
     milliseconds ms = duration_cast<milliseconds>(tp.time_since_epoch());
     stack.push(Value((double)ms.count(), VALUE_TYPE_DATE));
+#else
+    stack.push(Value::makeError());
+#endif
 }
 
 void do_OPERATION_TYPE_MATH_SIN(EvalStack &stack) {
