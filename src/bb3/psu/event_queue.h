@@ -187,6 +187,8 @@ static const int EVENT_TYPE_ERROR = 4;
     EVENT_INFO(DLOG_FINISH, 131, "DLOG recording finished")                                        \
     EVENT_INFO(ETHERNET_CONNECTED, 132, "Ethernet connected")                                      \
     EVENT_INFO(NTP_REFRESH_SUCCEEDED, 133, "NTP refresh succeeded")                                \
+    EVENT_INFO(OUTPUT_PROTECTION_MEASURE_ON, 134, "Output protection measure ON")                  \
+    EVENT_INFO(OUTPUT_PROTECTION_MEASURE_OFF, 135, "Output protection measure OFF")                \
 
 #define EVENT_ERROR_START_ID 10000
 #define EVENT_WARNING_START_ID 12000

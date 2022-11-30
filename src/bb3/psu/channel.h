@@ -707,6 +707,8 @@ public:
 
     virtual void dumpDebugVariables(scpi_t *context) = 0;
 
+    virtual bool isErrorInputVoltageDetectedWhenChannellIsOff();
+
     //
     //
     //
@@ -758,8 +760,7 @@ private:
 #define OUTPUT_ENABLE_TASK_CURRENT_RANGE (1 << 2)
 #define OUTPUT_ENABLE_TASK_OVP           (1 << 3)
 #define OUTPUT_ENABLE_TASK_DP            (1 << 4)
-#define OUTPUT_ENABLE_TASK_ADC_START     (1 << 5)
-#define OUTPUT_ENABLE_TASK_FINALIZE      (1 << 6)
+#define OUTPUT_ENABLE_TASK_FINALIZE      (1 << 5)
 
 extern int g_errorChannelIndex;
 

@@ -238,6 +238,23 @@ scpi_result_t scpi_cmd_outputProtectionCoupleQ(scpi_t *context) {
     return SCPI_RES_OK;
 }
 
+scpi_result_t scpi_cmd_outputProtectionMeasure(scpi_t *context) {
+    bool enable;
+    if (!SCPI_ParamBool(context, &enable, TRUE)) {
+        return SCPI_RES_ERR;
+    }
+
+    persist_conf::enableOutputProtectionMeasure(enable);
+
+    return SCPI_RES_OK;
+}
+
+scpi_result_t scpi_cmd_outputProtectionMeasureQ(scpi_t *context) {
+    SCPI_ResultBool(context, persist_conf::isOutputProtectionMeasureEnabled());
+
+    return SCPI_RES_OK;
+}
+
 scpi_result_t scpi_cmd_outputStateTriggered(scpi_t *context) {
     bool enable;
     if (!SCPI_ParamBool(context, &enable, TRUE)) {

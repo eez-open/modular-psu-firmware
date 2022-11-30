@@ -683,6 +683,10 @@ void action_sys_settings_protections_toggle_output_protection_couple() {
     SysSettingsProtectionsPage::toggleOutputProtectionCouple();
 }
 
+void action_toggle_sys_prohibit_output_enable_if_external_voltage_detected() {
+    SysSettingsProtectionsPage::toggleOutputProtectionMeasure();
+}
+
 void action_sys_settings_protections_toggle_shutdown_when_protection_tripped() {
     SysSettingsProtectionsPage::toggleShutdownWhenProtectionTripped();
 }
@@ -1074,7 +1078,10 @@ void action_user_switch_clicked() {
         for (int i = 0; i < CH_NUM; ++i) {
             Channel &channel = Channel::get(i);
             if (channel.flags.trackingEnabled) {
-                channel_dispatcher::outputEnable(channel, !channel.isOutputEnabled());
+                int err;
+                if (!channel_dispatcher::outputEnable(channel, !channel.isOutputEnabled(), &err)) {
+                    psuErrorMessage(channel.channelIndex, MakeScpiErrorValue(err));
+                }
                 return;
             }
         }

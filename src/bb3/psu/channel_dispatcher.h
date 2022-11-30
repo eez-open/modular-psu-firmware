@@ -129,6 +129,7 @@ void calibrationEnable(Channel &channel, bool enable);
 void remoteSensingEnable(Channel &channel, bool enable);
 
 bool isTripped(Channel &channel, int &channelIndex);
+bool isErrorInputVoltageDetectedWhenChannellIsOff(Channel &channel, int &channelIndex);
 void clearProtection(Channel &channel);
 void clearOvpProtection(Channel &channel);
 void clearOcpProtection(Channel &channel);

@@ -259,7 +259,9 @@ struct DcmChannel : public Channel {
 
 	void setOutputEnable(bool enable, uint16_t tasks) override {
 		outputEnable = enable;
-	}
+        u.resetMonValues();
+        i.resetMonValues();
+    }
 
     void setDacVoltage(uint16_t value) override {
 

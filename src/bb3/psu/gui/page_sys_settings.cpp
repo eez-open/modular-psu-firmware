@@ -561,6 +561,14 @@ void SysSettingsProtectionsPage::toggleOutputProtectionCouple() {
     }
 }
 
+void SysSettingsProtectionsPage::toggleOutputProtectionMeasure() {
+    if (persist_conf::isOutputProtectionMeasureEnabled()) {
+        persist_conf::enableOutputProtectionMeasure(false);
+    } else {
+        persist_conf::enableOutputProtectionMeasure(true);
+    }
+}
+
 void SysSettingsProtectionsPage::toggleShutdownWhenProtectionTripped() {
     if (persist_conf::isShutdownWhenProtectionTrippedEnabled()) {
         persist_conf::enableShutdownWhenProtectionTripped(false);

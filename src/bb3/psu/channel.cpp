@@ -379,7 +379,7 @@ void Channel::protectionEnter(ProtectionValue &cpv, bool hwOvp) {
         trigger::abort();
     }
 
-    channel_dispatcher::outputEnable(*this, false);
+    channel_dispatcher::outputEnable(*this, false, nullptr);
 
     cpv.flags.tripped = 1;
 
@@ -635,7 +635,7 @@ void Channel::tick() {
 #if CONF_SURVIVE_MODE
             DebugTrace("Remote sense rpol detected on channel %d\n", channelIndex + 1);
 #else
-            channel_dispatcher::outputEnable(*this, false);
+            channel_dispatcher::outputEnable(*this, false, nullptr);
             event_queue::pushChannelEvent(event_queue::EVENT_ERROR_CH_REMOTE_SENSE_REVERSE_POLARITY_DETECTED, channelIndex);
             onProtectionTripped();
 #endif
@@ -852,8 +852,6 @@ void Channel::updateAllChannels() {
 }
 
 void Channel::executeOutputEnable(bool enable, uint16_t tasks) {
-    u.resetMonValues();
-    i.resetMonValues();
     setOutputEnable(enable, tasks);
 
     if (tasks & OUTPUT_ENABLE_TASK_FINALIZE) {
@@ -917,8 +915,8 @@ void Channel::executeOutputEnable(bool inhibited) {
             Channel &channel = Channel::get(i);
             if (channel.flags.doOutputEnableOnNextSync) {
                 if (channel.flags.outputEnabled && !inhibited) {
-                    // DP and ADC start for enabled
-                    channel.executeOutputEnable(true, OUTPUT_ENABLE_TASK_DP | OUTPUT_ENABLE_TASK_ADC_START);
+                    // DP for enabled
+                    channel.executeOutputEnable(true, OUTPUT_ENABLE_TASK_DP);
                 } else if ((channel.flags.outputEnabled && inhibited) || (!channel.flags.outputEnabled && !inhibited)) {
                     // current range and DP for disabled
                     channel.executeOutputEnable(false, OUTPUT_ENABLE_TASK_CURRENT_RANGE | OUTPUT_ENABLE_TASK_DP);
@@ -1584,6 +1582,10 @@ const char *Channel::getDefaultLabel() {
     snprintf(g_defaultLabel, Channel::CHANNEL_LABEL_MAX_LENGTH + 1, "%s #%d", g_slots[slotIndex]->moduleName, (int)(channelIndex + 1));
     g_defaultLabel[Channel::CHANNEL_LABEL_MAX_LENGTH] = 0;
     return g_defaultLabel;
+}
+
+bool Channel::isErrorInputVoltageDetectedWhenChannellIsOff() {
+    return false;
 }
 
 ////////////////////////////////////////////////////////////////////////////////

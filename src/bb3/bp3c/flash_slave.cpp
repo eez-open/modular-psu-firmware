@@ -177,7 +177,7 @@ void enterBootloaderMode(int slotIndex) {
 
 		channel_dispatcher::setVoltage(channel, 40);
 		channel_dispatcher::setCurrent(channel, 3.5);
-		channel_dispatcher::outputEnable(channel, true);
+        channel_dispatcher::outputEnable(channel, true, nullptr);
 		
 		osDelay(100);
 	}

@@ -198,6 +198,7 @@ private:
 class SysSettingsProtectionsPage : public Page {
   public:
     static void toggleOutputProtectionCouple();
+    static void toggleOutputProtectionMeasure();    
     static void toggleShutdownWhenProtectionTripped();
     static void toggleForceDisablingAllOutputsOnPowerUp();
 };

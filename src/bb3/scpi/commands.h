@@ -152,6 +152,8 @@
     SCPI_COMMAND("OUTPut:PROTection:COUPle?", scpi_cmd_outputProtectionCoupleQ) \
     SCPI_COMMAND("OUTPut:TRACk[:STATe]", scpi_cmd_outputTrackState) \
     SCPI_COMMAND("OUTPut:TRACk[:STATe]?", scpi_cmd_outputTrackStateQ) \
+    SCPI_COMMAND("OUTPut:PROTection:MEASure", scpi_cmd_outputProtectionMeasure) \
+    SCPI_COMMAND("OUTPut:PROTection:MEASure?", scpi_cmd_outputProtectionMeasureQ) \
     SCPI_COMMAND("OUTPut[:STATe]", scpi_cmd_outputState) \
     SCPI_COMMAND("OUTPut[:STATe]?", scpi_cmd_outputStateQ) \
     SCPI_COMMAND("OUTPut[:STATe]:TRIGgered", scpi_cmd_outputStateTriggered) \
@@ -685,6 +687,8 @@
     SCPI_COMMAND("OUTPut:PROTection:COUPle?", scpi_cmd_outputProtectionCoupleQ) \
     SCPI_COMMAND("OUTPut:TRACk[:STATe]", scpi_cmd_outputTrackState) \
     SCPI_COMMAND("OUTPut:TRACk[:STATe]?", scpi_cmd_outputTrackStateQ) \
+    SCPI_COMMAND("OUTPut:PROTection:MEASure", scpi_cmd_outputProtectionMeasure) \
+    SCPI_COMMAND("OUTPut:PROTection:MEASure?", scpi_cmd_outputProtectionMeasureQ) \
     SCPI_COMMAND("OUTPut[:STATe]", scpi_cmd_outputState) \
     SCPI_COMMAND("OUTPut[:STATe]?", scpi_cmd_outputStateQ) \
     SCPI_COMMAND("OUTPut[:STATe]:TRIGgered", scpi_cmd_outputStateTriggered) \

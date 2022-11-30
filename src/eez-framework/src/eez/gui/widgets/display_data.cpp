@@ -58,7 +58,7 @@ bool DisplayDataWidgetState::updateState() {
 
     WIDGET_STATE(flags.active, g_isActiveWidget);
     WIDGET_STATE(flags.focused, isFocusWidget(widgetCursor));
-    WIDGET_STATE(flags.blinking, g_isBlinkTime && isBlinking(widgetCursor, widget->data));
+    WIDGET_STATE(flags.blinking, g_isBlinkTime && (styleIsBlink(style) || isBlinking(widgetCursor, widget->data)));
 
     bool refreshData = true;
     auto newData = get(widgetCursor, widget->data);
