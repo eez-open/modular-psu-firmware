@@ -583,13 +583,6 @@ struct DcpChannel : public Channel {
 			if (tasks & OUTPUT_ENABLE_TASK_DAC) {
 				dac.setDacVoltage(0);
 
-                if (flags.currentRangeSelectionMode == CURRENT_RANGE_SELECTION_USE_BOTH) {
-                    setCurrentRange(CURRENT_RANGE_LOW);
-                } else if (flags.currentRangeSelectionMode == CURRENT_RANGE_SELECTION_ALWAYS_HIGH) {
-                    setCurrentRange(CURRENT_RANGE_HIGH);
-                } else {
-                    setCurrentRange(CURRENT_RANGE_LOW);
-                }
                 dac.setCurrent(getCalibratedCurrent(CURRENT_WHEN_CHANNEL_IS_OFF)); // set 1.0 mA to prevent both CC and CV leds on when channel is off
             }
 
