@@ -314,7 +314,7 @@ struct DcpChannel : public Channel {
 			}
 		}
 
-		if (isOutputEnabled()) {
+		if (isOutputEnabled() && !io_pins::isInhibited()) {
 			/// Output power is monitored and if its go below DP_NEG_LEV
 			/// that is negative value in Watts (default -1 W),
 			/// and that condition lasts more then DP_NEG_DELAY seconds (default 5 s),
@@ -678,7 +678,7 @@ struct DcpChannel : public Channel {
 
 		bool bIsHwOvpEnabled = isHwOvpEnabled();
 
-		if (isOutputEnabled()) {
+		if (isOutputEnabled() && !io_pins::isInhibited()) {
 			bool belowThreshold = !dac.isOverHwOvpThreshold();
 
 			if (value < previousUSet) {
@@ -760,7 +760,7 @@ struct DcpChannel : public Channel {
 			ioexp.changeBit(IOExpander::IO_BIT_OUT_CURRENT_RANGE_500MA, false);
 		}
 
-		if (isOutputEnabled()) {
+		if (isOutputEnabled() && !io_pins::isInhibited()) {
 			if (flags.currentCurrentRange == 0 || dac.isTesting()) {
 				// 5A
 				// DebugTrace("CH%d: Switched to 5A range", channelIndex + 1);
@@ -878,7 +878,7 @@ struct DcpChannel : public Channel {
 		uint8_t intcap = ioexp.readIntcapRegister();
 		// DebugTrace("CH%d INTCAP 0x%02X\n", (int)(channelIndex + 1), (int)intcap);
 		if (!(intcap & (1 << IOExpander::R2B5_IO_BIT_IN_OVP_FAULT))) {
-			if (isOutputEnabled() && isHwOvpEnabled()) {
+			if (isOutputEnabled() && isHwOvpEnabled() && !io_pins::isInhibited()) {
 				protectionEnter(ovp, true);
 			}
 		} else if (!(intcap & (1 << IOExpander::IO_BIT_IN_PWRGOOD))) {
