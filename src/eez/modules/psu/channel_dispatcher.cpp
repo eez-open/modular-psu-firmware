@@ -1368,9 +1368,11 @@ void setOutputDelayDuration(Channel &channel, float duration) {
 bool testOutputEnable(Channel &channel, bool enable, bool &callTriggerAbort, int *err);
 
 bool outputEnable(Channel &channel, bool enable, int *err) {
-    bool callTriggerAbort;
-    if (!testOutputEnable(channel, enable, callTriggerAbort, err)) {
-        return false;
+    if (enable) {
+        bool callTriggerAbort;
+        if (!testOutputEnable(channel, enable, callTriggerAbort, err)) {
+            return false;
+        }
     }
 
     outputEnableOnNextSync(channel, enable);

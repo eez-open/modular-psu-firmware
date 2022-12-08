@@ -44,6 +44,7 @@
 #include <eez/index.h>
 #include <eez/function_generator.h>
 #include <eez/gui/gui.h>
+#include <eez/modules/psu/gui/psu.h>
 
 #include <eez/modules/bp3c/io_exp.h>
 #include <eez/modules/bp3c/flash_slave.h>
@@ -165,18 +166,18 @@ void Channel::Value::resetMonValues() {
 }
 
 void Channel::Value::addMonValue(float value, float prec) {
-    if (io_pins::isInhibited()) {
-        value = 0;
-    }
+    // if (io_pins::isInhibited()) {
+    //     value = 0;
+    // }
     
     mon_last = roundPrec(value, prec);
 
     monMovingAverage(value);
 
-    if (io_pins::isInhibited()) {
-        mon = mon_prev = 0;
-		mon_measured = true;
-	} else {
+    // if (io_pins::isInhibited()) {
+    //     mon = mon_prev = 0;
+	// 	mon_measured = true;
+	// } else {
         if (mon_measured) {
             float next = monMovingAverage;
             if (fabs(mon_prev - next) >= prec) {
@@ -187,7 +188,7 @@ void Channel::Value::addMonValue(float value, float prec) {
             mon = mon_prev = mon_last;            
 			mon_measured = true;
 		}
-    }
+    // }
 }
 
 void Channel::Value::addMonDacValue(float value, float prec) {
@@ -646,10 +647,10 @@ void Channel::tick() {
         }
     }
 
-    if (!io_pins::isInhibited()) {
+    // if (!io_pins::isInhibited()) {
         setCvMode(isInCvMode());
         setCcMode(isInCcMode());
-    }
+    // }
 
     if (channelHistory) {
         channelHistory->update();
@@ -884,7 +885,7 @@ void Channel::executeOutputEnable(bool inhibited) {
                 anyToEnable = true;
                 // OE for enabled
                 channel.executeOutputEnable(true, OUTPUT_ENABLE_TASK_OE);
-            } else if ((channel.flags.outputEnabled && inhibited) || (!channel.flags.outputEnabled && !inhibited)) {
+            } else { // } else if ((channel.flags.outputEnabled && inhibited) || (!channel.flags.outputEnabled && !inhibited)) {
                 anyToDisable = true;
                 // OVP, DAC, and OE for disabled
                 channel.executeOutputEnable(false, OUTPUT_ENABLE_TASK_OVP | OUTPUT_ENABLE_TASK_DAC | OUTPUT_ENABLE_TASK_OE);
@@ -991,13 +992,31 @@ void Channel::syncOutputEnable() {
 }
 
 void Channel::onInhibitedChanged(bool inhibited) {
-    for (int i = 0; i < CH_NUM; i++) {
-        Channel &channel = Channel::get(i);
+    int err = 0;
+    int errChannelIndex = -1;
+
+    for (int channelIndex = 0; channelIndex < CH_NUM; channelIndex++) {
+        Channel &channel = Channel::get(channelIndex);
         if (channel.isOutputEnabled()) {
+            int errorInputVoltageChannelIndex;
+            if (!inhibited && !persist_conf::devConf.outputProtectionMeasureDisabled && channel_dispatcher::isErrorInputVoltageDetectedWhenChannellIsOff(channel, errorInputVoltageChannelIndex)) {
+                if (err == 0) {
+                    err = SCPI_ERROR_EXTERNAL_VOLTAGE_ON_CH1_DETECTED + errorInputVoltageChannelIndex;
+                    errChannelIndex = errorInputVoltageChannelIndex;
+                }
+
+                channel.flags.outputEnabled = false;
+            }
+
             channel.flags.doOutputEnableOnNextSync = 1;
         }
     }
+
     executeOutputEnable(inhibited);
+
+    if (err != 0) {
+        gui::psuErrorMessage(errChannelIndex, MakeScpiErrorValue(err));
+    }
 }
 
 void Channel::doRemoteSensingEnable(bool enable) {
@@ -1574,7 +1593,7 @@ void Channel::changeIoExpBit(int io_bit, bool set) {
 #endif
 
 int Channel::getAdvancedOptionsPageId() {
-    return gui::PAGE_ID_NONE;
+    return eez::gui::PAGE_ID_NONE;
 }
 
 const char *Channel::getLabel() {
