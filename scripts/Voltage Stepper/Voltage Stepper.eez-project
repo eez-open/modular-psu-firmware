@@ -1,0 +1,1467 @@
+{
+  "objID": "6666cd76-f969-5646-9e7b-e39d750cc7d9",
+  "settings": {
+    "objID": "e007d988-9fba-797d-72e9-efc33ca6d05c",
+    "general": {
+      "objID": "fd434352-2277-c4a8-e87e-e96cfcbf2305",
+      "projectVersion": "v2",
+      "projectType": "resource",
+      "masterProject": "..\\..\\modular-psu-firmware.eez-project",
+      "imports": []
+    },
+    "build": {
+      "objID": "72794a43-a0fc-13c2-7eb5-67dd952141a4",
+      "configurations": [
+        {
+          "objID": "bba0546c-06b8-604d-c43e-ecf1963e7492",
+          "name": "Default"
+        }
+      ],
+      "files": [],
+      "lvglInclude": "lvgl/lvgl.h"
+    }
+  },
+  "variables": {
+    "objID": "c6c71e16-53e1-217f-d03b-cef56c6b037a",
+    "globalVariables": [
+      {
+        "objID": "e139f889-61b3-1a22-22d7-bc2a379c79a0",
+        "name": "set_curr",
+        "type": "float",
+        "defaultValue": "0",
+        "persistent": false
+      },
+      {
+        "objID": "74c31ba3-f691-3731-09ed-bf4d4737832f",
+        "name": "curr",
+        "type": "float",
+        "defaultValue": "0",
+        "persistent": false
+      },
+      {
+        "objID": "0af3bf97-b210-7201-54a9-0c2cd0ec667d",
+        "name": "vout",
+        "type": "float",
+        "defaultValue": "0",
+        "persistent": false
+      },
+      {
+        "objID": "2979c7da-68e2-9801-01bf-20850c859669",
+        "name": "position",
+        "type": "enum:Position",
+        "defaultValue": "0",
+        "persistent": false
+      },
+      {
+        "objID": "5a960336-5376-6ed0-b4ce-bd465150a952",
+        "name": "voltage",
+        "type": "float",
+        "defaultValue": "0.0 V"
+      },
+      {
+        "objID": "de1c2cc9-d218-ed0d-95ae-c8942d30841e",
+        "name": "v1",
+        "type": "float",
+        "defaultValue": "0",
+        "persistent": false
+      },
+      {
+        "objID": "54cfdcb6-fd99-28ac-347f-7a4fb7f4bd81",
+        "name": "v2",
+        "type": "float",
+        "defaultValue": "0",
+        "persistent": false
+      },
+      {
+        "objID": "387fa24e-54d5-5749-f01d-3b46fae13589",
+        "name": "v3",
+        "type": "float",
+        "defaultValue": "0",
+        "persistent": false
+      },
+      {
+        "objID": "a51dec2b-ecd2-eb30-d359-418436233194",
+        "name": "v4",
+        "type": "float",
+        "defaultValue": "0",
+        "persistent": false
+      },
+      {
+        "objID": "c22ef858-6fd6-3e94-47d6-497a3678abc6",
+        "name": "v5",
+        "type": "float",
+        "defaultValue": "0",
+        "persistent": false
+      },
+      {
+        "objID": "5bb3b159-effb-3989-da6e-4fc500351b65",
+        "name": "v6",
+        "type": "float",
+        "defaultValue": "0",
+        "persistent": false
+      },
+      {
+        "objID": "410480c8-db42-6f1c-7959-fd1cb0406d6b",
+        "name": "v7",
+        "type": "float",
+        "defaultValue": "0",
+        "persistent": false
+      },
+      {
+        "objID": "873c92b2-ffa4-ca41-85b3-20cae523f3c9",
+        "name": "i1",
+        "type": "float",
+        "defaultValue": "0",
+        "persistent": false
+      },
+      {
+        "objID": "5cd91bb1-e261-366b-0483-6cd9a758ba78",
+        "name": "i2",
+        "type": "float",
+        "defaultValue": "0",
+        "persistent": false
+      },
+      {
+        "objID": "38237abe-9921-9269-ea1c-712b36fc601f",
+        "name": "i3",
+        "type": "float",
+        "defaultValue": "0",
+        "persistent": false
+      },
+      {
+        "objID": "f5a39569-865b-7a4a-e54e-3b296d2008a8",
+        "name": "i4",
+        "type": "float",
+        "defaultValue": "0",
+        "persistent": false
+      },
+      {
+        "objID": "e5138c3f-0d16-e30c-0da1-9abba760a6ba",
+        "name": "i5",
+        "type": "float",
+        "defaultValue": "0",
+        "persistent": false
+      },
+      {
+        "objID": "57c0c326-8d4a-4272-3379-0af23ca162ae",
+        "name": "i6",
+        "type": "float",
+        "defaultValue": "0",
+        "persistent": false
+      },
+      {
+        "objID": "e142ebe3-08b5-6703-438f-64e3c8802a09",
+        "name": "i7",
+        "type": "float",
+        "defaultValue": "0",
+        "persistent": false
+      },
+      {
+        "objID": "c3ca4f00-3803-4a24-be45-8082705cb64a",
+        "name": "chann",
+        "type": "float",
+        "defaultValue": "0",
+        "persistent": false
+      }
+    ],
+    "structures": [],
+    "enums": [
+      {
+        "objID": "1d404c2c-1653-7398-66c9-e44da12a3369",
+        "name": "Position",
+        "members": [
+          {
+            "objID": "cdd37728-06a7-904e-52c1-2aed3111bb25",
+            "name": "0",
+            "value": 0
+          },
+          {
+            "objID": "9fa824ce-7b52-fbc2-bd24-1fe3215c7bcd",
+            "name": "1",
+            "value": 1
+          },
+          {
+            "objID": "fec80d68-e183-4a82-9a3b-6aeb27148107",
+            "name": "2",
+            "value": 2
+          },
+          {
+            "objID": "c34a3511-279e-6656-b958-767b838a0399",
+            "name": "3",
+            "value": 3
+          },
+          {
+            "objID": "0020f9cc-9ada-c07b-a7dc-ee5ae72beb01",
+            "name": "4",
+            "value": 4
+          },
+          {
+            "objID": "0532797c-6fe4-298b-a467-a4f0214c4c86",
+            "name": "5",
+            "value": 5
+          },
+          {
+            "objID": "4baf42a8-9795-539e-baeb-f564c1536b12",
+            "name": "6",
+            "value": 6
+          }
+        ]
+      }
+    ]
+  },
+  "actions": [
+    {
+      "objID": "06c64bda-62dc-d53d-87f6-516ec8afd457",
+      "components": [],
+      "connectionLines": [],
+      "localVariables": [],
+      "name": "off"
+    },
+    {
+      "objID": "4069f53e-424a-285d-5965-e9f12c3f00f6",
+      "components": [],
+      "connectionLines": [],
+      "localVariables": [],
+      "name": "on"
+    },
+    {
+      "objID": "0aa333de-df04-0944-98bf-b5b1f4b5ddb2",
+      "components": [],
+      "connectionLines": [],
+      "localVariables": [],
+      "name": "close"
+    },
+    {
+      "objID": "0917869f-ce39-ff36-911d-a392aacef39a",
+      "components": [],
+      "connectionLines": [],
+      "localVariables": [],
+      "name": "step_r"
+    },
+    {
+      "objID": "9f932898-b23d-75e2-c562-3681592eda21",
+      "components": [],
+      "connectionLines": [],
+      "localVariables": [],
+      "name": "step_l"
+    },
+    {
+      "objID": "1a599a2a-9dde-905d-50a0-ff4a3e5109e7",
+      "components": [],
+      "connectionLines": [],
+      "localVariables": [],
+      "name": "input_current"
+    },
+    {
+      "objID": "a46a5cf5-e9ea-4dd5-2560-4f3967404164",
+      "components": [],
+      "connectionLines": [],
+      "localVariables": [],
+      "name": "input_volt"
+    },
+    {
+      "objID": "cd63c2da-d55b-ecdf-c2c2-355ad5756a81",
+      "components": [],
+      "connectionLines": [],
+      "localVariables": [],
+      "name": "input_v1"
+    },
+    {
+      "objID": "3fe61919-5c60-6506-46a1-5e3433d1743b",
+      "components": [],
+      "connectionLines": [],
+      "localVariables": [],
+      "name": "input_v2"
+    },
+    {
+      "objID": "d716f1e9-8fe7-6d40-2caa-7fb36bc48c2c",
+      "components": [],
+      "connectionLines": [],
+      "localVariables": [],
+      "name": "input_v3"
+    },
+    {
+      "objID": "6b8fe584-6e94-f366-e8cf-e6ed1a52ae9c",
+      "components": [],
+      "connectionLines": [],
+      "localVariables": [],
+      "name": "input_v4"
+    },
+    {
+      "objID": "f18d0669-2a24-31f6-8fa4-5f4af3b3932f",
+      "components": [],
+      "connectionLines": [],
+      "localVariables": [],
+      "name": "input_v5"
+    },
+    {
+      "objID": "dd7ff7c4-4087-65c0-e064-8d2290bd8b89",
+      "components": [],
+      "connectionLines": [],
+      "localVariables": [],
+      "name": "input_v6"
+    },
+    {
+      "objID": "2bc6a878-7487-17d5-b8c3-c87bdb10cca7",
+      "components": [],
+      "connectionLines": [],
+      "localVariables": [],
+      "name": "input_v7"
+    },
+    {
+      "objID": "b816cbb3-374f-3489-be3f-16f486dc97ec",
+      "components": [],
+      "connectionLines": [],
+      "localVariables": [],
+      "name": "input_i1"
+    },
+    {
+      "objID": "4d4d8810-74e6-2b46-6a6f-e92b36d148c8",
+      "components": [],
+      "connectionLines": [],
+      "localVariables": [],
+      "name": "input_i2"
+    },
+    {
+      "objID": "b3f11793-ab7d-b76a-7b16-378973423d55",
+      "components": [],
+      "connectionLines": [],
+      "localVariables": [],
+      "name": "input_i3"
+    },
+    {
+      "objID": "4ea0e565-f815-80ef-5069-9ac108f3f24e",
+      "components": [],
+      "connectionLines": [],
+      "localVariables": [],
+      "name": "input_i4"
+    },
+    {
+      "objID": "b33836b6-d603-c335-5480-6937a3a1fa02",
+      "components": [],
+      "connectionLines": [],
+      "localVariables": [],
+      "name": "input_i5"
+    },
+    {
+      "objID": "f0e7872b-07bc-5de0-dec8-ab853c5294da",
+      "components": [],
+      "connectionLines": [],
+      "localVariables": [],
+      "name": "input_i6"
+    },
+    {
+      "objID": "29c16d4c-b405-c427-3afe-b6dfe725e3e0",
+      "components": [],
+      "connectionLines": [],
+      "localVariables": [],
+      "name": "input_i7"
+    },
+    {
+      "objID": "c0a45ff6-6795-edb2-451d-2f1db19d412e",
+      "components": [],
+      "connectionLines": [],
+      "localVariables": [],
+      "name": "sel_ch1"
+    },
+    {
+      "objID": "78992164-0e92-27da-3e96-fd128e823ec3",
+      "components": [],
+      "connectionLines": [],
+      "localVariables": [],
+      "name": "sel_ch2"
+    },
+    {
+      "objID": "91a1c1be-580f-3983-6957-fb2ac5cf071d",
+      "components": [],
+      "connectionLines": [],
+      "localVariables": [],
+      "name": "p1"
+    },
+    {
+      "objID": "e665268d-9100-1a79-ae1b-2e337f27e791",
+      "components": [],
+      "connectionLines": [],
+      "localVariables": [],
+      "name": "p2"
+    },
+    {
+      "objID": "192df9d7-7897-4342-1991-cbc3a9598018",
+      "components": [],
+      "connectionLines": [],
+      "localVariables": [],
+      "name": "p3"
+    },
+    {
+      "objID": "34177d55-2601-8198-a0f6-8ee6481f9366",
+      "components": [],
+      "connectionLines": [],
+      "localVariables": [],
+      "name": "p4"
+    },
+    {
+      "objID": "28674c2b-c71b-c82e-b4ac-48c15815e5b3",
+      "components": [],
+      "connectionLines": [],
+      "localVariables": [],
+      "name": "p5"
+    },
+    {
+      "objID": "020f779b-5fbb-f4b6-c106-1ee7bd7f3f13",
+      "components": [],
+      "connectionLines": [],
+      "localVariables": [],
+      "name": "p6"
+    },
+    {
+      "objID": "107665e8-274e-3be1-c1ce-e93986a8faeb",
+      "components": [],
+      "connectionLines": [],
+      "localVariables": [],
+      "name": "p7"
+    }
+  ],
+  "pages": [
+    {
+      "objID": "f7f15531-2f0d-6247-72af-17ad3967f8e0",
+      "components": [
+        {
+          "objID": "1a331409-37d5-13ac-651e-26eb227b18b1",
+          "type": "TextWidget",
+          "left": 416,
+          "top": 143,
+          "width": 64,
+          "height": 32,
+          "customInputs": [],
+          "customOutputs": [],
+          "action": "off",
+          "style": {
+            "objID": "759e70f7-0da0-ee89-4fb3-c9fe64b200c5",
+            "inheritFrom": "edit_value_active_M_center"
+          },
+          "timeline": [],
+          "name": "Off",
+          "text": "Off"
+        },
+        {
+          "objID": "b1d5a0ef-dd40-0055-2de1-a16cf1b7597e",
+          "type": "TextWidget",
+          "left": 416,
+          "top": 100,
+          "width": 64,
+          "height": 32,
+          "customInputs": [],
+          "customOutputs": [],
+          "action": "on",
+          "style": {
+            "objID": "f9a6ee82-e3c1-75b8-043a-a2ee56bd7bdc",
+            "inheritFrom": "edit_value_active_M_center"
+          },
+          "timeline": [],
+          "name": "On",
+          "text": "On"
+        },
+        {
+          "objID": "58d84e03-0aa1-9a55-2f99-b308ea38dba0",
+          "type": "Container",
+          "left": 0,
+          "top": 240,
+          "width": 480,
+          "height": 32,
+          "customInputs": [],
+          "customOutputs": [],
+          "style": {
+            "objID": "cdbcd671-bbcc-389e-954e-de0c2ea9c9dc",
+            "inheritFrom": "default"
+          },
+          "timeline": [],
+          "name": "Status line",
+          "widgets": [
+            {
+              "objID": "5e361543-5d2d-236e-29a6-73c249636a43",
+              "type": "Text",
+              "left": 0,
+              "top": 0,
+              "width": 41,
+              "height": 32,
+              "customInputs": [],
+              "customOutputs": [],
+              "action": "close",
+              "style": {
+                "objID": "c91a9a23-515d-7357-a80c-399d523ed980",
+                "inheritFrom": "status_icon_enabled"
+              },
+              "timeline": [],
+              "text": "E"
+            },
+            {
+              "objID": "614356cf-316d-4ee9-e7b7-9ca540bbc88b",
+              "type": "Text",
+              "left": 41,
+              "top": 0,
+              "width": 439,
+              "height": 32,
+              "customInputs": [],
+              "customOutputs": [],
+              "data": "",
+              "style": {
+                "objID": "c23039cb-fbfd-951b-802b-450e27f69df3",
+                "inheritFrom": "status_title"
+              },
+              "timeline": [],
+              "text": "Volt Step 4.8"
+            },
+            {
+              "objID": "ddd16ee4-2d90-fc15-25ae-81366580cd96",
+              "type": "TextWidget",
+              "left": 285,
+              "top": 0,
+              "width": 45,
+              "height": 32,
+              "customInputs": [],
+              "customOutputs": [],
+              "action": "sel_ch1",
+              "style": {
+                "objID": "fed2897b-e1b1-c93c-f1cd-9ce80ce23efa",
+                "inheritFrom": "status_title"
+              },
+              "timeline": [],
+              "text": "CH1"
+            },
+            {
+              "objID": "0307150c-ddd9-c4cc-86e6-22dcd46e28c1",
+              "type": "TextWidget",
+              "left": 350,
+              "top": 0,
+              "width": 54,
+              "height": 32,
+              "customInputs": [],
+              "customOutputs": [],
+              "action": "sel_ch2",
+              "style": {
+                "objID": "a923db8d-dbfe-50af-bd02-6d69d5bfe94b",
+                "inheritFrom": "status_title"
+              },
+              "timeline": [],
+              "text": "CH2"
+            }
+          ],
+          "layout": "static"
+        },
+        {
+          "objID": "ad6d7962-be1f-dc32-3dac-0c8c6052db45",
+          "type": "ContainerWidget",
+          "left": 0,
+          "top": 0,
+          "width": 480,
+          "height": 30,
+          "customInputs": [],
+          "customOutputs": [],
+          "style": {
+            "objID": "ba5a759e-2822-af12-0dfa-0a34816facd6",
+            "inheritFrom": "default"
+          },
+          "timeline": [],
+          "widgets": [
+            {
+              "objID": "ecdf5003-4ebe-6074-0dce-5baf2af98c1a",
+              "type": "TextWidget",
+              "left": 0,
+              "top": 0,
+              "width": 60,
+              "height": 30,
+              "customInputs": [],
+              "customOutputs": [],
+              "data": "v1",
+              "action": "input_v1",
+              "style": {
+                "objID": "ff6442e7-f30e-cf61-31ed-54f3ebf3a65c",
+                "inheritFrom": "edit_value_active_S_center"
+              },
+              "timeline": [],
+              "name": ""
+            },
+            {
+              "objID": "09799885-27d5-19b8-f7b6-29ed0a9fb956",
+              "type": "TextWidget",
+              "left": 70,
+              "top": 0,
+              "width": 60,
+              "height": 30,
+              "customInputs": [],
+              "customOutputs": [],
+              "data": "v2",
+              "action": "input_v2",
+              "style": {
+                "objID": "0684cd59-0231-03e5-1fea-d837e1bf2287",
+                "inheritFrom": "edit_value_active_S_center"
+              },
+              "timeline": []
+            },
+            {
+              "objID": "c300445c-ae06-37ab-5e3a-795a02bbacea",
+              "type": "TextWidget",
+              "left": 140,
+              "top": 0,
+              "width": 60,
+              "height": 30,
+              "customInputs": [],
+              "customOutputs": [],
+              "data": "v3",
+              "action": "input_v3",
+              "style": {
+                "objID": "564ece27-d03c-af30-3fa2-fd067a3263d0",
+                "inheritFrom": "edit_value_active_S_center"
+              },
+              "timeline": []
+            },
+            {
+              "objID": "b5c58930-2301-523f-8a7c-ca40a724561c",
+              "type": "TextWidget",
+              "left": 212,
+              "top": 0,
+              "width": 60,
+              "height": 30,
+              "customInputs": [],
+              "customOutputs": [],
+              "data": "v4",
+              "action": "input_v4",
+              "style": {
+                "objID": "0d072f91-8f8c-187e-1ecc-8e47dfbbde34",
+                "inheritFrom": "edit_value_active_S_center"
+              },
+              "timeline": []
+            },
+            {
+              "objID": "c4ffbd53-a649-4589-92ab-a41906ca028f",
+              "type": "TextWidget",
+              "left": 280,
+              "top": 0,
+              "width": 60,
+              "height": 30,
+              "customInputs": [],
+              "customOutputs": [],
+              "data": "v5",
+              "action": "input_v5",
+              "style": {
+                "objID": "2b514f43-fa89-a1aa-5707-a4a67497d96d",
+                "inheritFrom": "edit_value_active_S_center"
+              },
+              "timeline": []
+            },
+            {
+              "objID": "2366561f-e8c1-8c1c-83dd-bd707b1fa05f",
+              "type": "TextWidget",
+              "left": 350,
+              "top": 0,
+              "width": 60,
+              "height": 30,
+              "customInputs": [],
+              "customOutputs": [],
+              "data": "v6",
+              "action": "input_v6",
+              "style": {
+                "objID": "15424372-a5e0-e779-f659-fc5c811aebab",
+                "inheritFrom": "edit_value_active_S_center"
+              },
+              "timeline": []
+            },
+            {
+              "objID": "63d3f09e-d23d-87ac-e907-ec8072fef30f",
+              "type": "TextWidget",
+              "left": 420,
+              "top": 0,
+              "width": 60,
+              "height": 30,
+              "customInputs": [],
+              "customOutputs": [],
+              "data": "v7",
+              "action": "input_v7",
+              "style": {
+                "objID": "24317562-bc2a-3f10-4891-a6c4d2243083",
+                "inheritFrom": "edit_value_active_S_center"
+              },
+              "timeline": []
+            }
+          ],
+          "layout": "static"
+        },
+        {
+          "objID": "c489d6a8-f950-d778-2e3e-90bd3017c953",
+          "type": "TextWidget",
+          "left": 192,
+          "top": 240,
+          "width": 64,
+          "height": 32,
+          "customInputs": [],
+          "customOutputs": [],
+          "style": {
+            "objID": "72862002-7fbd-278c-4a47-f5102d88d446",
+            "inheritFrom": "status_title"
+          },
+          "timeline": [],
+          "text": "Select:"
+        },
+        {
+          "objID": "fb4b3fa1-d53b-75a6-c45d-c41ad06c4923",
+          "type": "ContainerWidget",
+          "left": 0,
+          "top": 185,
+          "width": 480,
+          "height": 55,
+          "customInputs": [],
+          "customOutputs": [],
+          "style": {
+            "objID": "9770ac8c-3842-2571-d0a9-dfe61d2abbc7",
+            "inheritFrom": "default"
+          },
+          "timeline": [],
+          "widgets": [
+            {
+              "objID": "dbb70ad0-2890-30f2-f7aa-5a3555d394c1",
+              "type": "TextWidget",
+              "left": 0,
+              "top": 0,
+              "width": 100,
+              "height": 55,
+              "customInputs": [],
+              "customOutputs": [],
+              "action": "step_l",
+              "style": {
+                "objID": "b74b0fee-e073-b7ac-5c0d-5f2a3b36c077",
+                "inheritFrom": "edit_value_active_S_center"
+              },
+              "timeline": [],
+              "text": "Step Left"
+            },
+            {
+              "objID": "e8483d81-f1fb-d4f3-8bbb-32f4e2e914fd",
+              "type": "TextWidget",
+              "left": 126,
+              "top": 5,
+              "width": 100,
+              "height": 50,
+              "customInputs": [],
+              "customOutputs": [],
+              "data": "vout",
+              "style": {
+                "objID": "58477784-b0b6-2b92-1ba1-47022280ad6e",
+                "inheritFrom": "default"
+              },
+              "timeline": []
+            },
+            {
+              "objID": "707b3e0d-b570-638c-6bac-f4b86b3680e0",
+              "type": "TextWidget",
+              "left": 243,
+              "top": 5,
+              "width": 110,
+              "height": 50,
+              "customInputs": [],
+              "customOutputs": [],
+              "data": "curr",
+              "style": {
+                "objID": "c3597aa7-8524-b0f5-c3c9-19f34bd97e10",
+                "inheritFrom": "default"
+              },
+              "timeline": []
+            },
+            {
+              "objID": "791a2b2c-7ecd-6414-6791-43bf9609b10e",
+              "type": "TextWidget",
+              "left": 380,
+              "top": 0,
+              "width": 100,
+              "height": 55,
+              "customInputs": [],
+              "customOutputs": [],
+              "action": "step_r",
+              "style": {
+                "objID": "de45aac0-8196-ba2a-a126-4c332e1cb3ef",
+                "inheritFrom": "edit_value_active_S_center"
+              },
+              "timeline": [],
+              "text": "Step Right"
+            }
+          ],
+          "layout": "static"
+        },
+        {
+          "objID": "da721dd5-7a45-4d91-0d3f-bb4336957e03",
+          "type": "SelectWidget",
+          "left": 0,
+          "top": 88,
+          "width": 480,
+          "height": 5,
+          "customInputs": [],
+          "customOutputs": [],
+          "data": "position",
+          "style": {
+            "objID": "f8322731-da0e-c354-7dfe-25934a164257",
+            "inheritFrom": "default"
+          },
+          "timeline": [],
+          "widgets": [
+            {
+              "objID": "c1bdeec5-4e08-f86f-913c-b22f34396250",
+              "type": "Container",
+              "left": 0,
+              "top": 0,
+              "width": 480,
+              "height": 5,
+              "customInputs": [],
+              "customOutputs": [],
+              "style": {
+                "objID": "a9da2707-c4e6-b42e-9d20-7fc2a4412886",
+                "inheritFrom": "default"
+              },
+              "timeline": [],
+              "widgets": [
+                {
+                  "objID": "30990d61-3bc9-dd3e-9525-4c30d8d8eaf1",
+                  "type": "RectangleWidget",
+                  "left": 0,
+                  "top": 0,
+                  "width": 60,
+                  "height": 5,
+                  "customInputs": [],
+                  "customOutputs": [],
+                  "style": {
+                    "objID": "72a6c46d-5513-9395-73ac-4ad15e017d44",
+                    "inheritFrom": "default"
+                  },
+                  "timeline": []
+                }
+              ],
+              "layout": "static"
+            },
+            {
+              "objID": "3c811841-db5b-d573-054b-e1ab319adc3a",
+              "type": "Container",
+              "left": 0,
+              "top": 0,
+              "width": 480,
+              "height": 5,
+              "customInputs": [],
+              "customOutputs": [],
+              "style": {
+                "objID": "d306f665-b290-044e-291e-86ff3047eb1e",
+                "inheritFrom": "default"
+              },
+              "timeline": [],
+              "widgets": [
+                {
+                  "objID": "61c4cbb1-4e35-ee64-3280-9422911f657a",
+                  "type": "RectangleWidget",
+                  "left": 70,
+                  "top": 0,
+                  "width": 60,
+                  "height": 5,
+                  "customInputs": [],
+                  "customOutputs": [],
+                  "style": {
+                    "objID": "fcd9a7ee-4123-46bc-fa4d-7373126fa7f8",
+                    "inheritFrom": "default"
+                  },
+                  "timeline": []
+                }
+              ],
+              "layout": "static"
+            },
+            {
+              "objID": "2d50fc8f-ce08-73ce-caad-3d60adf04bf9",
+              "type": "Container",
+              "left": 0,
+              "top": 0,
+              "width": 480,
+              "height": 5,
+              "customInputs": [],
+              "customOutputs": [],
+              "style": {
+                "objID": "2307fae1-d943-c8f5-650b-233144a425fa",
+                "inheritFrom": "default"
+              },
+              "timeline": [],
+              "widgets": [
+                {
+                  "objID": "159fccb7-b33f-a595-8c03-298ba3342b7a",
+                  "type": "RectangleWidget",
+                  "left": 140,
+                  "top": 0,
+                  "width": 60,
+                  "height": 5,
+                  "customInputs": [],
+                  "customOutputs": [],
+                  "style": {
+                    "objID": "a5273fc5-6ba6-24fa-7f9e-2e7d5df21aeb",
+                    "inheritFrom": "default"
+                  },
+                  "timeline": []
+                }
+              ],
+              "layout": "static"
+            },
+            {
+              "objID": "4d3c919b-1c55-4a86-9400-ccded557e83e",
+              "type": "Container",
+              "left": 0,
+              "top": 0,
+              "width": 480,
+              "height": 5,
+              "customInputs": [],
+              "customOutputs": [],
+              "style": {
+                "objID": "fc457f3f-beb2-b4bc-190e-14482e66810c",
+                "inheritFrom": "default"
+              },
+              "timeline": [],
+              "widgets": [
+                {
+                  "objID": "273c7eab-a890-f189-c68a-7d1924f1e0ad",
+                  "type": "RectangleWidget",
+                  "left": 210,
+                  "top": 0,
+                  "width": 60,
+                  "height": 5,
+                  "customInputs": [],
+                  "customOutputs": [],
+                  "style": {
+                    "objID": "520ac72c-3605-0c10-7887-c80c96dfc8f5",
+                    "inheritFrom": "default"
+                  },
+                  "timeline": []
+                }
+              ],
+              "layout": "static"
+            },
+            {
+              "objID": "7cb7feae-feaf-b816-c680-b15b12f996cc",
+              "type": "Container",
+              "left": 0,
+              "top": 0,
+              "width": 480,
+              "height": 5,
+              "customInputs": [],
+              "customOutputs": [],
+              "style": {
+                "objID": "17899ad0-165e-96af-3bb7-4ddf7d33a7e7",
+                "inheritFrom": "default"
+              },
+              "timeline": [],
+              "widgets": [
+                {
+                  "objID": "5fe1948d-b9a8-1f64-bd32-d8c37f689249",
+                  "type": "RectangleWidget",
+                  "left": 280,
+                  "top": 0,
+                  "width": 60,
+                  "height": 5,
+                  "customInputs": [],
+                  "customOutputs": [],
+                  "style": {
+                    "objID": "eaf4b5e4-1cbf-d321-ddf9-540ea4556846",
+                    "inheritFrom": "default"
+                  },
+                  "timeline": []
+                }
+              ],
+              "layout": "static"
+            },
+            {
+              "objID": "3f02cedb-2dae-91a1-e4fb-869bf7fa61ab",
+              "type": "Container",
+              "left": 0,
+              "top": 0,
+              "width": 480,
+              "height": 5,
+              "customInputs": [],
+              "customOutputs": [],
+              "style": {
+                "objID": "1cf73b43-61d0-6f01-38c0-aca6676ad778",
+                "inheritFrom": "default"
+              },
+              "timeline": [],
+              "widgets": [
+                {
+                  "objID": "b6f78ae2-d608-8c0f-673a-ae9474386082",
+                  "type": "RectangleWidget",
+                  "left": 350,
+                  "top": 0,
+                  "width": 60,
+                  "height": 5,
+                  "customInputs": [],
+                  "customOutputs": [],
+                  "style": {
+                    "objID": "47f4d6d3-e910-3907-f52f-be8111c03a7f",
+                    "inheritFrom": "default"
+                  },
+                  "timeline": []
+                }
+              ],
+              "layout": "static"
+            },
+            {
+              "objID": "3e3ec0bf-3c1f-fbdc-0bfe-5b8130986413",
+              "type": "Container",
+              "left": 0,
+              "top": 0,
+              "width": 480,
+              "height": 5,
+              "customInputs": [],
+              "customOutputs": [],
+              "style": {
+                "objID": "005079a4-23e5-104a-cc08-87622da2aa50",
+                "inheritFrom": "default"
+              },
+              "timeline": [],
+              "widgets": [
+                {
+                  "objID": "80fa769f-4d4b-85aa-92a6-4aa76fbdc9b1",
+                  "type": "RectangleWidget",
+                  "left": 420,
+                  "top": 0,
+                  "width": 60,
+                  "height": 5,
+                  "customInputs": [],
+                  "customOutputs": [],
+                  "style": {
+                    "objID": "48219b8b-5161-3dfa-66fd-858b3937b185",
+                    "inheritFrom": "default"
+                  },
+                  "timeline": []
+                }
+              ],
+              "layout": "static"
+            }
+          ]
+        },
+        {
+          "objID": "65ed2992-be4b-7a4c-f423-578e05f582f3",
+          "type": "ContainerWidget",
+          "left": 0,
+          "top": 63,
+          "width": 480,
+          "height": 25,
+          "customInputs": [],
+          "customOutputs": [],
+          "style": {
+            "objID": "78b3006b-a456-de9a-dccc-1ae4c3fea106",
+            "inheritFrom": "default"
+          },
+          "timeline": [],
+          "widgets": [
+            {
+              "objID": "a19a24b2-f33c-2a95-f5c4-49fa48645766",
+              "type": "TextWidget",
+              "left": 0,
+              "top": 0,
+              "width": 60,
+              "height": 25,
+              "customInputs": [],
+              "customOutputs": [],
+              "action": "p1",
+              "style": {
+                "objID": "fdf8a876-5166-c05d-99d1-4059ee6c9fd5",
+                "inheritFrom": "default_S"
+              },
+              "timeline": [],
+              "text": "1"
+            },
+            {
+              "objID": "3c1d6eae-bab3-65c3-64b2-c955e5ccdf72",
+              "type": "TextWidget",
+              "left": 70,
+              "top": 0,
+              "width": 60,
+              "height": 25,
+              "customInputs": [],
+              "customOutputs": [],
+              "action": "p2",
+              "style": {
+                "objID": "c1571929-6fd9-b691-d33b-54db5e81dbd6",
+                "inheritFrom": "default_S"
+              },
+              "timeline": [],
+              "text": "2"
+            },
+            {
+              "objID": "0953957d-fbed-850b-eca6-b23d7d518e3c",
+              "type": "TextWidget",
+              "left": 140,
+              "top": 0,
+              "width": 60,
+              "height": 25,
+              "customInputs": [],
+              "customOutputs": [],
+              "action": "p3",
+              "style": {
+                "objID": "b5209ff1-e97e-453d-61c0-e28a5a907888",
+                "inheritFrom": "default_S"
+              },
+              "timeline": [],
+              "text": "3"
+            },
+            {
+              "objID": "1addf36a-0101-5250-0ddd-26fd5ebaf937",
+              "type": "TextWidget",
+              "left": 210,
+              "top": 0,
+              "width": 60,
+              "height": 25,
+              "customInputs": [],
+              "customOutputs": [],
+              "action": "p4",
+              "style": {
+                "objID": "4deadc14-10d7-039f-8c97-a38ea38ede0c",
+                "inheritFrom": "default_S"
+              },
+              "timeline": [],
+              "text": "4"
+            },
+            {
+              "objID": "ad1b427c-3250-6337-7624-27423531c0a6",
+              "type": "TextWidget",
+              "left": 280,
+              "top": 0,
+              "width": 60,
+              "height": 25,
+              "customInputs": [],
+              "customOutputs": [],
+              "action": "p5",
+              "style": {
+                "objID": "87e55ec1-ea21-eb3a-6080-c9a7a794a9f8",
+                "inheritFrom": "default_S"
+              },
+              "timeline": [],
+              "text": "5"
+            },
+            {
+              "objID": "c4de4375-1d1e-bf79-1855-e748e07124ad",
+              "type": "TextWidget",
+              "left": 350,
+              "top": 0,
+              "width": 60,
+              "height": 25,
+              "customInputs": [],
+              "customOutputs": [],
+              "action": "p6",
+              "style": {
+                "objID": "1f3d3339-4447-cd76-d0d4-d2f4388bc3ec",
+                "inheritFrom": "default_S"
+              },
+              "timeline": [],
+              "text": "6"
+            },
+            {
+              "objID": "f6a5aa63-d98e-79d4-7063-62e755108588",
+              "type": "TextWidget",
+              "left": 420,
+              "top": 0,
+              "width": 60,
+              "height": 25,
+              "customInputs": [],
+              "customOutputs": [],
+              "action": "p7",
+              "style": {
+                "objID": "96d2159d-8dc2-faf8-a6e3-34d28518f54a",
+                "inheritFrom": "default_S"
+              },
+              "timeline": [],
+              "text": "7"
+            }
+          ],
+          "layout": "static"
+        },
+        {
+          "objID": "3328b57f-35e8-5239-09f8-bcc795169cb9",
+          "type": "ContainerWidget",
+          "left": 0,
+          "top": 33,
+          "width": 480,
+          "height": 30,
+          "customInputs": [],
+          "customOutputs": [],
+          "style": {
+            "objID": "64f56a8a-f576-a4a1-f1f4-0f06bb21dbc6",
+            "inheritFrom": "default"
+          },
+          "timeline": [],
+          "widgets": [
+            {
+              "objID": "63a7c17c-14f1-5483-8188-496f0778193b",
+              "type": "TextWidget",
+              "left": 0,
+              "top": 0,
+              "width": 60,
+              "height": 30,
+              "customInputs": [],
+              "customOutputs": [],
+              "data": "i1",
+              "action": "input_i1",
+              "style": {
+                "objID": "67094558-59c3-230d-9a20-c091fea59a23",
+                "inheritFrom": "edit_value_active_S_center"
+              },
+              "timeline": [],
+              "name": ""
+            },
+            {
+              "objID": "990ce449-7b7b-5633-2fe1-b7af1681a72b",
+              "type": "TextWidget",
+              "left": 69,
+              "top": 0,
+              "width": 60,
+              "height": 30,
+              "customInputs": [],
+              "customOutputs": [],
+              "data": "i2",
+              "action": "input_i2",
+              "style": {
+                "objID": "91c4199e-292d-c116-d370-18196d896f98",
+                "inheritFrom": "edit_value_active_S_center"
+              },
+              "timeline": []
+            },
+            {
+              "objID": "8835bf9f-f273-5dd9-986b-e7112ee58b59",
+              "type": "TextWidget",
+              "left": 142,
+              "top": 0,
+              "width": 60,
+              "height": 30,
+              "customInputs": [],
+              "customOutputs": [],
+              "data": "i3",
+              "action": "input_i3",
+              "style": {
+                "objID": "43f4c738-027a-2bd2-02fe-b8fa991d5acd",
+                "inheritFrom": "edit_value_active_S_center"
+              },
+              "timeline": []
+            },
+            {
+              "objID": "3b984b92-386a-7e3b-b3c5-7af16ab5f472",
+              "type": "TextWidget",
+              "left": 210,
+              "top": 0,
+              "width": 60,
+              "height": 30,
+              "customInputs": [],
+              "customOutputs": [],
+              "data": "i4",
+              "action": "input_i4",
+              "style": {
+                "objID": "364ddd52-adc6-1aa7-5e5b-ec58216a4893",
+                "inheritFrom": "edit_value_active_S_center"
+              },
+              "timeline": []
+            },
+            {
+              "objID": "c7638a9a-94bb-ab93-8165-6cec4a7e561d",
+              "type": "TextWidget",
+              "left": 280,
+              "top": 0,
+              "width": 60,
+              "height": 30,
+              "customInputs": [],
+              "customOutputs": [],
+              "data": "i5",
+              "action": "input_i5",
+              "style": {
+                "objID": "03b7a4e6-8cfb-3e9e-745b-89065e252431",
+                "inheritFrom": "edit_value_active_S_center"
+              },
+              "timeline": []
+            },
+            {
+              "objID": "ff960658-3289-c331-c037-593cea962ecf",
+              "type": "TextWidget",
+              "left": 350,
+              "top": 0,
+              "width": 60,
+              "height": 30,
+              "customInputs": [],
+              "customOutputs": [],
+              "data": "i6",
+              "action": "input_i6",
+              "style": {
+                "objID": "620fd0d6-607f-2dcd-5b48-a32d03db1b24",
+                "inheritFrom": "edit_value_active_S_center"
+              },
+              "timeline": []
+            },
+            {
+              "objID": "53ea2b03-c9af-414e-71ba-7b75e8ce2781",
+              "type": "TextWidget",
+              "left": 420,
+              "top": 0,
+              "width": 60,
+              "height": 30,
+              "customInputs": [],
+              "customOutputs": [],
+              "data": "i7",
+              "action": "input_i7",
+              "style": {
+                "objID": "88ef9598-a039-6550-8203-894fafe0ea8e",
+                "inheritFrom": "edit_value_active_S_center"
+              },
+              "timeline": []
+            }
+          ],
+          "layout": "static"
+        },
+        {
+          "objID": "9928539e-ace8-3aa6-dcc9-ffdf62bf6708",
+          "type": "TextWidget",
+          "left": 0,
+          "top": 105,
+          "width": 100,
+          "height": 21,
+          "customInputs": [],
+          "customOutputs": [],
+          "action": "input_current",
+          "style": {
+            "objID": "fa929cc3-bae0-69ec-accd-edf569a711d7",
+            "inheritFrom": "edit_value_active_S_center"
+          },
+          "timeline": [],
+          "text": "Set Global I"
+        },
+        {
+          "objID": "99e9c249-06b1-5559-9a34-fe49f3d52d4e",
+          "type": "TextWidget",
+          "left": 0,
+          "top": 143,
+          "width": 100,
+          "height": 21,
+          "customInputs": [],
+          "customOutputs": [],
+          "action": "input_volt",
+          "style": {
+            "objID": "7d151d57-0d67-2707-cc23-27f4ce0711a0",
+            "inheritFrom": "edit_value_active_S_center"
+          },
+          "timeline": [],
+          "text": "Set Global U"
+        },
+        {
+          "objID": "d0b96dee-f004-1f63-44e4-c4c2a4fcfe06",
+          "type": "TextWidget",
+          "left": 240,
+          "top": 170,
+          "width": 110,
+          "height": 16,
+          "customInputs": [],
+          "customOutputs": [],
+          "data": "set_curr",
+          "action": "",
+          "style": {
+            "objID": "4a456837-bfa7-f8a2-d279-300b174014ff",
+            "inheritFrom": "default_S"
+          },
+          "timeline": []
+        },
+        {
+          "objID": "629c9db1-9301-9dd6-7aa2-63da25ece3c9",
+          "type": "TextWidget",
+          "left": 240,
+          "top": 152,
+          "width": 110,
+          "height": 15,
+          "customInputs": [],
+          "customOutputs": [],
+          "style": {
+            "objID": "1091cfde-b60c-86a7-7cbd-a22ee854914b",
+            "inheritFrom": "default_S"
+          },
+          "timeline": [],
+          "text": "Current  limit"
+        },
+        {
+          "objID": "449dea31-af3a-6a20-5c48-ba9d732e4a81",
+          "type": "TextWidget",
+          "left": 140,
+          "top": 152,
+          "width": 70,
+          "height": 15,
+          "customInputs": [],
+          "customOutputs": [],
+          "style": {
+            "objID": "177d57b0-310e-ac9b-877d-a6d4361c10fc",
+            "inheritFrom": "default_S"
+          },
+          "timeline": [],
+          "text": "U Set"
+        },
+        {
+          "objID": "daf4ac76-bcf6-9b56-1291-fc1007cfe998",
+          "type": "TextWidget",
+          "left": 140,
+          "top": 170,
+          "width": 70,
+          "height": 16,
+          "customInputs": [],
+          "customOutputs": [],
+          "data": "voltage",
+          "action": "",
+          "style": {
+            "objID": "0705d684-d0a8-5a36-83aa-db43d908ceec",
+            "inheritFrom": "default_S"
+          },
+          "timeline": []
+        },
+        {
+          "objID": "549175fd-887d-109c-46e8-cba52082face",
+          "type": "TextWidget",
+          "left": 290,
+          "top": 100,
+          "width": 39,
+          "height": 32,
+          "customInputs": [],
+          "customOutputs": [],
+          "data": "chann",
+          "style": {
+            "objID": "e90c3a59-b5ff-1a17-8671-adbcac9e5cde",
+            "inheritFrom": "default"
+          },
+          "timeline": []
+        },
+        {
+          "objID": "2d5b054e-7a98-2e69-f3f6-6585448970e5",
+          "type": "TextWidget",
+          "left": 154,
+          "top": 100,
+          "width": 116,
+          "height": 32,
+          "customInputs": [],
+          "customOutputs": [],
+          "style": {
+            "objID": "5f41eeca-92bb-3e58-14de-afeaecf63504",
+            "inheritFrom": "default"
+          },
+          "timeline": [],
+          "text": "Channel:"
+        }
+      ],
+      "connectionLines": [],
+      "localVariables": [],
+      "name": "Main",
+      "left": 0,
+      "top": 0,
+      "width": 480,
+      "height": 272,
+      "lvglLocalStyles": {
+        "objID": "e85dbd5d-8325-1629-003b-86fd654ae635"
+      }
+    }
+  ],
+  "styles": [],
+  "fonts": [],
+  "bitmaps": [],
+  "micropython": {
+    "objID": "b45b2228-d8c5-05a4-86e8-bafbd3d42829",
+    "code": "# Allows 7 preset V and I for channels 1 & 2\r\n# Author: Mike G\r\n# Version: 4.8 \r\n\r\nfrom eez import scpi\r\n\r\n\r\ndef adj(n):\r\n    global voltage, max_voltage, volt, max_pwr, VOLTS, set_curr\r\n\r\n    val = scpi('DISP:INPUT? \"Set Step ' + str(n + 1) + ' Voltage\",NUMBER,VOLT, 0.0, 40.0,' + str(VOLTS[c][n]))\r\n    if val != None:\r\n        if float(val) * float(ISET[c][n]) > max_pwr:\r\n            volt_max = max_pwr/(ISET[c][n])\r\n            scpi('SYST:BEEP')\r\n            scpi('DISP:INPUT? \"Max volts on Step ' + str(n + 1) + ' - ' + str(volt_max) +  '\", MENU, BUTTON, \"Close\"')\r\n        else:\r\n            VOLTS[c][n] = float(val)\r\n            scpi('DISP:DIALog:DATA \"v' + str(n + 1) +'\",FLOAT,VOLT,' + str(VOLTS[c][n]))\r\n            scpi(\"VOLT \" + str(VOLTS[c][pos[c]]))\r\n            \r\n\r\ndef input_volt():\r\n    global set_curr, max_curr, voltage, max_pwr, VOLTS, pos, n\r\n    \r\n    value = scpi('DISP:INPUT? \"Set Global Voltage\",NUMBER,VOLT, 0.0, 40.0,' + str(VOLTS[c][pos[c]]))\r\n    \r\n    if value != None:\r\n        for x in range(7):\r\n            if float(value) * float(ISET[c][x]) > max_pwr:\r\n                curr_max = round((max_pwr)/(value),2)\r\n                (ISET[c][x]) = (curr_max)\r\n                (VOLTS[c][x]) = float(value)\r\n                scpi('DISP:DIALog:DATA \"i' + str(x + 1) + '\",FLOAT,AMPE,' + str(ISET[c][x]))\r\n                scpi('DISP:DIALog:DATA \"v' + str(x + 1) + '\",FLOAT,VOLT,' + str(VOLTS[c][x]))\r\n                scpi(\"CURR \" + str(ISET[c][pos[c]]))\r\n                scpi(\"VOLT \" + str(VOLTS[c][pos[c]]))\r\n                scpi('SYST:BEEP')\r\n                scpi('DISP:INPUT? \"Current on Step ' + str(x + 1) + ' reduced to  ' + str(curr_max) +  'A\", MENU, BUTTON, \"Close\"')\r\n            else:    \r\n                (VOLTS[c][x]) = float(value) \r\n                scpi('DISP:DIALog:DATA \"v' + str(x + 1) + '\",FLOAT,VOLT,' + str(VOLTS[c][x]))\r\n                scpi(\"VOLT \" + str(VOLTS[c][pos[c]])) \r\n    \r\n    \r\ndef adjI(n):\r\n    global set_curr, max_curr, voltage, max_pwr\r\n    value = scpi('DISP:INPUT? \"Set Step ' + str(n + 1) +' Curr Lim\",NUMBER,AMPE, 0.0, 5.0,' + str(ISET[c][n]))\r\n    if value != None:\r\n        if float(value) * float(VOLTS[c][n]) > max_pwr:\r\n            curr_max = max_pwr/(VOLTS[c][n])\r\n            scpi('SYST:BEEP')\r\n            scpi('DISP:INPUT? \"Max current on Step ' + str(n + 1) + ' - ' + str(curr_max) +  '\", MENU, BUTTON, \"Close\"')\r\n        else:    \r\n            ISET[c][n] = float(value)\r\n            scpi('DISP:DIALog:DATA \"i' + str(n + 1) + '\",FLOAT,AMPE,' + str(ISET[c][n]))\r\n            scpi(\"CURR \" + str(ISET[c][pos[c]]))\r\n\r\ndef input_current():\r\n    global  max_curr, voltage, max_pwr,set_curr\r\n    value = scpi('DISP:INPUT? \"Set Global Curr Lim\",NUMBER,AMPE, 0.0, 5.0,' + str(set_curr))\r\n    if value != None:\r\n        for x in range(7):\r\n            if float(value) * float(VOLTS[c][x]) > max_pwr:\r\n                volt_max = round((max_pwr)/(value))\r\n                (VOLTS[c][x]) = (volt_max)\r\n                scpi('DISP:DIALog:DATA \"v' + str(x + 1) + '\",FLOAT,VOLT,' + str(VOLTS[c][x]))\r\n                (ISET[c][x]) = float(value)\r\n                scpi('DISP:DIALog:DATA \"i' + str(x + 1) + '\",FLOAT,AMPE,' + str(ISET[c][x]))\r\n                scpi(\"VOLT \" + str(VOLTS[c][pos[c]]))\r\n                scpi(\"CURR \" + str(ISET[c][pos[c]]))\r\n                scpi('SYST:BEEP')\r\n                scpi('DISP:INPUT? \"Volts on Step ' + str(x + 1) + ' set to  ' + str(VOLTS[c][x]) + '.0V\", MENU, BUTTON,\"Close\"')\r\n            else:    \r\n                (ISET[c][x]) = float(value)\r\n                scpi('DISP:DIALog:DATA \"i' + str(x + 1) + '\",FLOAT,AMPE,' + str(ISET[c][x]))\r\n                scpi(\"CURR \" + str(ISET[c][pos[c]]))\r\n    \r\n            \r\ndef meas_output():\r\n    curr = scpi(\"MEAS:CURR?\")\r\n    scpi('DISP:DIAL:DATA \"curr\",FLOAT,AMPE,' + str(curr))\r\n    vout = scpi(\"MEAS:VOLT?\")\r\n    scpi('DISP:DIAL:DATA \"vout\",FLOAT,VOLT,' + str(vout))\r\n    \r\n    \r\ndef ch(s):\r\n    global c, set_curr, max_voltage, max_pwr, max_curr, voltage \r\n    c = s\r\n    if c == 1:\r\n        scpi(\"INST ch2\")\r\n    else:\r\n        scpi(\"INST ch1\")\r\n\r\n    max_voltage = scpi(\"VOLT? MAX\")\r\n    max_pwr = scpi(\"POW:LIM?\") -10\r\n    max_curr = scpi(\"CURR? MAX\")\r\n    \r\n    for x in range(7):\r\n        scpi('DISP:DIALog:DATA \"i' + str(x + 1) + '\",FLOAT,AMPE,' + str(ISET[c][x]))\r\n        scpi('DISP:DIALog:DATA \"v' + str(x + 1) + '\",FLOAT,VOLT,' + str(VOLTS[c][x]))\r\n    \r\n    \r\ndef right():\r\n    global pos\r\n    if pos[c]  == len(VOLTS[0]) - 1:\r\n\t    pos[c] = 0\r\n    else:\r\n\t    pos[c] = pos[c] + 1\r\n\r\n\r\ndef left():\r\n    global pos\r\n    if pos[c]  ==  0:\r\n        pos[c] = len(VOLTS[0]) - 1\r\n    else:\r\n\t    pos[c] = pos[c] - 1\r\n\t    \r\ndef newp(p):\r\n    global pos\r\n    pos[c] = (p-1)\r\n\r\n\r\ndef write_settings():\r\n    global VOLTS, ISET, pos\r\n    \r\n    SETTINGS_FILE_PATH = \"/Scripts/volt_step.settings48\"\r\n    # convert VOLTS, ISET and pos to list of strings and store into settings\r\n    settings = []\r\n    for ch_index in range(2):\r\n        for volt_index in range(7):\r\n            settings.append(str(VOLTS[ch_index][volt_index]))\r\n        for iset_index in range(7):\r\n            settings.append(str(ISET[ch_index][iset_index]))\r\n        settings.append(str(pos[ch_index]))\r\n    \r\n    settings_str = \"\\n\".join(settings)\r\n    settings_str_len = str(len(settings_str))\r\n\r\n    scpi('MMEM:DOWN:FNAM \"' + SETTINGS_FILE_PATH + '\"')\r\n    scpi('MMEM:DOWN:SIZE ' + settings_str_len)\r\n    scpi('MMEM:DOWN:DATA #' + str(len(settings_str_len)) + settings_str_len + settings_str)\r\n    scpi('MMEM:DOWN:FNAM \"\"')\r\n    \r\ndef file_exists(file_path):\r\n    i = file_path.rfind(\"/\")\r\n    folder = file_path[:i]\r\n    file_name = file_path[i+1:]\r\n    cat = scpi('MMEM:CAT? \"' + folder + '\"')\r\n    return file_name in cat\r\n    \r\ndef read_settings():\r\n    global VOLTS, ISET, pos\r\n    \r\n    SETTINGS_FILE_PATH = \"/Scripts/volt_step.settings48\"\r\n    \r\n    if not file_exists(SETTINGS_FILE_PATH):\r\n        return False\r\n    \r\n    try:\r\n        settings_str = scpi('MMEM:UPL? \"' + SETTINGS_FILE_PATH + '\"')\r\n        skip = 2 + int(settings_str[1])\r\n        settings_str = settings_str[skip:]\r\n        settings = settings_str.split(\"\\n\")\r\n        # convert settings (list of strings) into VOLTS, ISET and pos\r\n        settings_index = 0\r\n        VOLTS = []\r\n        ISET = []\r\n        pos = []\r\n        for ch_index in range(2):\r\n            VOLTS.append([])\r\n            for volt_index in range(7):\r\n                VOLTS[ch_index].append(float(settings[settings_index]))\r\n                settings_index += 1\r\n            ISET.append([])\r\n            for iset_index in range(7):\r\n                ISET[ch_index].append(float(settings[settings_index]))\r\n                settings_index += 1\r\n            pos.append(int(settings[settings_index]))\r\n            settings_index += 1\r\n        return True;\r\n    except:\r\n        return False\r\n\r\n\r\ndef main():\r\n    global voltage, max_voltage, volt, n, max_pwr, VOLTS, pos, set_curr, curr, ISET, set_volt, c\r\n    \r\n    if not read_settings():\r\n        # set to defaults\r\n        VOLTS = [[1.1, 2.2, 3.3, 4.4, 5.5, 6.6, 7.7], [11, 12, 13, 14, 15, 16, 17]]\r\n        ISET  = [[.1, .2, .3, .4, .5, .6, .7], [.11, .22, .33, .44, .55, .66, .77]]\r\n        pos = [0, 0]\r\n\r\n    scpi(\"INST ch2\")\r\n    scpi(\"OUTP OFF\")\r\n    scpi(\"INST ch1\")\r\n    scpi(\"OUTP OFF\")\r\n\r\n    scpi(\"DISP:DIAL:OPEN \\\"/Scripts/Voltage Stepper.res\\\"\")\r\n    ch(0)\r\n    \r\n    try:\r\n        while True:\r\n            meas_output()\r\n            scpi(\"DISP:DIALog:DATA \\\"position\\\",INTEGER,\" + str(pos[c]))\r\n            scpi(\"VOLT \" + str(VOLTS[c][pos[c]]))\r\n            scpi(\"CURR \" + str(ISET[c][pos[c]]))\r\n            set_curr = scpi(\"CURR?\")\r\n            scpi('DISP:DIALog:DATA \"set_curr\",FLOAT,AMPE,' + str(set_curr))\r\n            voltage = scpi(\"VOLT?\")\r\n            scpi('DISP:DIALog:DATA \"voltage\",FLOAT,VOLT,' + str(voltage))\r\n            scpi('DISP:DIAL:DATA \"chann\",FLOAT,UNKN,' + str(c+1))\r\n            \r\n            action = scpi(\"DISP:DIALog:ACTIon? .1\")\r\n            if action == \"input_volt\":\r\n                input_volt()\r\n            elif action == \"input_current\":\r\n                input_current()\r\n            elif action == \"input_v1\":\r\n                adj(0)\r\n            elif action == \"input_i1\":\r\n                adjI(0)\r\n            elif action == \"input_v2\":\r\n                adj(1)\r\n            elif action == \"input_i2\":\r\n                adjI(1)\r\n            elif action == \"input_v3\":\r\n                adj(2)\r\n            elif action == \"input_i3\":\r\n                adjI(2)\r\n            elif action == \"input_v4\":\r\n                adj(3)\r\n            elif action == \"input_i4\":\r\n                adjI(3)\r\n            elif action == \"input_v5\":\r\n                adj(4)\r\n            elif action == \"input_i5\":\r\n                adjI(4)\r\n            elif action == \"input_v6\":\r\n                adj(5)\r\n            elif action == \"input_i6\":\r\n                adjI(5)\r\n            elif action == \"input_v7\":\r\n                adj(6)\r\n            elif action == \"input_i7\":\r\n                adjI(6)\r\n            elif action == \"p1\":\r\n                newp(1)\r\n            elif action == \"p2\":\r\n                newp(2)\r\n            elif action == \"p3\":\r\n                newp(3)\r\n            elif action == \"p4\":\r\n                newp(4)\r\n            elif action == \"p5\":\r\n                newp(5)\r\n            elif action == \"p6\":\r\n                newp(6)\r\n            elif action == \"p7\":\r\n                newp(7)\r\n            elif action == \"step_r\":\r\n                right()\r\n            elif action == \"step_l\":\r\n                left()\r\n            elif action == \"sel_ch1\":\r\n                ch(0)\r\n            elif action == \"sel_ch2\":\r\n                ch(1)\r\n            elif action == \"on\":\r\n                scpi(\"OUTP ON\")\r\n            elif action == \"off\":\r\n                scpi(\"OUTP OFF\")\r\n            elif action == \"close\" or action == 0:\r\n                break\r\n      \r\n    finally:\r\n        scpi(\"DISP:DIALog:CLOSe\")\r\n        write_settings()\r\n    \r\nmain()"
+  },
+  "colors": [],
+  "themes": []
+}

@@ -1,0 +1,748 @@
+{
+  "objID": "6666cd76-f969-5646-9e7b-e39d750cc7d9",
+  "settings": {
+    "objID": "e007d988-9fba-797d-72e9-efc33ca6d05c",
+    "general": {
+      "objID": "fd434352-2277-c4a8-e87e-e96cfcbf2305",
+      "projectVersion": "v2",
+      "projectType": "resource",
+      "masterProject": "..\\..\\modular-psu-firmware.eez-project",
+      "imports": []
+    },
+    "build": {
+      "objID": "72794a43-a0fc-13c2-7eb5-67dd952141a4",
+      "configurations": [
+        {
+          "objID": "bba0546c-06b8-604d-c43e-ecf1963e7492",
+          "name": "Default"
+        }
+      ],
+      "files": [],
+      "lvglInclude": "lvgl/lvgl.h"
+    }
+  },
+  "variables": {
+    "objID": "c6c71e16-53e1-217f-d03b-cef56c6b037a",
+    "globalVariables": [
+      {
+        "objID": "5a960336-5376-6ed0-b4ce-bd465150a952",
+        "name": "voltage",
+        "type": "float",
+        "defaultValue": "3.0 V"
+      },
+      {
+        "objID": "d55b153d-a036-1c72-0430-adfede303b61",
+        "name": "volt",
+        "type": "float",
+        "defaultValue": "0",
+        "persistent": false
+      },
+      {
+        "objID": "2ca1a48a-e071-71e1-b8ce-dde8c6bb2f4b",
+        "name": "n",
+        "type": "float",
+        "defaultValue": "0",
+        "persistent": false
+      },
+      {
+        "objID": "74c31ba3-f691-3731-09ed-bf4d4737832f",
+        "name": "curr",
+        "type": "float",
+        "defaultValue": "0",
+        "persistent": false
+      },
+      {
+        "objID": "0af3bf97-b210-7201-54a9-0c2cd0ec667d",
+        "name": "vout",
+        "type": "float",
+        "defaultValue": "0",
+        "persistent": false
+      },
+      {
+        "objID": "e139f889-61b3-1a22-22d7-bc2a379c79a0",
+        "name": "set_curr",
+        "type": "float",
+        "defaultValue": "0.1",
+        "persistent": false
+      },
+      {
+        "objID": "494ea747-66d8-9398-e716-1fa11bb3aab4",
+        "name": "max_voltage",
+        "type": "float",
+        "defaultValue": "0",
+        "persistent": false
+      },
+      {
+        "objID": "3ddd58d7-b48a-a3f8-a4f1-2bf92c005fc4",
+        "name": "max_curr",
+        "type": "float",
+        "defaultValue": "0",
+        "persistent": false
+      },
+      {
+        "objID": "28bc6fdb-f835-495c-c8bb-fa09f3ab6093",
+        "name": "max_pwr",
+        "type": "float",
+        "defaultValue": "0",
+        "persistent": false
+      }
+    ],
+    "structures": [],
+    "enums": []
+  },
+  "actions": [
+    {
+      "objID": "c4ffc0ad-228d-c213-0bd5-926ac00b8bae",
+      "components": [],
+      "connectionLines": [],
+      "localVariables": [],
+      "name": "input_voltage"
+    },
+    {
+      "objID": "0aa333de-df04-0944-98bf-b5b1f4b5ddb2",
+      "components": [],
+      "connectionLines": [],
+      "localVariables": [],
+      "name": "close"
+    },
+    {
+      "objID": "375578a4-d25a-e00c-b588-afa94141b483",
+      "components": [],
+      "connectionLines": [],
+      "localVariables": [],
+      "name": "+1"
+    },
+    {
+      "objID": "28db1f21-82af-3a3b-47f0-15e9c08e5dcc",
+      "components": [],
+      "connectionLines": [],
+      "localVariables": [],
+      "name": "+.01"
+    },
+    {
+      "objID": "78e2cc9b-29dd-8321-41ec-636af5cb29f2",
+      "components": [],
+      "connectionLines": [],
+      "localVariables": [],
+      "name": "+0.1"
+    },
+    {
+      "objID": "0e09047b-89cb-6a68-9b80-4cd582bf1f52",
+      "components": [],
+      "connectionLines": [],
+      "localVariables": [],
+      "name": "-1"
+    },
+    {
+      "objID": "f8665eeb-2fbb-4d49-1453-2593fcbfa601",
+      "components": [],
+      "connectionLines": [],
+      "localVariables": [],
+      "name": "-.01"
+    },
+    {
+      "objID": "9f040a35-c031-c496-07cb-eeb0d07acf6b",
+      "components": [],
+      "connectionLines": [],
+      "localVariables": [],
+      "name": "-0.1"
+    },
+    {
+      "objID": "06c64bda-62dc-d53d-87f6-516ec8afd457",
+      "components": [],
+      "connectionLines": [],
+      "localVariables": [],
+      "name": "off"
+    },
+    {
+      "objID": "4069f53e-424a-285d-5965-e9f12c3f00f6",
+      "components": [],
+      "connectionLines": [],
+      "localVariables": [],
+      "name": "on"
+    },
+    {
+      "objID": "1a599a2a-9dde-905d-50a0-ff4a3e5109e7",
+      "components": [],
+      "connectionLines": [],
+      "localVariables": [],
+      "name": "input_current"
+    },
+    {
+      "objID": "18c10f15-88f2-fe56-326a-e2a651375236",
+      "components": [],
+      "connectionLines": [],
+      "localVariables": [],
+      "name": "+1c"
+    },
+    {
+      "objID": "70d88717-4e8b-d6ae-34d0-0905faf88ba3",
+      "components": [],
+      "connectionLines": [],
+      "localVariables": [],
+      "name": "+.01c"
+    },
+    {
+      "objID": "bfd63529-ced9-e5da-6a6b-69e79bbe78a1",
+      "components": [],
+      "connectionLines": [],
+      "localVariables": [],
+      "name": "+0.1c"
+    },
+    {
+      "objID": "0da4db03-56b8-fe9b-cf2b-45928a227f41",
+      "components": [],
+      "connectionLines": [],
+      "localVariables": [],
+      "name": "-1c"
+    },
+    {
+      "objID": "3d7cf34f-e801-ea53-86ac-c44b1d5100ad",
+      "components": [],
+      "connectionLines": [],
+      "localVariables": [],
+      "name": "-.01c"
+    },
+    {
+      "objID": "2969b5e0-b38e-8de1-e142-3d18fbc469bd",
+      "components": [],
+      "connectionLines": [],
+      "localVariables": [],
+      "name": "-0.1c"
+    }
+  ],
+  "pages": [
+    {
+      "objID": "dc8c5e32-a2aa-9d2d-a70b-4d971f3c2b8d",
+      "components": [
+        {
+          "objID": "1a331409-37d5-13ac-651e-26eb227b18b1",
+          "type": "ContainerWidget",
+          "left": 385,
+          "top": 0,
+          "width": 95,
+          "height": 110,
+          "customInputs": [],
+          "customOutputs": [],
+          "style": {
+            "objID": "759e70f7-0da0-ee89-4fb3-c9fe64b200c5",
+            "inheritFrom": "default"
+          },
+          "timeline": [],
+          "name": "+ current",
+          "widgets": [
+            {
+              "objID": "407b782f-cff5-93c1-0091-71654064d96d",
+              "type": "TextWidget",
+              "left": 0,
+              "top": 0,
+              "width": 95,
+              "height": 30,
+              "customInputs": [],
+              "customOutputs": [],
+              "action": "+1c",
+              "style": {
+                "objID": "70479d97-ad20-6d59-31c0-a390828ebd7e",
+                "inheritFrom": "edit_value_active_S_center"
+              },
+              "timeline": [],
+              "text": "+ 1.0 Amp"
+            },
+            {
+              "objID": "e3f3f516-6f8f-e5ed-1614-5c1ce059a24e",
+              "type": "TextWidget",
+              "left": 0,
+              "top": 35,
+              "width": 95,
+              "height": 30,
+              "customInputs": [],
+              "customOutputs": [],
+              "action": "+0.1c",
+              "style": {
+                "objID": "cb3f06c5-4a53-de37-ec5b-f82cf28149bc",
+                "inheritFrom": "edit_value_active_S_center"
+              },
+              "timeline": [],
+              "text": "+ 0.1 Amp"
+            },
+            {
+              "objID": "3c28659c-fc91-def8-0624-d8f1b19a0d05",
+              "type": "TextWidget",
+              "left": 0,
+              "top": 70,
+              "width": 95,
+              "height": 30,
+              "customInputs": [],
+              "customOutputs": [],
+              "action": "+.01c",
+              "style": {
+                "objID": "b8fb5773-d23b-87ec-2f90-fd18f550edad",
+                "inheritFrom": "edit_value_active_S_center"
+              },
+              "timeline": [],
+              "text": "+ 0.01 Amp"
+            }
+          ],
+          "layout": "static"
+        },
+        {
+          "objID": "b1d5a0ef-dd40-0055-2de1-a16cf1b7597e",
+          "type": "ContainerWidget",
+          "left": 385,
+          "top": 128,
+          "width": 95,
+          "height": 110,
+          "customInputs": [],
+          "customOutputs": [],
+          "style": {
+            "objID": "f9a6ee82-e3c1-75b8-043a-a2ee56bd7bdc",
+            "inheritFrom": "default"
+          },
+          "timeline": [],
+          "name": "- current",
+          "widgets": [
+            {
+              "objID": "4ee418a2-14cd-c8b6-58e8-b0c19871ac2d",
+              "type": "TextWidget",
+              "left": 0,
+              "top": 70,
+              "width": 95,
+              "height": 30,
+              "customInputs": [],
+              "customOutputs": [],
+              "action": "-1c",
+              "style": {
+                "objID": "860f85a7-f9bb-16e2-3fc7-9c9b8faef1d8",
+                "inheritFrom": "edit_value_active_S_center"
+              },
+              "timeline": [],
+              "text": "- 1.0 Amp"
+            },
+            {
+              "objID": "5f75fefd-a9c2-65e8-44aa-d866cfae2ccb",
+              "type": "TextWidget",
+              "left": 0,
+              "top": 35,
+              "width": 95,
+              "height": 30,
+              "customInputs": [],
+              "customOutputs": [],
+              "action": "-0.1c",
+              "style": {
+                "objID": "665c5476-ec27-de52-428e-11c5cfb88730",
+                "inheritFrom": "edit_value_active_S_center"
+              },
+              "timeline": [],
+              "text": "- 0.1 Amp"
+            },
+            {
+              "objID": "b1c98dbe-da52-2c27-cd7a-e56d0e950b6c",
+              "type": "TextWidget",
+              "left": 0,
+              "top": 0,
+              "width": 95,
+              "height": 30,
+              "customInputs": [],
+              "customOutputs": [],
+              "action": "-.01c",
+              "style": {
+                "objID": "6f2fbf5c-f9a9-43e9-edf4-36f5a49943f3",
+                "inheritFrom": "edit_value_active_S_center"
+              },
+              "timeline": [],
+              "text": "- 0.01 Amp"
+            }
+          ],
+          "layout": "static"
+        },
+        {
+          "objID": "58d84e03-0aa1-9a55-2f99-b308ea38dba0",
+          "type": "ContainerWidget",
+          "left": 0,
+          "top": 0,
+          "width": 95,
+          "height": 110,
+          "customInputs": [],
+          "customOutputs": [],
+          "style": {
+            "objID": "cdbcd671-bbcc-389e-954e-de0c2ea9c9dc",
+            "inheritFrom": "default"
+          },
+          "timeline": [],
+          "name": "+ voltages",
+          "widgets": [
+            {
+              "objID": "5e361543-5d2d-236e-29a6-73c249636a43",
+              "type": "TextWidget",
+              "left": 0,
+              "top": 0,
+              "width": 95,
+              "height": 30,
+              "customInputs": [],
+              "customOutputs": [],
+              "action": "+1",
+              "style": {
+                "objID": "c91a9a23-515d-7357-a80c-399d523ed980",
+                "inheritFrom": "edit_value_active_S_center"
+              },
+              "timeline": [],
+              "text": "+ 1.0 Volt"
+            },
+            {
+              "objID": "614356cf-316d-4ee9-e7b7-9ca540bbc88b",
+              "type": "TextWidget",
+              "left": 0,
+              "top": 35,
+              "width": 95,
+              "height": 30,
+              "customInputs": [],
+              "customOutputs": [],
+              "action": "+0.1",
+              "style": {
+                "objID": "c23039cb-fbfd-951b-802b-450e27f69df3",
+                "inheritFrom": "edit_value_active_S_center"
+              },
+              "timeline": [],
+              "text": "+ 0.1 Volt"
+            },
+            {
+              "objID": "ddd16ee4-2d90-fc15-25ae-81366580cd96",
+              "type": "TextWidget",
+              "left": 0,
+              "top": 71,
+              "width": 95,
+              "height": 30,
+              "customInputs": [],
+              "customOutputs": [],
+              "action": "+.01",
+              "style": {
+                "objID": "fed2897b-e1b1-c93c-f1cd-9ce80ce23efa",
+                "inheritFrom": "edit_value_active_S_center"
+              },
+              "timeline": [],
+              "text": "+ 0.01 Volt"
+            }
+          ],
+          "layout": "static"
+        },
+        {
+          "objID": "ad6d7962-be1f-dc32-3dac-0c8c6052db45",
+          "type": "ContainerWidget",
+          "left": 0,
+          "top": 128,
+          "width": 95,
+          "height": 112,
+          "customInputs": [],
+          "customOutputs": [],
+          "style": {
+            "objID": "ba5a759e-2822-af12-0dfa-0a34816facd6",
+            "inheritFrom": "default"
+          },
+          "timeline": [],
+          "name": "- voltages",
+          "widgets": [
+            {
+              "objID": "ecdf5003-4ebe-6074-0dce-5baf2af98c1a",
+              "type": "TextWidget",
+              "left": 0,
+              "top": 70,
+              "width": 95,
+              "height": 30,
+              "customInputs": [],
+              "customOutputs": [],
+              "action": "-1",
+              "style": {
+                "objID": "ff6442e7-f30e-cf61-31ed-54f3ebf3a65c",
+                "inheritFrom": "edit_value_active_S_center"
+              },
+              "timeline": [],
+              "text": "- 1.0 Volt"
+            },
+            {
+              "objID": "09799885-27d5-19b8-f7b6-29ed0a9fb956",
+              "type": "TextWidget",
+              "left": 0,
+              "top": 35,
+              "width": 95,
+              "height": 30,
+              "customInputs": [],
+              "customOutputs": [],
+              "action": "-0.1",
+              "style": {
+                "objID": "0684cd59-0231-03e5-1fea-d837e1bf2287",
+                "inheritFrom": "edit_value_active_S_center"
+              },
+              "timeline": [],
+              "text": "- 0.1 Volt"
+            },
+            {
+              "objID": "c300445c-ae06-37ab-5e3a-795a02bbacea",
+              "type": "TextWidget",
+              "left": 0,
+              "top": 0,
+              "width": 95,
+              "height": 30,
+              "customInputs": [],
+              "customOutputs": [],
+              "action": "-.01",
+              "style": {
+                "objID": "564ece27-d03c-af30-3fa2-fd067a3263d0",
+                "inheritFrom": "edit_value_active_S_center"
+              },
+              "timeline": [],
+              "text": "- 0.01 Volt"
+            }
+          ],
+          "layout": "static"
+        },
+        {
+          "objID": "c489d6a8-f950-d778-2e3e-90bd3017c953",
+          "type": "Container",
+          "left": 109,
+          "top": 15,
+          "width": 266,
+          "height": 127,
+          "customInputs": [],
+          "customOutputs": [],
+          "style": {
+            "objID": "72862002-7fbd-278c-4a47-f5102d88d446",
+            "inheritFrom": "default"
+          },
+          "timeline": [],
+          "widgets": [
+            {
+              "objID": "1da8b3d7-af07-b560-4520-59b9b9734381",
+              "type": "TextWidget",
+              "left": 202,
+              "top": 0,
+              "width": 64,
+              "height": 32,
+              "customInputs": [],
+              "customOutputs": [],
+              "action": "on",
+              "style": {
+                "objID": "fc48406b-d46c-f2d5-5127-fa39a6aa536b",
+                "inheritFrom": "edit_value_active_M_center"
+              },
+              "timeline": [],
+              "name": "On",
+              "text": "On"
+            },
+            {
+              "objID": "1041e694-5748-3068-8096-26ebad3506ba",
+              "type": "Text",
+              "left": 106,
+              "top": 40,
+              "width": 159,
+              "height": 65,
+              "customInputs": [],
+              "customOutputs": [],
+              "data": "curr",
+              "action": "",
+              "style": {
+                "objID": "8c05f335-d823-6a87-f019-f8d6fe208e84",
+                "inheritFrom": "default"
+              },
+              "timeline": [],
+              "text": ""
+            },
+            {
+              "objID": "2fdf2555-534c-0026-40d5-2bf852eb5f70",
+              "type": "Text",
+              "left": 0,
+              "top": 0,
+              "width": 106,
+              "height": 32,
+              "customInputs": [],
+              "customOutputs": [],
+              "style": {
+                "objID": "097146b7-f202-653c-7209-a48bfeeaf005",
+                "inheritFrom": "default_S",
+                "color": "#ffffff"
+              },
+              "timeline": [],
+              "text": "Output"
+            },
+            {
+              "objID": "bda737d9-6fa3-05cd-2e57-0647619ddbc2",
+              "type": "Text",
+              "left": 0,
+              "top": 40,
+              "width": 106,
+              "height": 65,
+              "customInputs": [],
+              "customOutputs": [],
+              "data": "vout",
+              "action": "",
+              "style": {
+                "objID": "c5e10285-f190-a351-e2d4-3227273186fb",
+                "inheritFrom": "default"
+              },
+              "timeline": [],
+              "text": ""
+            },
+            {
+              "objID": "b6ff364b-7fb0-4c34-eba0-a1b2a061a671",
+              "type": "TextWidget",
+              "left": 121,
+              "top": 0,
+              "width": 64,
+              "height": 32,
+              "customInputs": [],
+              "customOutputs": [],
+              "action": "off",
+              "style": {
+                "objID": "c5342ecf-4fec-80a4-63ed-e97e272fac4e",
+                "inheritFrom": "edit_value_active_M_center"
+              },
+              "timeline": [],
+              "name": "Off",
+              "text": "Off"
+            }
+          ],
+          "layout": "static"
+        },
+        {
+          "objID": "fb4b3fa1-d53b-75a6-c45d-c41ad06c4923",
+          "type": "Container",
+          "left": 0,
+          "top": 240,
+          "width": 480,
+          "height": 32,
+          "customInputs": [],
+          "customOutputs": [],
+          "style": {
+            "objID": "9770ac8c-3842-2571-d0a9-dfe61d2abbc7",
+            "inheritFrom": "default"
+          },
+          "timeline": [],
+          "name": "Status line",
+          "widgets": [
+            {
+              "objID": "dbb70ad0-2890-30f2-f7aa-5a3555d394c1",
+              "type": "Text",
+              "left": 0,
+              "top": 0,
+              "width": 41,
+              "height": 32,
+              "customInputs": [],
+              "customOutputs": [],
+              "action": "close",
+              "style": {
+                "objID": "b74b0fee-e073-b7ac-5c0d-5f2a3b36c077",
+                "inheritFrom": "status_icon_enabled"
+              },
+              "timeline": [],
+              "text": "E"
+            },
+            {
+              "objID": "e8483d81-f1fb-d4f3-8bbb-32f4e2e914fd",
+              "type": "Text",
+              "left": 41,
+              "top": 0,
+              "width": 439,
+              "height": 32,
+              "customInputs": [],
+              "customOutputs": [],
+              "data": "",
+              "style": {
+                "objID": "58477784-b0b6-2b92-1ba1-47022280ad6e",
+                "inheritFrom": "status_title"
+              },
+              "timeline": [],
+              "text": "Output Stepper 4.1"
+            }
+          ],
+          "layout": "static"
+        },
+        {
+          "objID": "da721dd5-7a45-4d91-0d3f-bb4336957e03",
+          "type": "ContainerWidget",
+          "left": 109,
+          "top": 180,
+          "width": 266,
+          "height": 46,
+          "customInputs": [],
+          "customOutputs": [],
+          "style": {
+            "objID": "f8322731-da0e-c354-7dfe-25934a164257",
+            "inheritFrom": "default"
+          },
+          "timeline": [],
+          "widgets": [
+            {
+              "objID": "c1bdeec5-4e08-f86f-913c-b22f34396250",
+              "type": "TextWidget",
+              "left": 142,
+              "top": 0,
+              "width": 75,
+              "height": 46,
+              "customInputs": [],
+              "customOutputs": [],
+              "data": "set_curr",
+              "action": "input_current",
+              "style": {
+                "objID": "a9da2707-c4e6-b42e-9d20-7fc2a4412886",
+                "inheritFrom": "edit_value_active_S_center"
+              },
+              "timeline": []
+            },
+            {
+              "objID": "3c811841-db5b-d573-054b-e1ab319adc3a",
+              "type": "TextWidget",
+              "left": 34,
+              "top": 0,
+              "width": 75,
+              "height": 46,
+              "customInputs": [],
+              "customOutputs": [],
+              "data": "voltage",
+              "action": "input_voltage",
+              "style": {
+                "objID": "d306f665-b290-044e-291e-86ff3047eb1e",
+                "inheritFrom": "edit_value_active_S_center"
+              },
+              "timeline": []
+            }
+          ],
+          "layout": "static"
+        },
+        {
+          "objID": "65ed2992-be4b-7a4c-f423-578e05f582f3",
+          "type": "TextWidget",
+          "left": 163,
+          "top": 150,
+          "width": 143,
+          "height": 24,
+          "customInputs": [],
+          "customOutputs": [],
+          "style": {
+            "objID": "78b3006b-a456-de9a-dccc-1ae4c3fea106",
+            "inheritFrom": "default_S"
+          },
+          "timeline": [],
+          "text": "Output Set To"
+        }
+      ],
+      "connectionLines": [],
+      "localVariables": [],
+      "name": "main",
+      "left": 0,
+      "top": 0,
+      "width": 480,
+      "height": 272,
+      "lvglLocalStyles": {
+        "objID": "1b4d3944-2a33-2556-6e3f-c1c1bb594fb7"
+      }
+    }
+  ],
+  "styles": [],
+  "fonts": [],
+  "bitmaps": [],
+  "micropython": {
+    "objID": "b45b2228-d8c5-05a4-86e8-bafbd3d42829",
+    "code": "# Adjusts output V and I in fixed steps\r\n# Author: Mike G\r\n# Version: 4.1\r\n\r\nfrom eez import scpi\r\n\r\ndef input_voltage():\r\n    global voltage, max_voltage, max_curr, max_pwr\r\n    val = scpi('DISP:INPUT? \"Set Output Voltage\",NUMBER,VOLT,0.0,' + str(max_voltage) + '.0,' + str(voltage))\r\n    if val != None:\r\n        if float(set_curr) * float(val) > max_pwr:\r\n            scpi('SYST:BEEP')\r\n            scpi('DISP:INPUT? \"Maximum power exceeded\", MENU, BUTTON, \"Close\"')\r\n        else:\r\n            voltage = float(val)\r\n            scpi(\"VOLT \" + str(voltage))\r\n\r\n\r\ndef input_current():\r\n    global set_curr,max_curr,voltage\r\n    value = scpi('DISP:INPUT? \"Set Current Limit\",NUMBER,AMPE,0.0,' + str(max_curr) + '.0,' + str(set_curr))\r\n    if value != None:\r\n        if float(value) * float(voltage) > max_pwr:\r\n            scpi('SYST:BEEP')\r\n            scpi('DISP:INPUT? \"Maximum power exceeded\", MENU, BUTTON, \"Close\"')\r\n        else: \r\n            set_curr = float(value)\r\n            scpi(\"CURR \" + str(value))\r\n           \r\n\r\n\r\ndef adj(n):\r\n    global voltage, max_voltage, volt,  max_pwr\r\n    voltage = (voltage + n)\r\n    if float(set_curr) * float(voltage) > max_pwr:\r\n        voltage = (voltage - n)\r\n        scpi('SYST:BEEP')\r\n        scpi('DISP:INPUT? \"Maximum power exceeded\", MENU, BUTTON, \"Close\"')\r\n    elif voltage > (max_voltage):\r\n        voltage = (voltage - n)\r\n        scpi('SYST:BEEP')\r\n        scpi('DISP:INPUT? \"Voltage above 40V\", MENU, BUTTON, \"Close\"')\r\n    else:\r\n        scpi(\"VOLT \" + str(voltage))\r\n       \r\n        \r\ndef adjc(n):\r\n    global max_curr, set_curr, max_pwr,voltage\r\n    set_curr = (set_curr + n )\r\n    if float(set_curr) * float(voltage) > max_pwr:\r\n        set_curr = (set_curr - n)\r\n        scpi('SYST:BEEP')\r\n        scpi('DISP:INPUT? \"Maximum power exceeded\", MENU, BUTTON, \"Close\"')\r\n    elif set_curr > (max_curr):\r\n        set_curr = (set_curr - n)\r\n        scpi('SYST:BEEP')\r\n        scpi('DISP:INPUT? \"Current limit above 5.0 Amps\", MENU, BUTTON, \"Close\"')\r\n    else:\r\n        scpi(\"CURR \" + str(set_curr))\r\n        \r\n\r\ndef meas_output():\r\n    curr = scpi(\"MEAS:CURR?\")\r\n    scpi('DISP:DIAL:DATA \"curr\",FLOAT,AMPE,' + str(curr))\r\n    vout = scpi(\"MEAS:VOLT?\")\r\n    scpi('DISP:DIAL:DATA \"vout\",FLOAT,VOLT,' + str(vout))\r\n\r\n\r\ndef main():\r\n    global voltage, max_voltage, volt, n, set_curr,max_curr,max_pwr\r\n    scpi(\"INST ch1\")\r\n    scpi(\"OUTP OFF\")\r\n    #voltage = scpi(\"VOLT?\")\r\n    max_voltage = scpi(\"VOLT? MAX\")\r\n    #value = scpi(\"VOLT?\")\r\n    voltage = 0.0\r\n    scpi(\"VOLT \" + str(voltage))\r\n    max_curr = scpi(\"CURR? MAX\")\r\n    curr = scpi(\"MEAS:CURR?\")\r\n    #set_curri = scpi(\"CURR?\")\r\n    set_curr = 0.0\r\n    scpi(\"CURR \" + str(set_curr))\r\n    max_pwr = scpi(\"POW:LIM?\")\r\n    scpi(\"DISP:DIAL:OPEN \\\"/Scripts/Output Stepper.res\\\"\")\r\n    \r\n    try:\r\n       \r\n        while True:\r\n            meas_output()\r\n            scpi('DISP:DIAL:DATA \"voltage\",FLOAT,VOLT,' + str(voltage))\r\n            scpi('DISP:DIAL:DATA \"set_curr\",FLOAT,AMPE,' + str(set_curr))\r\n            action = scpi(\"DISP:DIALog:ACTIon? .1\")\r\n            if action == \"input_voltage\":\r\n                input_voltage()\r\n            elif action == \"input_current\":\r\n                input_current()\r\n            elif action == \"off\":\r\n                scpi(\"OUTP OFF\")\r\n            elif action == \"+1\":\r\n                adj(1)\r\n            elif action == \"+0.1\":\r\n                adj(.1)\r\n            elif action == \"+.01\":\r\n                adj(.01)\r\n            elif action == \"-1\":\r\n                adj(-1)\r\n            elif action == \"-0.1\":\r\n                adj(-.1)\r\n            elif action == \"-.01\":\r\n                adj(-.01)\r\n            elif action == \"+1c\":\r\n                adjc(1)\r\n            elif action == \"+0.1c\":\r\n                adjc(.1)\r\n            elif action == \"+.01c\":\r\n                adjc(.01)\r\n            elif action == \"-1c\":\r\n                adjc(-1)\r\n            elif action == \"-0.1c\":\r\n                adjc(-.1)\r\n            elif action == \"-.01c\":\r\n                adjc(-.01)\r\n            elif action == \"on\":\r\n                scpi(\"OUTP ON\")\r\n            elif action == \"close\" or action == 0:\r\n                break\r\n           \r\n    finally:\r\n        scpi(\"DISP:DIALog:CLOSe\")\r\n        \r\n\r\n    \r\n     \r\nmain()\r\n"
+  },
+  "colors": [],
+  "themes": []
+}
