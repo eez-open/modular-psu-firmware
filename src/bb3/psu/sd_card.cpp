@@ -900,32 +900,6 @@ bool matchQuotedString(BufferedFileRead &file, char *str, unsigned int strLength
 }
 
 bool match(BufferedFileRead &file, int &result) {
-	matchZeroOrMoreSpaces(file);
-
-	int c = file.peek();
-	if (c == -1) {
-		return false;
-	}
-
-	bool isNumber = false;
-	unsigned int value = 0;
-
-	while (true) {
-		if (c >= '0' && c <= '9') {
-			value = value * 10 + (c - '0');
-			isNumber = true;
-		} else {
-			if (isNumber) {
-				result = value;
-			}
-			return isNumber;
-		}
-		file.read();
-		c = file.peek();
-	}
-}
-
-bool match(BufferedFileRead &file, unsigned int &result) {
     matchZeroOrMoreSpaces(file);
 
     int c = file.peek();
@@ -958,6 +932,32 @@ bool match(BufferedFileRead &file, unsigned int &result) {
         file.read();
         c = file.peek();
     }
+}
+
+bool match(BufferedFileRead &file, unsigned int &result) {
+	matchZeroOrMoreSpaces(file);
+
+	int c = file.peek();
+	if (c == -1) {
+		return false;
+	}
+
+	bool isNumber = false;
+	unsigned int value = 0;
+
+	while (true) {
+		if (c >= '0' && c <= '9') {
+			value = value * 10 + (c - '0');
+			isNumber = true;
+		} else {
+			if (isNumber) {
+				result = value;
+			}
+			return isNumber;
+		}
+		file.read();
+		c = file.peek();
+	}
 }
 
 bool match(BufferedFileRead &file, float &result) {
