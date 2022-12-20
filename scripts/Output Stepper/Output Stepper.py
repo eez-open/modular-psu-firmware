@@ -30,8 +30,10 @@ def input_current():
 
 
 def adj(n):
-    global voltage, max_voltage, volt,  max_pwr
+    global voltage, min_voltage, max_voltage, volt,  max_pwr
     voltage = (voltage + n)
+    if voltage < min_voltage:
+        voltage = min_voltage
     if float(set_curr) * float(voltage) > max_pwr:
         voltage = (voltage - n)
         scpi('SYST:BEEP')
@@ -45,8 +47,10 @@ def adj(n):
        
         
 def adjc(n):
-    global max_curr, set_curr, max_pwr,voltage
+    global min_curr, max_curr, set_curr, max_pwr,voltage
     set_curr = (set_curr + n )
+    if set_curr < min_curr:
+        set_curr = min_curr
     if float(set_curr) * float(voltage) > max_pwr:
         set_curr = (set_curr - n)
         scpi('SYST:BEEP')
@@ -67,14 +71,16 @@ def meas_output():
 
 
 def main():
-    global voltage, max_voltage, volt, n, set_curr,max_curr,max_pwr
+    global voltage, min_voltage, max_voltage, volt, n, set_curr, min_curr, max_curr, max_pwr
     scpi("INST ch1")
     scpi("OUTP OFF")
     #voltage = scpi("VOLT?")
+    min_voltage = scpi("VOLT? MIN")
     max_voltage = scpi("VOLT? MAX")
     #value = scpi("VOLT?")
     voltage = 0.0
     scpi("VOLT " + str(voltage))
+    min_curr = scpi("CURR? MIN")
     max_curr = scpi("CURR? MAX")
     curr = scpi("MEAS:CURR?")
     #set_curri = scpi("CURR?")
