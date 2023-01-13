@@ -233,6 +233,14 @@ int checkTrigger() {
             continue;
         }
 
+        if (channel_dispatcher::isTripped(channel, g_errorChannelIndex)) {
+            return SCPI_ERROR_CANNOT_EXECUTE_BEFORE_CLEARING_PROTECTION;
+        }
+
+        if (!persist_conf::devConf.outputProtectionMeasureDisabled && channel_dispatcher::isErrorInputVoltageDetectedWhenChannellIsOff(channel, g_errorChannelIndex)) {
+            return SCPI_ERROR_EXTERNAL_VOLTAGE_ON_CH1_DETECTED + g_errorChannelIndex;
+        }
+
         if (i == 1 && (channel_dispatcher::getCouplingType() == channel_dispatcher::COUPLING_TYPE_PARALLEL || channel_dispatcher::getCouplingType() == channel_dispatcher::COUPLING_TYPE_SERIES)) {
             continue;
         }
