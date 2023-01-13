@@ -969,7 +969,7 @@ bool match(BufferedFileRead &file, float &result) {
     while (true) {
         int c = file.peek();
 
-        if (isSpace(c) || c == -1) {
+        if (c == ',' || isSpace(c) || c == -1) {
             if (i == 0) {
                 return false;
             }

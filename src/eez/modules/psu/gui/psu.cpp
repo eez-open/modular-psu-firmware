@@ -2034,7 +2034,9 @@ void onEncoder(int counter, bool clicked) {
 static void channelInitiateTrigger() {
     int err = trigger::initiate();
     if (err != SCPI_RES_OK) {
-        psuErrorMessage(g_toggleOutputWidgetCursor.cursor, MakeScpiErrorValue(err));
+        if (!(err >= SCPI_ERROR_EXTERNAL_VOLTAGE_ON_CH1_DETECTED && err <= SCPI_ERROR_EXTERNAL_VOLTAGE_ON_CH6_DETECTED)) {
+            psuErrorMessage(g_toggleOutputWidgetCursor.cursor, MakeScpiErrorValue(err));
+        }
     }
 }
 
