@@ -78,7 +78,6 @@ void executeAnimateComponent(FlowState *flowState, unsigned componentIndex) {
             state->startTimestamp = millis();
 
             if (!addToQueue(flowState, componentIndex, -1, -1, -1, true)) {
-                throwError(flowState, componentIndex, "Execution queue is full\n");
                 return;
             }
         }
@@ -105,7 +104,6 @@ void executeAnimateComponent(FlowState *flowState, unsigned componentIndex) {
             propagateValueThroughSeqout(flowState, componentIndex);
         } else {
             if (!addToQueue(flowState, componentIndex, -1, -1, -1, true)) {
-                throwError(flowState, componentIndex, "Execution queue is full\n");
                 return;
             }
         }

@@ -13,6 +13,10 @@
 //          http://www.antigrain.com
 //----------------------------------------------------------------------------
 
+#include <eez/conf-internal.h>
+
+#if EEZ_OPTION_GUI
+
 #ifndef AGG_BASICS_INCLUDED
 #define AGG_BASICS_INCLUDED
 
@@ -588,3 +592,4 @@ namespace agg
 
 #endif
 
+#endif // EEZ_OPTION_GUI

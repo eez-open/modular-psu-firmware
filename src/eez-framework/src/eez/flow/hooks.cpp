@@ -23,16 +23,16 @@
 
 #include <eez/flow/hooks.h>
 
+#include <eez/core/util.h>
+
 #if EEZ_OPTION_GUI
 #include <eez/gui/gui.h>
 #endif
 
+#include <chrono>
+
 namespace eez {
 namespace flow {
-
-static bool isFlowRunning() {
-	return true;
-}
 
 static void replacePage(int16_t pageId, uint32_t animType, uint32_t speed, uint32_t delay) {
 #if EEZ_OPTION_GUI
@@ -65,7 +65,6 @@ static void finishToDebuggerMessage() {
 static void onDebuggerInputAvailable() {
 }
 
-bool (*isFlowRunningHook)() = isFlowRunning;
 void (*replacePageHook)(int16_t pageId, uint32_t animType, uint32_t speed, uint32_t delay) = replacePage;
 void (*showKeyboardHook)(Value label, Value initialText, Value minChars, Value maxChars, bool isPassword, void(*onOk)(char *), void(*onCancel)()) = showKeyboard;
 void (*showKeypadHook)(Value label, Value initialValue, Value min, Value max, Unit unit, void(*onOk)(float), void(*onCancel)()) = showKeypad;
@@ -94,6 +93,14 @@ static const void *getLvglImageByName(const char *name) {
 lv_obj_t *(*getLvglObjectFromIndexHook)(int32_t index) = getLvglObjectFromIndex;
 const void *(*getLvglImageByNameHook)(const char *name) = getLvglImageByName;
 #endif
+
+double getDateNowDefaultImplementation() {
+    using namespace std::chrono;
+    milliseconds ms = duration_cast<milliseconds>(system_clock::now().time_since_epoch());
+    return (double)ms.count();
+}
+
+double (*getDateNowHook)() = getDateNowDefaultImplementation;
 
 } // namespace flow
 } // namespace eez

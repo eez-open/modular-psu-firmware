@@ -77,7 +77,7 @@ void executeLayoutViewWidgetComponent(FlowState *flowState, unsigned componentIn
                     Value value;
                     if (getCallActionValue(layoutViewFlowState, layoutViewComponentIndex, value)) {
                         if (inputActionComponentExecutionState->value != value) {
-                            addToQueue(layoutViewWidgetExecutionState->flowState, layoutViewComponentIndex);
+                            addToQueue(layoutViewWidgetExecutionState->flowState, layoutViewComponentIndex, -1, -1, -1, false);
                             inputActionComponentExecutionState->value = value;
                         }
                     } else {
@@ -88,7 +88,7 @@ void executeLayoutViewWidgetComponent(FlowState *flowState, unsigned componentIn
                 Value value;
                 if (getCallActionValue(layoutViewFlowState, layoutViewComponentIndex, value)) {
                     if (value.getType() != VALUE_TYPE_UNDEFINED) {
-                        addToQueue(layoutViewWidgetExecutionState->flowState, layoutViewComponentIndex);
+                        addToQueue(layoutViewWidgetExecutionState->flowState, layoutViewComponentIndex, -1, -1, -1, false);
                     }
                 } else {
                     return;

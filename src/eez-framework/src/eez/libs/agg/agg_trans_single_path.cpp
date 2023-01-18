@@ -13,6 +13,10 @@
 //          http://www.antigrain.com
 //----------------------------------------------------------------------------
 
+#include <eez/conf-internal.h>
+
+#if EEZ_OPTION_GUI
+
 #include "agg_math.h"
 #include "agg_vertex_sequence.h"
 #include "agg_trans_single_path.h"
@@ -200,3 +204,4 @@ namespace agg
 
 }
 
+#endif // EEZ_OPTION_GUI

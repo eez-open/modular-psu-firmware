@@ -18,6 +18,7 @@
 
 #pragma once
 
+#include <eez/core/os.h>
 #include <eez/core/assets.h>
 #include <eez/core/value.h>
 
@@ -33,6 +34,8 @@ static const int UNDEFINED_VALUE_INDEX = 0;
 static const int NULL_VALUE_INDEX = 1;
 
 struct ComponenentExecutionState {
+    uint32_t lastExecutedTime;
+    ComponenentExecutionState() : lastExecutedTime(millis()) {}
 	virtual ~ComponenentExecutionState() {}
 };
 

@@ -16,6 +16,11 @@
 // Stroke generator
 //
 //----------------------------------------------------------------------------
+
+#include <eez/conf-internal.h>
+
+#if EEZ_OPTION_GUI
+
 #include "agg_vcgen_stroke.h"
 #include "agg_shorten_path.h"
 
@@ -210,3 +215,5 @@ namespace agg
     }
 
 }
+
+#endif // EEZ_OPTION_GUI

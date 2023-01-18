@@ -331,19 +331,27 @@ void drawText(
     }
 
     // draw text
+    uint16_t color;
+
     if (active || blink) {
         if (overrideActiveColor) {
-            display::setColor(*overrideActiveColor, ignoreLuminocity);
+            color = *overrideActiveColor;
         } else {
-            display::setColor(style->activeColor, ignoreLuminocity);
+            color = style->activeColor;
         }
     }  else {
         if (overrideColor) {
-            display::setColor(*overrideColor, ignoreLuminocity);
+            color = *overrideColor;
         } else {
-            display::setColor(style->color, ignoreLuminocity);
+            color = style->color;
         }
     }
+
+    if (color == TRANSPARENT_COLOR_INDEX) {
+        return;
+    }
+
+    display::setColor(color, ignoreLuminocity);
     display::drawStr(text, textLength, x_offset - xScroll, y_offset, x1, y1, x2, y2, font, cursorPosition);
 }
 
@@ -606,7 +614,8 @@ struct MultilineTextRender {
         spaceWidth = spaceGlyph->dx;
 
         // draw text
-        display::setColor(active ? style->activeColor : style->color);
+        uint16_t color = active ? style->activeColor : style->color;
+        display::setColor(color);
 
         x1 += style->paddingLeft;
         x2 -= style->paddingRight;
@@ -623,7 +632,9 @@ struct MultilineTextRender {
         }
         y2 = y1 + textHeight - 1;
 
-        executeStep(RENDER);
+        if (color != TRANSPARENT_COLOR_INDEX) {
+            executeStep(RENDER);
+        }
     }
 };
 

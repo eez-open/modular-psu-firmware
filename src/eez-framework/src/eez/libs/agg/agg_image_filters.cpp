@@ -18,6 +18,10 @@
 //----------------------------------------------------------------------------
 
 
+#include <eez/conf-internal.h>
+
+#if EEZ_OPTION_GUI
+
 #include "agg_image_filters.h"
 
 
@@ -101,3 +105,4 @@ namespace agg
 
 }
 
+#endif // EEZ_OPTION_GUI

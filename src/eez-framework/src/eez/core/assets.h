@@ -147,6 +147,8 @@ struct Settings {
 #define WIDGET_TIMELINE_PROPERTY_WIDTH (1 << 2)
 #define WIDGET_TIMELINE_PROPERTY_HEIGHT (1 << 3)
 #define WIDGET_TIMELINE_PROPERTY_OPACITY (1 << 4)
+#define WIDGET_TIMELINE_PROPERTY_CP1 (1 << 5)
+#define WIDGET_TIMELINE_PROPERTY_CP2 (1 << 6)
 
 #define EASING_FUNC_LINEAR 0
 #define EASING_FUNC_IN_QUAD 1
@@ -190,19 +192,25 @@ struct TimelineKeyframe {
 
 	int16_t x;
 	int16_t y;
+
 	int16_t width;
 	int16_t height;
+
     float opacity;
 
     uint8_t xEasingFunc;
     uint8_t yEasingFunc;
     uint8_t widthEasingFunc;
     uint8_t heightEasingFunc;
-    uint8_t opacityEasingFunc;
 
+    uint8_t opacityEasingFunc;
     uint8_t reserved1;
-    uint8_t reserved2;
-    uint8_t reserved3;
+    uint16_t reserved2;
+
+	int16_t cp1x;
+	int16_t cp1y;
+    int16_t cp2x;
+    int16_t cp2y;
 };
 
 struct Widget {

@@ -223,7 +223,7 @@ void scpiComponentInit() {
 }
 
 void executeScpi() {
-	if (!isFlowRunningHook()) {
+	if (isFlowStopped()) {
 		return;
 	}
 

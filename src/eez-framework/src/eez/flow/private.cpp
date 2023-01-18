@@ -106,11 +106,7 @@ bool isComponentReadyToRun(FlowState *flowState, unsigned componentIndex) {
 
 static bool pingComponent(FlowState *flowState, unsigned componentIndex, int sourceComponentIndex = -1, int sourceOutputIndex = -1, int targetInputIndex = -1) {
 	if (isComponentReadyToRun(flowState, componentIndex)) {
-		if (!addToQueue(flowState, componentIndex, sourceComponentIndex, sourceOutputIndex, targetInputIndex)) {
-			throwError(flowState, componentIndex, "Execution queue is full\n");
-			return false;
-		}
-		return true;
+		return addToQueue(flowState, componentIndex, sourceComponentIndex, sourceOutputIndex, targetInputIndex, false);
 	}
 	return false;
 }
@@ -320,21 +316,24 @@ void resetSequenceInputs(FlowState *flowState) {
 		auto component = flowState->flow->components[flowState->executingComponentIndex];
         flowState->executingComponentIndex = NO_COMPONENT_INDEX;
 
-		for (uint32_t i = 0; i < component->inputs.count; i++) {
-			auto inputIndex = component->inputs[i];
-			if (flowState->flow->componentInputs[inputIndex] & COMPONENT_INPUT_FLAG_IS_SEQ_INPUT) {
-                auto pValue = &flowState->values[inputIndex];
-                if (pValue->getType() != VALUE_TYPE_UNDEFINED) {
-				    *pValue = Value();
-                    onValueChanged(pValue);
+        if (component->type != defs_v3::COMPONENT_TYPE_OUTPUT_ACTION) {
+            for (uint32_t i = 0; i < component->inputs.count; i++) {
+                auto inputIndex = component->inputs[i];
+                if (flowState->flow->componentInputs[inputIndex] & COMPONENT_INPUT_FLAG_IS_SEQ_INPUT) {
+                    auto pValue = &flowState->values[inputIndex];
+                    if (pValue->getType() != VALUE_TYPE_UNDEFINED) {
+                        *pValue = Value();
+                        onValueChanged(pValue);
+                    }
                 }
-			}
-		}
+            }
+        }
     }
 }
 
 void propagateValue(FlowState *flowState, unsigned componentIndex, unsigned outputIndex, const Value &value) {
     if ((int)componentIndex == -1) {
+        // call action flow directly
         auto flowIndex = outputIndex;
         executeCallAction(flowState, -1, flowIndex);
         return;
@@ -386,7 +385,7 @@ void propagateValueThroughSeqout(FlowState *flowState, unsigned componentIndex) 
 
 #if EEZ_OPTION_GUI
 void getValue(uint16_t dataId, DataOperationEnum operation, const WidgetCursor &widgetCursor, Value &value) {
-	if (isFlowRunningHook()) {
+	if (!isFlowStopped()) {
 		FlowState *flowState = widgetCursor.flowState;
 		auto flow = flowState->flow;
 
@@ -398,7 +397,7 @@ void getValue(uint16_t dataId, DataOperationEnum operation, const WidgetCursor &
 }
 
 void setValue(uint16_t dataId, const WidgetCursor &widgetCursor, const Value& value) {
-	if (isFlowRunningHook()) {
+	if (!isFlowStopped()) {
 		FlowState *flowState = widgetCursor.flowState;
 		auto flow = flowState->flow;
 
@@ -493,7 +492,6 @@ void onEvent(FlowState *flowState, FlowEvent flowEvent) {
             auto onEventComponent = (OnEventComponent *)component;
             if (onEventComponent->event == flowEvent) {
                 if (!addToQueue(flowState, componentIndex, -1, -1, -1, false)) {
-                    throwError(flowState, componentIndex, "Execution queue is full\n");
                     return;
                 }
             }
@@ -551,9 +549,8 @@ void throwError(FlowState *flowState, int componentIndex, const char *errorMessa
 			auto catchErrorComponentExecutionState = allocateComponentExecutionState<CatchErrorComponenentExecutionState>(catchErrorFlowState, catchErrorComponentIndex);
 			catchErrorComponentExecutionState->message = Value::makeStringRef(errorMessage, strlen(errorMessage), 0x9473eef2);
 
-			if (!addToQueue(catchErrorFlowState, catchErrorComponentIndex, -1, -1, -1)) {
+			if (!addToQueue(catchErrorFlowState, catchErrorComponentIndex, -1, -1, -1, false)) {
 				catchErrorFlowState->error = true;
-				onFlowError(catchErrorFlowState, catchErrorComponentIndex, "Execution queue is full\n");
 				stopScriptHook();
 			}
 		} else {

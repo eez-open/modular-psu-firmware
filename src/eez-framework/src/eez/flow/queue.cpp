@@ -58,6 +58,7 @@ size_t getQueueSize() {
 
 bool addToQueue(FlowState *flowState, unsigned componentIndex, int sourceComponentIndex, int sourceOutputIndex, int targetInputIndex, bool continuousTask) {
 	if (g_queueIsFull) {
+        throwError(flowState, componentIndex, "Execution queue is full\n");
 		return false;
 	}
 

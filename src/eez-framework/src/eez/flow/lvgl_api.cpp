@@ -208,4 +208,9 @@ extern "C" void assignBooleanProperty(unsigned pageIndex, unsigned componentInde
     eez::flow::assignValue(flowState, componentIndex, dstValue, srcValue);
 }
 
+extern "C" float getTimelinePosition(unsigned pageIndex) {
+    eez::flow::FlowState *flowState = eez::flow::getPageFlowState(eez::g_mainAssets, pageIndex);
+    return flowState->timelinePosition;
+}
+
 #endif // EEZ_FOR_LVGL

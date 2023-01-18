@@ -18,6 +18,9 @@
 //
 //----------------------------------------------------------------------------
 
+#include <eez/conf-internal.h>
+
+#if EEZ_OPTION_GUI
 
 #include <cmath>
 #include "agg_bezier_arc.h"
@@ -256,3 +259,5 @@ namespace agg
 
 
 }
+
+#endif // EEZ_OPTION_GUI

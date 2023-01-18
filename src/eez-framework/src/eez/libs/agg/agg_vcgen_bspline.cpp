@@ -13,6 +13,10 @@
 //          http://www.antigrain.com
 //----------------------------------------------------------------------------
 
+#include <eez/conf-internal.h>
+
+#if EEZ_OPTION_GUI
+
 #include "agg_vcgen_bspline.h"
 
 namespace agg
@@ -192,3 +196,4 @@ namespace agg
 
 }
 
+#endif // EEZ_OPTION_GUI

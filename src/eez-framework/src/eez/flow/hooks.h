@@ -19,6 +19,7 @@
 #pragma once
 
 #include <stdint.h>
+#include <stdlib.h>
 
 #include <eez/core/value.h>
 #include <eez/flow/private.h>
@@ -34,7 +35,6 @@
 namespace eez {
 namespace flow {
 
-extern bool (*isFlowRunningHook)();
 extern void (*replacePageHook)(int16_t pageId, uint32_t animType, uint32_t speed, uint32_t delay);
 extern void (*showKeyboardHook)(Value label, Value initialText, Value minChars, Value maxChars, bool isPassword, void(*onOk)(char *), void(*onCancel)());
 extern void (*showKeypadHook)(Value label, Value initialValue, Value min, Value max, Unit unit, void(*onOk)(float), void(*onCancel)());
@@ -55,6 +55,8 @@ extern void (*onArrayValueFreeHook)(ArrayValue *arrayValue);
 extern lv_obj_t *(*getLvglObjectFromIndexHook)(int32_t index);
 extern const void *(*getLvglImageByNameHook)(const char *name);
 #endif
+
+extern double (*getDateNowHook)();
 
 } // flow
 } // eez

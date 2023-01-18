@@ -22,15 +22,7 @@
 #include <string.h>
 #include <math.h>
 
-#include <chrono>
 #include <string>
-#include <iostream>
-#include <sstream>
-
-#ifndef ARDUINO
-// https://howardhinnant.github.io/date/date.html
-#include <eez/libs/date.h>
-#endif
 
 #include <eez/core/os.h>
 #include <eez/core/value.h>
@@ -39,11 +31,14 @@
 #include <eez/flow/flow.h>
 #include <eez/flow/operations.h>
 #include <eez/flow/flow_defs_v3.h>
+#include <eez/flow/date.h>
 
 #if EEZ_OPTION_GUI
 #include <eez/gui/gui.h>
 using namespace eez::gui;
 #endif
+
+extern "C" int g_eezFlowLvlgMeterTickIndex = 0;
 
 namespace eez {
 namespace flow {
@@ -57,37 +52,37 @@ Value op_add(const Value& a1, const Value& b1) {
         return b1;
     }
 
-	auto a = a1.getValue();
-	auto b = b1.getValue();
+    auto a = a1.getValue();
+    auto b = b1.getValue();
 
-	if (a.isString() || b.isString()) {
-		Value value1 = a.toString(0x84eafaa8);
-		Value value2 = b.toString(0xd273cab6);
-		auto res = Value::concatenateString(value1, value2);
+    if (a.isString() || b.isString()) {
+        Value value1 = a.toString(0x84eafaa8);
+        Value value2 = b.toString(0xd273cab6);
+        auto res = Value::concatenateString(value1, value2);
 
-		char str1[128];
-		res.toText(str1, sizeof(str1));
+        char str1[128];
+        res.toText(str1, sizeof(str1));
 
-		return res;
-	}
+        return res;
+    }
 
-	if (a.isDouble() || b.isDouble()) {
-		return Value(a.toDouble() + b.toDouble(), VALUE_TYPE_DOUBLE);
-	}
+    if (a.isDouble() || b.isDouble()) {
+        return Value(a.toDouble() + b.toDouble(), VALUE_TYPE_DOUBLE);
+    }
 
-	if (a.isFloat() || b.isFloat()) {
-		return Value(a.toFloat() + b.toFloat(), VALUE_TYPE_FLOAT);
-	}
+    if (a.isFloat() || b.isFloat()) {
+        return Value(a.toFloat() + b.toFloat(), VALUE_TYPE_FLOAT);
+    }
 
-	if (a.isInt64() || b.isInt64()) {
-		return Value(a.toInt64() + b.toInt64(), VALUE_TYPE_INT64);
-	}
+    if (a.isInt64() || b.isInt64()) {
+        return Value(a.toInt64() + b.toInt64(), VALUE_TYPE_INT64);
+    }
 
-	if (a.isInt32OrLess() && b.isInt32OrLess()) {
-		return Value((int)(a.int32Value + b.int32Value), VALUE_TYPE_INT32);
-	}
+    if (a.isInt32OrLess() && b.isInt32OrLess()) {
+        return Value((int)(a.int32Value + b.int32Value), VALUE_TYPE_INT32);
+    }
 
-	return Value();
+    return Value();
 }
 
 Value op_sub(const Value& a1, const Value& b1) {
@@ -99,26 +94,26 @@ Value op_sub(const Value& a1, const Value& b1) {
         return b1;
     }
 
-	auto a = a1.getValue();
-	auto b = b1.getValue();
+    auto a = a1.getValue();
+    auto b = b1.getValue();
 
-	if (a.isDouble() || b.isDouble()) {
-		return Value(a.toDouble() - b.toDouble(), VALUE_TYPE_DOUBLE);
-	}
+    if (a.isDouble() || b.isDouble()) {
+        return Value(a.toDouble() - b.toDouble(), VALUE_TYPE_DOUBLE);
+    }
 
-	if (a.isFloat() || b.isFloat()) {
-		return Value(a.toFloat() - b.toFloat(), VALUE_TYPE_FLOAT);
-	}
+    if (a.isFloat() || b.isFloat()) {
+        return Value(a.toFloat() - b.toFloat(), VALUE_TYPE_FLOAT);
+    }
 
-	if (a.isInt64() || b.isInt64()) {
-		return Value(a.toInt64() - b.toInt64(), VALUE_TYPE_INT64);
-	}
+    if (a.isInt64() || b.isInt64()) {
+        return Value(a.toInt64() - b.toInt64(), VALUE_TYPE_INT64);
+    }
 
-	if (a.isInt32OrLess() && b.isInt32OrLess()) {
-		return Value((int)(a.int32Value - b.int32Value), VALUE_TYPE_INT32);
-	}
+    if (a.isInt32OrLess() && b.isInt32OrLess()) {
+        return Value((int)(a.int32Value - b.int32Value), VALUE_TYPE_INT32);
+    }
 
-	return Value();
+    return Value();
 }
 
 Value op_mul(const Value& a1, const Value& b1) {
@@ -130,26 +125,26 @@ Value op_mul(const Value& a1, const Value& b1) {
         return b1;
     }
 
-	auto a = a1.getValue();
-	auto b = b1.getValue();
+    auto a = a1.getValue();
+    auto b = b1.getValue();
 
-	if (a.isDouble() || b.isDouble()) {
-		return Value(a.toDouble() * b.toDouble(), VALUE_TYPE_DOUBLE);
-	}
+    if (a.isDouble() || b.isDouble()) {
+        return Value(a.toDouble() * b.toDouble(), VALUE_TYPE_DOUBLE);
+    }
 
-	if (a.isFloat() || b.isFloat()) {
-		return Value(a.toFloat() * b.toFloat(), VALUE_TYPE_FLOAT);
-	}
+    if (a.isFloat() || b.isFloat()) {
+        return Value(a.toFloat() * b.toFloat(), VALUE_TYPE_FLOAT);
+    }
 
-	if (a.isInt64() || b.isInt64()) {
-		return Value(a.toInt64() * b.toInt64(), VALUE_TYPE_INT64);
-	}
+    if (a.isInt64() || b.isInt64()) {
+        return Value(a.toInt64() * b.toInt64(), VALUE_TYPE_INT64);
+    }
 
-	if (a.isInt32OrLess() && b.isInt32OrLess()) {
-		return Value((int)(a.int32Value * b.int32Value), VALUE_TYPE_INT32);
-	}
+    if (a.isInt32OrLess() && b.isInt32OrLess()) {
+        return Value((int)(a.int32Value * b.int32Value), VALUE_TYPE_INT32);
+    }
 
-	return Value();
+    return Value();
 }
 
 Value op_div(const Value& a1, const Value& b1) {
@@ -161,26 +156,26 @@ Value op_div(const Value& a1, const Value& b1) {
         return b1;
     }
 
-	auto a = a1.getValue();
-	auto b = b1.getValue();
+    auto a = a1.getValue();
+    auto b = b1.getValue();
 
-	if (a.isDouble() || b.isDouble()) {
-		return Value(a.toDouble() / b.toDouble(), VALUE_TYPE_DOUBLE);
-	}
+    if (a.isDouble() || b.isDouble()) {
+        return Value(a.toDouble() / b.toDouble(), VALUE_TYPE_DOUBLE);
+    }
 
-	if (a.isFloat() || b.isFloat()) {
-		return Value(a.toFloat() / b.toFloat(), VALUE_TYPE_FLOAT);
-	}
+    if (a.isFloat() || b.isFloat()) {
+        return Value(a.toFloat() / b.toFloat(), VALUE_TYPE_FLOAT);
+    }
 
-	if (a.isInt64() || b.isInt64()) {
-		return Value(1.0 * a.toInt64() / b.toInt64(), VALUE_TYPE_DOUBLE);
-	}
+    if (a.isInt64() || b.isInt64()) {
+        return Value(1.0 * a.toInt64() / b.toInt64(), VALUE_TYPE_DOUBLE);
+    }
 
-	if (a.isInt32OrLess() && b.isInt32OrLess()) {
-		return Value(1.0 * a.int32Value / b.int32Value, VALUE_TYPE_DOUBLE);
-	}
+    if (a.isInt32OrLess() && b.isInt32OrLess()) {
+        return Value(1.0 * a.int32Value / b.int32Value, VALUE_TYPE_DOUBLE);
+    }
 
-	return Value();
+    return Value();
 }
 
 Value op_mod(const Value& a1, const Value& b1) {
@@ -192,10 +187,10 @@ Value op_mod(const Value& a1, const Value& b1) {
         return b1;
     }
 
-	auto a = a1.getValue();
-	auto b = b1.getValue();
+    auto a = a1.getValue();
+    auto b = b1.getValue();
 
-	return Value(a.toDouble() - floor(a.toDouble() / b.toDouble()) * b.toDouble(), VALUE_TYPE_DOUBLE);
+    return Value(a.toDouble() - floor(a.toDouble() / b.toDouble()) * b.toDouble(), VALUE_TYPE_DOUBLE);
 }
 
 Value op_left_shift(const Value& a1, const Value& b1) {
@@ -207,10 +202,10 @@ Value op_left_shift(const Value& a1, const Value& b1) {
         return b1;
     }
 
-	auto a = a1.getValue();
-	auto b = b1.getValue();
+    auto a = a1.getValue();
+    auto b = b1.getValue();
 
-	return Value((int)(a.toInt32() << b.toInt32()), VALUE_TYPE_INT32);
+    return Value((int)(a.toInt32() << b.toInt32()), VALUE_TYPE_INT32);
 }
 
 Value op_right_shift(const Value& a1, const Value& b1) {
@@ -222,10 +217,10 @@ Value op_right_shift(const Value& a1, const Value& b1) {
         return b1;
     }
 
-	auto a = a1.getValue();
-	auto b = b1.getValue();
+    auto a = a1.getValue();
+    auto b = b1.getValue();
 
-	return Value((int)(a.toInt32() >> b.toInt32()), VALUE_TYPE_INT32);
+    return Value((int)(a.toInt32() >> b.toInt32()), VALUE_TYPE_INT32);
 }
 
 Value op_binary_and(const Value& a1, const Value& b1) {
@@ -237,10 +232,10 @@ Value op_binary_and(const Value& a1, const Value& b1) {
         return b1;
     }
 
-	auto a = a1.getValue();
-	auto b = b1.getValue();
+    auto a = a1.getValue();
+    auto b = b1.getValue();
 
-	return Value((int)(a.toBool() & b.toBool()), VALUE_TYPE_INT32);
+    return Value((int)(a.toBool() & b.toBool()), VALUE_TYPE_INT32);
 }
 
 Value op_binary_or(const Value& a1, const Value& b1) {
@@ -252,10 +247,10 @@ Value op_binary_or(const Value& a1, const Value& b1) {
         return b1;
     }
 
-	auto a = a1.getValue();
-	auto b = b1.getValue();
+    auto a = a1.getValue();
+    auto b = b1.getValue();
 
-	return Value((int)(a.toBool() | b.toBool()), VALUE_TYPE_INT32);
+    return Value((int)(a.toBool() | b.toBool()), VALUE_TYPE_INT32);
 }
 
 Value op_binary_xor(const Value& a1, const Value& b1) {
@@ -267,15 +262,15 @@ Value op_binary_xor(const Value& a1, const Value& b1) {
         return b1;
     }
 
-	auto a = a1.getValue();
-	auto b = b1.getValue();
+    auto a = a1.getValue();
+    auto b = b1.getValue();
 
-	return Value((int)(a.toBool() ^ b.toBool()), VALUE_TYPE_INT32);
+    return Value((int)(a.toBool() ^ b.toBool()), VALUE_TYPE_INT32);
 }
 
 bool is_equal(const Value& a1, const Value& b1) {
-	auto a = a1.getValue();
-	auto b = b1.getValue();
+    auto a = a1.getValue();
+    auto b = b1.getValue();
 
     auto aIsUndefinedOrNull = a.getType() == VALUE_TYPE_UNDEFINED || a.getType() == VALUE_TYPE_NULL;
     auto bIsUndefinedOrNull = b.getType() == VALUE_TYPE_UNDEFINED || b.getType() == VALUE_TYPE_NULL;
@@ -286,35 +281,35 @@ bool is_equal(const Value& a1, const Value& b1) {
         return false;
     }
 
-	if (a.isString() && b.isString()) {
-		const char *aStr = a.getString();
-		const char *bStr = b.getString();
-		if (!aStr && !aStr) {
-			return true;
-		}
-		if (!aStr || !bStr) {
-			return false;
-		}
-		return strcmp(aStr, bStr) == 0;
-	}
+    if (a.isString() && b.isString()) {
+        const char *aStr = a.getString();
+        const char *bStr = b.getString();
+        if (!aStr && !aStr) {
+            return true;
+        }
+        if (!aStr || !bStr) {
+            return false;
+        }
+        return strcmp(aStr, bStr) == 0;
+    }
 
-	return a.toDouble() == b.toDouble();
+    return a.toDouble() == b.toDouble();
 }
 
 bool is_less(const Value& a1, const Value& b1) {
-	auto a = a1.getValue();
-	auto b = b1.getValue();
+    auto a = a1.getValue();
+    auto b = b1.getValue();
 
-	if (a.isString() && b.isString()) {
-		const char *aStr = a.getString();
-		const char *bStr = b.getString();
-		if (!aStr || !bStr) {
-			return false;
-		}
-		return strcmp(aStr, bStr) < 0;
-	}
+    if (a.isString() && b.isString()) {
+        const char *aStr = a.getString();
+        const char *bStr = b.getString();
+        if (!aStr || !bStr) {
+            return false;
+        }
+        return strcmp(aStr, bStr) < 0;
+    }
 
-	return a.toDouble() < b.toDouble();
+    return a.toDouble() < b.toDouble();
 }
 
 Value op_eq(const Value& a1, const Value& b1) {
@@ -326,7 +321,7 @@ Value op_eq(const Value& a1, const Value& b1) {
         return b1;
     }
 
-	return Value(is_equal(a1, b1), VALUE_TYPE_BOOLEAN);
+    return Value(is_equal(a1, b1), VALUE_TYPE_BOOLEAN);
 }
 
 Value op_neq(const Value& a1, const Value& b1) {
@@ -338,7 +333,7 @@ Value op_neq(const Value& a1, const Value& b1) {
         return b1;
     }
 
-	return Value(!is_equal(a1, b1), VALUE_TYPE_BOOLEAN);
+    return Value(!is_equal(a1, b1), VALUE_TYPE_BOOLEAN);
 }
 
 Value op_less(const Value& a1, const Value& b1) {
@@ -350,7 +345,7 @@ Value op_less(const Value& a1, const Value& b1) {
         return b1;
     }
 
-	return Value(is_less(a1, b1), VALUE_TYPE_BOOLEAN);
+    return Value(is_less(a1, b1), VALUE_TYPE_BOOLEAN);
 }
 
 Value op_great(const Value& a1, const Value& b1) {
@@ -362,7 +357,7 @@ Value op_great(const Value& a1, const Value& b1) {
         return b1;
     }
 
-	return Value(!is_less(a1, b1) && !is_equal(a1, b1), VALUE_TYPE_BOOLEAN);
+    return Value(!is_less(a1, b1) && !is_equal(a1, b1), VALUE_TYPE_BOOLEAN);
 }
 
 Value op_less_eq(const Value& a1, const Value& b1) {
@@ -374,7 +369,7 @@ Value op_less_eq(const Value& a1, const Value& b1) {
         return b1;
     }
 
-	return Value(is_less(a1, b1) || is_equal(a1, b1), VALUE_TYPE_BOOLEAN);
+    return Value(is_less(a1, b1) || is_equal(a1, b1), VALUE_TYPE_BOOLEAN);
 }
 
 Value op_great_eq(const Value& a1, const Value& b1) {
@@ -386,178 +381,178 @@ Value op_great_eq(const Value& a1, const Value& b1) {
         return b1;
     }
 
-	return Value(!is_less(a1, b1), VALUE_TYPE_BOOLEAN);
+    return Value(!is_less(a1, b1), VALUE_TYPE_BOOLEAN);
 }
 
 void do_OPERATION_TYPE_ADD(EvalStack &stack) {
-	auto b = stack.pop();
-	auto a = stack.pop();
+    auto b = stack.pop();
+    auto a = stack.pop();
 
-	auto result = op_add(a, b);
+    auto result = op_add(a, b);
 
-	if (result.getType() == VALUE_TYPE_UNDEFINED) {
-		result = Value::makeError();
-	}
+    if (result.getType() == VALUE_TYPE_UNDEFINED) {
+        result = Value::makeError();
+    }
 
-	stack.push(result);
+    stack.push(result);
 }
 
 void do_OPERATION_TYPE_SUB(EvalStack &stack) {
-	auto b = stack.pop();
-	auto a = stack.pop();
+    auto b = stack.pop();
+    auto a = stack.pop();
 
-	auto result = op_sub(a, b);
+    auto result = op_sub(a, b);
 
-	if (result.getType() == VALUE_TYPE_UNDEFINED) {
-		result = Value::makeError();
-	}
+    if (result.getType() == VALUE_TYPE_UNDEFINED) {
+        result = Value::makeError();
+    }
 
-	stack.push(result);
+    stack.push(result);
 }
 
 void do_OPERATION_TYPE_MUL(EvalStack &stack) {
-	auto b = stack.pop();
-	auto a = stack.pop();
+    auto b = stack.pop();
+    auto a = stack.pop();
 
-	auto result = op_mul(a, b);
+    auto result = op_mul(a, b);
 
-	if (result.getType() == VALUE_TYPE_UNDEFINED) {
-		result = Value::makeError();
-	}
+    if (result.getType() == VALUE_TYPE_UNDEFINED) {
+        result = Value::makeError();
+    }
 
-	stack.push(result);
+    stack.push(result);
 }
 
 void do_OPERATION_TYPE_DIV(EvalStack &stack) {
-	auto b = stack.pop();
-	auto a = stack.pop();
+    auto b = stack.pop();
+    auto a = stack.pop();
 
-	auto result = op_div(a, b);
+    auto result = op_div(a, b);
 
-	if (result.getType() == VALUE_TYPE_UNDEFINED) {
-		result = Value::makeError();
-	}
+    if (result.getType() == VALUE_TYPE_UNDEFINED) {
+        result = Value::makeError();
+    }
 
-	stack.push(result);
+    stack.push(result);
 }
 
 void do_OPERATION_TYPE_MOD(EvalStack &stack) {
-	auto b = stack.pop();
-	auto a = stack.pop();
+    auto b = stack.pop();
+    auto a = stack.pop();
 
-	auto result = op_mod(a, b);
+    auto result = op_mod(a, b);
 
-	if (result.getType() == VALUE_TYPE_UNDEFINED) {
-		result = Value::makeError();
-	}
+    if (result.getType() == VALUE_TYPE_UNDEFINED) {
+        result = Value::makeError();
+    }
 
-	stack.push(result);
+    stack.push(result);
 }
 
 void do_OPERATION_TYPE_LEFT_SHIFT(EvalStack &stack) {
-	auto b = stack.pop();
-	auto a = stack.pop();
+    auto b = stack.pop();
+    auto a = stack.pop();
 
-	auto result = op_left_shift(a, b);
+    auto result = op_left_shift(a, b);
 
-	if (result.getType() == VALUE_TYPE_UNDEFINED) {
-		result = Value::makeError();
-	}
+    if (result.getType() == VALUE_TYPE_UNDEFINED) {
+        result = Value::makeError();
+    }
 
-	stack.push(result);
+    stack.push(result);
 }
 
 void do_OPERATION_TYPE_RIGHT_SHIFT(EvalStack &stack) {
-	auto b = stack.pop();
-	auto a = stack.pop();
+    auto b = stack.pop();
+    auto a = stack.pop();
 
-	auto result = op_right_shift(a, b);
+    auto result = op_right_shift(a, b);
 
-	if (result.getType() == VALUE_TYPE_UNDEFINED) {
-		result = Value::makeError();
-	}
+    if (result.getType() == VALUE_TYPE_UNDEFINED) {
+        result = Value::makeError();
+    }
 
-	stack.push(result);
+    stack.push(result);
 }
 
 void do_OPERATION_TYPE_BINARY_AND(EvalStack &stack) {
-	auto b = stack.pop();
-	auto a = stack.pop();
+    auto b = stack.pop();
+    auto a = stack.pop();
 
-	auto result = op_binary_and(a, b);
+    auto result = op_binary_and(a, b);
 
-	if (result.getType() == VALUE_TYPE_UNDEFINED) {
-		result = Value::makeError();
-	}
+    if (result.getType() == VALUE_TYPE_UNDEFINED) {
+        result = Value::makeError();
+    }
 
-	stack.push(result);
+    stack.push(result);
 }
 
 void do_OPERATION_TYPE_BINARY_OR(EvalStack &stack) {
-	auto b = stack.pop();
-	auto a = stack.pop();
+    auto b = stack.pop();
+    auto a = stack.pop();
 
-	auto result = op_binary_or(a, b);
+    auto result = op_binary_or(a, b);
 
-	if (result.getType() == VALUE_TYPE_UNDEFINED) {
-		result = Value::makeError();
-	}
+    if (result.getType() == VALUE_TYPE_UNDEFINED) {
+        result = Value::makeError();
+    }
 
-	stack.push(result);
+    stack.push(result);
 }
 
 void do_OPERATION_TYPE_BINARY_XOR(EvalStack &stack) {
-	auto b = stack.pop();
-	auto a = stack.pop();
+    auto b = stack.pop();
+    auto a = stack.pop();
 
-	auto result = op_binary_xor(a, b);
+    auto result = op_binary_xor(a, b);
 
-	if (result.getType() == VALUE_TYPE_UNDEFINED) {
-		result = Value::makeError();
-	}
+    if (result.getType() == VALUE_TYPE_UNDEFINED) {
+        result = Value::makeError();
+    }
 
-	stack.push(result);
+    stack.push(result);
 }
 
 void do_OPERATION_TYPE_EQUAL(EvalStack &stack) {
-	auto b = stack.pop();
-	auto a = stack.pop();
-	stack.push(op_eq(a, b));
+    auto b = stack.pop();
+    auto a = stack.pop();
+    stack.push(op_eq(a, b));
 }
 
 void do_OPERATION_TYPE_NOT_EQUAL(EvalStack &stack) {
-	auto b = stack.pop();
-	auto a = stack.pop();
-	stack.push(op_neq(a, b));
+    auto b = stack.pop();
+    auto a = stack.pop();
+    stack.push(op_neq(a, b));
 }
 
 void do_OPERATION_TYPE_LESS(EvalStack &stack) {
-	auto b = stack.pop();
-	auto a = stack.pop();
-	stack.push(op_less(a, b));
+    auto b = stack.pop();
+    auto a = stack.pop();
+    stack.push(op_less(a, b));
 }
 
 void do_OPERATION_TYPE_GREATER(EvalStack &stack) {
-	auto b = stack.pop();
-	auto a = stack.pop();
-	stack.push(op_great(a, b));
+    auto b = stack.pop();
+    auto a = stack.pop();
+    stack.push(op_great(a, b));
 }
 
 void do_OPERATION_TYPE_LESS_OR_EQUAL(EvalStack &stack) {
-	auto b = stack.pop();
-	auto a = stack.pop();
-	stack.push(op_less_eq(a, b));
+    auto b = stack.pop();
+    auto a = stack.pop();
+    stack.push(op_less_eq(a, b));
 }
 
 void do_OPERATION_TYPE_GREATER_OR_EQUAL(EvalStack &stack) {
-	auto b = stack.pop();
-	auto a = stack.pop();
-	stack.push(op_great_eq(a, b));
+    auto b = stack.pop();
+    auto a = stack.pop();
+    stack.push(op_great_eq(a, b));
 }
 
 void do_OPERATION_TYPE_LOGICAL_AND(EvalStack &stack) {
-	auto bValue = stack.pop().getValue();
-	auto aValue = stack.pop().getValue();
+    auto bValue = stack.pop().getValue();
+    auto aValue = stack.pop().getValue();
 
     if (aValue.isError()) {
         stack.push(aValue);
@@ -578,8 +573,8 @@ void do_OPERATION_TYPE_LOGICAL_AND(EvalStack &stack) {
 }
 
 void do_OPERATION_TYPE_LOGICAL_OR(EvalStack &stack) {
-	auto bValue = stack.pop().getValue();
-	auto aValue = stack.pop().getValue();
+    auto bValue = stack.pop().getValue();
+    auto aValue = stack.pop().getValue();
 
     if (aValue.isError()) {
         stack.push(aValue);
@@ -600,201 +595,201 @@ void do_OPERATION_TYPE_LOGICAL_OR(EvalStack &stack) {
 }
 
 void do_OPERATION_TYPE_UNARY_PLUS(EvalStack &stack) {
-	auto a = stack.pop().getValue();
+    auto a = stack.pop().getValue();
 
-	if (a.isDouble()) {
-		stack.push(Value(a.getDouble(), VALUE_TYPE_DOUBLE));
-		return;
-	}
-
-	if (a.isFloat()) {
-		stack.push(Value(a.toFloat(), VALUE_TYPE_FLOAT));
-		return;
-	}
-
-	if (a.isInt64()) {
-		stack.push(Value((int64_t)a.getInt64(), VALUE_TYPE_INT64));
-		return;
-	}
-
-	if (a.isInt32()) {
-		stack.push(Value((int)a.getInt32(), VALUE_TYPE_INT32));
-		return;
-	}
-
-	if (a.isInt16()) {
-		stack.push(Value((int16_t)a.getInt16(), VALUE_TYPE_INT16));
+    if (a.isDouble()) {
+        stack.push(Value(a.getDouble(), VALUE_TYPE_DOUBLE));
         return;
-	}
+    }
 
-	if (a.isInt8()) {
-		stack.push(Value((int8_t)a.getInt8(), VALUE_TYPE_INT8));
-		return;
-	}
+    if (a.isFloat()) {
+        stack.push(Value(a.toFloat(), VALUE_TYPE_FLOAT));
+        return;
+    }
 
-	stack.push(Value::makeError());
+    if (a.isInt64()) {
+        stack.push(Value((int64_t)a.getInt64(), VALUE_TYPE_INT64));
+        return;
+    }
+
+    if (a.isInt32()) {
+        stack.push(Value((int)a.getInt32(), VALUE_TYPE_INT32));
+        return;
+    }
+
+    if (a.isInt16()) {
+        stack.push(Value((int16_t)a.getInt16(), VALUE_TYPE_INT16));
+        return;
+    }
+
+    if (a.isInt8()) {
+        stack.push(Value((int8_t)a.getInt8(), VALUE_TYPE_INT8));
+        return;
+    }
+
+    stack.push(Value::makeError());
 }
 
 void do_OPERATION_TYPE_UNARY_MINUS(EvalStack &stack) {
-	auto a = stack.pop().getValue();
+    auto a = stack.pop().getValue();
 
-	if (a.isDouble()) {
-		stack.push(Value(-a.getDouble(), VALUE_TYPE_DOUBLE));
-		return;
-	}
+    if (a.isDouble()) {
+        stack.push(Value(-a.getDouble(), VALUE_TYPE_DOUBLE));
+        return;
+    }
 
-	if (a.isFloat()) {
-		stack.push(Value(-a.toFloat(), VALUE_TYPE_FLOAT));
-		return;
-	}
+    if (a.isFloat()) {
+        stack.push(Value(-a.toFloat(), VALUE_TYPE_FLOAT));
+        return;
+    }
 
-	if (a.isInt64()) {
-		stack.push(Value((int64_t)-a.getInt64(), VALUE_TYPE_INT64));
-		return;
-	}
+    if (a.isInt64()) {
+        stack.push(Value((int64_t)-a.getInt64(), VALUE_TYPE_INT64));
+        return;
+    }
 
-	if (a.isInt32()) {
-		stack.push(Value((int)-a.getInt32(), VALUE_TYPE_INT32));
-		return;
-	}
+    if (a.isInt32()) {
+        stack.push(Value((int)-a.getInt32(), VALUE_TYPE_INT32));
+        return;
+    }
 
-	if (a.isInt16()) {
-		stack.push(Value((int16_t)-a.getInt16(), VALUE_TYPE_INT16));
-		return;
-	}
+    if (a.isInt16()) {
+        stack.push(Value((int16_t)-a.getInt16(), VALUE_TYPE_INT16));
+        return;
+    }
 
-	if (a.isInt8()) {
-		stack.push(Value((int8_t)-a.getInt8(), VALUE_TYPE_INT8));
-		return;
-	}
+    if (a.isInt8()) {
+        stack.push(Value((int8_t)-a.getInt8(), VALUE_TYPE_INT8));
+        return;
+    }
 
-	stack.push(Value::makeError());
+    stack.push(Value::makeError());
 }
 
 void do_OPERATION_TYPE_BINARY_ONE_COMPLEMENT(EvalStack &stack) {
-	auto a = stack.pop().getValue();
+    auto a = stack.pop().getValue();
 
-	if (a.isInt64()) {
-		stack.push(Value(~a.uint64Value, VALUE_TYPE_UINT64));
-		return;
-	}
+    if (a.isInt64()) {
+        stack.push(Value(~a.uint64Value, VALUE_TYPE_UINT64));
+        return;
+    }
 
-	if (a.isInt32()) {
-		stack.push(Value(~a.uint32Value, VALUE_TYPE_UINT32));
-		return;
-	}
+    if (a.isInt32()) {
+        stack.push(Value(~a.uint32Value, VALUE_TYPE_UINT32));
+        return;
+    }
 
-	if (a.isInt16()) {
-		stack.push(Value(~a.uint16Value, VALUE_TYPE_UINT16));
-		return;
-	}
+    if (a.isInt16()) {
+        stack.push(Value(~a.uint16Value, VALUE_TYPE_UINT16));
+        return;
+    }
 
-	if (a.isInt8()) {
-		stack.push(Value(~a.uint8Value, VALUE_TYPE_UINT8));
-		return;
-	}
+    if (a.isInt8()) {
+        stack.push(Value(~a.uint8Value, VALUE_TYPE_UINT8));
+        return;
+    }
 
-	stack.push(Value::makeError());
+    stack.push(Value::makeError());
 }
 
 void do_OPERATION_TYPE_NOT(EvalStack &stack) {
-	auto aValue = stack.pop();
+    auto aValue = stack.pop();
 
     if (aValue.isError()) {
         stack.push(aValue);
         return;
     }
 
-	int err;
-	auto a = aValue.toBool(&err);
-	if (err != 0) {
+    int err;
+    auto a = aValue.toBool(&err);
+    if (err != 0) {
         stack.push(Value::makeError());
-		return;
-	}
+        return;
+    }
 
-	stack.push(Value(!a, VALUE_TYPE_BOOLEAN));
+    stack.push(Value(!a, VALUE_TYPE_BOOLEAN));
 }
 
 void do_OPERATION_TYPE_CONDITIONAL(EvalStack &stack) {
     auto alternate = stack.pop();
-	auto consequent = stack.pop();
-	auto conditionValue = stack.pop();
+    auto consequent = stack.pop();
+    auto conditionValue = stack.pop();
 
     if (conditionValue.isError()) {
         stack.push(conditionValue);
         return;
     }
 
-	int err;
-	auto condition = conditionValue.toBool(&err);
-	if (err != 0) {
+    int err;
+    auto condition = conditionValue.toBool(&err);
+    if (err != 0) {
         stack.push(Value::makeError());
-		return;
-	}
+        return;
+    }
 
-	stack.push(condition ? consequent : alternate);
+    stack.push(condition ? consequent : alternate);
 }
 
 void do_OPERATION_TYPE_SYSTEM_GET_TICK(EvalStack &stack) {
-	stack.push(Value(millis(), VALUE_TYPE_UINT32));
+    stack.push(Value(millis(), VALUE_TYPE_UINT32));
 }
 
 void do_OPERATION_TYPE_FLOW_INDEX(EvalStack &stack) {
-	if (!stack.iterators) {
+    if (!stack.iterators) {
         stack.push(Value::makeError());
-		return;
-	}
-
-	auto a = stack.pop();
-
-	int err;
-	auto iteratorIndex = a.toInt32(&err);
-	if (err != 0) {
-		stack.push(Value::makeError());
         return;
-	}
+    }
 
-	iteratorIndex = iteratorIndex;
-	if (iteratorIndex < 0 || iteratorIndex >= (int)MAX_ITERATORS) {
-		stack.push(Value::makeError());
+    auto a = stack.pop();
+
+    int err;
+    auto iteratorIndex = a.toInt32(&err);
+    if (err != 0) {
+        stack.push(Value::makeError());
         return;
-	}
+    }
 
-	stack.push(stack.iterators[iteratorIndex]);
+    iteratorIndex = iteratorIndex;
+    if (iteratorIndex < 0 || iteratorIndex >= (int)MAX_ITERATORS) {
+        stack.push(Value::makeError());
+        return;
+    }
+
+    stack.push(stack.iterators[iteratorIndex]);
 }
 
 void do_OPERATION_TYPE_FLOW_IS_PAGE_ACTIVE(EvalStack &stack) {
 #if EEZ_OPTION_GUI
-	bool isActive = false;
+    bool isActive = false;
 
-	auto pageIndex = getPageIndex(stack.flowState);
-	if (pageIndex >= 0) {
-		int16_t pageId = (int16_t)(pageIndex + 1);
-		if (stack.flowState->assets == g_externalAssets) {
-			pageId = -pageId;
-		}
+    auto pageIndex = getPageIndex(stack.flowState);
+    if (pageIndex >= 0) {
+        int16_t pageId = (int16_t)(pageIndex + 1);
+        if (stack.flowState->assets == g_externalAssets) {
+            pageId = -pageId;
+        }
 
-		for (int16_t appContextId = 0; ; appContextId++) {
-			auto appContext = getAppContextFromId(appContextId);
-			if (!appContext) {
-				break;
-			}
+        for (int16_t appContextId = 0; ; appContextId++) {
+            auto appContext = getAppContextFromId(appContextId);
+            if (!appContext) {
+                break;
+            }
 
-			if (appContext->isPageOnStack(pageId)) {
-				isActive = true;
-				break;
-			}
-		}
-	}
+            if (appContext->isPageOnStack(pageId)) {
+                isActive = true;
+                break;
+            }
+        }
+    }
 
-	stack.push(Value(isActive, VALUE_TYPE_BOOLEAN));
+    stack.push(Value(isActive, VALUE_TYPE_BOOLEAN));
 #else
     stack.push(Value::makeError());
 #endif // EEZ_OPTION_GUI
 }
 
 void do_OPERATION_TYPE_FLOW_PAGE_TIMELINE_POSITION(EvalStack &stack) {
-	stack.push(Value(stack.flowState->timelinePosition, VALUE_TYPE_FLOAT));
+    stack.push(Value(stack.flowState->timelinePosition, VALUE_TYPE_FLOAT));
 }
 
 void do_OPERATION_TYPE_FLOW_MAKE_ARRAY_VALUE(EvalStack &stack) {
@@ -909,15 +904,12 @@ void do_OPERATION_TYPE_FLOW_PARSE_DOUBLE(EvalStack &stack) {
 }
 
 void do_OPERATION_TYPE_DATE_NOW(EvalStack &stack) {
-    using namespace std::chrono;
-    milliseconds ms = duration_cast<milliseconds>(system_clock::now().time_since_epoch());
-
-    stack.push(Value((double)ms.count(), VALUE_TYPE_DATE));
+    stack.push(Value((double)date::now(), VALUE_TYPE_DATE));
 }
 
 void do_OPERATION_TYPE_DATE_TO_STRING(EvalStack &stack) {
 #ifndef ARDUINO
-	auto a = stack.pop().getValue();
+    auto a = stack.pop().getValue();
     if (a.isError()) {
         stack.push(a);
         return;
@@ -927,16 +919,29 @@ void do_OPERATION_TYPE_DATE_TO_STRING(EvalStack &stack) {
         return;
     }
 
-    using namespace std;
-    using namespace std::chrono;
-    using namespace date;
+    char str[128];
+    date::toString(a.getDouble(), str, sizeof(str));
+    stack.push(Value::makeStringRef(str, -1, 0xbe440ec8));
+#else
+    stack.push(Value::makeError());
+#endif
+}
 
-    auto tp = system_clock::time_point(milliseconds((long long)a.getDouble()));
+void do_OPERATION_TYPE_DATE_TO_LOCALE_STRING(EvalStack &stack) {
+#ifndef ARDUINO
+    auto a = stack.pop().getValue();
+    if (a.isError()) {
+        stack.push(a);
+        return;
+    }
+    if (a.getType() != VALUE_TYPE_DATE) {
+        stack.push(Value::makeError());
+        return;
+    }
 
-    stringstream out;
-    out << tp << endl;
-
-    stack.push(Value::makeStringRef(out.str().c_str(), -1, 0xbe440ec8));
+    char str[128];
+    date::toLocaleString(a.getDouble(), str, sizeof(str));
+    stack.push(Value::makeStringRef(str, -1, 0xbe440ec8));
 #else
     stack.push(Value::makeError());
 #endif
@@ -944,7 +949,7 @@ void do_OPERATION_TYPE_DATE_TO_STRING(EvalStack &stack) {
 
 void do_OPERATION_TYPE_DATE_FROM_STRING(EvalStack &stack) {
 #ifndef ARDUINO
-	auto a = stack.pop().getValue();
+    auto a = stack.pop().getValue();
     if (a.isError()) {
         stack.push(a);
         return;
@@ -952,230 +957,464 @@ void do_OPERATION_TYPE_DATE_FROM_STRING(EvalStack &stack) {
 
     Value dateStrValue = a.toString(0x99cb1a93);
 
-    using namespace std;
-    using namespace std::chrono;
-    using namespace date;
-
-    istringstream in{dateStrValue.getString()};
-
-    system_clock::time_point tp;
-    in >> date::parse("%Y-%m-%d %T", tp);
-
-    milliseconds ms = duration_cast<milliseconds>(tp.time_since_epoch());
-    stack.push(Value((double)ms.count(), VALUE_TYPE_DATE));
+    auto date = (double)date::fromString(dateStrValue.getString());
+    stack.push(Value(date, VALUE_TYPE_DATE));
 #else
     stack.push(Value::makeError());
 #endif
 }
 
+void do_OPERATION_TYPE_DATE_GET_YEAR(EvalStack &stack) {
+    auto a = stack.pop().getValue();
+    if (a.isError()) {
+        stack.push(a);
+        return;
+    }
+    if (a.getType() != VALUE_TYPE_DATE) {
+        stack.push(Value::makeError());
+        return;
+    }
+
+    stack.push(date::getYear(a.getDouble()));
+}
+
+void do_OPERATION_TYPE_DATE_GET_MONTH(EvalStack &stack) {
+    auto a = stack.pop().getValue();
+    if (a.isError()) {
+        stack.push(a);
+        return;
+    }
+    if (a.getType() != VALUE_TYPE_DATE) {
+        stack.push(Value::makeError());
+        return;
+    }
+
+    stack.push(date::getMonth(a.getDouble()));
+}
+
+void do_OPERATION_TYPE_DATE_GET_DAY(EvalStack &stack) {
+    auto a = stack.pop().getValue();
+    if (a.isError()) {
+        stack.push(a);
+        return;
+    }
+    if (a.getType() != VALUE_TYPE_DATE) {
+        stack.push(Value::makeError());
+        return;
+    }
+
+    stack.push(date::getDay(a.getDouble()));
+}
+
+void do_OPERATION_TYPE_DATE_GET_HOURS(EvalStack &stack) {
+    auto a = stack.pop().getValue();
+    if (a.isError()) {
+        stack.push(a);
+        return;
+    }
+    if (a.getType() != VALUE_TYPE_DATE) {
+        stack.push(Value::makeError());
+        return;
+    }
+
+    stack.push(date::getHours(a.getDouble()));
+}
+
+void do_OPERATION_TYPE_DATE_GET_MINUTES(EvalStack &stack) {
+    auto a = stack.pop().getValue();
+    if (a.isError()) {
+        stack.push(a);
+        return;
+    }
+    if (a.getType() != VALUE_TYPE_DATE) {
+        stack.push(Value::makeError());
+        return;
+    }
+
+    stack.push(date::getMinutes(a.getDouble()));
+}
+
+void do_OPERATION_TYPE_DATE_GET_SECONDS(EvalStack &stack) {
+    auto a = stack.pop().getValue();
+    if (a.isError()) {
+        stack.push(a);
+        return;
+    }
+    if (a.getType() != VALUE_TYPE_DATE) {
+        stack.push(Value::makeError());
+        return;
+    }
+
+    stack.push(date::getSeconds(a.getDouble()));
+}
+
+void do_OPERATION_TYPE_DATE_GET_MILLISECONDS(EvalStack &stack) {
+    auto a = stack.pop().getValue();
+    if (a.isError()) {
+        stack.push(a);
+        return;
+    }
+    if (a.getType() != VALUE_TYPE_DATE) {
+        stack.push(Value::makeError());
+        return;
+    }
+
+    stack.push(date::getMilliseconds(a.getDouble()));
+}
+
+void do_OPERATION_TYPE_DATE_MAKE(EvalStack &stack) {
+    int err;
+    Value value;
+
+    value = stack.pop().getValue();
+    if (value.isError()) {
+        stack.push(value);
+        return;
+    }
+    int year = value.toInt32(&err);
+    if (err) {
+        stack.push(Value::makeError());
+        return;
+    }
+
+    value = stack.pop().getValue();
+    if (value.isError()) {
+        stack.push(value);
+        return;
+    }
+    int month = value.toInt32(&err);
+    if (err) {
+        stack.push(Value::makeError());
+        return;
+    }
+
+    value = stack.pop().getValue();
+    if (value.isError()) {
+        stack.push(value);
+        return;
+    }
+    int day = value.toInt32(&err);
+    if (err) {
+        stack.push(Value::makeError());
+        return;
+    }
+
+    value = stack.pop().getValue();
+    if (value.isError()) {
+        stack.push(value);
+        return;
+    }
+    int hours = value.toInt32(&err);
+    if (err) {
+        stack.push(Value::makeError());
+        return;
+    }
+
+    value = stack.pop().getValue();
+    if (value.isError()) {
+        stack.push(value);
+        return;
+    }
+    int minutes = value.toInt32(&err);
+    if (err) {
+        stack.push(Value::makeError());
+        return;
+    }
+
+    value = stack.pop().getValue();
+    if (value.isError()) {
+        stack.push(value);
+        return;
+    }
+    int seconds = value.toInt32(&err);
+    if (err) {
+        stack.push(Value::makeError());
+        return;
+    }
+
+    value = stack.pop().getValue();
+    if (value.isError()) {
+        stack.push(value);
+        return;
+    }
+    int milliseconds = value.toInt32(&err);
+    if (err) {
+        stack.push(Value::makeError());
+        return;
+    }
+
+    auto date = (double)date::makeDate(year, month, day, hours, minutes, seconds, milliseconds);
+    stack.push(Value(date, VALUE_TYPE_DATE));
+}
+
 void do_OPERATION_TYPE_MATH_SIN(EvalStack &stack) {
-	auto a = stack.pop().getValue();
+    auto a = stack.pop().getValue();
     if (a.isError()) {
         stack.push(a);
         return;
     }
 
-	if (a.isDouble()) {
-		stack.push(Value(sin(a.getDouble()), VALUE_TYPE_DOUBLE));
+    if (a.isDouble()) {
+        stack.push(Value(sin(a.getDouble()), VALUE_TYPE_DOUBLE));
         return;
-	}
+    }
 
-	if (a.isFloat()) {
-		stack.push(Value(sinf(a.toFloat()), VALUE_TYPE_FLOAT));
+    if (a.isFloat()) {
+        stack.push(Value(sinf(a.toFloat()), VALUE_TYPE_FLOAT));
         return;
-	}
+    }
 
-	if (a.isInt64()) {
-		stack.push(Value(sin(a.toInt64()), VALUE_TYPE_FLOAT));
-		return;
-	}
+    if (a.isInt64()) {
+        stack.push(Value(sin(a.toInt64()), VALUE_TYPE_FLOAT));
+        return;
+    }
 
-	if (a.isInt32OrLess()) {
-		stack.push(Value(sinf(a.int32Value), VALUE_TYPE_FLOAT));
-		return;
-	}
+    if (a.isInt32OrLess()) {
+        stack.push(Value(sinf(a.int32Value), VALUE_TYPE_FLOAT));
+        return;
+    }
 
-	stack.push(Value::makeError());
+    stack.push(Value::makeError());
 }
 
 void do_OPERATION_TYPE_MATH_COS(EvalStack &stack) {
-	auto a = stack.pop().getValue();
+    auto a = stack.pop().getValue();
     if (a.isError()) {
         stack.push(a);
         return;
     }
 
-	if (a.isDouble()) {
-		stack.push(Value(cos(a.getDouble()), VALUE_TYPE_DOUBLE));
-		return;
-	}
+    if (a.isDouble()) {
+        stack.push(Value(cos(a.getDouble()), VALUE_TYPE_DOUBLE));
+        return;
+    }
 
-	if (a.isFloat()) {
-		stack.push(Value(cosf(a.toFloat()), VALUE_TYPE_FLOAT));
-		return;
-	}
+    if (a.isFloat()) {
+        stack.push(Value(cosf(a.toFloat()), VALUE_TYPE_FLOAT));
+        return;
+    }
 
-	if (a.isInt64()) {
-		stack.push(Value(cos(a.toInt64()), VALUE_TYPE_FLOAT));
-		return;
-	}
+    if (a.isInt64()) {
+        stack.push(Value(cos(a.toInt64()), VALUE_TYPE_FLOAT));
+        return;
+    }
 
-	if (a.isInt32OrLess()) {
-		stack.push(Value(cosf(a.int32Value), VALUE_TYPE_FLOAT));
-		return;
-	}
+    if (a.isInt32OrLess()) {
+        stack.push(Value(cosf(a.int32Value), VALUE_TYPE_FLOAT));
+        return;
+    }
 
-	stack.push(Value::makeError());
+    stack.push(Value::makeError());
+}
+
+void do_OPERATION_TYPE_MATH_POW(EvalStack &stack) {
+    auto baseValue = stack.pop().getValue();
+    if (baseValue.isError()) {
+        stack.push(Value::makeError());
+        return;
+    }
+    if (!baseValue.isInt32OrLess() && !baseValue.isFloat() && !baseValue.isDouble()) {
+        stack.push(Value::makeError());
+        return;
+    }
+
+    auto exponentValue = stack.pop().getValue();
+    if (exponentValue.isError()) {
+        stack.push(Value::makeError());
+        return;
+    }
+    if (!exponentValue.isInt32OrLess() && !exponentValue.isFloat() && !exponentValue.isDouble()) {
+        stack.push(Value::makeError());
+        return;
+    }
+
+    if (baseValue.isFloat() && (exponentValue.isFloat() || exponentValue.isInt32OrLess())) {
+        int err;
+
+        float base = baseValue.toFloat(&err);
+        if (err) {
+            stack.push(Value::makeError());
+            return;
+        }
+
+        float exponent = exponentValue.toFloat(&err);
+        if (err) {
+            stack.push(Value::makeError());
+            return;
+        }
+
+        float result = powf(base, exponent);
+
+        stack.push(Value(result, VALUE_TYPE_FLOAT));
+    } else {
+        int err;
+
+        double base = baseValue.toDouble(&err);
+        if (err) {
+            stack.push(Value::makeError());
+            return;
+        }
+
+        double exponent = exponentValue.toDouble(&err);
+        if (err) {
+            stack.push(Value::makeError());
+            return;
+        }
+
+        double result = pow(base, exponent);
+
+        stack.push(Value(result, VALUE_TYPE_DOUBLE));
+    }
 }
 
 void do_OPERATION_TYPE_MATH_LOG(EvalStack &stack) {
-	auto a = stack.pop().getValue();
+    auto a = stack.pop().getValue();
     if (a.isError()) {
         stack.push(a);
         return;
     }
 
-	if (a.isDouble()) {
-		stack.push(Value(log(a.getDouble()), VALUE_TYPE_DOUBLE));
-		return;
-	}
+    if (a.isDouble()) {
+        stack.push(Value(log(a.getDouble()), VALUE_TYPE_DOUBLE));
+        return;
+    }
 
-	if (a.isFloat()) {
-		stack.push(Value(logf(a.toFloat()), VALUE_TYPE_FLOAT));
-		return;
-	}
+    if (a.isFloat()) {
+        stack.push(Value(logf(a.toFloat()), VALUE_TYPE_FLOAT));
+        return;
+    }
 
-	if (a.isInt64()) {
-		stack.push(Value(log(a.toInt64()), VALUE_TYPE_FLOAT));
-		return;
-	}
+    if (a.isInt64()) {
+        stack.push(Value(log(a.toInt64()), VALUE_TYPE_FLOAT));
+        return;
+    }
 
-	if (a.isInt32OrLess()) {
-		stack.push(Value(logf(a.int32Value), VALUE_TYPE_FLOAT));
-		return;
-	}
+    if (a.isInt32OrLess()) {
+        stack.push(Value(logf(a.int32Value), VALUE_TYPE_FLOAT));
+        return;
+    }
 
-	stack.push(Value::makeError());
+    stack.push(Value::makeError());
 }
 
 void do_OPERATION_TYPE_MATH_LOG10(EvalStack &stack) {
-	auto a = stack.pop().getValue();
+    auto a = stack.pop().getValue();
     if (a.isError()) {
         stack.push(a);
         return;
     }
 
-	if (a.isDouble()) {
-		stack.push(Value(log10(a.getDouble()), VALUE_TYPE_DOUBLE));
-		return;
-	}
+    if (a.isDouble()) {
+        stack.push(Value(log10(a.getDouble()), VALUE_TYPE_DOUBLE));
+        return;
+    }
 
-	if (a.isFloat()) {
-		stack.push(Value(log10f(a.toFloat()), VALUE_TYPE_FLOAT));
-		return;
-	}
+    if (a.isFloat()) {
+        stack.push(Value(log10f(a.toFloat()), VALUE_TYPE_FLOAT));
+        return;
+    }
 
-	if (a.isInt64()) {
-		stack.push(Value(log10(a.toInt64()), VALUE_TYPE_FLOAT));
-		return;
-	}
+    if (a.isInt64()) {
+        stack.push(Value(log10(a.toInt64()), VALUE_TYPE_FLOAT));
+        return;
+    }
 
-	if (a.isInt32OrLess()) {
-		stack.push(Value(log10f(a.int32Value), VALUE_TYPE_FLOAT));
-		return;
-	}
+    if (a.isInt32OrLess()) {
+        stack.push(Value(log10f(a.int32Value), VALUE_TYPE_FLOAT));
+        return;
+    }
 
-	stack.push(Value::makeError());
+    stack.push(Value::makeError());
 }
 
 void do_OPERATION_TYPE_MATH_ABS(EvalStack &stack) {
-	auto a = stack.pop().getValue();
+    auto a = stack.pop().getValue();
     if (a.isError()) {
         stack.push(a);
         return;
     }
 
-	if (a.isDouble()) {
-		stack.push(Value(abs(a.getDouble()), VALUE_TYPE_DOUBLE));
-		return;
-	}
+    if (a.isDouble()) {
+        stack.push(Value(abs(a.getDouble()), VALUE_TYPE_DOUBLE));
+        return;
+    }
 
-	if (a.isFloat()) {
-		stack.push(Value(abs(a.toFloat()), VALUE_TYPE_FLOAT));
-		return;
-	}
+    if (a.isFloat()) {
+        stack.push(Value(abs(a.toFloat()), VALUE_TYPE_FLOAT));
+        return;
+    }
 
-	if (a.isInt64()) {
-		stack.push(Value((int64_t)abs(a.getInt64()), VALUE_TYPE_INT64));
-		return;
-	}
+    if (a.isInt64()) {
+        stack.push(Value((int64_t)abs(a.getInt64()), VALUE_TYPE_INT64));
+        return;
+    }
 
-	if (a.isInt32()) {
-		stack.push(Value((int)abs(a.getInt32()), VALUE_TYPE_INT32));
-		return;
-	}
+    if (a.isInt32()) {
+        stack.push(Value((int)abs(a.getInt32()), VALUE_TYPE_INT32));
+        return;
+    }
 
-	if (a.isInt16()) {
-		stack.push(Value(abs(a.getInt16()), VALUE_TYPE_INT16));
-		return;
-	}
+    if (a.isInt16()) {
+        stack.push(Value(abs(a.getInt16()), VALUE_TYPE_INT16));
+        return;
+    }
 
-	if (a.isInt8()) {
-		stack.push(Value(abs(a.getInt8()), VALUE_TYPE_INT8));
-		return;
-	}
+    if (a.isInt8()) {
+        stack.push(Value(abs(a.getInt8()), VALUE_TYPE_INT8));
+        return;
+    }
 
-	stack.push(Value::makeError());
+    stack.push(Value::makeError());
 }
 
 void do_OPERATION_TYPE_MATH_FLOOR(EvalStack &stack) {
-	auto a = stack.pop().getValue();
+    auto a = stack.pop().getValue();
     if (a.isError()) {
         stack.push(a);
         return;
     }
 
-	if (a.isInt32OrLess()) {
-		stack.push(a);
-		return;
-	}
+    if (a.isInt32OrLess()) {
+        stack.push(a);
+        return;
+    }
 
-	if (a.isDouble()) {
-		stack.push(Value(floor(a.getDouble()), VALUE_TYPE_DOUBLE));
-		return;
-	}
+    if (a.isDouble()) {
+        stack.push(Value(floor(a.getDouble()), VALUE_TYPE_DOUBLE));
+        return;
+    }
 
-	if (a.isFloat()) {
-		stack.push(Value(floorf(a.toFloat()), VALUE_TYPE_FLOAT));
-		return;
-	}
+    if (a.isFloat()) {
+        stack.push(Value(floorf(a.toFloat()), VALUE_TYPE_FLOAT));
+        return;
+    }
 
-	stack.push(Value::makeError());
+    stack.push(Value::makeError());
 }
 
 void do_OPERATION_TYPE_MATH_CEIL(EvalStack &stack) {
-	auto a = stack.pop().getValue();
+    auto a = stack.pop().getValue();
     if (a.isError()) {
         stack.push(a);
         return;
     }
 
-	if (a.isInt32OrLess()) {
-		stack.push(a);
-		return;
-	}
+    if (a.isInt32OrLess()) {
+        stack.push(a);
+        return;
+    }
 
-	if (a.isDouble()) {
-		stack.push(Value(ceil(a.getDouble()), VALUE_TYPE_DOUBLE));
-		return;
-	}
+    if (a.isDouble()) {
+        stack.push(Value(ceil(a.getDouble()), VALUE_TYPE_DOUBLE));
+        return;
+    }
 
-	if (a.isFloat()) {
-		stack.push(Value(ceilf(a.toFloat()), VALUE_TYPE_FLOAT));
-		return;
-	}
+    if (a.isFloat()) {
+        stack.push(Value(ceilf(a.toFloat()), VALUE_TYPE_FLOAT));
+        return;
+    }
 
-	stack.push(Value::makeError());
+    stack.push(Value::makeError());
 }
 
 float roundN(float value, unsigned int numDigits) {
@@ -1190,7 +1429,7 @@ double roundN(double value, unsigned int numDigits) {
 
 void do_OPERATION_TYPE_MATH_ROUND(EvalStack &stack) {
     auto numArgs = stack.pop().getInt();
-	auto a = stack.pop().getValue();
+    auto a = stack.pop().getValue();
     if (a.isError()) {
         stack.push(a);
         return;
@@ -1204,27 +1443,27 @@ void do_OPERATION_TYPE_MATH_ROUND(EvalStack &stack) {
         numDigits = 0;
     }
 
-	if (a.isInt32OrLess()) {
-		stack.push(a);
-		return;
-	}
-
-	if (a.isDouble()) {
-		stack.push(Value(roundN(a.getDouble(), numDigits), VALUE_TYPE_DOUBLE));
-		return;
-	}
-
-	if (a.isFloat()) {
-		stack.push(Value(roundN(a.toFloat(), numDigits), VALUE_TYPE_FLOAT));
-		return;
-	}
-
     if (a.isInt32OrLess()) {
-		stack.push(a);
-		return;
+        stack.push(a);
+        return;
     }
 
-	stack.push(Value::makeError());
+    if (a.isDouble()) {
+        stack.push(Value(roundN(a.getDouble(), numDigits), VALUE_TYPE_DOUBLE));
+        return;
+    }
+
+    if (a.isFloat()) {
+        stack.push(Value(roundN(a.toFloat(), numDigits), VALUE_TYPE_FLOAT));
+        return;
+    }
+
+    if (a.isInt32OrLess()) {
+        stack.push(a);
+        return;
+    }
+
+    stack.push(Value::makeError());
 }
 
 void do_OPERATION_TYPE_MATH_MIN(EvalStack &stack) {
@@ -1244,7 +1483,7 @@ void do_OPERATION_TYPE_MATH_MIN(EvalStack &stack) {
         }
     }
 
-	stack.push(Value(minValue, VALUE_TYPE_DOUBLE));
+    stack.push(Value(minValue, VALUE_TYPE_DOUBLE));
 }
 
 void do_OPERATION_TYPE_MATH_MAX(EvalStack &stack) {
@@ -1264,21 +1503,21 @@ void do_OPERATION_TYPE_MATH_MAX(EvalStack &stack) {
         }
     }
 
-	stack.push(Value(maxValue, VALUE_TYPE_DOUBLE));
+    stack.push(Value(maxValue, VALUE_TYPE_DOUBLE));
 }
 
 void do_OPERATION_TYPE_STRING_LENGTH(EvalStack &stack) {
-	auto a = stack.pop().getValue();
+    auto a = stack.pop().getValue();
     if (a.isError()) {
         stack.push(a);
         return;
     }
 
     const char *aStr = a.getString();
-	if (!aStr) {
+    if (!aStr) {
         stack.push(Value::makeError());
-		return;
-	}
+        return;
+    }
 
     int aStrLen = strlen(aStr);
 
@@ -1356,23 +1595,23 @@ void do_OPERATION_TYPE_STRING_SUBSTRING(EvalStack &stack) {
 }
 
 void do_OPERATION_TYPE_STRING_FIND(EvalStack &stack) {
-	auto a = stack.pop().getValue();
+    auto a = stack.pop().getValue();
     if (a.isError()) {
         stack.push(a);
         return;
     }
-	auto b = stack.pop().getValue();
+    auto b = stack.pop().getValue();
     if (b.isError()) {
         stack.push(b);
         return;
     }
 
-	Value aStr = a.toString(0xf616bf4d);
-	Value bStr = b.toString(0x81229133);
-	if (!aStr.getString() || !bStr.getString()) {
-		stack.push(Value(-1, VALUE_TYPE_INT32));
-		return;
-	}
+    Value aStr = a.toString(0xf616bf4d);
+    Value bStr = b.toString(0x81229133);
+    if (!aStr.getString() || !bStr.getString()) {
+        stack.push(Value(-1, VALUE_TYPE_INT32));
+        return;
+    }
 
     const char *pos = strstr(aStr.getString(), bStr.getString());
     if (pos) {
@@ -1389,7 +1628,7 @@ void do_OPERATION_TYPE_STRING_PAD_START(EvalStack &stack) {
         stack.push(a);
         return;
     }
-	auto b = stack.pop().getValue();
+    auto b = stack.pop().getValue();
     if (b.isError()) {
         stack.push(b);
         return;
@@ -1400,49 +1639,49 @@ void do_OPERATION_TYPE_STRING_PAD_START(EvalStack &stack) {
         return;
     }
 
-	auto str = a.toString(0xcf6aabe6);
-	if (!str.getString()) {
+    auto str = a.toString(0xcf6aabe6);
+    if (!str.getString()) {
         stack.push(Value::makeError());
-		return;
-	}
-	int strLen = strlen(str.getString());
+        return;
+    }
+    int strLen = strlen(str.getString());
 
-	int err;
-	int targetLength = b.toInt32(&err);
-	if (err) {
+    int err;
+    int targetLength = b.toInt32(&err);
+    if (err) {
         stack.push(Value::makeError());
-		return;
-	}
-	if (targetLength < strLen) {
-		targetLength = strLen;
-	}
+        return;
+    }
+    if (targetLength < strLen) {
+        targetLength = strLen;
+    }
 
-	auto padStr = c.toString(0x81353bd7);
-	if (!padStr.getString()) {
+    auto padStr = c.toString(0x81353bd7);
+    if (!padStr.getString()) {
         stack.push(Value::makeError());
-		return;
-	}
-	int padStrLen = strlen(padStr.getString());
+        return;
+    }
+    int padStrLen = strlen(padStr.getString());
 
-	Value resultValue = Value::makeStringRef("", targetLength, 0xf43b14dd);
-	if (resultValue.type == VALUE_TYPE_NULL) {
+    Value resultValue = Value::makeStringRef("", targetLength, 0xf43b14dd);
+    if (resultValue.type == VALUE_TYPE_NULL) {
         stack.push(Value::makeError());
-		return;
-	}
-	char *resultStr = (char *)resultValue.getString();
+        return;
+    }
+    char *resultStr = (char *)resultValue.getString();
 
-	auto n = targetLength - strLen;
-	stringCopy(resultStr + (targetLength - strLen), strLen + 1, str.getString());
+    auto n = targetLength - strLen;
+    stringCopy(resultStr + (targetLength - strLen), strLen + 1, str.getString());
 
-	for (int i = 0; i < n; i++) {
-		resultStr[i] = padStr.getString()[i % padStrLen];
-	}
+    for (int i = 0; i < n; i++) {
+        resultStr[i] = padStr.getString()[i % padStrLen];
+    }
 
-	stack.push(resultValue);
+    stack.push(resultValue);
 }
 
 void do_OPERATION_TYPE_STRING_SPLIT(EvalStack &stack) {
-	auto strValue = stack.pop().getValue();
+    auto strValue = stack.pop().getValue();
     if (strValue.isError()) {
         stack.push(strValue);
         return;
@@ -1454,16 +1693,16 @@ void do_OPERATION_TYPE_STRING_SPLIT(EvalStack &stack) {
     }
 
     auto str = strValue.getString();
-	if (!str) {
+    if (!str) {
         stack.push(Value::makeError());
-		return;
-	}
+        return;
+    }
 
     auto delim = delimValue.getString();
-	if (!delim) {
+    if (!delim) {
         stack.push(Value::makeError());
-		return;
-	}
+        return;
+    }
 
     auto strLen = strlen(str);
 
@@ -1587,7 +1826,7 @@ void do_OPERATION_TYPE_ARRAY_ALLOCATE(EvalStack &stack) {
 }
 
 void do_OPERATION_TYPE_ARRAY_APPEND(EvalStack &stack) {
-	auto arrayValue = stack.pop().getValue();
+    auto arrayValue = stack.pop().getValue();
     if (arrayValue.isError()) {
         stack.push(arrayValue);
         return;
@@ -1617,7 +1856,7 @@ void do_OPERATION_TYPE_ARRAY_APPEND(EvalStack &stack) {
 }
 
 void do_OPERATION_TYPE_ARRAY_INSERT(EvalStack &stack) {
-	auto arrayValue = stack.pop().getValue();
+    auto arrayValue = stack.pop().getValue();
     if (arrayValue.isError()) {
         stack.push(arrayValue);
         return;
@@ -1663,7 +1902,7 @@ void do_OPERATION_TYPE_ARRAY_INSERT(EvalStack &stack) {
 }
 
 void do_OPERATION_TYPE_ARRAY_REMOVE(EvalStack &stack) {
-	auto arrayValue = stack.pop().getValue();
+    auto arrayValue = stack.pop().getValue();
     if (arrayValue.isError()) {
         stack.push(arrayValue);
         return;
@@ -1702,7 +1941,7 @@ void do_OPERATION_TYPE_ARRAY_REMOVE(EvalStack &stack) {
 }
 
 void do_OPERATION_TYPE_ARRAY_CLONE(EvalStack &stack) {
-	auto arrayValue = stack.pop().getValue();
+    auto arrayValue = stack.pop().getValue();
     if (arrayValue.isError()) {
         stack.push(arrayValue);
         return;
@@ -1713,33 +1952,37 @@ void do_OPERATION_TYPE_ARRAY_CLONE(EvalStack &stack) {
     stack.push(resultArray);
 }
 
+void do_OPERATION_TYPE_LVGL_METER_TICK_INDEX(EvalStack &stack) {
+    stack.push(g_eezFlowLvlgMeterTickIndex);
+}
+
 EvalOperation g_evalOperations[] = {
-	do_OPERATION_TYPE_ADD,
-	do_OPERATION_TYPE_SUB,
-	do_OPERATION_TYPE_MUL,
-	do_OPERATION_TYPE_DIV,
-	do_OPERATION_TYPE_MOD,
-	do_OPERATION_TYPE_LEFT_SHIFT,
-	do_OPERATION_TYPE_RIGHT_SHIFT,
-	do_OPERATION_TYPE_BINARY_AND,
-	do_OPERATION_TYPE_BINARY_OR,
-	do_OPERATION_TYPE_BINARY_XOR,
-	do_OPERATION_TYPE_EQUAL,
-	do_OPERATION_TYPE_NOT_EQUAL,
-	do_OPERATION_TYPE_LESS,
-	do_OPERATION_TYPE_GREATER,
-	do_OPERATION_TYPE_LESS_OR_EQUAL,
-	do_OPERATION_TYPE_GREATER_OR_EQUAL,
-	do_OPERATION_TYPE_LOGICAL_AND,
-	do_OPERATION_TYPE_LOGICAL_OR,
-	do_OPERATION_TYPE_UNARY_PLUS,
-	do_OPERATION_TYPE_UNARY_MINUS,
-	do_OPERATION_TYPE_BINARY_ONE_COMPLEMENT,
-	do_OPERATION_TYPE_NOT,
-	do_OPERATION_TYPE_CONDITIONAL,
-	do_OPERATION_TYPE_SYSTEM_GET_TICK,
-	do_OPERATION_TYPE_FLOW_INDEX,
-	do_OPERATION_TYPE_FLOW_IS_PAGE_ACTIVE,
+    do_OPERATION_TYPE_ADD,
+    do_OPERATION_TYPE_SUB,
+    do_OPERATION_TYPE_MUL,
+    do_OPERATION_TYPE_DIV,
+    do_OPERATION_TYPE_MOD,
+    do_OPERATION_TYPE_LEFT_SHIFT,
+    do_OPERATION_TYPE_RIGHT_SHIFT,
+    do_OPERATION_TYPE_BINARY_AND,
+    do_OPERATION_TYPE_BINARY_OR,
+    do_OPERATION_TYPE_BINARY_XOR,
+    do_OPERATION_TYPE_EQUAL,
+    do_OPERATION_TYPE_NOT_EQUAL,
+    do_OPERATION_TYPE_LESS,
+    do_OPERATION_TYPE_GREATER,
+    do_OPERATION_TYPE_LESS_OR_EQUAL,
+    do_OPERATION_TYPE_GREATER_OR_EQUAL,
+    do_OPERATION_TYPE_LOGICAL_AND,
+    do_OPERATION_TYPE_LOGICAL_OR,
+    do_OPERATION_TYPE_UNARY_PLUS,
+    do_OPERATION_TYPE_UNARY_MINUS,
+    do_OPERATION_TYPE_BINARY_ONE_COMPLEMENT,
+    do_OPERATION_TYPE_NOT,
+    do_OPERATION_TYPE_CONDITIONAL,
+    do_OPERATION_TYPE_SYSTEM_GET_TICK,
+    do_OPERATION_TYPE_FLOW_INDEX,
+    do_OPERATION_TYPE_FLOW_IS_PAGE_ACTIVE,
     do_OPERATION_TYPE_FLOW_PAGE_TIMELINE_POSITION,
     do_OPERATION_TYPE_FLOW_MAKE_ARRAY_VALUE,
     do_OPERATION_TYPE_FLOW_MAKE_ARRAY_VALUE,
@@ -1751,28 +1994,39 @@ EvalOperation g_evalOperations[] = {
     do_OPERATION_TYPE_DATE_NOW,
     do_OPERATION_TYPE_DATE_TO_STRING,
     do_OPERATION_TYPE_DATE_FROM_STRING,
-	do_OPERATION_TYPE_MATH_SIN,
-	do_OPERATION_TYPE_MATH_COS,
-	do_OPERATION_TYPE_MATH_LOG,
-	do_OPERATION_TYPE_MATH_LOG10,
-	do_OPERATION_TYPE_MATH_ABS,
-	do_OPERATION_TYPE_MATH_FLOOR,
-	do_OPERATION_TYPE_MATH_CEIL,
-	do_OPERATION_TYPE_MATH_ROUND,
+    do_OPERATION_TYPE_MATH_SIN,
+    do_OPERATION_TYPE_MATH_COS,
+    do_OPERATION_TYPE_MATH_LOG,
+    do_OPERATION_TYPE_MATH_LOG10,
+    do_OPERATION_TYPE_MATH_ABS,
+    do_OPERATION_TYPE_MATH_FLOOR,
+    do_OPERATION_TYPE_MATH_CEIL,
+    do_OPERATION_TYPE_MATH_ROUND,
     do_OPERATION_TYPE_MATH_MIN,
     do_OPERATION_TYPE_MATH_MAX,
     do_OPERATION_TYPE_STRING_LENGTH,
     do_OPERATION_TYPE_STRING_SUBSTRING,
-	do_OPERATION_TYPE_STRING_FIND,
-	do_OPERATION_TYPE_STRING_PAD_START,
-	do_OPERATION_TYPE_STRING_SPLIT,
-	do_OPERATION_TYPE_ARRAY_LENGTH,
-	do_OPERATION_TYPE_ARRAY_SLICE,
+    do_OPERATION_TYPE_STRING_FIND,
+    do_OPERATION_TYPE_STRING_PAD_START,
+    do_OPERATION_TYPE_STRING_SPLIT,
+    do_OPERATION_TYPE_ARRAY_LENGTH,
+    do_OPERATION_TYPE_ARRAY_SLICE,
     do_OPERATION_TYPE_ARRAY_ALLOCATE,
-	do_OPERATION_TYPE_ARRAY_APPEND,
-	do_OPERATION_TYPE_ARRAY_INSERT,
-	do_OPERATION_TYPE_ARRAY_REMOVE,
-	do_OPERATION_TYPE_ARRAY_CLONE
+    do_OPERATION_TYPE_ARRAY_APPEND,
+    do_OPERATION_TYPE_ARRAY_INSERT,
+    do_OPERATION_TYPE_ARRAY_REMOVE,
+    do_OPERATION_TYPE_ARRAY_CLONE,
+    do_OPERATION_TYPE_DATE_TO_LOCALE_STRING,
+    do_OPERATION_TYPE_DATE_GET_YEAR,
+    do_OPERATION_TYPE_DATE_GET_MONTH,
+    do_OPERATION_TYPE_DATE_GET_DAY,
+    do_OPERATION_TYPE_DATE_GET_HOURS,
+    do_OPERATION_TYPE_DATE_GET_MINUTES,
+    do_OPERATION_TYPE_DATE_GET_SECONDS,
+    do_OPERATION_TYPE_DATE_GET_MILLISECONDS,
+    do_OPERATION_TYPE_DATE_MAKE,
+    do_OPERATION_TYPE_MATH_POW,
+    do_OPERATION_TYPE_LVGL_METER_TICK_INDEX,
 };
 
 } // namespace flow

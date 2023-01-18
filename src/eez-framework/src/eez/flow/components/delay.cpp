@@ -53,7 +53,6 @@ void executeDelayComponent(FlowState *flowState, unsigned componentIndex) {
 		}
 
 		if (!addToQueue(flowState, componentIndex, -1, -1, -1, true)) {
-			throwError(flowState, componentIndex, "Execution queue is full\n");
 			return;
 		}
 	} else {
@@ -62,7 +61,6 @@ void executeDelayComponent(FlowState *flowState, unsigned componentIndex) {
 			propagateValueThroughSeqout(flowState, componentIndex);
 		} else {
 			if (!addToQueue(flowState, componentIndex, -1, -1, -1, true)) {
-				throwError(flowState, componentIndex, "Execution queue is full\n");
 				return;
 			}
 		}

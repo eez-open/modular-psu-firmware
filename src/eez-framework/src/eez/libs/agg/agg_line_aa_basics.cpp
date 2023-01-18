@@ -13,6 +13,10 @@
 //          http://www.antigrain.com
 //----------------------------------------------------------------------------
 
+#include <eez/conf-internal.h>
+
+#if EEZ_OPTION_GUI
+
 #include <cmath>
 #include "agg_line_aa_basics.h"
 
@@ -80,3 +84,5 @@ namespace agg
     }
 
 }
+
+#endif // EEZ_OPTION_GUI

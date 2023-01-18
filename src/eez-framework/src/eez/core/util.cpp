@@ -689,86 +689,92 @@ void getBaseFileName(const char *path, char *baseName, unsigned baseNameSize) {
 
 ////////////////////////////////////////////////////////////////////////////////
 
+} // namespace eez
+
+#if defined(M_PI)
 static const float PI_FLOAT = (float)M_PI;
+#else
+static const float PI_FLOAT = (float)3.14159265358979323846;
+#endif
 static const float c1 = 1.70158f;
 static const float c2 = c1 * 1.525f;
 static const float c3 = c1 + 1.0f;
 static const float c4 = (2 * PI_FLOAT) / 3;
 static const float c5 = (2 * PI_FLOAT) / 4.5f;
 
-float linear(float x) {
+extern "C" float eez_linear(float x) {
     return x;
 }
 
-float easeInQuad(float x) {
+extern "C" float eez_easeInQuad(float x) {
     return x * x;
 }
 
-float easeOutQuad(float x) {
+extern "C" float eez_easeOutQuad(float x) {
     return 1 - (1 - x) * (1 - x);
 }
 
-float easeInOutQuad(float x) {
+extern "C" float eez_easeInOutQuad(float x) {
     return x < 0.5f ? 2 * x * x : 1 - powf(-2 * x + 2, 2) / 2;
 }
 
-float easeInCubic(float x) {
+extern "C" float eez_easeInCubic(float x) {
     return x * x * x;
 }
 
-float easeOutCubic(float x) {
+extern "C" float eez_easeOutCubic(float x) {
     return 1 - pow(1 - x, 3);
 }
 
-float easeInOutCubic(float x) {
+extern "C" float eez_easeInOutCubic(float x) {
     return x < 0.5f ? 4 * x * x * x : 1 - powf(-2 * x + 2, 3) / 2;
 }
 
-float easeInQuart(float x) {
+extern "C" float eez_easeInQuart(float x) {
     return x * x * x * x;
 }
 
-float easeOutQuart(float x) {
+extern "C" float eez_easeOutQuart(float x) {
     return 1 - powf(1 - x, 4);
 }
 
-float easeInOutQuart(float x) {
+extern "C" float eez_easeInOutQuart(float x) {
     return x < 0.5 ? 8 * x * x * x * x : 1 - powf(-2 * x + 2, 4) / 2;
 }
 
-float easeInQuint(float x) {
+extern "C" float eez_easeInQuint(float x) {
     return x * x * x * x * x;
 }
 
-float easeOutQuint(float x) {
+extern "C" float eez_easeOutQuint(float x) {
     return 1 - powf(1 - x, 5);
 }
 
-float easeInOutQuint(float x) {
+extern "C" float eez_easeInOutQuint(float x) {
     return x < 0.5f ? 16 * x * x * x * x * x : 1 - powf(-2 * x + 2, 5) / 2;
 }
 
-float easeInSine(float x) {
+extern "C" float eez_easeInSine(float x) {
     return 1 - cosf((x * PI_FLOAT) / 2);
 }
 
-float easeOutSine(float x) {
+extern "C" float eez_easeOutSine(float x) {
     return sinf((x * PI_FLOAT) / 2);
 }
 
-float easeInOutSine(float x) {
+extern "C" float eez_easeInOutSine(float x) {
     return -(cosf(PI_FLOAT * x) - 1) / 2;
 }
 
-float easeInExpo(float x) {
+extern "C" float eez_easeInExpo(float x) {
     return x == 0 ? 0 : powf(2, 10 * x - 10);
 }
 
-float easeOutExpo(float x) {
+extern "C" float eez_easeOutExpo(float x) {
     return x == 1 ? 1 : 1 - powf(2, -10 * x);
 }
 
-float easeInOutExpo(float x) {
+extern "C" float eez_easeInOutExpo(float x) {
     return x == 0
         ? 0
         : x == 1
@@ -778,35 +784,35 @@ float easeInOutExpo(float x) {
         : (2 - powf(2, -20 * x + 10)) / 2;
 }
 
-float easeInCirc(float x) {
+extern "C" float eez_easeInCirc(float x) {
     return 1 - sqrtf(1 - powf(x, 2));
 }
 
-float easeOutCirc(float x) {
+extern "C" float eez_easeOutCirc(float x) {
     return sqrtf(1 - powf(x - 1, 2));
 }
 
-float easeInOutCirc(float x) {
+extern "C" float eez_easeInOutCirc(float x) {
     return x < 0.5
         ? (1 - sqrtf(1 - pow(2 * x, 2))) / 2
         : (sqrtf(1 - powf(-2 * x + 2, 2)) + 1) / 2;
 }
 
-float easeInBack(float x) {
+extern "C" float eez_easeInBack(float x) {
     return c3 * x * x * x - c1 * x * x;
 }
 
-float easeOutBack(float x) {
+extern "C" float eez_easeOutBack(float x) {
     return 1 + c3 * powf(x - 1, 3) + c1 * powf(x - 1, 2);
 }
 
-float easeInOutBack(float x) {
+extern "C" float eez_easeInOutBack(float x) {
     return x < 0.5
         ? (powf(2 * x, 2) * ((c2 + 1) * 2 * x - c2)) / 2
         : (powf(2 * x - 2, 2) * ((c2 + 1) * (x * 2 - 2) + c2) + 2) / 2;
 }
 
-float easeInElastic(float x) {
+extern "C" float eez_easeInElastic(float x) {
     return x == 0
         ? 0
         : x == 1
@@ -814,7 +820,7 @@ float easeInElastic(float x) {
         : -powf(2, 10 * x - 10) * sinf((x * 10 - 10.75f) * c4);
 }
 
-float easeOutElastic(float x) {
+extern "C" float eez_easeOutElastic(float x) {
     return x == 0
         ? 0
         : x == 1
@@ -822,7 +828,7 @@ float easeOutElastic(float x) {
         : powf(2, -10 * x) * sinf((x * 10 - 0.75f) * c4) + 1;
 }
 
-float easeInOutElastic(float x) {
+extern "C" float eez_easeInOutElastic(float x) {
     return x == 0
         ? 0
         : x == 1
@@ -832,13 +838,13 @@ float easeInOutElastic(float x) {
         : (powf(2, -20 * x + 10) * sinf((20 * x - 11.125f) * c5)) / 2 + 1;
 }
 
-float easeOutBounce(float x);
+extern "C" float eez_easeOutBounce(float x);
 
-float easeInBounce(float x) {
-    return 1 -easeOutBounce(1 - x);
+extern "C" float eez_easeInBounce(float x) {
+    return 1 - eez_easeOutBounce(1 - x);
 }
 
-float easeOutBounce(float x) {
+extern "C" float eez_easeOutBounce(float x) {
     static const float n1 = 7.5625f;
     static const float d1 = 2.75f;
 
@@ -856,44 +862,46 @@ float easeOutBounce(float x) {
     }
 };
 
-float easeInOutBounce(float x) {
+extern "C" float eez_easeInOutBounce(float x) {
     return x < 0.5
-        ? (1 - easeOutBounce(1 - 2 * x)) / 2
-        : (1 + easeOutBounce(2 * x - 1)) / 2;
+        ? (1 - eez_easeOutBounce(1 - 2 * x)) / 2
+        : (1 + eez_easeOutBounce(2 * x - 1)) / 2;
 }
 
+namespace eez {
+
 EasingFuncType g_easingFuncs[] = {
-    linear,
-    easeInQuad,
-    easeOutQuad,
-    easeInOutQuad,
-    easeInCubic,
-    easeOutCubic,
-    easeInOutCubic,
-    easeInQuart,
-    easeOutQuart,
-    easeInOutQuart,
-    easeInQuint,
-    easeOutQuint,
-    easeInOutQuint,
-    easeInSine,
-    easeOutSine,
-    easeInOutSine,
-    easeInExpo,
-    easeOutExpo,
-    easeInOutExpo,
-    easeInCirc,
-    easeOutCirc,
-    easeInOutCirc,
-    easeInBack,
-    easeOutBack,
-    easeInOutBack,
-    easeInElastic,
-    easeOutElastic,
-    easeInOutElastic,
-    easeInBounce,
-    easeOutBounce,
-    easeInOutBounce,
+    eez_linear,
+    eez_easeInQuad,
+    eez_easeOutQuad,
+    eez_easeInOutQuad,
+    eez_easeInCubic,
+    eez_easeOutCubic,
+    eez_easeInOutCubic,
+    eez_easeInQuart,
+    eez_easeOutQuart,
+    eez_easeInOutQuart,
+    eez_easeInQuint,
+    eez_easeOutQuint,
+    eez_easeInOutQuint,
+    eez_easeInSine,
+    eez_easeOutSine,
+    eez_easeInOutSine,
+    eez_easeInExpo,
+    eez_easeOutExpo,
+    eez_easeInOutExpo,
+    eez_easeInCirc,
+    eez_easeOutCirc,
+    eez_easeInOutCirc,
+    eez_easeInBack,
+    eez_easeOutBack,
+    eez_easeInOutBack,
+    eez_easeInElastic,
+    eez_easeOutElastic,
+    eez_easeInOutElastic,
+    eez_easeInBounce,
+    eez_easeOutBounce,
+    eez_easeInOutBounce,
 };
 
 } // namespace eez

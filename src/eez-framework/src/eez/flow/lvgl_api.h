@@ -18,6 +18,8 @@
 
 #pragma once
 
+#include <math.h>
+
 #if defined(EEZ_FOR_LVGL)
 
 #include <stdint.h>
@@ -59,6 +61,43 @@ bool evalBooleanProperty(unsigned pageIndex, unsigned componentIndex, unsigned p
 void assignStringProperty(unsigned pageIndex, unsigned componentIndex, unsigned propertyIndex, const char *value, const char *errorMessage);
 void assignIntegerProperty(unsigned pageIndex, unsigned componentIndex, unsigned propertyIndex, int32_t value, const char *errorMessage);
 void assignBooleanProperty(unsigned pageIndex, unsigned componentIndex, unsigned propertyIndex, bool value, const char *errorMessage);
+
+float eez_linear(float x);
+float eez_easeInQuad(float x);
+float eez_easeOutQuad(float x);
+float eez_easeInOutQuad(float x);
+float eez_easeInCubic(float x);
+float eez_easeOutCubic(float x);
+float eez_easeInOutCubic(float x);
+float eez_easeInQuart(float x);
+float eez_easeOutQuart(float x);
+float eez_easeInOutQuart(float x);
+float eez_easeInQuint(float x);
+float eez_easeOutQuint(float x);
+float eez_easeInOutQuint(float x);
+float eez_easeInSine(float x);
+float eez_easeOutSine(float x);
+float eez_easeInOutSine(float x);
+float eez_easeInExpo(float x);
+float eez_easeOutExpo(float x);
+float eez_easeInOutExpo(float x);
+float eez_easeInCirc(float x);
+float eez_easeOutCirc(float x);
+float eez_easeInOutCirc(float x);
+float eez_easeInBack(float x);
+float eez_easeOutBack(float x);
+float eez_easeInOutBack(float x);
+float eez_easeInElastic(float x);
+float eez_easeOutElastic(float x);
+float eez_easeInOutElastic(float x);
+float eez_easeOutBounce(float x);
+float eez_easeInBounce(float x);
+float eez_easeOutBounce(float x);
+float eez_easeInOutBounce(float x);
+
+float getTimelinePosition(unsigned pageIndex);
+
+extern int g_eezFlowLvlgMeterTickIndex;
 
 #ifdef __cplusplus
 }

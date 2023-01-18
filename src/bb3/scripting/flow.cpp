@@ -31,8 +31,6 @@
 namespace eez {
 namespace scripting {
 
-static unsigned g_flowIsRunning;
-
 bool loadFlowScript(int *err) {
 	int localErr = SCPI_RES_OK;
 	if (!err) {
@@ -72,13 +70,12 @@ void startFlowScript() {
     afterScriptCleanup(false);
 
 	flow::start(g_externalAssets);
-	g_flowIsRunning = true;
 
 	psu::gui::g_psuAppContext.dialogOpen(nullptr);
 }
 
 void flowTick() {
-	if (g_flowIsRunning && g_state != STATE_STOPPING) {
+	if (isFlowRunning() && g_state != STATE_STOPPING) {
 		flow::tick();
 	}
 }
@@ -89,7 +86,6 @@ void stopFlowScript() {
 		return;
 	}
 
-	g_flowIsRunning = false;
 	flow::stop();
 }
 
@@ -104,7 +100,7 @@ void executeFlowAction(const WidgetCursor &widgetCursor, int16_t actionId) {
 ////////////////////////////////////////////////////////////////////////////////
 
 bool isFlowRunning() {
-	return g_flowIsRunning;
+	return !flow::isFlowStopped();
 }
 
 void dataOperation(int16_t dataId, DataOperationEnum operation, const gui::WidgetCursor &widgetCursor, Value &value) {

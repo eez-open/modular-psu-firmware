@@ -35,7 +35,10 @@ CallActionComponenentExecutionState::~CallActionComponenentExecutionState() {
 }
 
 void executeCallAction(FlowState *flowState, unsigned componentIndex, int flowIndex) {
+    // if componentIndex == -1 then execute flow at flowIndex without CallAction component
+
 	if (flowIndex >= (int)flowState->flowDefinition->flows.count) {
+        // native action
 		executeActionFunction(flowIndex - flowState->flowDefinition->flows.count);
 		propagateValueThroughSeqout(flowState, componentIndex);
 		return;
@@ -45,11 +48,9 @@ void executeCallAction(FlowState *flowState, unsigned componentIndex, int flowIn
         auto callActionComponenentExecutionState = (CallActionComponenentExecutionState *)flowState->componenentExecutionStates[componentIndex];
         if (callActionComponenentExecutionState) {
             if (canFreeFlowState(callActionComponenentExecutionState->flowState)) {
-                freeFlowState(callActionComponenentExecutionState->flowState);
+                deallocateComponentExecutionState(flowState, componentIndex);
             } else {
-                if (!addToQueue(flowState, componentIndex, -1, -1, -1, true)) {
-			        throwError(flowState, componentIndex, "Execution queue is full\n");
-		        }
+                addToQueue(flowState, componentIndex, -1, -1, -1, true);
                 return;
             }
         }
@@ -58,7 +59,7 @@ void executeCallAction(FlowState *flowState, unsigned componentIndex, int flowIn
 	FlowState *actionFlowState = initActionFlowState(flowIndex, flowState, componentIndex);
 
 	if (canFreeFlowState(actionFlowState)) {
-		freeFlowState(actionFlowState);
+        freeFlowState(actionFlowState);
         if ((int)componentIndex != -1) {
 		    propagateValueThroughSeqout(flowState, componentIndex);
         }

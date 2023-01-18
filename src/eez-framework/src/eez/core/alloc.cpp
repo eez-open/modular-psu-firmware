@@ -102,7 +102,7 @@ void *alloc(size_t size, uint32_t id) {
 		return nullptr;
 	}
 
-	if (EEZ_MUTEX_WAIT(alloc, 0)) {
+	if (EEZ_MUTEX_WAIT(alloc, osWaitForever)) {
 		AllocBlock *firstBlock = (AllocBlock *)g_heap;
 
 		AllocBlock *block = firstBlock;
@@ -150,7 +150,7 @@ void free(void *ptr) {
 		return;
 	}
 
-	if (EEZ_MUTEX_WAIT(alloc, 0)) {
+	if (EEZ_MUTEX_WAIT(alloc, osWaitForever)) {
 		AllocBlock *firstBlock = (AllocBlock *)g_heap;
 
 		AllocBlock *prevBlock = nullptr;
@@ -220,7 +220,7 @@ void dumpAlloc(scpi_t *context) {
 void getAllocInfo(uint32_t &free, uint32_t &alloc) {
 	free = 0;
 	alloc = 0;
-	if (EEZ_MUTEX_WAIT(alloc, 0)) {
+	if (EEZ_MUTEX_WAIT(alloc, osWaitForever)) {
 		AllocBlock *first = (AllocBlock *)g_heap;
 		AllocBlock *block = first;
 		while (block) {

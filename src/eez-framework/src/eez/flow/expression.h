@@ -54,6 +54,9 @@ struct EvalStack {
 	}
 
 	Value pop() {
+        if (sp == 0) {
+            return Value::makeError();
+        }
 		return stack[--sp];
 	}
 

@@ -74,14 +74,11 @@ unsigned start(Assets *assets) {
 }
 
 void tick() {
-	if (!isFlowRunningHook()) {
+	if (isFlowStopped()) {
 		return;
 	}
 
 	uint32_t startTickCount = millis();
-
-    // // remember queue size before the loop
-    // size_t queueSize = getQueueSize();
 
     for (size_t i = 0; ; i++) {
 		FlowState *flowState;
@@ -91,12 +88,6 @@ void tick() {
 			break;
 		}
 
-        // // if continuous task and we are above remembered queue size then stop
-        // // (we don't want to exhaust flow execution because of, for example, animate block)
-        // if (continuousTask && i >= queueSize) {
-        //     break;
-        // }
-
 		if (!continuousTask && !canExecuteStep(flowState, componentIndex)) {
 			break;
 		}
@@ -105,7 +96,19 @@ void tick() {
 
         flowState->executingComponentIndex = componentIndex;
 
-		executeComponent(flowState, componentIndex);
+        if (continuousTask) {
+            auto componentExecutionState = (ComponenentExecutionState *)flowState->componenentExecutionStates[componentIndex];
+            if (!componentExecutionState) {
+                executeComponent(flowState, componentIndex);
+            } else if (componentExecutionState->lastExecutedTime + FLOW_TICK_MAX_DURATION_MS <= startTickCount) {
+                componentExecutionState->lastExecutedTime = startTickCount;
+                executeComponent(flowState, componentIndex);
+            } else {
+                addToQueue(flowState, componentIndex, -1, -1, -1, true);
+            }
+        } else {
+		    executeComponent(flowState, componentIndex);
+        }
 
         if (isFlowStopped()) {
             break;
@@ -157,7 +160,7 @@ FlowState *getPageFlowState(Assets *assets, int16_t pageIndex, const WidgetCurso
 		return nullptr;
 	}
 
-	if (!isFlowRunningHook()) {
+	if (isFlowStopped()) {
 		return nullptr;
 	}
 
@@ -197,7 +200,7 @@ FlowState *getPageFlowState(Assets *assets, int16_t pageIndex) {
 		return nullptr;
 	}
 
-	if (!isFlowRunningHook()) {
+	if (isFlowStopped()) {
 		return nullptr;
 	}
 
@@ -236,7 +239,7 @@ void setGlobalVariable(Assets *assets, uint32_t globalVariableIndex, const Value
 
 #if EEZ_OPTION_GUI
 void executeFlowAction(const WidgetCursor &widgetCursor, int16_t actionId, void *param) {
-	if (!isFlowRunningHook()) {
+	if (isFlowStopped()) {
 		return;
 	}
 
@@ -291,7 +294,7 @@ void executeFlowAction(const WidgetCursor &widgetCursor, int16_t actionId, void 
 }
 
 void dataOperation(int16_t dataId, DataOperationEnum operation, const WidgetCursor &widgetCursor, Value &value) {
-	if (!isFlowRunningHook()) {
+	if (isFlowStopped()) {
 		return;
 	}
 
@@ -444,6 +447,8 @@ void dataOperation(int16_t dataId, DataOperationEnum operation, const WidgetCurs
             } else {
                 value = 0;
             }
+        } else if (operation == DATA_OPERATION_GET_TEXT_REFRESH_RATE) {
+            getValue(flowDataId, operation, widgetCursor, value);
         }
 	} else {
 		// TODO this shouldn't happen

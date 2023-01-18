@@ -30,6 +30,18 @@
 #include "pico/stdlib.h"
 #endif
 
+#if defined(EEZ_PLATFORM_RASPBERRY)
+#include <circle/timer.h>
+#endif
+
+#if defined(EEZ_FOR_LVGL)
+#ifdef LV_LVGL_H_INCLUDE_SIMPLE
+#include "lvgl.h"
+#else
+#include "lvgl/lvgl.h"
+#endif
+#endif
+
 #include <eez/core/os.h>
 
 namespace eez {
@@ -37,19 +49,20 @@ namespace eez {
 uint32_t millis() {
 #if defined(EEZ_PLATFORM_STM32)
 	return HAL_GetTick();
-#endif
-
-#if defined(EEZ_PLATFORM_SIMULATOR) || defined(__EMSCRIPTEN__)
+#elif defined(EEZ_PLATFORM_SIMULATOR) || defined(__EMSCRIPTEN__)
 	return osKernelGetTickCount();
-#endif
-
-#if defined(EEZ_PLATFORM_ESP32)
+#elif defined(EEZ_PLATFORM_ESP32)
 	return (unsigned long) (esp_timer_get_time() / 1000ULL);
-#endif
-
-#if defined(EEZ_PLATFORM_PICO)
+#elif defined(EEZ_PLATFORM_PICO)
     auto abs_time = get_absolute_time();
     return to_ms_since_boot(abs_time);
+#elif defined(EEZ_PLATFORM_RASPBERRY)
+    unsigned nStartTicks = CTimer::Get()->GetClockTicks();
+    return nStartTicks / 1000;
+#elif defined(EEZ_FOR_LVGL)
+    return lv_tick_get();
+#else
+    #error "Missing millis implementation";
 #endif
 }
 

@@ -50,7 +50,6 @@ void executeWatchVariableComponent(FlowState *flowState, unsigned componentIndex
         propagateValue(flowState, componentIndex, 1, value);
 
 		if (!addToQueue(flowState, componentIndex, -1, -1, -1, true)) {
-			throwError(flowState, componentIndex, "Execution queue is full\n");
 			return;
 		}
 	} else {
@@ -63,7 +62,6 @@ void executeWatchVariableComponent(FlowState *flowState, unsigned componentIndex
             deallocateComponentExecutionState(flowState, componentIndex);
         } else {
             if (!addToQueue(flowState, componentIndex, -1, -1, -1, true)) {
-                throwError(flowState, componentIndex, "Execution queue is full\n");
                 return;
             }
         }

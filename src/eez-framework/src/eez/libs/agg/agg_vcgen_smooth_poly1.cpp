@@ -17,6 +17,10 @@
 //
 //----------------------------------------------------------------------------
 
+#include <eez/conf-internal.h>
+
+#if EEZ_OPTION_GUI
+
 #include "agg_vcgen_smooth_poly1.h"
 
 namespace agg
@@ -223,3 +227,4 @@ namespace agg
 
 }
 
+#endif // EEZ_OPTION_GUI

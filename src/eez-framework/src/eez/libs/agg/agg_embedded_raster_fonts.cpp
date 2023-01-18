@@ -13,6 +13,10 @@
 //          http://www.antigrain.com
 //----------------------------------------------------------------------------
 
+#include <eez/conf-internal.h>
+
+#if EEZ_OPTION_GUI
+
 #include "agg_embedded_raster_fonts.h"
 
 namespace agg
@@ -10424,3 +10428,4 @@ namespace agg
 
 }
 
+#endif // EEZ_OPTION_GUI

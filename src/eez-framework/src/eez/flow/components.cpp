@@ -142,8 +142,7 @@ void executeComponent(FlowState *flowState, unsigned componentIndex) {
         }
 #endif // __EMSCRIPTEN__
         return;
-    } else
-    if (component->type >= defs_v3::COMPONENT_TYPE_START_ACTION) {
+    } else if (component->type >= defs_v3::COMPONENT_TYPE_START_ACTION) {
 		auto executeComponentFunction = g_executeComponentFunctions[component->type - defs_v3::COMPONENT_TYPE_START_ACTION];
 		if (executeComponentFunction != nullptr) {
 			executeComponentFunction(flowState, componentIndex);

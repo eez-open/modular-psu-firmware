@@ -22,6 +22,14 @@
 
 #include <eez/gui/gui.h>
 
+#ifndef RADIO_BUTTON_ON_ICON
+#define RADIO_BUTTON_ON_ICON (char)142
+#endif
+
+#ifndef RADIO_BUTTON_OFF_ICON
+#define RADIO_BUTTON_OFF_ICON (char)141
+#endif
+
 namespace eez {
 namespace gui {
 
@@ -666,7 +674,7 @@ void SelectFromEnumPage::updateInternalPage() {
             text, -1,
             xItem, yItem, itemWidth, itemHeight,
             isDisabled(i) ? disabledItemStyle : itemStyle,
-            i == activeItemIndex
+            i == activeItemIndex || (!showRadioButtonIcon && currentValue == getValue(i))
         );
     }
 
@@ -722,9 +730,9 @@ void SelectFromEnumPage::getItemPosition(int itemIndex, int &xItem, int &yItem) 
 void SelectFromEnumPage::getItemLabel(int itemIndex, char *text, int count) {
     if (showRadioButtonIcon) {
         if (getValue(itemIndex) == currentValue) {
-            text[0] = (char)142;
+            text[0] = (char)RADIO_BUTTON_ON_ICON;
         } else {
-            text[0] = (char)141;
+            text[0] = (char)RADIO_BUTTON_OFF_ICON;
         }
 
         text[1] = ' ';

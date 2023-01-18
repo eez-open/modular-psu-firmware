@@ -13,6 +13,10 @@
 //          http://www.antigrain.com
 //----------------------------------------------------------------------------
 
+#include <eez/conf-internal.h>
+
+#if EEZ_OPTION_GUI
+
 #include "agg_vpgen_clip_polygon.h"
 #include "agg_clip_liang_barsky.h"
 
@@ -131,3 +135,5 @@ namespace agg
 
 
 }
+
+#endif // EEZ_OPTION_GUI

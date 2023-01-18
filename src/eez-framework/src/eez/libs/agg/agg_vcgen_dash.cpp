@@ -17,6 +17,10 @@
 //
 //----------------------------------------------------------------------------
 
+#include <eez/conf-internal.h>
+
+#if EEZ_OPTION_GUI
+
 #include <cmath>
 #include "agg_vcgen_dash.h"
 #include "agg_shorten_path.h"
@@ -233,3 +237,4 @@ namespace agg
 
 }
 
+#endif // EEZ_OPTION_GUI

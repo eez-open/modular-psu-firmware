@@ -13,6 +13,10 @@
 //          http://www.antigrain.com
 //----------------------------------------------------------------------------
 
+#include <eez/conf-internal.h>
+
+#if EEZ_OPTION_GUI
+
 #include "agg_renderer_outline_aa.h"
 
 namespace agg
@@ -114,3 +118,4 @@ namespace agg
 
 }
 
+#endif // EEZ_OPTION_GUI

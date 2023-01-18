@@ -46,6 +46,8 @@ bool getCallActionValue(FlowState *flowState, unsigned componentIndex, Value &va
     if (component->type == defs_v3::COMPONENT_TYPE_INPUT_ACTION) {
         auto inputActionComponent = (InputActionComponent *)component;
         callActionComponentInputIndex += inputActionComponent->inputIndex;
+    } else {
+        callActionComponentInputIndex -= 1;
     }
 
     if (callActionComponentInputIndex >= callActionComponent->inputs.count) {

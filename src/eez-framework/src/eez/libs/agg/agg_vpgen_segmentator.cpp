@@ -13,6 +13,10 @@
 //          http://www.antigrain.com
 //----------------------------------------------------------------------------
 
+#include <eez/conf-internal.h>
+
+#if EEZ_OPTION_GUI
+
 #include <cmath>
 #include "agg_vpgen_segmentator.h"
 
@@ -65,3 +69,4 @@ namespace agg
 
 }
 
+#endif // EEZ_OPTION_GUI

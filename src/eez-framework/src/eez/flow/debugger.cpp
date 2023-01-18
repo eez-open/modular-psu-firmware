@@ -325,11 +325,11 @@ void writeValue(const Value &value) {
 
 	switch (value.getType()) {
 	case VALUE_TYPE_UNDEFINED:
-		stringCopy(tempStr, sizeof(tempStr) - 1, "undefined\n");
+		stringCopy(tempStr, sizeof(tempStr) - 1, "undefined");
 		break;
 
 	case VALUE_TYPE_NULL:
-		stringCopy(tempStr, sizeof(tempStr) - 1, "null\n");
+		stringCopy(tempStr, sizeof(tempStr) - 1, "null");
 		break;
 
 	case VALUE_TYPE_BOOLEAN:

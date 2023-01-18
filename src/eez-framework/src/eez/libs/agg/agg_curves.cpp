@@ -13,6 +13,10 @@
 //          http://www.antigrain.com
 //----------------------------------------------------------------------------
 
+#include <eez/conf-internal.h>
+
+#if EEZ_OPTION_GUI
+
 #include <cmath>
 #include "agg_curves.h"
 #include "agg_math.h"
@@ -611,3 +615,4 @@ namespace agg
 
 }
 
+#endif // EEZ_OPTION_GUI

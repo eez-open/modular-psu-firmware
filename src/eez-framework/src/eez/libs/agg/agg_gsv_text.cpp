@@ -16,6 +16,11 @@
 // Class gsv_text
 //
 //----------------------------------------------------------------------------
+
+#include <eez/conf-internal.h>
+
+#if EEZ_OPTION_GUI
+
 #include <cstring>
 #include <cstdio>
 #include "agg_gsv_text.h"
@@ -675,3 +680,5 @@ namespace agg
 
 
 }
+
+#endif // EEZ_OPTION_GUI

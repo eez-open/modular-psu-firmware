@@ -113,10 +113,27 @@ bool evalExpression(FlowState *flowState, int componentIndex, const uint8_t *ins
 
 	evalExpression(flowState, instructions, numInstructionBytes, errorMessage);
     if (g_stack.sp == 1) {
-        result = g_stack.pop().getValue();
-        if (!result.isError()) {
-            return true;
+#if EEZ_OPTION_GUI
+        if (operation == DATA_OPERATION_GET_TEXT_REFRESH_RATE) {
+            result = g_stack.pop();
+            if (!result.isError()) {
+                if (result.getType() == VALUE_TYPE_NATIVE_VARIABLE) {
+                    auto nativeVariableId = result.getInt();
+                    result = Value(getTextRefreshRate(g_widgetCursor, nativeVariableId), VALUE_TYPE_UINT32);
+                } else {
+                    result = 0;
+                }
+                return true;
+            }
+        } else {
+#endif
+            result = g_stack.pop().getValue();
+            if (!result.isError()) {
+                return true;
+            }
+#if EEZ_OPTION_GUI
         }
+#endif
     }
 
     throwError(flowState, componentIndex, errorMessage, *g_stack.errorMessage ? g_stack.errorMessage : nullptr);
