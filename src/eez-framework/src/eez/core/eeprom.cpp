@@ -175,7 +175,7 @@ bool read(uint8_t *buffer, uint16_t bufferSize, uint16_t address) {
 #else
     File file;
     if (!file.open(EEPROM_FILE_PATH, FILE_READ)) {
-        return false;
+        return true;
     }
     file.seek(address);
     size_t readBytes = file.read(buffer, bufferSize);
