@@ -339,8 +339,8 @@
         {
           "objID": "8b4a7b9c-1c6a-4905-a39b-6603e624b796",
           "type": "WatchVariableActionComponent",
-          "left": -897,
-          "top": -186,
+          "left": -1125,
+          "top": -177,
           "width": 209,
           "height": 68,
           "customInputs": [],
@@ -350,8 +350,8 @@
         {
           "objID": "d3cc2e37-e1cc-4ff6-bb42-eb47678e2b73",
           "type": "IsTrueActionComponent",
-          "left": -642,
-          "top": -185,
+          "left": -870,
+          "top": -176,
           "width": 87,
           "height": 73,
           "customInputs": [
@@ -811,12 +811,13 @@
         {
           "objID": "3607e696-dfc3-4d94-84fe-dc829f55d8d2",
           "type": "SCPIActionComponent",
-          "left": -513,
-          "top": -177,
-          "width": 195,
+          "left": -654,
+          "top": -175,
+          "width": 244,
           "height": 55,
           "customInputs": [],
           "customOutputs": [],
+          "catchError": true,
           "instrument": "instrument",
           "scpi": "fw_ver = SYSTem:CPU:FIRMware?"
         },
@@ -1138,6 +1139,13 @@
           "source": "2bc8860d-d3a2-4f85-de28-b0d79dd834f3",
           "output": "done",
           "target": "e3d18178-62d8-44c5-bf68-05173b38836d",
+          "input": "@seqin"
+        },
+        {
+          "objID": "9acf5370-b4ce-4c43-81cd-5f713ff3ac3b",
+          "source": "3607e696-dfc3-4d94-84fe-dc829f55d8d2",
+          "output": "@error",
+          "target": "3607e696-dfc3-4d94-84fe-dc829f55d8d2",
           "input": "@seqin"
         }
       ],
