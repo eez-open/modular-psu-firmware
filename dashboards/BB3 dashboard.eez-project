@@ -40,10 +40,10 @@
         "persistent": false
       },
       {
-        "objID": "fceb818b-c665-4c62-c9fe-638d0329ebdd",
-        "name": "number_input",
-        "type": "struct:NumberInput",
-        "defaultValue": "{\n  is_open: false\n}",
+        "objID": "152bb4bf-3c4d-4f40-a007-afa549aaa88c",
+        "name": "fw_ver",
+        "type": "string",
+        "defaultValue": "\"\"",
         "persistent": false
       },
       {
@@ -51,6 +51,27 @@
         "name": "loaded",
         "type": "boolean",
         "defaultValue": "false",
+        "persistent": false
+      },
+      {
+        "objID": "56ee2cf2-3780-48c3-be8c-f9c5c78eb00e",
+        "name": "error_message",
+        "type": "string",
+        "defaultValue": "\"\"",
+        "persistent": false
+      },
+      {
+        "objID": "4844af1a-5993-4138-bf7e-ba6e42a9235e",
+        "name": "error_time",
+        "type": "date",
+        "defaultValue": "0",
+        "persistent": false
+      },
+      {
+        "objID": "fceb818b-c665-4c62-c9fe-638d0329ebdd",
+        "name": "number_input",
+        "type": "struct:NumberInput",
+        "defaultValue": "{\n  is_open: false\n}",
         "persistent": false
       }
     ],
@@ -78,6 +99,71 @@
             "objID": "bbb98180-b63e-43b6-b48b-a8106aac1715",
             "name": "ch_idx",
             "type": "integer"
+          },
+          {
+            "objID": "6bb476cd-8d21-42cc-dc0f-249ec5233183",
+            "name": "ch",
+            "type": "string"
+          },
+          {
+            "objID": "fd203775-4c01-4663-82a2-56080cc2b311",
+            "name": "oe",
+            "type": "boolean"
+          },
+          {
+            "objID": "00473383-9490-46f4-e48a-c65cbb86c4cb",
+            "name": "mode",
+            "type": "string"
+          },
+          {
+            "objID": "503eba05-0373-436e-a447-cd803fd70476",
+            "name": "initialized",
+            "type": "boolean"
+          },
+          {
+            "objID": "8fff4e95-50e7-4408-9c27-d6001d0b73c9",
+            "name": "u_min",
+            "type": "float"
+          },
+          {
+            "objID": "5ec33d8a-0314-496d-e701-c2d981da4770",
+            "name": "u_max",
+            "type": "float"
+          },
+          {
+            "objID": "f30efce9-7988-4311-966c-2568ac8a7e77",
+            "name": "u_set",
+            "type": "float"
+          },
+          {
+            "objID": "e58ad484-0c41-4168-f912-752dfa74a50f",
+            "name": "u_mon",
+            "type": "float"
+          },
+          {
+            "objID": "b68bdd20-1978-4d5d-b005-d957b249763d",
+            "name": "i_min",
+            "type": "float"
+          },
+          {
+            "objID": "6c3db1ac-27c5-46c4-b8b4-d3c785b903e1",
+            "name": "i_max",
+            "type": "float"
+          },
+          {
+            "objID": "da37147d-0ffc-4cb7-d451-d798cf4ef32e",
+            "name": "i_set",
+            "type": "float"
+          },
+          {
+            "objID": "418a908f-adf5-47c8-8502-0a103d6afb3a",
+            "name": "i_mon",
+            "type": "float"
+          },
+          {
+            "objID": "39e868aa-4225-4d0a-abc4-78e82a785752",
+            "name": "p_mon",
+            "type": "float"
           }
         ]
       },
@@ -130,7 +216,1083 @@
     ],
     "enums": []
   },
-  "actions": [],
+  "actions": [
+    {
+      "objID": "b48a5a5e-f429-44c4-aa95-91e81a24572a",
+      "components": [
+        {
+          "objID": "24150806-de97-4a16-a08a-1303afa1879b",
+          "type": "StartActionComponent",
+          "left": -473,
+          "top": -139,
+          "width": 87,
+          "height": 25,
+          "customInputs": [],
+          "customOutputs": []
+        },
+        {
+          "objID": "3ca37eb4-3d7d-41aa-b808-bdf1ece1ca7c",
+          "type": "SCPIActionComponent",
+          "left": -317,
+          "top": -139,
+          "width": 244,
+          "height": 55,
+          "customInputs": [],
+          "customOutputs": [],
+          "catchError": true,
+          "instrument": "instrument",
+          "scpi": "fw_ver = SYSTem:CPU:FIRMware?"
+        },
+        {
+          "objID": "46a0a80a-43b2-4e3b-ff76-28c5a1f92369",
+          "type": "SetVariableActionComponent",
+          "left": -25,
+          "top": -139,
+          "width": 110,
+          "height": 56,
+          "customInputs": [],
+          "customOutputs": [],
+          "entries": [
+            {
+              "objID": "d030177c-0888-4299-fb32-5db8e4296b4a",
+              "variable": "ch_idx",
+              "value": "1"
+            }
+          ]
+        },
+        {
+          "objID": "5c8e41a4-1f96-426d-fd7a-4c660f42b33a",
+          "type": "LoopActionComponent",
+          "left": 151,
+          "top": -141,
+          "width": 205,
+          "height": 73,
+          "customInputs": [],
+          "customOutputs": [],
+          "variable": "i",
+          "from": "1",
+          "to": "3",
+          "step": "1",
+          "version": 1
+        },
+        {
+          "objID": "efaa8a26-a5ef-4597-c5bb-89ca26ae3f89",
+          "type": "SCPIActionComponent",
+          "left": 428,
+          "top": -141,
+          "width": 250,
+          "height": 73,
+          "customInputs": [],
+          "customOutputs": [
+            {
+              "objID": "215938ba-332c-4484-e7ed-b42ec49dfc9f",
+              "name": "model",
+              "type": "string"
+            }
+          ],
+          "catchError": true,
+          "instrument": "instrument",
+          "scpi": "model = SYSTem:SLOT:MODel? {i}"
+        },
+        {
+          "objID": "744f029c-2c99-4445-bc6d-3a01d79e7705",
+          "type": "SetVariableActionComponent",
+          "left": 742,
+          "top": -141,
+          "width": 254,
+          "height": 76,
+          "customInputs": [
+            {
+              "objID": "15512903-14ce-4a7c-c46c-01b7ae1d521e",
+              "name": "model",
+              "type": "string"
+            }
+          ],
+          "customOutputs": [],
+          "entries": [
+            {
+              "objID": "30a54c6b-71b3-4ee9-fa1f-9c372df70743",
+              "variable": "slots[i-1].model",
+              "value": "model"
+            },
+            {
+              "objID": "921f65a1-646c-4ce5-be03-8cde11df51aa",
+              "variable": "slots[i-1].ch_idx",
+              "value": "ch_idx"
+            }
+          ]
+        },
+        {
+          "objID": "73aa99d0-a5fb-4e40-a053-fd4f65958896",
+          "type": "SwitchActionComponent",
+          "left": 1037,
+          "top": -176,
+          "width": 447,
+          "height": 93,
+          "customInputs": [],
+          "customOutputs": [],
+          "tests": [
+            {
+              "objID": "fcf245a6-ca4f-477c-b8ba-e445c6097669",
+              "condition": "slots[i-1].model == \"DCP405\"",
+              "outputName": "DCP"
+            },
+            {
+              "objID": "9d05541f-afe4-4540-96d6-e689a324ecf2",
+              "condition": "slots[i-1].model == \"DCM220\" || slots[i-1].model == \"DCM224\"",
+              "outputName": "DCM"
+            },
+            {
+              "objID": "fc959c0a-80a3-4b51-ae59-3caab1061e6f",
+              "condition": "true",
+              "outputName": "Other"
+            }
+          ]
+        },
+        {
+          "objID": "06432ca1-ca06-458a-bdc1-17d36ddb5c17",
+          "type": "SCPIActionComponent",
+          "left": 1579,
+          "top": -176,
+          "width": 343,
+          "height": 73,
+          "customInputs": [],
+          "customOutputs": [
+            {
+              "objID": "5e3de5bc-5a9d-4694-d8bd-b0524e6c22c2",
+              "name": "label",
+              "type": "string"
+            }
+          ],
+          "catchError": true,
+          "instrument": "instrument",
+          "scpi": "label = SYSTem:CHANnel:LABel? {\"CH\" + ch_idx}"
+        },
+        {
+          "objID": "633dbad1-75ea-4bae-83a8-989538096ba0",
+          "type": "SetVariableActionComponent",
+          "left": 2011,
+          "top": -176,
+          "width": 283,
+          "height": 96,
+          "customInputs": [
+            {
+              "objID": "1ed248cf-218b-4f96-fa02-f6424e058e51",
+              "name": "label",
+              "type": "string"
+            }
+          ],
+          "customOutputs": [],
+          "entries": [
+            {
+              "objID": "ce52e103-0642-4c04-99ca-4563502d4519",
+              "variable": "slots[i-1].label",
+              "value": "label"
+            },
+            {
+              "objID": "afa4d228-c889-4314-c070-a99d6efa3f56",
+              "variable": "slots[i-1].ch_idx",
+              "value": "ch_idx"
+            },
+            {
+              "objID": "3293b6eb-a114-49e4-a49f-cb20d4996d15",
+              "variable": "slots[i-1].ch",
+              "value": "\"(@\" + i + \"01)\""
+            }
+          ]
+        },
+        {
+          "objID": "fe1b7145-1a52-46e5-8d1b-6bd859a76334",
+          "type": "SCPIActionComponent",
+          "left": 2532,
+          "top": -176,
+          "width": 330,
+          "height": 94,
+          "customInputs": [],
+          "customOutputs": [],
+          "catchError": true,
+          "instrument": "instrument",
+          "scpi": "{slots[i-1].u_min} = sour{ch_idx}:volt? MIN\n{slots[i-1].u_max} = sour{ch_idx}:volt? MAX\n{slots[i-1].i_min} = sour{ch_idx}:curr? MIN\n{slots[i-1].i_max} = sour{ch_idx}:curr? MAX\n"
+        },
+        {
+          "objID": "a5040d2f-b62d-4f34-b980-3177f760891d",
+          "type": "SetVariableActionComponent",
+          "left": 2909,
+          "top": -176,
+          "width": 165,
+          "height": 56,
+          "customInputs": [],
+          "customOutputs": [],
+          "entries": [
+            {
+              "objID": "bd342398-b194-4b70-efed-491d8b7b3423",
+              "variable": "ch_idx",
+              "value": "ch_idx + 1"
+            }
+          ]
+        },
+        {
+          "objID": "af1315b0-c631-4d4b-ae43-7880c69c2008",
+          "type": "DelayActionComponent",
+          "left": 2909,
+          "top": -101,
+          "width": 87,
+          "height": 55,
+          "customInputs": [],
+          "customOutputs": [],
+          "milliseconds": "10"
+        },
+        {
+          "objID": "6f7d2ab5-4b0b-4db5-8a22-137e59b760f9",
+          "type": "SCPIActionComponent",
+          "left": 1580,
+          "top": -43,
+          "width": 386,
+          "height": 92,
+          "customInputs": [],
+          "customOutputs": [
+            {
+              "objID": "822d39f1-9c1a-42b9-c56b-897410289ae2",
+              "name": "label",
+              "type": "string"
+            },
+            {
+              "objID": "91ca5ea5-9a9d-4d0e-91b6-bd3fce82e1e1",
+              "name": "label2",
+              "type": "string"
+            }
+          ],
+          "catchError": true,
+          "instrument": "instrument",
+          "scpi": "label = SYSTem:CHANnel:LABel? {\"CH\" + ch_idx}\nlabel2 = SYSTem:CHANnel:LABel? {\"CH\" + (ch_idx + 1)}"
+        },
+        {
+          "objID": "130765cf-3a52-44d9-b4ab-aa278bbc2ae7",
+          "type": "SetVariableActionComponent",
+          "left": 2012,
+          "top": -43,
+          "width": 253,
+          "height": 96,
+          "customInputs": [
+            {
+              "objID": "fce5461d-40ee-45ff-c8a4-f46f6997df3b",
+              "name": "label",
+              "type": "string"
+            },
+            {
+              "objID": "3b4bf5fe-b128-49eb-8c48-2f149cb9c883",
+              "name": "label2",
+              "type": "string"
+            }
+          ],
+          "customOutputs": [],
+          "entries": [
+            {
+              "objID": "4816188c-f878-46b3-d062-e191207ba72b",
+              "variable": "slots[i-1].label",
+              "value": "label"
+            },
+            {
+              "objID": "36289077-0641-419a-9ae5-3b8529ad30a2",
+              "variable": "slots[i-1].label2",
+              "value": "label2"
+            },
+            {
+              "objID": "b8a57579-f6ac-4aa5-f0b2-96997c79199c",
+              "variable": "slots[i-1].ch_idx",
+              "value": "-1"
+            }
+          ]
+        },
+        {
+          "objID": "0e038d79-6efc-48bb-910c-5d8d8861775e",
+          "type": "SetVariableActionComponent",
+          "left": 2295,
+          "top": -43,
+          "width": 165,
+          "height": 56,
+          "customInputs": [],
+          "customOutputs": [],
+          "entries": [
+            {
+              "objID": "cacfd981-554e-4738-f5e4-20d4cee6931f",
+              "variable": "ch_idx",
+              "value": "ch_idx + 2"
+            }
+          ]
+        },
+        {
+          "objID": "9eaa92b7-d995-4706-b44a-0a83be234d85",
+          "type": "SCPIActionComponent",
+          "left": 1580,
+          "top": 131,
+          "width": 250,
+          "height": 73,
+          "customInputs": [],
+          "customOutputs": [
+            {
+              "objID": "8347c797-f57b-4379-a6b3-44c7dae7b31c",
+              "name": "label",
+              "type": "string"
+            }
+          ],
+          "catchError": true,
+          "instrument": "instrument",
+          "scpi": "label = SYSTem:SLOT:LABel? {i}"
+        },
+        {
+          "objID": "306441dd-3fa2-4b5a-8021-211e4f0a87ad",
+          "type": "SetVariableActionComponent",
+          "left": 2012,
+          "top": 131,
+          "width": 234,
+          "height": 76,
+          "customInputs": [
+            {
+              "objID": "f174f552-c499-4f2d-c3c4-8cea189e1319",
+              "name": "label",
+              "type": "string"
+            }
+          ],
+          "customOutputs": [],
+          "entries": [
+            {
+              "objID": "f254afb7-74e2-470d-cc3a-71378f00f865",
+              "variable": "slots[i-1].label",
+              "value": "label"
+            },
+            {
+              "objID": "12ef1ff3-a507-4582-8a94-eee33b7cd3b2",
+              "variable": "slots[i-1].ch_idx",
+              "value": "-1"
+            }
+          ]
+        },
+        {
+          "objID": "d2fa48b8-4a85-4e24-fa37-479ecdbf7953",
+          "type": "SetVariableActionComponent",
+          "left": 1194,
+          "top": 175,
+          "width": 128,
+          "height": 56,
+          "customInputs": [],
+          "customOutputs": [],
+          "entries": [
+            {
+              "objID": "bef1dc66-8f3c-4e84-8c71-c7c1e2a690be",
+              "variable": "loaded",
+              "value": "true"
+            }
+          ]
+        },
+        {
+          "objID": "b6a04791-263a-442a-cff5-d946875b1ff6",
+          "type": "EndActionComponent",
+          "left": 1375,
+          "top": 175,
+          "width": 87,
+          "height": 25,
+          "customInputs": [],
+          "customOutputs": []
+        }
+      ],
+      "connectionLines": [
+        {
+          "objID": "82a7850b-1a8a-46ec-af7e-e5227c7673a9",
+          "source": "5c8e41a4-1f96-426d-fd7a-4c660f42b33a",
+          "output": "@seqout",
+          "target": "efaa8a26-a5ef-4597-c5bb-89ca26ae3f89",
+          "input": "@seqin"
+        },
+        {
+          "objID": "3d07450b-4b21-4453-9e7e-e9c016205f41",
+          "source": "744f029c-2c99-4445-bc6d-3a01d79e7705",
+          "output": "@seqout",
+          "target": "73aa99d0-a5fb-4e40-a053-fd4f65958896",
+          "input": "@seqin"
+        },
+        {
+          "objID": "83bfb028-4c30-4c56-b762-a4faeb0c6599",
+          "source": "efaa8a26-a5ef-4597-c5bb-89ca26ae3f89",
+          "output": "model",
+          "target": "744f029c-2c99-4445-bc6d-3a01d79e7705",
+          "input": "model"
+        },
+        {
+          "objID": "0ddbf7f7-b172-4ea6-8040-61c11cc86b30",
+          "source": "73aa99d0-a5fb-4e40-a053-fd4f65958896",
+          "output": "DCP",
+          "target": "06432ca1-ca06-458a-bdc1-17d36ddb5c17",
+          "input": "@seqin"
+        },
+        {
+          "objID": "3c19835f-8b8b-4e63-8af5-bdc5398e89bb",
+          "source": "73aa99d0-a5fb-4e40-a053-fd4f65958896",
+          "output": "DCM",
+          "target": "6f7d2ab5-4b0b-4db5-8a22-137e59b760f9",
+          "input": "@seqin"
+        },
+        {
+          "objID": "823b6d82-001a-421e-8683-198c555c474a",
+          "source": "a5040d2f-b62d-4f34-b980-3177f760891d",
+          "output": "@seqout",
+          "target": "5c8e41a4-1f96-426d-fd7a-4c660f42b33a",
+          "input": "next"
+        },
+        {
+          "objID": "6836a517-8d40-4adc-b8dd-53defa2ee8fe",
+          "source": "46a0a80a-43b2-4e3b-ff76-28c5a1f92369",
+          "output": "@seqout",
+          "target": "5c8e41a4-1f96-426d-fd7a-4c660f42b33a",
+          "input": "start"
+        },
+        {
+          "objID": "a5a01e1e-6a1c-4a68-f73e-4d17139604c7",
+          "source": "efaa8a26-a5ef-4597-c5bb-89ca26ae3f89",
+          "output": "@seqout",
+          "target": "744f029c-2c99-4445-bc6d-3a01d79e7705",
+          "input": "@seqin"
+        },
+        {
+          "objID": "3bcd6d09-bb15-46d3-89a7-e350a19f6174",
+          "source": "73aa99d0-a5fb-4e40-a053-fd4f65958896",
+          "output": "Other",
+          "target": "9eaa92b7-d995-4706-b44a-0a83be234d85",
+          "input": "@seqin"
+        },
+        {
+          "objID": "d394613e-db6d-4758-f295-1c398cfc4926",
+          "source": "06432ca1-ca06-458a-bdc1-17d36ddb5c17",
+          "output": "@seqout",
+          "target": "633dbad1-75ea-4bae-83a8-989538096ba0",
+          "input": "@seqin"
+        },
+        {
+          "objID": "baa5cc51-4cc6-4c20-fd6a-18d7540f761f",
+          "source": "633dbad1-75ea-4bae-83a8-989538096ba0",
+          "output": "@seqout",
+          "target": "fe1b7145-1a52-46e5-8d1b-6bd859a76334",
+          "input": "@seqin"
+        },
+        {
+          "objID": "4623578b-8b66-4841-ffad-48083f907157",
+          "source": "06432ca1-ca06-458a-bdc1-17d36ddb5c17",
+          "output": "label",
+          "target": "633dbad1-75ea-4bae-83a8-989538096ba0",
+          "input": "label"
+        },
+        {
+          "objID": "9aa86039-8fa3-4219-e1c0-cd205a19465c",
+          "source": "6f7d2ab5-4b0b-4db5-8a22-137e59b760f9",
+          "output": "label",
+          "target": "130765cf-3a52-44d9-b4ab-aa278bbc2ae7",
+          "input": "label"
+        },
+        {
+          "objID": "a76cb334-9ac6-4428-903e-ec1b036a5cfc",
+          "source": "6f7d2ab5-4b0b-4db5-8a22-137e59b760f9",
+          "output": "label2",
+          "target": "130765cf-3a52-44d9-b4ab-aa278bbc2ae7",
+          "input": "label2"
+        },
+        {
+          "objID": "949a587b-1c6e-43b0-f0ef-e817e4142ab8",
+          "source": "6f7d2ab5-4b0b-4db5-8a22-137e59b760f9",
+          "output": "@seqout",
+          "target": "130765cf-3a52-44d9-b4ab-aa278bbc2ae7",
+          "input": "@seqin"
+        },
+        {
+          "objID": "f1432424-603f-483f-e160-9080e3991b4f",
+          "source": "130765cf-3a52-44d9-b4ab-aa278bbc2ae7",
+          "output": "@seqout",
+          "target": "0e038d79-6efc-48bb-910c-5d8d8861775e",
+          "input": "@seqin"
+        },
+        {
+          "objID": "0704b9b1-0c29-45b4-ea4c-e6af82b02f9c",
+          "source": "9eaa92b7-d995-4706-b44a-0a83be234d85",
+          "output": "@seqout",
+          "target": "306441dd-3fa2-4b5a-8021-211e4f0a87ad",
+          "input": "@seqin"
+        },
+        {
+          "objID": "dea7ec8b-a757-4175-b010-98b6030a29da",
+          "source": "9eaa92b7-d995-4706-b44a-0a83be234d85",
+          "output": "label",
+          "target": "306441dd-3fa2-4b5a-8021-211e4f0a87ad",
+          "input": "label"
+        },
+        {
+          "objID": "e05a2a20-3d84-47b8-f02d-0c1891e12106",
+          "source": "0e038d79-6efc-48bb-910c-5d8d8861775e",
+          "output": "@seqout",
+          "target": "5c8e41a4-1f96-426d-fd7a-4c660f42b33a",
+          "input": "next"
+        },
+        {
+          "objID": "27085227-1297-4b92-cd40-da9594c7e36d",
+          "source": "306441dd-3fa2-4b5a-8021-211e4f0a87ad",
+          "output": "@seqout",
+          "target": "5c8e41a4-1f96-426d-fd7a-4c660f42b33a",
+          "input": "next"
+        },
+        {
+          "objID": "b5cf60f2-1060-46b6-ac91-e6c3658b8723",
+          "source": "3ca37eb4-3d7d-41aa-b808-bdf1ece1ca7c",
+          "output": "@seqout",
+          "target": "46a0a80a-43b2-4e3b-ff76-28c5a1f92369",
+          "input": "@seqin"
+        },
+        {
+          "objID": "97ae43cd-ad64-4e93-d992-61c0fe83ef1d",
+          "source": "5c8e41a4-1f96-426d-fd7a-4c660f42b33a",
+          "output": "done",
+          "target": "d2fa48b8-4a85-4e24-fa37-479ecdbf7953",
+          "input": "@seqin"
+        },
+        {
+          "objID": "b8707b43-fbf2-4114-9c32-d0d7ebeb067f",
+          "source": "3ca37eb4-3d7d-41aa-b808-bdf1ece1ca7c",
+          "output": "@error",
+          "target": "3ca37eb4-3d7d-41aa-b808-bdf1ece1ca7c",
+          "input": "@seqin"
+        },
+        {
+          "objID": "f7911ca0-58e5-4b19-90d1-36301f136ef9",
+          "source": "efaa8a26-a5ef-4597-c5bb-89ca26ae3f89",
+          "output": "@error",
+          "target": "5c8e41a4-1f96-426d-fd7a-4c660f42b33a",
+          "input": "start"
+        },
+        {
+          "objID": "16c52186-f5da-4de2-83a0-fee5843e786b",
+          "source": "06432ca1-ca06-458a-bdc1-17d36ddb5c17",
+          "output": "@error",
+          "target": "633dbad1-75ea-4bae-83a8-989538096ba0",
+          "input": "label"
+        },
+        {
+          "objID": "5392a511-f732-4f8b-c59d-6896e486b285",
+          "source": "6f7d2ab5-4b0b-4db5-8a22-137e59b760f9",
+          "output": "@error",
+          "target": "130765cf-3a52-44d9-b4ab-aa278bbc2ae7",
+          "input": "label"
+        },
+        {
+          "objID": "ab69918e-267d-48d7-a86f-59f5f9564f8d",
+          "source": "6f7d2ab5-4b0b-4db5-8a22-137e59b760f9",
+          "output": "@error",
+          "target": "130765cf-3a52-44d9-b4ab-aa278bbc2ae7",
+          "input": "label2"
+        },
+        {
+          "objID": "b9b99a40-8e8f-4d62-ea39-98c0191092d7",
+          "source": "9eaa92b7-d995-4706-b44a-0a83be234d85",
+          "output": "@error",
+          "target": "306441dd-3fa2-4b5a-8021-211e4f0a87ad",
+          "input": "label"
+        },
+        {
+          "objID": "774eecde-8a61-4680-c0a8-b8fd68e16b20",
+          "source": "9eaa92b7-d995-4706-b44a-0a83be234d85",
+          "output": "@error",
+          "target": "306441dd-3fa2-4b5a-8021-211e4f0a87ad",
+          "input": "@seqin"
+        },
+        {
+          "objID": "ba227a5a-5d4c-439b-bc91-304d55b1d6d0",
+          "source": "6f7d2ab5-4b0b-4db5-8a22-137e59b760f9",
+          "output": "@error",
+          "target": "130765cf-3a52-44d9-b4ab-aa278bbc2ae7",
+          "input": "@seqin"
+        },
+        {
+          "objID": "8d14e39b-22bd-40e8-b603-84589af581dc",
+          "source": "06432ca1-ca06-458a-bdc1-17d36ddb5c17",
+          "output": "@error",
+          "target": "633dbad1-75ea-4bae-83a8-989538096ba0",
+          "input": "@seqin"
+        },
+        {
+          "objID": "1376d8e2-de99-457e-92a4-e2361ee6a2f3",
+          "source": "24150806-de97-4a16-a08a-1303afa1879b",
+          "output": "@seqout",
+          "target": "3ca37eb4-3d7d-41aa-b808-bdf1ece1ca7c",
+          "input": "@seqin"
+        },
+        {
+          "objID": "f4d009fc-e274-442c-93c9-a6b36ce82e93",
+          "source": "d2fa48b8-4a85-4e24-fa37-479ecdbf7953",
+          "output": "@seqout",
+          "target": "b6a04791-263a-442a-cff5-d946875b1ff6",
+          "input": "@seqin"
+        },
+        {
+          "objID": "ddb72e9d-9e60-4b51-aa6e-99d77c5ed1d2",
+          "source": "fe1b7145-1a52-46e5-8d1b-6bd859a76334",
+          "output": "@seqout",
+          "target": "a5040d2f-b62d-4f34-b980-3177f760891d",
+          "input": "@seqin"
+        },
+        {
+          "objID": "9a0bfcd8-a7d5-42a2-b9bc-04ad6d5c7876",
+          "source": "fe1b7145-1a52-46e5-8d1b-6bd859a76334",
+          "output": "@error",
+          "target": "af1315b0-c631-4d4b-ae43-7880c69c2008",
+          "input": "@seqin"
+        },
+        {
+          "objID": "cdc442b5-8eca-4656-cf47-ab7dda92fbd5",
+          "source": "af1315b0-c631-4d4b-ae43-7880c69c2008",
+          "output": "@seqout",
+          "target": "fe1b7145-1a52-46e5-8d1b-6bd859a76334",
+          "input": "@seqin"
+        }
+      ],
+      "localVariables": [
+        {
+          "objID": "7ee8b5ba-7fb8-46d4-ccdb-3f5cc55eebdf",
+          "name": "i",
+          "type": "integer",
+          "defaultValue": "0",
+          "persistent": false
+        },
+        {
+          "objID": "127c7bf4-b805-4115-d180-518519513e34",
+          "name": "ch_idx",
+          "type": "integer",
+          "defaultValue": "1",
+          "persistent": false
+        }
+      ],
+      "name": "setup",
+      "implementationType": "flow"
+    },
+    {
+      "objID": "3646cc5d-7b2d-466f-9a00-fb116d501531",
+      "components": [
+        {
+          "objID": "75302e9c-ec40-4663-c413-d093e8d98285",
+          "type": "StartActionComponent",
+          "left": -261,
+          "top": -15,
+          "width": 87,
+          "height": 25,
+          "customInputs": [],
+          "customOutputs": []
+        },
+        {
+          "objID": "ab4e68ff-c880-45d5-e4fe-7c6ea782580e",
+          "type": "CallActionActionComponent",
+          "left": -115,
+          "top": -15,
+          "width": 118,
+          "height": 25,
+          "customInputs": [],
+          "customOutputs": [],
+          "action": "read_power_ch"
+        },
+        {
+          "objID": "3256e9c9-9fb3-456e-f9e2-6be57a6345cd",
+          "type": "CallActionActionComponent",
+          "left": 47,
+          "top": -15,
+          "width": 87,
+          "height": 25,
+          "customInputs": [],
+          "customOutputs": [],
+          "action": "get_error"
+        },
+        {
+          "objID": "c18a2bf3-3845-466c-de24-7dd649042c34",
+          "type": "EndActionComponent",
+          "left": 212,
+          "top": -15,
+          "width": 87,
+          "height": 25,
+          "customInputs": [],
+          "customOutputs": []
+        }
+      ],
+      "connectionLines": [
+        {
+          "objID": "4b7ab7a6-4420-4bf2-8b14-442b3ad71747",
+          "source": "3256e9c9-9fb3-456e-f9e2-6be57a6345cd",
+          "output": "@seqout",
+          "target": "c18a2bf3-3845-466c-de24-7dd649042c34",
+          "input": "@seqin"
+        },
+        {
+          "objID": "81ceeb1c-e84f-4931-f498-42b3efa627df",
+          "source": "75302e9c-ec40-4663-c413-d093e8d98285",
+          "output": "@seqout",
+          "target": "ab4e68ff-c880-45d5-e4fe-7c6ea782580e",
+          "input": "@seqin"
+        },
+        {
+          "objID": "6834a76e-1a4b-4330-8f5c-8eb461dd1971",
+          "source": "ab4e68ff-c880-45d5-e4fe-7c6ea782580e",
+          "output": "@seqout",
+          "target": "3256e9c9-9fb3-456e-f9e2-6be57a6345cd",
+          "input": "@seqin"
+        }
+      ],
+      "localVariables": [],
+      "name": "loop",
+      "implementationType": "flow"
+    },
+    {
+      "objID": "36e8577f-52a9-4b6a-f726-545517bf3450",
+      "components": [
+        {
+          "objID": "c5d44c22-85ec-4cb6-cab1-feac5f3b6f18",
+          "type": "StartActionComponent",
+          "left": -397,
+          "top": -12,
+          "width": 87,
+          "height": 25,
+          "customInputs": [],
+          "customOutputs": []
+        },
+        {
+          "objID": "74415d9f-ba33-403a-83c3-0f0c9fce4276",
+          "type": "IsTrueActionComponent",
+          "left": -272,
+          "top": -12,
+          "width": 249,
+          "height": 73,
+          "customInputs": [],
+          "customOutputs": [],
+          "value": "error_message == \"\" ||\n(Date.now() - error_time >= 3000)"
+        },
+        {
+          "objID": "06a2d90b-e21a-4bd8-be6d-8cb128170277",
+          "type": "SCPIActionComponent",
+          "left": 23,
+          "top": -128,
+          "width": 170,
+          "height": 73,
+          "customInputs": [],
+          "customOutputs": [
+            {
+              "objID": "5bdc2f5e-828a-469f-b830-83aa53c7a49f",
+              "name": "err",
+              "type": "string"
+            }
+          ],
+          "catchError": true,
+          "instrument": "instrument",
+          "scpi": "err = syst:error?"
+        },
+        {
+          "objID": "d12054d6-162b-4d18-8595-287f12ae2159",
+          "type": "IsTrueActionComponent",
+          "left": 247,
+          "top": -181,
+          "width": 241,
+          "height": 73,
+          "customInputs": [
+            {
+              "objID": "c5de9d82-c396-4239-8c11-9c20b24fc08a",
+              "name": "value",
+              "type": "any"
+            }
+          ],
+          "customOutputs": [],
+          "value": "value == \"0,\\\"No error\\\"\""
+        },
+        {
+          "objID": "7a793dc4-ca36-48b8-e074-820ccfab3b11",
+          "type": "SetVariableActionComponent",
+          "left": 531,
+          "top": -181,
+          "width": 159,
+          "height": 56,
+          "customInputs": [],
+          "customOutputs": [],
+          "entries": [
+            {
+              "objID": "a45b98a5-3cb1-4713-f93e-e44a844324c6",
+              "variable": "error_message",
+              "value": "\"\""
+            }
+          ]
+        },
+        {
+          "objID": "872ff061-75ff-4bba-8fa6-69a6611cf32a",
+          "type": "SetVariableActionComponent",
+          "left": 531,
+          "top": -75,
+          "width": 218,
+          "height": 76,
+          "customInputs": [
+            {
+              "objID": "54fd0f3e-6c6c-4da7-f3cb-24db54b6608f",
+              "name": "err",
+              "type": "string"
+            }
+          ],
+          "customOutputs": [],
+          "entries": [
+            {
+              "objID": "394ed5be-476b-4ab9-86da-3d067f2e1268",
+              "variable": "error_message",
+              "value": "err"
+            },
+            {
+              "objID": "3c70b83e-e0c0-4601-9cc7-0bd671ad4644",
+              "variable": "error_time",
+              "value": "Date.now()"
+            }
+          ]
+        },
+        {
+          "objID": "acfa5035-1c22-4510-82f9-fdc4f1ea54d0",
+          "type": "EndActionComponent",
+          "left": 879,
+          "top": 36,
+          "width": 87,
+          "height": 25,
+          "customInputs": [],
+          "customOutputs": []
+        }
+      ],
+      "connectionLines": [
+        {
+          "objID": "2a123346-89b1-4ad5-9706-4e012e493d16",
+          "source": "d12054d6-162b-4d18-8595-287f12ae2159",
+          "output": "False",
+          "target": "872ff061-75ff-4bba-8fa6-69a6611cf32a",
+          "input": "@seqin"
+        },
+        {
+          "objID": "7ac8032a-09f6-4587-ae9e-d5f09e28b331",
+          "source": "06a2d90b-e21a-4bd8-be6d-8cb128170277",
+          "output": "err",
+          "target": "d12054d6-162b-4d18-8595-287f12ae2159",
+          "input": "value"
+        },
+        {
+          "objID": "198ae3e0-1ff9-45cf-8275-76b4dc81ba78",
+          "source": "d12054d6-162b-4d18-8595-287f12ae2159",
+          "output": "True",
+          "target": "7a793dc4-ca36-48b8-e074-820ccfab3b11",
+          "input": "@seqin"
+        },
+        {
+          "objID": "9793ef12-bf2a-40fe-9e2a-edd54bd59242",
+          "source": "06a2d90b-e21a-4bd8-be6d-8cb128170277",
+          "output": "err",
+          "target": "872ff061-75ff-4bba-8fa6-69a6611cf32a",
+          "input": "err"
+        },
+        {
+          "objID": "d0ac063b-90f5-4bf2-ba61-248e3a90395e",
+          "source": "c5d44c22-85ec-4cb6-cab1-feac5f3b6f18",
+          "output": "@seqout",
+          "target": "74415d9f-ba33-403a-83c3-0f0c9fce4276",
+          "input": "@seqin"
+        },
+        {
+          "objID": "4b36304b-4ffe-417d-c78a-2fa9a72d2780",
+          "source": "872ff061-75ff-4bba-8fa6-69a6611cf32a",
+          "output": "@seqout",
+          "target": "acfa5035-1c22-4510-82f9-fdc4f1ea54d0",
+          "input": "@seqin"
+        },
+        {
+          "objID": "c20fe642-9a16-4ef3-c104-282ed2d72d88",
+          "source": "7a793dc4-ca36-48b8-e074-820ccfab3b11",
+          "output": "@seqout",
+          "target": "acfa5035-1c22-4510-82f9-fdc4f1ea54d0",
+          "input": "@seqin"
+        },
+        {
+          "objID": "b2e5f840-13e8-4725-ff6e-7d22e95f28fd",
+          "source": "06a2d90b-e21a-4bd8-be6d-8cb128170277",
+          "output": "@error",
+          "target": "d12054d6-162b-4d18-8595-287f12ae2159",
+          "input": "value"
+        },
+        {
+          "objID": "1f3b8669-b707-40d3-f8df-26a11f00dac6",
+          "source": "74415d9f-ba33-403a-83c3-0f0c9fce4276",
+          "output": "True",
+          "target": "06a2d90b-e21a-4bd8-be6d-8cb128170277",
+          "input": "@seqin"
+        },
+        {
+          "objID": "e68c2261-e7af-4f36-de22-96e16caeb848",
+          "source": "74415d9f-ba33-403a-83c3-0f0c9fce4276",
+          "output": "False",
+          "target": "acfa5035-1c22-4510-82f9-fdc4f1ea54d0",
+          "input": "@seqin"
+        },
+        {
+          "objID": "0876c223-f899-4118-fda5-2522e7e7500b",
+          "source": "06a2d90b-e21a-4bd8-be6d-8cb128170277",
+          "output": "@error",
+          "target": "872ff061-75ff-4bba-8fa6-69a6611cf32a",
+          "input": "err"
+        }
+      ],
+      "localVariables": [],
+      "name": "get_error",
+      "implementationType": "flow"
+    },
+    {
+      "objID": "0b49a24c-dcbd-45c2-e966-dc7677c480e4",
+      "components": [
+        {
+          "objID": "26a0ba33-47b2-4d2a-8ac3-66130c3032f0",
+          "type": "StartActionComponent",
+          "left": -301,
+          "top": -55,
+          "width": 87,
+          "height": 25,
+          "customInputs": [],
+          "customOutputs": []
+        },
+        {
+          "objID": "45ebc062-eb4c-4b60-e5db-5bf6f8782b72",
+          "type": "LoopActionComponent",
+          "left": -146,
+          "top": -55,
+          "width": 340,
+          "height": 73,
+          "customInputs": [],
+          "customOutputs": [],
+          "variable": "i",
+          "from": "0",
+          "to": "Array.length(slots) - 1",
+          "step": "1",
+          "version": 1
+        },
+        {
+          "objID": "41379e19-2190-435c-ee81-b7a12ed5df04",
+          "type": "IsTrueActionComponent",
+          "left": 237,
+          "top": -55,
+          "width": 176,
+          "height": 73,
+          "customInputs": [],
+          "customOutputs": [],
+          "description": "Is power channel?",
+          "value": "slots[i].ch_idx != -1"
+        },
+        {
+          "objID": "4ff324fe-c964-4da7-cbe2-ce27fff51777",
+          "type": "SCPIActionComponent",
+          "left": 465,
+          "top": -55,
+          "width": 349,
+          "height": 133,
+          "customInputs": [],
+          "customOutputs": [],
+          "catchError": true,
+          "instrument": "instrument",
+          "scpi": "{slots[i].oe} = outp? {slots[i].ch}\n{slots[i].mode} = OUTPut:MODE? {slots[i].ch}\n{slots[i].u_set} = sour{slots[i].ch_idx}:volt?\n{slots[i].i_set} = sour{slots[i].ch_idx}:curr?\n{slots[i].u_mon} = meas:volt? {slots[i].ch}\n{slots[i].i_mon} = meas:curr? {slots[i].ch}\n{slots[i].p_mon} = meas:pow? {slots[i].ch}"
+        },
+        {
+          "objID": "2052b813-da5a-4e96-e437-a8cb7a4df6ad",
+          "type": "SetVariableActionComponent",
+          "left": 864,
+          "top": -55,
+          "width": 214,
+          "height": 56,
+          "customInputs": [],
+          "customOutputs": [],
+          "entries": [
+            {
+              "objID": "8581c54c-3268-4781-fc70-f8cd2785312a",
+              "variable": "slots[i].initialized",
+              "value": "true"
+            }
+          ]
+        },
+        {
+          "objID": "3a3ee051-d328-4b34-acf9-27ac1e343861",
+          "type": "EndActionComponent",
+          "left": 266,
+          "top": 216,
+          "width": 87,
+          "height": 25,
+          "customInputs": [],
+          "customOutputs": []
+        }
+      ],
+      "connectionLines": [
+        {
+          "objID": "e7e2a9fc-dd64-440b-821f-bc5ec7c02ea6",
+          "source": "26a0ba33-47b2-4d2a-8ac3-66130c3032f0",
+          "output": "@seqout",
+          "target": "45ebc062-eb4c-4b60-e5db-5bf6f8782b72",
+          "input": "start"
+        },
+        {
+          "objID": "0c81b5eb-7250-4fca-dab2-cf839293bea7",
+          "source": "4ff324fe-c964-4da7-cbe2-ce27fff51777",
+          "output": "@seqout",
+          "target": "2052b813-da5a-4e96-e437-a8cb7a4df6ad",
+          "input": "@seqin"
+        },
+        {
+          "objID": "05663b20-8544-431c-8e56-642a2e3c8cb5",
+          "source": "45ebc062-eb4c-4b60-e5db-5bf6f8782b72",
+          "output": "@seqout",
+          "target": "41379e19-2190-435c-ee81-b7a12ed5df04",
+          "input": "@seqin"
+        },
+        {
+          "objID": "b3e05110-1741-4b72-a0f8-4299752e2770",
+          "source": "2052b813-da5a-4e96-e437-a8cb7a4df6ad",
+          "output": "@seqout",
+          "target": "45ebc062-eb4c-4b60-e5db-5bf6f8782b72",
+          "input": "next"
+        },
+        {
+          "objID": "1d8dda55-0de3-425a-ea17-a8cbf75cd6a7",
+          "source": "4ff324fe-c964-4da7-cbe2-ce27fff51777",
+          "output": "@error",
+          "target": "45ebc062-eb4c-4b60-e5db-5bf6f8782b72",
+          "input": "next"
+        },
+        {
+          "objID": "110121d8-7053-4d65-92fc-f6baf13f8116",
+          "source": "41379e19-2190-435c-ee81-b7a12ed5df04",
+          "output": "True",
+          "target": "4ff324fe-c964-4da7-cbe2-ce27fff51777",
+          "input": "@seqin"
+        },
+        {
+          "objID": "69e79a49-52ee-4111-bd1a-95794c200ffd",
+          "source": "41379e19-2190-435c-ee81-b7a12ed5df04",
+          "output": "False",
+          "target": "45ebc062-eb4c-4b60-e5db-5bf6f8782b72",
+          "input": "next"
+        },
+        {
+          "objID": "189a025d-497b-4c44-b8e6-f920d55e35b1",
+          "source": "45ebc062-eb4c-4b60-e5db-5bf6f8782b72",
+          "output": "done",
+          "target": "3a3ee051-d328-4b34-acf9-27ac1e343861",
+          "input": "@seqin"
+        }
+      ],
+      "localVariables": [
+        {
+          "objID": "51ae2fa6-f79a-44f7-8794-3bf3b9388916",
+          "name": "i",
+          "type": "integer",
+          "defaultValue": "0",
+          "persistent": false
+        }
+      ],
+      "name": "read_power_ch",
+      "implementationType": "flow"
+    }
+  ],
   "pages": [
     {
       "objID": "f7f15531-2f0d-6247-72af-17ad3967f8e0",
@@ -310,8 +1472,8 @@
         {
           "objID": "fb7c6e12-e830-41d9-fe22-b25234fecb97",
           "type": "LogActionComponent",
-          "left": 884,
-          "top": 573,
+          "left": 859,
+          "top": 443,
           "width": 87,
           "height": 55,
           "customInputs": [],
@@ -337,449 +1499,10 @@
           "layout": "NumberInput"
         },
         {
-          "objID": "8b4a7b9c-1c6a-4905-a39b-6603e624b796",
-          "type": "WatchVariableActionComponent",
-          "left": -1125,
-          "top": -177,
-          "width": 209,
-          "height": 68,
-          "customInputs": [],
-          "customOutputs": [],
-          "variable": "instrument && \ninstrument.isConnected"
-        },
-        {
-          "objID": "d3cc2e37-e1cc-4ff6-bb42-eb47678e2b73",
-          "type": "IsTrueActionComponent",
-          "left": -870,
-          "top": -176,
-          "width": 87,
-          "height": 73,
-          "customInputs": [
-            {
-              "objID": "2346753b-dd43-4e91-c1e7-e1736ab40a63",
-              "name": "value",
-              "type": "any"
-            }
-          ],
-          "customOutputs": [],
-          "value": "value"
-        },
-        {
-          "objID": "1e60386a-4141-46d3-df22-452a8b3d4ec4",
-          "type": "SetVariableActionComponent",
-          "left": -276,
-          "top": -177,
-          "width": 110,
-          "height": 56,
-          "customInputs": [],
-          "customOutputs": [],
-          "entries": [
-            {
-              "objID": "a3421af1-c97a-4bfe-c44b-f12d8be0b4c6",
-              "variable": "ch_idx",
-              "value": "1"
-            }
-          ]
-        },
-        {
-          "objID": "2bc8860d-d3a2-4f85-de28-b0d79dd834f3",
-          "type": "LoopActionComponent",
-          "left": -95,
-          "top": -177,
-          "width": 205,
-          "height": 73,
-          "customInputs": [],
-          "customOutputs": [],
-          "variable": "i",
-          "from": "1",
-          "to": "3",
-          "step": "1",
-          "version": 1
-        },
-        {
-          "objID": "e8926869-c7bd-475e-ddbb-7e8f813ae72c",
-          "type": "SCPIActionComponent",
-          "left": 200,
-          "top": -177,
-          "width": 247,
-          "height": 55,
-          "customInputs": [],
-          "customOutputs": [
-            {
-              "objID": "05aedde2-45a6-471a-a386-fd963b4c5245",
-              "name": "model",
-              "type": "string"
-            }
-          ],
-          "instrument": "instrument",
-          "scpi": "model = SYSTem:SLOT:MODel? {i}"
-        },
-        {
-          "objID": "4e540f7f-3006-4a62-9bcc-2cfa15121e34",
-          "type": "SetVariableActionComponent",
-          "left": 496,
-          "top": -177,
-          "width": 254,
-          "height": 76,
-          "customInputs": [
-            {
-              "objID": "263c3890-eda0-4240-b6e1-8ab1bb5877b8",
-              "name": "model",
-              "type": "string"
-            }
-          ],
-          "customOutputs": [],
-          "entries": [
-            {
-              "objID": "f88dedbf-b8df-4358-ef77-cbe2baf1b180",
-              "variable": "slots[i-1].model",
-              "value": "model"
-            },
-            {
-              "objID": "0d92f3e5-6612-4a30-f10e-fc2199044eb2",
-              "variable": "slots[i-1].ch_idx",
-              "value": "ch_idx"
-            }
-          ]
-        },
-        {
-          "objID": "69bbd093-38f6-4ccc-c4a5-f49b5fb5c0ea",
-          "type": "SwitchActionComponent",
-          "left": 791,
-          "top": -212,
-          "width": 447,
-          "height": 93,
-          "customInputs": [],
-          "customOutputs": [],
-          "tests": [
-            {
-              "objID": "85e3526e-7762-4f7a-ecbe-b22b59d5674e",
-              "condition": "slots[i-1].model == \"DCP405\"",
-              "outputName": "DCP"
-            },
-            {
-              "objID": "2a2bb842-b553-4df6-c500-7d39f09718e9",
-              "condition": "slots[i-1].model == \"DCM220\" || slots[i-1].model == \"DCM224\"",
-              "outputName": "DCM"
-            },
-            {
-              "objID": "557494a5-6730-4c1c-8468-5ee11e8f6a40",
-              "condition": "true",
-              "outputName": "Other"
-            }
-          ]
-        },
-        {
-          "objID": "b7ad289d-7d46-40f2-b153-693386cb9735",
-          "type": "SetVariableActionComponent",
-          "left": 2048,
-          "top": -212,
-          "width": 165,
-          "height": 56,
-          "customInputs": [],
-          "customOutputs": [],
-          "entries": [
-            {
-              "objID": "e630c9da-a932-4846-c54b-852f5e9a5281",
-              "variable": "ch_idx",
-              "value": "ch_idx + 1"
-            }
-          ]
-        },
-        {
-          "objID": "001dcb7f-a880-4b5e-fe68-963dd0c3a572",
-          "type": "SetVariableActionComponent",
-          "left": 2049,
-          "top": -79,
-          "width": 165,
-          "height": 56,
-          "customInputs": [],
-          "customOutputs": [],
-          "entries": [
-            {
-              "objID": "d13ab764-397c-48d6-caeb-9953a34729b0",
-              "variable": "ch_idx",
-              "value": "ch_idx + 2"
-            }
-          ]
-        },
-        {
-          "objID": "de3b06c2-04e3-4988-92d6-d3e79f8e4ded",
-          "type": "StartActionComponent",
-          "left": -696,
-          "top": 619,
-          "width": 87,
-          "height": 25,
-          "customInputs": [],
-          "customOutputs": []
-        },
-        {
-          "objID": "ac410559-3333-415d-e719-504dcfb09bf6",
-          "type": "IsTrueActionComponent",
-          "left": -524,
-          "top": 619,
-          "width": 182,
-          "height": 73,
-          "customInputs": [],
-          "customOutputs": [],
-          "value": "instrument && \ninstrument.isConnected"
-        },
-        {
-          "objID": "81cd380e-ff6e-4227-fa6c-e3bc5fb3ca25",
-          "type": "SCPIActionComponent",
-          "left": -265,
-          "top": 619,
-          "width": 149,
-          "height": 55,
-          "customInputs": [],
-          "customOutputs": [
-            {
-              "objID": "af3fce68-e9c8-4778-b58a-da403b2b354c",
-              "name": "err",
-              "type": "string"
-            }
-          ],
-          "instrument": "instrument",
-          "scpi": "err = syst:error?"
-        },
-        {
-          "objID": "2530989d-c05d-41e0-f8f6-5ac3be0cfda1",
-          "type": "DelayActionComponent",
-          "left": -265,
-          "top": 692,
-          "width": 87,
-          "height": 55,
-          "customInputs": [],
-          "customOutputs": [],
-          "milliseconds": "10"
-        },
-        {
-          "objID": "45e958ec-ecb8-499c-e3a7-592aedafb996",
-          "type": "IsTrueActionComponent",
-          "left": -26,
-          "top": 601,
-          "width": 241,
-          "height": 73,
-          "customInputs": [
-            {
-              "objID": "7535d3c5-4a66-498c-e9ca-1f6b8c7b4ee0",
-              "name": "value",
-              "type": "any"
-            }
-          ],
-          "customOutputs": [],
-          "value": "value == \"0,\\\"No error\\\"\""
-        },
-        {
-          "objID": "53d54ad8-1441-4520-bbd4-05b720d0e4c3",
-          "type": "SetVariableActionComponent",
-          "left": 270,
-          "top": 601,
-          "width": 159,
-          "height": 56,
-          "customInputs": [],
-          "customOutputs": [],
-          "entries": [
-            {
-              "objID": "71380ddf-a615-4d63-d7fd-3421496ad7aa",
-              "variable": "error_message",
-              "value": "\"\""
-            }
-          ]
-        },
-        {
-          "objID": "328ded40-776a-4330-af97-ad8e7fc954c3",
-          "type": "SetVariableActionComponent",
-          "left": 270,
-          "top": 674,
-          "width": 193,
-          "height": 56,
-          "customInputs": [
-            {
-              "objID": "b38c5446-28d8-44fc-b72f-424cb5f52a89",
-              "name": "err",
-              "type": "string"
-            }
-          ],
-          "customOutputs": [],
-          "entries": [
-            {
-              "objID": "86464033-6810-4475-ca5a-11e9ce1d8ba0",
-              "variable": "error_message",
-              "value": "err"
-            }
-          ]
-        },
-        {
-          "objID": "9e8044a0-f86c-4e34-c77e-89d76409e73c",
-          "type": "DelayActionComponent",
-          "left": 493,
-          "top": 601,
-          "width": 87,
-          "height": 55,
-          "customInputs": [],
-          "customOutputs": [],
-          "milliseconds": "10"
-        },
-        {
-          "objID": "5000a223-972d-4664-ec59-f41c595521b1",
-          "type": "DelayActionComponent",
-          "left": 493,
-          "top": 674,
-          "width": 87,
-          "height": 55,
-          "customInputs": [],
-          "customOutputs": [],
-          "milliseconds": "3000"
-        },
-        {
-          "objID": "07f03fc7-03ab-4d83-a444-b701cb17d7c3",
-          "type": "SCPIActionComponent",
-          "left": 1333,
-          "top": -212,
-          "width": 331,
-          "height": 55,
-          "customInputs": [],
-          "customOutputs": [
-            {
-              "objID": "6d91a60d-015d-49ab-c28d-5bd70f97f30f",
-              "name": "label",
-              "type": "string"
-            }
-          ],
-          "instrument": "instrument",
-          "scpi": "label = SYSTem:CHANnel:LABel? {\"CH\" + ch_idx}"
-        },
-        {
-          "objID": "6819dd23-7555-47e4-a682-93e542ea5a00",
-          "type": "SetVariableActionComponent",
-          "left": 1765,
-          "top": -212,
-          "width": 246,
-          "height": 76,
-          "customInputs": [
-            {
-              "objID": "76f66823-de2f-4a5e-e49b-b10d14f34c8d",
-              "name": "label",
-              "type": "string"
-            }
-          ],
-          "customOutputs": [],
-          "entries": [
-            {
-              "objID": "0c846478-d876-4b8f-8da1-aa4541655ea5",
-              "variable": "slots[i-1].label",
-              "value": "label"
-            },
-            {
-              "objID": "194b7f3a-3e88-49fa-8ba7-b4cfcc5412b3",
-              "variable": "slots[i-1].ch_idx",
-              "value": "ch_idx"
-            }
-          ]
-        },
-        {
-          "objID": "f29e81e5-2a9c-44c7-a405-44474cab13e6",
-          "type": "SCPIActionComponent",
-          "left": 1334,
-          "top": -79,
-          "width": 381,
-          "height": 73,
-          "customInputs": [],
-          "customOutputs": [
-            {
-              "objID": "8569bdc0-c4bd-481b-e53e-f7c52422f3c5",
-              "name": "label",
-              "type": "string"
-            },
-            {
-              "objID": "9658d040-5796-4d1b-f0fe-c2f88ee39e68",
-              "name": "label2",
-              "type": "string"
-            }
-          ],
-          "instrument": "instrument",
-          "scpi": "label = SYSTem:CHANnel:LABel? {\"CH\" + ch_idx}\nlabel2 = SYSTem:CHANnel:LABel? {\"CH\" + (ch_idx + 1)}"
-        },
-        {
-          "objID": "bfcb9f1b-f3dc-46b7-f912-8173df5dd4a5",
-          "type": "SCPIActionComponent",
-          "left": 1334,
-          "top": 95,
-          "width": 239,
-          "height": 55,
-          "customInputs": [],
-          "customOutputs": [
-            {
-              "objID": "2c783e5c-8afb-4332-83ad-2e8ccb692419",
-              "name": "label",
-              "type": "string"
-            }
-          ],
-          "instrument": "instrument",
-          "scpi": "label = SYSTem:SLOT:LABel? {i}"
-        },
-        {
-          "objID": "bcb2885a-51d9-4830-86e3-51071c56a2cb",
-          "type": "SetVariableActionComponent",
-          "left": 1766,
-          "top": 95,
-          "width": 234,
-          "height": 56,
-          "customInputs": [
-            {
-              "objID": "7291d8d8-c430-4d02-e71c-601b05402f52",
-              "name": "label",
-              "type": "string"
-            }
-          ],
-          "customOutputs": [],
-          "entries": [
-            {
-              "objID": "5f92ae42-980d-4609-dff4-b86a22f2a156",
-              "variable": "slots[i-1].label",
-              "value": "label"
-            }
-          ]
-        },
-        {
-          "objID": "e7bf7081-d4b8-470b-c625-1aac8de11252",
-          "type": "SetVariableActionComponent",
-          "left": 1766,
-          "top": -79,
-          "width": 253,
-          "height": 76,
-          "customInputs": [
-            {
-              "objID": "4bf55885-3c4b-40d4-e9c1-0f62c1318155",
-              "name": "label",
-              "type": "string"
-            },
-            {
-              "objID": "5b21b65a-f25d-4bb3-852a-6bf8187837cb",
-              "name": "label2",
-              "type": "string"
-            }
-          ],
-          "customOutputs": [],
-          "entries": [
-            {
-              "objID": "f0eaa012-0bd0-45cb-8ea1-9e674d076068",
-              "variable": "slots[i-1].label",
-              "value": "label"
-            },
-            {
-              "objID": "49fbfdcf-eb55-4b97-b1b5-2174df3ae44a",
-              "variable": "slots[i-1].label2",
-              "value": "label2"
-            }
-          ]
-        },
-        {
           "objID": "3db28463-cf86-4261-af23-47177d81e36f",
           "type": "ConstantActionComponent",
-          "left": -190,
-          "top": 225,
+          "left": -143,
+          "top": 185,
           "width": 87,
           "height": 54,
           "customInputs": [],
@@ -789,8 +1512,8 @@
         {
           "objID": "311efb22-a36a-4617-95c8-2829389c1b31",
           "type": "ConstantActionComponent",
-          "left": -190,
-          "top": 305,
+          "left": -143,
+          "top": 265,
           "width": 87,
           "height": 54,
           "customInputs": [],
@@ -800,8 +1523,8 @@
         {
           "objID": "d2a00793-4073-4f40-ff08-2936028aeaba",
           "type": "ConstantActionComponent",
-          "left": -190,
-          "top": 386,
+          "left": -143,
+          "top": 346,
           "width": 87,
           "height": 54,
           "customInputs": [],
@@ -809,34 +1532,47 @@
           "value": "3"
         },
         {
-          "objID": "3607e696-dfc3-4d94-84fe-dc829f55d8d2",
-          "type": "SCPIActionComponent",
-          "left": -654,
-          "top": -175,
-          "width": 244,
+          "objID": "dd149896-6974-4c3a-b544-962bb382a844",
+          "type": "CallActionActionComponent",
+          "left": 257,
+          "top": -76,
+          "width": 87,
+          "height": 25,
+          "customInputs": [],
+          "customOutputs": [],
+          "action": "setup"
+        },
+        {
+          "objID": "ef011a77-3b03-4cb1-9064-43b1ac3a1423",
+          "type": "StartActionComponent",
+          "left": 134,
+          "top": -76,
+          "width": 87,
+          "height": 25,
+          "customInputs": [],
+          "customOutputs": []
+        },
+        {
+          "objID": "f8a86189-ff4d-4f2b-9382-aace0b73474d",
+          "type": "CallActionActionComponent",
+          "left": 413,
+          "top": -76,
+          "width": 87,
+          "height": 25,
+          "customInputs": [],
+          "customOutputs": [],
+          "action": "loop"
+        },
+        {
+          "objID": "0e20649e-cf51-42f4-cae3-0df19ba86e2e",
+          "type": "DelayActionComponent",
+          "left": 563,
+          "top": -76,
+          "width": 87,
           "height": 55,
           "customInputs": [],
           "customOutputs": [],
-          "catchError": true,
-          "instrument": "instrument",
-          "scpi": "fw_ver = SYSTem:CPU:FIRMware?"
-        },
-        {
-          "objID": "e3d18178-62d8-44c5-bf68-05173b38836d",
-          "type": "SetVariableActionComponent",
-          "left": 948,
-          "top": 139,
-          "width": 128,
-          "height": 56,
-          "customInputs": [],
-          "customOutputs": [],
-          "entries": [
-            {
-              "objID": "4d01f013-8e49-4a29-f93d-10ad275c8a87",
-              "variable": "loaded",
-              "value": "true"
-            }
-          ]
+          "milliseconds": "10"
         }
       ],
       "connectionLines": [
@@ -846,230 +1582,6 @@
           "output": "action",
           "target": "fb7c6e12-e830-41d9-fe22-b25234fecb97",
           "input": "@seqin"
-        },
-        {
-          "objID": "429913a1-6fe9-4608-b362-8a9a07ae97cd",
-          "source": "8b4a7b9c-1c6a-4905-a39b-6603e624b796",
-          "output": "variable",
-          "target": "d3cc2e37-e1cc-4ff6-bb42-eb47678e2b73",
-          "input": "value"
-        },
-        {
-          "objID": "38d500a9-4c4d-4f37-cbbf-ebf8c920f1a4",
-          "source": "d3cc2e37-e1cc-4ff6-bb42-eb47678e2b73",
-          "output": "True",
-          "target": "3607e696-dfc3-4d94-84fe-dc829f55d8d2",
-          "input": "@seqin"
-        },
-        {
-          "objID": "3b052ed4-60fd-4dfb-a359-c74ca1e61da2",
-          "source": "2bc8860d-d3a2-4f85-de28-b0d79dd834f3",
-          "output": "@seqout",
-          "target": "e8926869-c7bd-475e-ddbb-7e8f813ae72c",
-          "input": "@seqin"
-        },
-        {
-          "objID": "134b627c-c17a-4b25-b189-3b806e17164c",
-          "source": "4e540f7f-3006-4a62-9bcc-2cfa15121e34",
-          "output": "@seqout",
-          "target": "69bbd093-38f6-4ccc-c4a5-f49b5fb5c0ea",
-          "input": "@seqin"
-        },
-        {
-          "objID": "5122a83a-71e6-4fdd-c4df-717cd9836183",
-          "source": "e8926869-c7bd-475e-ddbb-7e8f813ae72c",
-          "output": "model",
-          "target": "4e540f7f-3006-4a62-9bcc-2cfa15121e34",
-          "input": "model"
-        },
-        {
-          "objID": "088551b6-a142-43b5-de17-047fe0d2ce45",
-          "source": "69bbd093-38f6-4ccc-c4a5-f49b5fb5c0ea",
-          "output": "DCP",
-          "target": "07f03fc7-03ab-4d83-a444-b701cb17d7c3",
-          "input": "@seqin"
-        },
-        {
-          "objID": "333385c5-4c53-497b-e105-a8786f304c37",
-          "source": "69bbd093-38f6-4ccc-c4a5-f49b5fb5c0ea",
-          "output": "DCM",
-          "target": "f29e81e5-2a9c-44c7-a405-44474cab13e6",
-          "input": "@seqin"
-        },
-        {
-          "objID": "1a60e880-bbdb-4e9e-ac1a-15830c5a84f0",
-          "source": "b7ad289d-7d46-40f2-b153-693386cb9735",
-          "output": "@seqout",
-          "target": "2bc8860d-d3a2-4f85-de28-b0d79dd834f3",
-          "input": "next"
-        },
-        {
-          "objID": "a9e84d8d-835c-4ca8-d12a-a5bc3bca91d8",
-          "source": "1e60386a-4141-46d3-df22-452a8b3d4ec4",
-          "output": "@seqout",
-          "target": "2bc8860d-d3a2-4f85-de28-b0d79dd834f3",
-          "input": "start"
-        },
-        {
-          "objID": "cd4c74b7-fa0b-4194-b539-472c04e8b025",
-          "source": "45e958ec-ecb8-499c-e3a7-592aedafb996",
-          "output": "False",
-          "target": "328ded40-776a-4330-af97-ad8e7fc954c3",
-          "input": "@seqin"
-        },
-        {
-          "objID": "92b13e34-f745-4714-ecde-f645ed6c4f37",
-          "source": "5000a223-972d-4664-ec59-f41c595521b1",
-          "output": "@seqout",
-          "target": "ac410559-3333-415d-e719-504dcfb09bf6",
-          "input": "@seqin"
-        },
-        {
-          "objID": "4593a141-e475-46de-df3c-c6b9b673461d",
-          "source": "ac410559-3333-415d-e719-504dcfb09bf6",
-          "output": "True",
-          "target": "81cd380e-ff6e-4227-fa6c-e3bc5fb3ca25",
-          "input": "@seqin"
-        },
-        {
-          "objID": "2dad6b16-2388-475f-df0e-d1084d02fdea",
-          "source": "de3b06c2-04e3-4988-92d6-d3e79f8e4ded",
-          "output": "@seqout",
-          "target": "ac410559-3333-415d-e719-504dcfb09bf6",
-          "input": "@seqin"
-        },
-        {
-          "objID": "c6e692b2-2335-4d4b-93c0-d1b45d4efcff",
-          "source": "81cd380e-ff6e-4227-fa6c-e3bc5fb3ca25",
-          "output": "err",
-          "target": "45e958ec-ecb8-499c-e3a7-592aedafb996",
-          "input": "value"
-        },
-        {
-          "objID": "6cdcb85d-a8a1-4748-d22f-8fcb30185191",
-          "source": "45e958ec-ecb8-499c-e3a7-592aedafb996",
-          "output": "True",
-          "target": "53d54ad8-1441-4520-bbd4-05b720d0e4c3",
-          "input": "@seqin"
-        },
-        {
-          "objID": "379a4fde-ecb9-4057-b7d2-b8303e0b38aa",
-          "source": "9e8044a0-f86c-4e34-c77e-89d76409e73c",
-          "output": "@seqout",
-          "target": "ac410559-3333-415d-e719-504dcfb09bf6",
-          "input": "@seqin"
-        },
-        {
-          "objID": "4d27a0b4-8464-4e47-aca6-a56379676ed3",
-          "source": "53d54ad8-1441-4520-bbd4-05b720d0e4c3",
-          "output": "@seqout",
-          "target": "9e8044a0-f86c-4e34-c77e-89d76409e73c",
-          "input": "@seqin"
-        },
-        {
-          "objID": "d09dacf4-04ff-45a2-b040-7c0fd7b82f0d",
-          "source": "328ded40-776a-4330-af97-ad8e7fc954c3",
-          "output": "@seqout",
-          "target": "5000a223-972d-4664-ec59-f41c595521b1",
-          "input": "@seqin"
-        },
-        {
-          "objID": "23e7a5a4-31de-400d-afc4-dac66b8a8b82",
-          "source": "81cd380e-ff6e-4227-fa6c-e3bc5fb3ca25",
-          "output": "err",
-          "target": "328ded40-776a-4330-af97-ad8e7fc954c3",
-          "input": "err"
-        },
-        {
-          "objID": "86c91c0e-7993-4fc2-ab38-c17a2ae720db",
-          "source": "ac410559-3333-415d-e719-504dcfb09bf6",
-          "output": "False",
-          "target": "2530989d-c05d-41e0-f8f6-5ac3be0cfda1",
-          "input": "@seqin"
-        },
-        {
-          "objID": "91b35061-0ca0-4279-af1a-64c4fa7cc04f",
-          "source": "2530989d-c05d-41e0-f8f6-5ac3be0cfda1",
-          "output": "@seqout",
-          "target": "ac410559-3333-415d-e719-504dcfb09bf6",
-          "input": "@seqin"
-        },
-        {
-          "objID": "b15b90c6-7d89-4acf-afa3-0f9d5c2e832a",
-          "source": "e8926869-c7bd-475e-ddbb-7e8f813ae72c",
-          "output": "@seqout",
-          "target": "4e540f7f-3006-4a62-9bcc-2cfa15121e34",
-          "input": "@seqin"
-        },
-        {
-          "objID": "ad9d89d2-22b8-4f2b-a285-42431e717eb5",
-          "source": "69bbd093-38f6-4ccc-c4a5-f49b5fb5c0ea",
-          "output": "Other",
-          "target": "bfcb9f1b-f3dc-46b7-f912-8173df5dd4a5",
-          "input": "@seqin"
-        },
-        {
-          "objID": "66f85921-6265-4e10-98e7-c23b156e7c21",
-          "source": "07f03fc7-03ab-4d83-a444-b701cb17d7c3",
-          "output": "@seqout",
-          "target": "6819dd23-7555-47e4-a682-93e542ea5a00",
-          "input": "@seqin"
-        },
-        {
-          "objID": "08771dcd-05a4-4c98-a9b0-e969516d4c36",
-          "source": "6819dd23-7555-47e4-a682-93e542ea5a00",
-          "output": "@seqout",
-          "target": "b7ad289d-7d46-40f2-b153-693386cb9735",
-          "input": "@seqin"
-        },
-        {
-          "objID": "86727e02-a916-490b-af0a-e762529bf56c",
-          "source": "07f03fc7-03ab-4d83-a444-b701cb17d7c3",
-          "output": "label",
-          "target": "6819dd23-7555-47e4-a682-93e542ea5a00",
-          "input": "label"
-        },
-        {
-          "objID": "f75bd9fc-a38f-4b99-b840-aad7d75c22e0",
-          "source": "f29e81e5-2a9c-44c7-a405-44474cab13e6",
-          "output": "label",
-          "target": "e7bf7081-d4b8-470b-c625-1aac8de11252",
-          "input": "label"
-        },
-        {
-          "objID": "d6aa10da-b17f-4978-c81b-88a64f6178b0",
-          "source": "f29e81e5-2a9c-44c7-a405-44474cab13e6",
-          "output": "label2",
-          "target": "e7bf7081-d4b8-470b-c625-1aac8de11252",
-          "input": "label2"
-        },
-        {
-          "objID": "c6246a6d-a4d0-473a-88d7-f9426b8dedf0",
-          "source": "f29e81e5-2a9c-44c7-a405-44474cab13e6",
-          "output": "@seqout",
-          "target": "e7bf7081-d4b8-470b-c625-1aac8de11252",
-          "input": "@seqin"
-        },
-        {
-          "objID": "165706ab-9e66-4e23-d1c5-fe63ae9a1c79",
-          "source": "e7bf7081-d4b8-470b-c625-1aac8de11252",
-          "output": "@seqout",
-          "target": "001dcb7f-a880-4b5e-fe68-963dd0c3a572",
-          "input": "@seqin"
-        },
-        {
-          "objID": "7885b8db-2dc8-4888-eb4a-1f44301a59c2",
-          "source": "bfcb9f1b-f3dc-46b7-f912-8173df5dd4a5",
-          "output": "@seqout",
-          "target": "bcb2885a-51d9-4830-86e3-51071c56a2cb",
-          "input": "@seqin"
-        },
-        {
-          "objID": "a1c0a059-63ed-4d5e-8a38-1cd2e020efe0",
-          "source": "bfcb9f1b-f3dc-46b7-f912-8173df5dd4a5",
-          "output": "label",
-          "target": "bcb2885a-51d9-4830-86e3-51071c56a2cb",
-          "input": "label"
         },
         {
           "objID": "b51e1f28-6f73-46ac-e04b-dab99139c139",
@@ -1093,92 +1605,35 @@
           "input": "3906b318-2072-4cc9-a6e5-699827b3331d"
         },
         {
-          "objID": "920bc3f0-7e55-4843-93dd-a835a0f58e55",
-          "source": "2bc8860d-d3a2-4f85-de28-b0d79dd834f3",
-          "output": "done",
-          "target": "d61c5de6-1686-4296-db01-d189472ab1fd",
-          "input": "@seqin"
-        },
-        {
-          "objID": "3c3384e4-c064-43a6-af34-4eb46918bc23",
-          "source": "2bc8860d-d3a2-4f85-de28-b0d79dd834f3",
-          "output": "done",
-          "target": "03f0727b-73a6-4ff1-ba5d-aaacdd3d2f0a",
-          "input": "@seqin"
-        },
-        {
-          "objID": "94bda54b-e76c-4524-a29a-945365124a72",
-          "source": "2bc8860d-d3a2-4f85-de28-b0d79dd834f3",
-          "output": "done",
-          "target": "e9d60094-36c2-41e2-fde9-c85a4d0c8ca0",
-          "input": "@seqin"
-        },
-        {
-          "objID": "11aecd6d-cf33-4b40-ea9d-132395cb24a3",
-          "source": "001dcb7f-a880-4b5e-fe68-963dd0c3a572",
+          "objID": "be5ee55b-14e9-41a2-baba-b976904850f3",
+          "source": "ef011a77-3b03-4cb1-9064-43b1ac3a1423",
           "output": "@seqout",
-          "target": "2bc8860d-d3a2-4f85-de28-b0d79dd834f3",
-          "input": "next"
-        },
-        {
-          "objID": "2b96cf84-0865-4642-f3ad-cb82cf77bd09",
-          "source": "bcb2885a-51d9-4830-86e3-51071c56a2cb",
-          "output": "@seqout",
-          "target": "2bc8860d-d3a2-4f85-de28-b0d79dd834f3",
-          "input": "next"
-        },
-        {
-          "objID": "5ef128e1-fc60-40e6-ee99-8a807b06e447",
-          "source": "3607e696-dfc3-4d94-84fe-dc829f55d8d2",
-          "output": "@seqout",
-          "target": "1e60386a-4141-46d3-df22-452a8b3d4ec4",
+          "target": "dd149896-6974-4c3a-b544-962bb382a844",
           "input": "@seqin"
         },
         {
-          "objID": "a2d13172-9b9f-4e1e-9bac-99c4ca173c0a",
-          "source": "2bc8860d-d3a2-4f85-de28-b0d79dd834f3",
-          "output": "done",
-          "target": "e3d18178-62d8-44c5-bf68-05173b38836d",
+          "objID": "3fe5109e-ea6c-4829-aabb-0a195594659c",
+          "source": "dd149896-6974-4c3a-b544-962bb382a844",
+          "output": "@seqout",
+          "target": "f8a86189-ff4d-4f2b-9382-aace0b73474d",
           "input": "@seqin"
         },
         {
-          "objID": "9acf5370-b4ce-4c43-81cd-5f713ff3ac3b",
-          "source": "3607e696-dfc3-4d94-84fe-dc829f55d8d2",
-          "output": "@error",
-          "target": "3607e696-dfc3-4d94-84fe-dc829f55d8d2",
+          "objID": "bbc7ee99-7a6f-4709-dc04-e4a3b59fa731",
+          "source": "f8a86189-ff4d-4f2b-9382-aace0b73474d",
+          "output": "@seqout",
+          "target": "0e20649e-cf51-42f4-cae3-0df19ba86e2e",
+          "input": "@seqin"
+        },
+        {
+          "objID": "70f839b9-7ba7-48c9-aca9-c99a2e70f645",
+          "source": "0e20649e-cf51-42f4-cae3-0df19ba86e2e",
+          "output": "@seqout",
+          "target": "f8a86189-ff4d-4f2b-9382-aace0b73474d",
           "input": "@seqin"
         }
       ],
-      "localVariables": [
-        {
-          "objID": "2227876b-74f3-453c-c42f-a9392da7685f",
-          "name": "i",
-          "type": "integer",
-          "defaultValue": "0",
-          "persistent": false
-        },
-        {
-          "objID": "b7ff718a-459b-42ff-833f-8f7dfe85d14a",
-          "name": "ch_idx",
-          "type": "integer",
-          "defaultValue": "1",
-          "persistent": false
-        },
-        {
-          "objID": "cf08893d-cd18-4096-eb90-e71a4067c6a8",
-          "name": "error_message",
-          "type": "string",
-          "defaultValue": "\"\"",
-          "persistent": false
-        },
-        {
-          "objID": "11cbb27e-0c05-4a8c-bafd-a751c4c33bbf",
-          "name": "fw_ver",
-          "type": "string",
-          "defaultValue": "\"\"",
-          "persistent": false
-        }
-      ],
+      "localVariables": [],
       "name": "Main",
       "style": "page",
       "left": 0,
@@ -1207,7 +1662,7 @@
             }
           ],
           "customOutputs": [],
-          "data": "loaded ? slots[slot_idx - 1].model == \"DCP405\" ? 1 : 2 : 0",
+          "data": "!loaded ? 0 : slot.model == \"DCP405\" ? 1 : 2\n",
           "style": {
             "objID": "da5e6786-e9a0-4a2e-b917-82d112d222cc",
             "inheritFrom": "default"
@@ -1265,20 +1720,10 @@
           ]
         },
         {
-          "objID": "fac03e96-d7fd-4703-dca8-53c58045f0f7",
-          "type": "StartActionComponent",
-          "left": -592,
-          "top": 98,
-          "width": 87,
-          "height": 25,
-          "customInputs": [],
-          "customOutputs": []
-        },
-        {
           "objID": "3906b318-2072-4cc9-a6e5-699827b3331d",
           "type": "InputActionComponent",
-          "left": -592,
-          "top": 254,
+          "left": -359,
+          "top": 166,
           "width": 87,
           "height": 25,
           "customInputs": [],
@@ -1287,28 +1732,11 @@
           "inputType": "integer"
         },
         {
-          "objID": "af2d595e-2d48-49d2-92a9-4d88fc2f90a5",
-          "type": "IsTrueActionComponent",
-          "left": -426,
-          "top": 98,
-          "width": 326,
-          "height": 73,
-          "customInputs": [
-            {
-              "objID": "3410532d-64e5-4c3a-fd61-a62cb0e2137a",
-              "name": "slot_idx",
-              "type": "any"
-            }
-          ],
-          "customOutputs": [],
-          "value": "slots[slot_idx - 1].model == \"DCP405\""
-        },
-        {
           "objID": "8852d3e1-c668-4e1d-cc43-83033798db36",
           "type": "SetVariableActionComponent",
-          "left": -426,
-          "top": 337,
-          "width": 163,
+          "left": -223,
+          "top": 0,
+          "width": 194,
           "height": 56,
           "customInputs": [
             {
@@ -1321,27 +1749,13 @@
           "entries": [
             {
               "objID": "1ad012fb-3424-46b0-a38f-9c3c0f37f586",
-              "variable": "slot_idx",
-              "value": "idx"
+              "variable": "slot",
+              "value": "slots[idx-1]"
             }
           ]
         }
       ],
       "connectionLines": [
-        {
-          "objID": "fbd9d7e4-9fb3-44ca-f314-d6e3d0ad9e42",
-          "source": "fac03e96-d7fd-4703-dca8-53c58045f0f7",
-          "output": "@seqout",
-          "target": "af2d595e-2d48-49d2-92a9-4d88fc2f90a5",
-          "input": "@seqin"
-        },
-        {
-          "objID": "8d1ec877-0ca2-404c-d52e-36f8bffa64c4",
-          "source": "3906b318-2072-4cc9-a6e5-699827b3331d",
-          "output": "@seqout",
-          "target": "af2d595e-2d48-49d2-92a9-4d88fc2f90a5",
-          "input": "slot_idx"
-        },
         {
           "objID": "002744a2-d05a-4c5b-d0b8-799c1714b36a",
           "source": "3906b318-2072-4cc9-a6e5-699827b3331d",
@@ -1350,25 +1764,11 @@
           "input": "idx"
         },
         {
-          "objID": "01e262db-4a08-4153-9591-02ff49ef876f",
-          "source": "af2d595e-2d48-49d2-92a9-4d88fc2f90a5",
-          "output": "True",
-          "target": "c001a92f-bff2-4746-9ec8-48aeef4291e0",
-          "input": "@seqin"
-        },
-        {
           "objID": "eedd2bb3-c3b2-4897-c390-f8f0ae8f9958",
           "source": "3906b318-2072-4cc9-a6e5-699827b3331d",
           "output": "@seqout",
           "target": "c001a92f-bff2-4746-9ec8-48aeef4291e0",
           "input": "b39ec145-0583-4a7c-b75c-a54f44a733ba"
-        },
-        {
-          "objID": "042e4e42-242e-4ed6-dfae-2446eed64608",
-          "source": "af2d595e-2d48-49d2-92a9-4d88fc2f90a5",
-          "output": "False",
-          "target": "c16dc4da-58c5-4d46-f252-6d26c1a8d7d6",
-          "input": "@seqin"
         },
         {
           "objID": "5b73f490-119d-4c29-f0a3-b01abdd5b729",
@@ -1387,10 +1787,10 @@
       ],
       "localVariables": [
         {
-          "objID": "add9f1b3-25d8-4e66-8d57-2fa509f507f8",
-          "name": "slot_idx",
-          "type": "integer",
-          "defaultValue": "0",
+          "objID": "39937c05-c10e-4f98-e5b6-d095d6cb9757",
+          "name": "slot",
+          "type": "struct:Slot",
+          "defaultValue": "null",
           "persistent": false
         }
       ],
@@ -1432,7 +1832,7 @@
           "height": 24,
           "customInputs": [],
           "customOutputs": [],
-          "data": "slots[slot_idx-1].label",
+          "data": "slot.label",
           "style": {
             "objID": "3e006960-2229-4b10-e145-dac67ac53ac7",
             "inheritFrom": "default",
@@ -1451,7 +1851,7 @@
           "height": 412,
           "customInputs": [],
           "customOutputs": [],
-          "visible": "initialized",
+          "visible": "slot.initialized",
           "style": {
             "objID": "185cdf1a-03a8-421c-82dc-921cc9297fb3",
             "inheritFrom": "default"
@@ -1487,7 +1887,7 @@
               "height": 160,
               "customInputs": [],
               "customOutputs": [],
-              "data": "oe ? 1 : 0",
+              "data": "slot.oe ? 1 : 0",
               "style": {
                 "objID": "0ffb3c66-2ef3-4b45-d4f2-f36fbf66d7fa",
                 "inheritFrom": "default"
@@ -1525,7 +1925,7 @@
                   "height": 160,
                   "customInputs": [],
                   "customOutputs": [],
-                  "data": "Math.round(u_mon, 3)",
+                  "data": "Math.round(slot.u_mon, 3)",
                   "style": {
                     "objID": "badab870-ea23-4730-d492-249965a465d4",
                     "inheritFrom": "default",
@@ -1533,8 +1933,8 @@
                   },
                   "timeline": [],
                   "title": "",
-                  "minRange": "u_min",
-                  "maxRange": "u_max",
+                  "minRange": "slot.u_min",
+                  "maxRange": "slot.u_max",
                   "color": "#03b300",
                   "margin": {
                     "objID": "9fd6c916-f148-44f8-a982-757f680a10da",
@@ -1555,7 +1955,7 @@
               "height": 32,
               "customInputs": [],
               "customOutputs": [],
-              "data": "Math.round(u_set, 3) + \" V\"",
+              "data": "Math.round(slot.u_set, 3) + \" V\"",
               "style": {
                 "objID": "e3a9a775-0a74-4ee1-819a-3ce6b0353520",
                 "inheritFrom": "default",
@@ -1597,7 +1997,7 @@
               "height": 16,
               "customInputs": [],
               "customOutputs": [],
-              "data": "oe && mode == \"CV\" ? 1 : 0",
+              "data": "slot.oe && slot.mode == \"CV\" ? 1 : 0",
               "style": {
                 "objID": "4717e1d6-6fd4-481b-fb7a-7f54eb2e9a3b",
                 "inheritFrom": "default"
@@ -1704,7 +2104,7 @@
               "height": 160,
               "customInputs": [],
               "customOutputs": [],
-              "data": "oe ? 1 : 0",
+              "data": "slot.oe ? 1 : 0",
               "style": {
                 "objID": "fbc740c7-c21b-4757-d131-4b13e0046a57",
                 "inheritFrom": "default",
@@ -1743,15 +2143,15 @@
                   "height": 160,
                   "customInputs": [],
                   "customOutputs": [],
-                  "data": "Math.round(i_mon, 5)",
+                  "data": "Math.round(slot.i_mon, 5)",
                   "style": {
                     "objID": "9dd3e161-c64a-4ca8-b0d7-1bf5b0974dd7",
                     "inheritFrom": "default"
                   },
                   "timeline": [],
                   "title": "",
-                  "minRange": "i_min",
-                  "maxRange": "i_max",
+                  "minRange": "slot.i_min",
+                  "maxRange": "slot.i_max",
                   "color": "#e00000",
                   "margin": {
                     "objID": "a246e978-829f-4c4a-bc01-3c202033ee71",
@@ -1772,7 +2172,7 @@
               "height": 32,
               "customInputs": [],
               "customOutputs": [],
-              "data": "Math.round(i_set, 5) + \" A\"",
+              "data": "Math.round(slot.i_set, 5) + \" A\"",
               "style": {
                 "objID": "b7753b08-d171-47af-c343-694eeac863d8",
                 "inheritFrom": "default",
@@ -1814,7 +2214,7 @@
               "height": 16,
               "customInputs": [],
               "customOutputs": [],
-              "data": "oe && mode == \"CC\" ? 1 : 0",
+              "data": "slot.oe && slot.mode == \"CC\" ? 1 : 0",
               "style": {
                 "objID": "367952df-451e-48f0-eb6d-0ed80ff1b239",
                 "inheritFrom": "default"
@@ -1928,7 +2328,7 @@
               "height": 32,
               "customInputs": [],
               "customOutputs": [],
-              "data": "oe ? 1 : 0",
+              "data": "slot.oe ? 1 : 0",
               "style": {
                 "objID": "72b6d20b-371b-45fe-bc7e-3672fc156f77",
                 "inheritFrom": "default"
@@ -1963,7 +2363,7 @@
                   "height": 32,
                   "customInputs": [],
                   "customOutputs": [],
-                  "data": "Math.round(p_mon, 3) + \" W\"",
+                  "data": "Math.round(slot.p_mon, 3) + \" W\"",
                   "style": {
                     "objID": "4034a021-dcee-4dfa-807b-e04bb77f2330",
                     "inheritFrom": "default",
@@ -1979,24 +2379,37 @@
           "layout": "static"
         },
         {
-          "objID": "e153d1d4-345c-41c7-90ed-7aa44e82f9d3",
-          "type": "SetVariableActionComponent",
-          "left": 843,
-          "top": 145,
-          "width": 220,
-          "height": 76,
+          "objID": "b39ec145-0583-4a7c-b75c-a54f44a733ba",
+          "type": "InputActionComponent",
+          "left": -129,
+          "top": -89,
+          "width": 87,
+          "height": 25,
           "customInputs": [],
+          "customOutputs": [],
+          "name": "slot_idx",
+          "inputType": "integer"
+        },
+        {
+          "objID": "fa233904-535d-4d71-c37e-83d44ab3161c",
+          "type": "SetVariableActionComponent",
+          "left": 32,
+          "top": -89,
+          "width": 194,
+          "height": 56,
+          "customInputs": [
+            {
+              "objID": "c0fc081b-ef31-4a89-c1b2-4d91515559c8",
+              "name": "idx",
+              "type": "integer"
+            }
+          ],
           "customOutputs": [],
           "entries": [
             {
-              "objID": "233e80ca-1d08-4e5e-a1ec-601c0c67efc6",
-              "variable": "number_input.ch_idx",
-              "value": "ch_idx"
-            },
-            {
-              "objID": "7927cb15-d7b7-45e0-9e14-7f7dd49a82b1",
-              "variable": "number_input.is_open",
-              "value": "true"
+              "objID": "ff63b230-7ee3-46ee-a053-85f5fb5e6ad5",
+              "variable": "slot",
+              "value": "slots[idx-1]"
             }
           ]
         },
@@ -2005,7 +2418,7 @@
           "type": "SetVariableActionComponent",
           "left": 344,
           "top": 20,
-          "width": 442,
+          "width": 362,
           "height": 136,
           "customInputs": [],
           "customOutputs": [],
@@ -2013,22 +2426,22 @@
             {
               "objID": "694cbb6f-b19f-435b-932d-b59f98f67b34",
               "variable": "number_input.title",
-              "value": "\"Set Voltage on \" + slots[slot_idx-1].label"
+              "value": "\"Set Voltage on \" + slot.label"
             },
             {
               "objID": "0fd61fe1-895b-46df-ff6e-7a763fe805b7",
               "variable": "number_input.min",
-              "value": "u_min"
+              "value": "slot.u_min"
             },
             {
               "objID": "15284995-e112-479d-bd5c-0b8c4cbaf2d5",
               "variable": "number_input.max",
-              "value": "u_max"
+              "value": "slot.u_max"
             },
             {
               "objID": "e424bb74-7253-4891-ac7b-c0f958b47808",
               "variable": "number_input.value",
-              "value": "Math.round(u_set, 3) + \"\""
+              "value": "Math.round(slot.u_set, 3) + \"\""
             },
             {
               "objID": "6e6cc82a-0ecd-4017-a103-d342bd6b37e6",
@@ -2042,7 +2455,7 @@
           "type": "SetVariableActionComponent",
           "left": 354,
           "top": 247,
-          "width": 442,
+          "width": 362,
           "height": 136,
           "customInputs": [],
           "customOutputs": [],
@@ -2050,22 +2463,22 @@
             {
               "objID": "414b7b70-2af4-48b5-a118-215bd57d13cf",
               "variable": "number_input.title",
-              "value": "\"Set Current on \" + slots[slot_idx-1].label"
+              "value": "\"Set Current on \" + slot.label"
             },
             {
               "objID": "ae459ede-0446-4171-986f-64203a63cf47",
               "variable": "number_input.min",
-              "value": "i_min"
+              "value": "slot.i_min"
             },
             {
               "objID": "b10257da-a981-4c9a-aa04-0b92bf71eb10",
               "variable": "number_input.max",
-              "value": "i_max"
+              "value": "slot.i_max"
             },
             {
               "objID": "fea36a9a-8995-46b5-a0b9-1ab1335a6013",
               "variable": "number_input.value",
-              "value": "Math.round(i_set, 5) + \"\""
+              "value": "Math.round(slot.i_set, 5) + \"\""
             },
             {
               "objID": "d89c16f1-4ebb-458f-9381-cac1928c3727",
@@ -2075,168 +2488,73 @@
           ]
         },
         {
-          "objID": "c3320139-2f42-481f-d3db-94b520a8fd13",
-          "type": "StartActionComponent",
-          "left": -545,
-          "top": -290,
-          "width": 87,
-          "height": 25,
-          "customInputs": [],
-          "customOutputs": []
-        },
-        {
-          "objID": "b39ec145-0583-4a7c-b75c-a54f44a733ba",
-          "type": "InputActionComponent",
-          "left": -545,
-          "top": -206,
-          "width": 87,
-          "height": 25,
-          "customInputs": [],
-          "customOutputs": [],
-          "name": "slot_idx",
-          "inputType": "integer"
-        },
-        {
-          "objID": "fa233904-535d-4d71-c37e-83d44ab3161c",
+          "objID": "e153d1d4-345c-41c7-90ed-7aa44e82f9d3",
           "type": "SetVariableActionComponent",
-          "left": -402,
-          "top": -302,
-          "width": 292,
-          "height": 96,
-          "customInputs": [
-            {
-              "objID": "c0fc081b-ef31-4a89-c1b2-4d91515559c8",
-              "name": "idx",
-              "type": "integer"
-            }
-          ],
+          "left": 843,
+          "top": 145,
+          "width": 251,
+          "height": 76,
+          "customInputs": [],
           "customOutputs": [],
           "entries": [
             {
-              "objID": "ff63b230-7ee3-46ee-a053-85f5fb5e6ad5",
-              "variable": "slot_idx",
-              "value": "idx"
+              "objID": "233e80ca-1d08-4e5e-a1ec-601c0c67efc6",
+              "variable": "number_input.ch_idx",
+              "value": "slot.ch_idx"
             },
             {
-              "objID": "fdc295ea-50a7-455d-d01b-0afe08d541b7",
-              "variable": "ch_idx",
-              "value": "slots[slot_idx - 1].ch_idx"
-            },
-            {
-              "objID": "e049d7e0-f452-4640-89d9-63cc1b367897",
-              "variable": "ch",
-              "value": "\"(@\" + slot_idx + \"01)\""
+              "objID": "7927cb15-d7b7-45e0-9e14-7f7dd49a82b1",
+              "variable": "number_input.is_open",
+              "value": "true"
             }
           ]
-        },
-        {
-          "objID": "7cb156a1-fcbb-4085-9348-34d2bd115c52",
-          "type": "IsTrueActionComponent",
-          "left": 291,
-          "top": -302,
-          "width": 508,
-          "height": 73,
-          "customInputs": [],
-          "customOutputs": [],
-          "value": "instrument && instrument.isConnected && slots[slot_idx-1].model == \"DCP405\""
-        },
-        {
-          "objID": "773a158d-61fa-4ce3-84a0-858da162dbb8",
-          "type": "SCPIActionComponent",
-          "left": 935,
-          "top": -332,
-          "width": 176,
-          "height": 133,
-          "customInputs": [],
-          "customOutputs": [],
-          "instrument": "instrument",
-          "scpi": "oe = outp? {ch}\nu_set = sour{ch_idx}:volt?\ni_set = sour{ch_idx}:curr?\nu_mon = meas:volt? {ch}\ni_mon = meas:curr? {ch}\np_mon = meas:pow? {ch}\nmode = OUTPut:MODE? {ch}"
-        },
-        {
-          "objID": "eb0c35c0-cbd8-4a38-9400-eb9d1637dc9a",
-          "type": "DelayActionComponent",
-          "left": 1420,
-          "top": -332,
-          "width": 87,
-          "height": 55,
-          "customInputs": [],
-          "customOutputs": [],
-          "milliseconds": "10"
         },
         {
           "objID": "f8994bcd-7e02-48c5-f325-39371073dda3",
           "type": "SCPIActionComponent",
           "left": 354,
           "top": 496,
-          "width": 151,
+          "width": 263,
           "height": 55,
           "customInputs": [],
           "customOutputs": [],
+          "catchError": true,
           "instrument": "instrument",
-          "scpi": "outp {oe ? 0 : 1},{ch}\n"
+          "scpi": "outp {slot.oe ? 0 : 1},{slot.ch}\n"
         },
         {
-          "objID": "00737e6b-3552-4358-d94f-ff593f9547fd",
-          "type": "SCPIActionComponent",
-          "left": 31,
-          "top": -302,
-          "width": 201,
-          "height": 94,
-          "customInputs": [],
-          "customOutputs": [],
-          "instrument": "instrument",
-          "scpi": "u_min = sour{ch_idx}:volt? MIN\nu_max = sour{ch_idx}:volt? MAX\ni_min = sour{ch_idx}:curr? MIN\ni_max = sour{ch_idx}:curr? MAX\n"
-        },
-        {
-          "objID": "3460b1c1-97f9-45f9-f4d6-5cafc9cbd2cd",
+          "objID": "a88c6da2-24b3-49fd-cbdf-38d732730053",
           "type": "SetVariableActionComponent",
-          "left": 1158,
-          "top": -332,
+          "left": 684,
+          "top": 496,
           "width": 159,
           "height": 56,
           "customInputs": [],
           "customOutputs": [],
           "entries": [
             {
-              "objID": "9bafee61-ccc2-4e53-f391-f688fadd65eb",
-              "variable": "initialized",
-              "value": "true"
-            }
-          ]
-        },
-        {
-          "objID": "a392d65f-45e2-413e-f2d9-edaf585619f1",
-          "type": "SetVariableActionComponent",
-          "left": 1063,
-          "top": -139,
-          "width": 165,
-          "height": 56,
-          "customInputs": [],
-          "customOutputs": [],
-          "entries": [
-            {
-              "objID": "2bbb0833-3558-4402-f67f-3dc4bac4951d",
-              "variable": "initialized",
-              "value": "false"
-            }
-          ]
-        },
-        {
-          "objID": "a88c6da2-24b3-49fd-cbdf-38d732730053",
-          "type": "SetVariableActionComponent",
-          "left": 545,
-          "top": 496,
-          "width": 97,
-          "height": 56,
-          "customInputs": [],
-          "customOutputs": [],
-          "entries": [
-            {
               "objID": "49668144-03ce-47c7-c60f-c82aa1352db8",
-              "variable": "oe",
-              "value": "!oe"
+              "variable": "slot.oe",
+              "value": "!slot.oe"
             }
           ]
+        },
+        {
+          "objID": "8d5285f9-0a1e-4b2f-99fb-16600dbaea7c",
+          "type": "LogActionComponent",
+          "left": 684,
+          "top": 581,
+          "width": 87,
+          "height": 54,
+          "customInputs": [
+            {
+              "objID": "428e8f90-df07-4ca0-eb73-278d6e6cbe57",
+              "name": "value",
+              "type": "string"
+            }
+          ],
+          "customOutputs": [],
+          "value": "value"
         }
       ],
       "connectionLines": [
@@ -2276,13 +2594,6 @@
           "input": "@seqin"
         },
         {
-          "objID": "f72b6381-d4a7-4c41-ddcf-8d17c3bc8fb9",
-          "source": "c3320139-2f42-481f-d3db-94b520a8fd13",
-          "output": "@seqout",
-          "target": "fa233904-535d-4d71-c37e-83d44ab3161c",
-          "input": "@seqin"
-        },
-        {
           "objID": "54aa93d2-a581-41ee-e204-7444e61023b9",
           "source": "b39ec145-0583-4a7c-b75c-a54f44a733ba",
           "output": "@seqout",
@@ -2290,173 +2601,26 @@
           "input": "idx"
         },
         {
-          "objID": "4234d920-c30c-45b2-edcd-2997f1f597cc",
-          "source": "773a158d-61fa-4ce3-84a0-858da162dbb8",
-          "output": "@seqout",
-          "target": "3460b1c1-97f9-45f9-f4d6-5cafc9cbd2cd",
-          "input": "@seqin"
-        },
-        {
-          "objID": "c01fa530-1ac2-43ab-d06b-e34ba432f353",
-          "source": "eb0c35c0-cbd8-4a38-9400-eb9d1637dc9a",
-          "output": "@seqout",
-          "target": "7cb156a1-fcbb-4085-9348-34d2bd115c52",
-          "input": "@seqin"
-        },
-        {
-          "objID": "70695779-b6db-45a9-cc04-ecad7e75e5b5",
-          "source": "7cb156a1-fcbb-4085-9348-34d2bd115c52",
-          "output": "True",
-          "target": "773a158d-61fa-4ce3-84a0-858da162dbb8",
-          "input": "@seqin"
-        },
-        {
-          "objID": "60959231-b0ed-4a42-9534-c1af872a5e11",
-          "source": "7cb156a1-fcbb-4085-9348-34d2bd115c52",
-          "output": "False",
-          "target": "a392d65f-45e2-413e-f2d9-edaf585619f1",
-          "input": "@seqin"
-        },
-        {
-          "objID": "1eac8745-433f-4ec2-b2c1-9324d8165238",
-          "source": "fa233904-535d-4d71-c37e-83d44ab3161c",
-          "output": "@seqout",
-          "target": "00737e6b-3552-4358-d94f-ff593f9547fd",
-          "input": "@seqin"
-        },
-        {
-          "objID": "39db1f6f-b9be-4610-e99e-4c2d6cfc2e36",
-          "source": "00737e6b-3552-4358-d94f-ff593f9547fd",
-          "output": "@seqout",
-          "target": "7cb156a1-fcbb-4085-9348-34d2bd115c52",
-          "input": "@seqin"
-        },
-        {
-          "objID": "2a1c66bf-1fa8-48e0-a9e8-5b93222d1c00",
-          "source": "3460b1c1-97f9-45f9-f4d6-5cafc9cbd2cd",
-          "output": "@seqout",
-          "target": "eb0c35c0-cbd8-4a38-9400-eb9d1637dc9a",
-          "input": "@seqin"
-        },
-        {
-          "objID": "aeebb841-f0f1-4c1d-f2ea-60be87e9aeee",
-          "source": "a392d65f-45e2-413e-f2d9-edaf585619f1",
-          "output": "@seqout",
-          "target": "eb0c35c0-cbd8-4a38-9400-eb9d1637dc9a",
-          "input": "@seqin"
-        },
-        {
           "objID": "acff816c-622e-4f54-e09b-81ff40f51708",
           "source": "f8994bcd-7e02-48c5-f325-39371073dda3",
           "output": "@seqout",
           "target": "a88c6da2-24b3-49fd-cbdf-38d732730053",
           "input": "@seqin"
+        },
+        {
+          "objID": "dc6677ac-1490-471d-fedd-4cdedc66c558",
+          "source": "f8994bcd-7e02-48c5-f325-39371073dda3",
+          "output": "@error",
+          "target": "8d5285f9-0a1e-4b2f-99fb-16600dbaea7c",
+          "input": "value"
         }
       ],
       "localVariables": [
         {
-          "objID": "0456f4b7-4a4e-4d0a-b312-dbd0eecd3445",
-          "name": "initialized",
-          "type": "boolean",
-          "defaultValue": "false",
-          "persistent": false
-        },
-        {
           "objID": "4034bb20-a5c4-4d8c-d904-dae611bc0027",
-          "name": "slot_idx",
-          "type": "integer",
-          "defaultValue": "0",
-          "persistent": false
-        },
-        {
-          "objID": "11d48038-9fcf-4a9d-a611-f22566ab833a",
-          "name": "ch_idx",
-          "type": "integer",
-          "defaultValue": "0",
-          "persistent": false
-        },
-        {
-          "objID": "9cc1b94d-5a13-4ff5-b4bb-554b5f1dff28",
-          "name": "ch",
-          "type": "string",
-          "defaultValue": "\"\"",
-          "persistent": false
-        },
-        {
-          "objID": "4341fe85-2a19-4cc3-add1-3b3044e75b9e",
-          "name": "u_set",
-          "type": "float",
-          "defaultValue": "0",
-          "persistent": false
-        },
-        {
-          "objID": "808863ee-ec78-4da2-d4e2-8d50f4fb5183",
-          "name": "i_set",
-          "type": "float",
-          "defaultValue": "0",
-          "persistent": false
-        },
-        {
-          "objID": "4a5874e8-692d-4466-e19c-b32ce17f89a5",
-          "name": "u_mon",
-          "type": "float",
-          "defaultValue": "0",
-          "persistent": false
-        },
-        {
-          "objID": "a63f9dba-17d5-43ad-b661-b0d2fff35e56",
-          "name": "i_mon",
-          "type": "float",
-          "defaultValue": "0",
-          "persistent": false
-        },
-        {
-          "objID": "1e7f78dc-614a-4289-d56d-b38a68640e78",
-          "name": "oe",
-          "type": "integer",
-          "defaultValue": "0",
-          "persistent": false
-        },
-        {
-          "objID": "c5a7cab8-23a4-4c62-e56b-a7bc1e17ba80",
-          "name": "p_mon",
-          "type": "float",
-          "defaultValue": "0",
-          "persistent": false
-        },
-        {
-          "objID": "40d41be0-e3b6-4c3c-c4fd-ced11a9ba9d7",
-          "name": "u_min",
-          "type": "float",
-          "defaultValue": "0",
-          "persistent": false
-        },
-        {
-          "objID": "9aec6710-23af-432e-95e5-2000d0389b32",
-          "name": "u_max",
-          "type": "float",
-          "defaultValue": "0",
-          "persistent": false
-        },
-        {
-          "objID": "91da4dd5-a066-486a-9bb2-78e894014c66",
-          "name": "i_min",
-          "type": "float",
-          "defaultValue": "0",
-          "persistent": false
-        },
-        {
-          "objID": "12b4ff23-f698-4851-b68f-d10a68a10130",
-          "name": "i_max",
-          "type": "float",
-          "defaultValue": "0",
-          "persistent": false
-        },
-        {
-          "objID": "b2e918f7-6c2a-4a4a-9a71-84780c1d55db",
-          "name": "mode",
-          "type": "string",
-          "defaultValue": "\"\"",
+          "name": "slot",
+          "type": "struct:Slot",
+          "defaultValue": "null",
           "persistent": false
         }
       ],
@@ -2519,7 +2683,7 @@
           "height": 24,
           "customInputs": [],
           "customOutputs": [],
-          "data": "slots[slot_idx-1].label + (slots[slot_idx-1].label2 ? \" & \" + slots[slot_idx-1].label2 : \"\")",
+          "data": "slot.label + (slot.label2 ? \" & \" + slot.label2 : \"\")",
           "style": {
             "objID": "bd4bb360-59c7-477b-d633-3e1231c5f113",
             "inheritFrom": "default",
@@ -2531,20 +2695,10 @@
           "timeline": []
         },
         {
-          "objID": "1b9ef348-09f6-4638-837e-cb142597e37b",
-          "type": "StartActionComponent",
-          "left": -201,
-          "top": -126,
-          "width": 87,
-          "height": 25,
-          "customInputs": [],
-          "customOutputs": []
-        },
-        {
           "objID": "6d5eeae2-7b17-43ec-e5c2-272c45ba11d3",
           "type": "InputActionComponent",
-          "left": -189,
-          "top": 54,
+          "left": -14,
+          "top": -97,
           "width": 87,
           "height": 25,
           "customInputs": [],
@@ -2555,9 +2709,9 @@
         {
           "objID": "567de46b-753c-43cf-c5c2-c7adddd709dd",
           "type": "SetVariableActionComponent",
-          "left": -44,
-          "top": -126,
-          "width": 163,
+          "left": 122,
+          "top": -97,
+          "width": 194,
           "height": 56,
           "customInputs": [
             {
@@ -2570,20 +2724,13 @@
           "entries": [
             {
               "objID": "6d434e35-a57d-44a8-cb1d-b7a243af75f4",
-              "variable": "slot_idx",
-              "value": "idx"
+              "variable": "slot",
+              "value": "slots[idx-1]"
             }
           ]
         }
       ],
       "connectionLines": [
-        {
-          "objID": "583696e2-223c-44e9-b77e-5146890aca00",
-          "source": "1b9ef348-09f6-4638-837e-cb142597e37b",
-          "output": "@seqout",
-          "target": "567de46b-753c-43cf-c5c2-c7adddd709dd",
-          "input": "@seqin"
-        },
         {
           "objID": "c5363dba-aca0-4d0b-ab2e-d98249e0eb43",
           "source": "6d5eeae2-7b17-43ec-e5c2-272c45ba11d3",
@@ -2595,9 +2742,9 @@
       "localVariables": [
         {
           "objID": "68db5c35-7cf0-4d49-bb93-7d89358e5720",
-          "name": "slot_idx",
-          "type": "integer",
-          "defaultValue": "0",
+          "name": "slot",
+          "type": "struct:Slot",
+          "defaultValue": "null",
           "persistent": false
         }
       ],
@@ -2636,8 +2783,8 @@
         {
           "objID": "953e80be-013c-4539-f7e0-65295a35b265",
           "type": "Container",
-          "left": 209,
-          "top": 150,
+          "left": 259,
+          "top": 104,
           "width": 300,
           "height": 200,
           "customInputs": [],
@@ -2683,6 +2830,26 @@
                 "alignHorizontal": "center",
                 "backgroundColor": "#f0f0f0",
                 "css": ""
+              },
+              "timeline": []
+            },
+            {
+              "objID": "1ed9d174-234b-4b92-ec55-af463e320292",
+              "type": "TextInputWidget",
+              "left": 90,
+              "top": 68,
+              "width": 120,
+              "height": 32,
+              "customInputs": [],
+              "customOutputs": [],
+              "asOutputProperties": [
+                "action",
+                "onChange"
+              ],
+              "data": "number_input.value",
+              "style": {
+                "objID": "80fa004e-4164-47ab-f563-68eb92c80dbc",
+                "inheritFrom": "default"
               },
               "timeline": []
             },
@@ -2771,58 +2938,21 @@
           "layout": "static"
         },
         {
-          "objID": "993fbcd2-6f11-448b-abb8-1d07686402ad",
+          "objID": "5d883645-7d6e-40f8-c388-2cba8ebabbb8",
           "type": "SetVariableActionComponent",
           "left": 881,
-          "top": 539,
-          "width": 220,
-          "height": 76,
+          "top": 210,
+          "width": 190,
+          "height": 56,
           "customInputs": [],
           "customOutputs": [],
           "entries": [
             {
-              "objID": "d7dba296-142c-4509-c0ef-8da7cd22940f",
-              "variable": "number_input.is_open",
-              "value": "false"
-            },
-            {
-              "objID": "6801edbd-05cf-4dee-ced2-204229c30fab",
+              "objID": "e913ac9f-fb8b-459d-9c89-a2c1eda83a2a",
               "variable": "number_input.error",
               "value": "\"\""
             }
           ]
-        },
-        {
-          "objID": "1ed9d174-234b-4b92-ec55-af463e320292",
-          "type": "TextInputWidget",
-          "left": 299,
-          "top": 218,
-          "width": 120,
-          "height": 32,
-          "customInputs": [],
-          "customOutputs": [],
-          "asOutputProperties": [
-            "action",
-            "onChange"
-          ],
-          "data": "number_input.value",
-          "style": {
-            "objID": "80fa004e-4164-47ab-f563-68eb92c80dbc",
-            "inheritFrom": "default"
-          },
-          "timeline": []
-        },
-        {
-          "objID": "82157cae-ba21-45c5-a58f-96e610057ab9",
-          "type": "SCPIActionComponent",
-          "left": 227,
-          "top": 539,
-          "width": 576,
-          "height": 55,
-          "customInputs": [],
-          "customOutputs": [],
-          "instrument": "instrument",
-          "scpi": "sour{number_input.ch_idx}:{number_input.unit == \"V\" ? \"volt\" : \"curr\"} {number_input.value}"
         },
         {
           "objID": "eefd1333-169c-4d59-9b88-1141f3188852",
@@ -2834,6 +2964,19 @@
           "customInputs": [],
           "customOutputs": [],
           "value": "number_input.value >= number_input.min &&\nnumber_input.value <= number_input.max"
+        },
+        {
+          "objID": "82157cae-ba21-45c5-a58f-96e610057ab9",
+          "type": "SCPIActionComponent",
+          "left": 227,
+          "top": 539,
+          "width": 626,
+          "height": 55,
+          "customInputs": [],
+          "customOutputs": [],
+          "catchError": true,
+          "instrument": "instrument",
+          "scpi": "sour{number_input.ch_idx}:{number_input.unit == \"V\" ? \"volt\" : \"curr\"} {number_input.value}"
         },
         {
           "objID": "8904cadb-1738-4c1d-f810-57abe675b038",
@@ -2853,17 +2996,22 @@
           ]
         },
         {
-          "objID": "5d883645-7d6e-40f8-c388-2cba8ebabbb8",
+          "objID": "993fbcd2-6f11-448b-abb8-1d07686402ad",
           "type": "SetVariableActionComponent",
-          "left": 881,
-          "top": 210,
-          "width": 190,
-          "height": 56,
+          "left": 976,
+          "top": 539,
+          "width": 220,
+          "height": 76,
           "customInputs": [],
           "customOutputs": [],
           "entries": [
             {
-              "objID": "e913ac9f-fb8b-459d-9c89-a2c1eda83a2a",
+              "objID": "d7dba296-142c-4509-c0ef-8da7cd22940f",
+              "variable": "number_input.is_open",
+              "value": "false"
+            },
+            {
+              "objID": "6801edbd-05cf-4dee-ced2-204229c30fab",
               "variable": "number_input.error",
               "value": "\"\""
             }
@@ -2918,6 +3066,13 @@
           "source": "eefd1333-169c-4d59-9b88-1141f3188852",
           "output": "True",
           "target": "82157cae-ba21-45c5-a58f-96e610057ab9",
+          "input": "@seqin"
+        },
+        {
+          "objID": "72c6aeb2-a790-422e-910c-dd84f8fc8c34",
+          "source": "82157cae-ba21-45c5-a58f-96e610057ab9",
+          "output": "@error",
+          "target": "993fbcd2-6f11-448b-abb8-1d07686402ad",
           "input": "@seqin"
         }
       ],
