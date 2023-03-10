@@ -936,11 +936,11 @@ void onIdle() {
 
 void doRelaseInputBuffer(char *inputBuffer) {
     if (inputBuffer == g_scpiInputBuffer) {
-        free(g_scpiInputBuffer - 4);
+        ::free(g_scpiInputBuffer - 4);
         g_scpiInputBuffer = nullptr;
         g_scpiInputBufferLength = 0;
     } else if (inputBuffer == g_debuggerInputBuffer) {
-        free(g_debuggerInputBuffer - 4);
+        ::free(g_debuggerInputBuffer - 4);
         g_debuggerInputBuffer = nullptr;
         g_debuggerInputBufferLength = 0;
     }

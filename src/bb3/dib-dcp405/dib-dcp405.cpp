@@ -999,7 +999,7 @@ struct DcpChannel : public Channel {
         return u.mon > SIGNIFICANT_INPUT_VOLTAGE_WHEN_CHANNEL_IS_OFF;
     }
 
-    bool isErrorInputVoltageDetectedWhenChannellIsOff() {
+    bool isErrorInputVoltageDetectedWhenChannellIsOff() override {
         return u.mon > ERROR_INPUT_VOLTAGE_WHEN_CHANNEL_IS_OFF;
     }    
 };

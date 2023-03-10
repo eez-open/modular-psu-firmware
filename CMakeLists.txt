@@ -17,7 +17,7 @@ if(${CMAKE_SYSTEM_NAME} STREQUAL "Emscripten")
 endif()
 
 add_definitions(-DFIRMWARE_VERSION_MAJOR=1)
-add_definitions(-DFIRMWARE_VERSION_MINOR=8.alpha3)
+add_definitions(-DFIRMWARE_VERSION_MINOR=8.alpha4)
 
 if(NOT(${CMAKE_SYSTEM_NAME} STREQUAL "Emscripten"))
     set(SDL2_BUILDING_LIBRARY 1)
