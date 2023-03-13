@@ -223,8 +223,8 @@
         {
           "objID": "24150806-de97-4a16-a08a-1303afa1879b",
           "type": "StartActionComponent",
-          "left": -473,
-          "top": -139,
+          "left": -653,
+          "top": -138,
           "width": 87,
           "height": 25,
           "customInputs": [],
@@ -235,11 +235,11 @@
           "type": "SCPIActionComponent",
           "left": -317,
           "top": -139,
-          "width": 244,
+          "width": 195,
           "height": 55,
           "customInputs": [],
           "customOutputs": [],
-          "catchError": true,
+          "catchError": false,
           "instrument": "instrument",
           "scpi": "fw_ver = SYSTem:CPU:FIRMware?"
         },
@@ -280,8 +280,8 @@
           "type": "SCPIActionComponent",
           "left": 428,
           "top": -141,
-          "width": 250,
-          "height": 73,
+          "width": 247,
+          "height": 55,
           "customInputs": [],
           "customOutputs": [
             {
@@ -290,7 +290,7 @@
               "type": "string"
             }
           ],
-          "catchError": true,
+          "catchError": false,
           "instrument": "instrument",
           "scpi": "model = SYSTem:SLOT:MODel? {i}"
         },
@@ -354,8 +354,8 @@
           "type": "SCPIActionComponent",
           "left": 1579,
           "top": -176,
-          "width": 343,
-          "height": 73,
+          "width": 331,
+          "height": 55,
           "customInputs": [],
           "customOutputs": [
             {
@@ -364,7 +364,7 @@
               "type": "string"
             }
           ],
-          "catchError": true,
+          "catchError": false,
           "instrument": "instrument",
           "scpi": "label = SYSTem:CHANnel:LABel? {\"CH\" + ch_idx}"
         },
@@ -406,11 +406,11 @@
           "type": "SCPIActionComponent",
           "left": 2532,
           "top": -176,
-          "width": 330,
+          "width": 281,
           "height": 94,
           "customInputs": [],
           "customOutputs": [],
-          "catchError": true,
+          "catchError": false,
           "instrument": "instrument",
           "scpi": "{slots[i-1].u_min} = sour{ch_idx}:volt? MIN\n{slots[i-1].u_max} = sour{ch_idx}:volt? MAX\n{slots[i-1].i_min} = sour{ch_idx}:curr? MIN\n{slots[i-1].i_max} = sour{ch_idx}:curr? MAX\n"
         },
@@ -432,23 +432,12 @@
           ]
         },
         {
-          "objID": "af1315b0-c631-4d4b-ae43-7880c69c2008",
-          "type": "DelayActionComponent",
-          "left": 2909,
-          "top": -101,
-          "width": 87,
-          "height": 55,
-          "customInputs": [],
-          "customOutputs": [],
-          "milliseconds": "10"
-        },
-        {
           "objID": "6f7d2ab5-4b0b-4db5-8a22-137e59b760f9",
           "type": "SCPIActionComponent",
           "left": 1580,
           "top": -43,
-          "width": 386,
-          "height": 92,
+          "width": 381,
+          "height": 73,
           "customInputs": [],
           "customOutputs": [
             {
@@ -462,7 +451,7 @@
               "type": "string"
             }
           ],
-          "catchError": true,
+          "catchError": false,
           "instrument": "instrument",
           "scpi": "label = SYSTem:CHANnel:LABel? {\"CH\" + ch_idx}\nlabel2 = SYSTem:CHANnel:LABel? {\"CH\" + (ch_idx + 1)}"
         },
@@ -526,8 +515,8 @@
           "type": "SCPIActionComponent",
           "left": 1580,
           "top": 131,
-          "width": 250,
-          "height": 73,
+          "width": 239,
+          "height": 55,
           "customInputs": [],
           "customOutputs": [
             {
@@ -536,7 +525,7 @@
               "type": "string"
             }
           ],
-          "catchError": true,
+          "catchError": false,
           "instrument": "instrument",
           "scpi": "label = SYSTem:SLOT:LABel? {i}"
         },
@@ -573,8 +562,8 @@
           "type": "SetVariableActionComponent",
           "left": 1194,
           "top": 175,
-          "width": 128,
-          "height": 56,
+          "width": 159,
+          "height": 76,
           "customInputs": [],
           "customOutputs": [],
           "entries": [
@@ -582,6 +571,11 @@
               "objID": "bef1dc66-8f3c-4e84-8c71-c7c1e2a690be",
               "variable": "loaded",
               "value": "true"
+            },
+            {
+              "objID": "fa678c46-45c1-4006-e1a7-108e92738f8e",
+              "variable": "error_message",
+              "value": "\"\""
             }
           ]
         },
@@ -594,6 +588,23 @@
           "height": 25,
           "customInputs": [],
           "customOutputs": []
+        },
+        {
+          "objID": "d47fc663-c2c3-4547-dc50-821dc86cc852",
+          "type": "SetVariableActionComponent",
+          "left": -508,
+          "top": -138,
+          "width": 134,
+          "height": 56,
+          "customInputs": [],
+          "customOutputs": [],
+          "entries": [
+            {
+              "objID": "51f451e0-6c88-4b34-c712-99296192f004",
+              "variable": "loaded",
+              "value": "false"
+            }
+          ]
         }
       ],
       "connectionLines": [
@@ -752,73 +763,10 @@
           "input": "@seqin"
         },
         {
-          "objID": "b8707b43-fbf2-4114-9c32-d0d7ebeb067f",
-          "source": "3ca37eb4-3d7d-41aa-b808-bdf1ece1ca7c",
-          "output": "@error",
-          "target": "3ca37eb4-3d7d-41aa-b808-bdf1ece1ca7c",
-          "input": "@seqin"
-        },
-        {
-          "objID": "f7911ca0-58e5-4b19-90d1-36301f136ef9",
-          "source": "efaa8a26-a5ef-4597-c5bb-89ca26ae3f89",
-          "output": "@error",
-          "target": "5c8e41a4-1f96-426d-fd7a-4c660f42b33a",
-          "input": "start"
-        },
-        {
-          "objID": "16c52186-f5da-4de2-83a0-fee5843e786b",
-          "source": "06432ca1-ca06-458a-bdc1-17d36ddb5c17",
-          "output": "@error",
-          "target": "633dbad1-75ea-4bae-83a8-989538096ba0",
-          "input": "label"
-        },
-        {
-          "objID": "5392a511-f732-4f8b-c59d-6896e486b285",
-          "source": "6f7d2ab5-4b0b-4db5-8a22-137e59b760f9",
-          "output": "@error",
-          "target": "130765cf-3a52-44d9-b4ab-aa278bbc2ae7",
-          "input": "label"
-        },
-        {
-          "objID": "ab69918e-267d-48d7-a86f-59f5f9564f8d",
-          "source": "6f7d2ab5-4b0b-4db5-8a22-137e59b760f9",
-          "output": "@error",
-          "target": "130765cf-3a52-44d9-b4ab-aa278bbc2ae7",
-          "input": "label2"
-        },
-        {
-          "objID": "b9b99a40-8e8f-4d62-ea39-98c0191092d7",
-          "source": "9eaa92b7-d995-4706-b44a-0a83be234d85",
-          "output": "@error",
-          "target": "306441dd-3fa2-4b5a-8021-211e4f0a87ad",
-          "input": "label"
-        },
-        {
-          "objID": "774eecde-8a61-4680-c0a8-b8fd68e16b20",
-          "source": "9eaa92b7-d995-4706-b44a-0a83be234d85",
-          "output": "@error",
-          "target": "306441dd-3fa2-4b5a-8021-211e4f0a87ad",
-          "input": "@seqin"
-        },
-        {
-          "objID": "ba227a5a-5d4c-439b-bc91-304d55b1d6d0",
-          "source": "6f7d2ab5-4b0b-4db5-8a22-137e59b760f9",
-          "output": "@error",
-          "target": "130765cf-3a52-44d9-b4ab-aa278bbc2ae7",
-          "input": "@seqin"
-        },
-        {
-          "objID": "8d14e39b-22bd-40e8-b603-84589af581dc",
-          "source": "06432ca1-ca06-458a-bdc1-17d36ddb5c17",
-          "output": "@error",
-          "target": "633dbad1-75ea-4bae-83a8-989538096ba0",
-          "input": "@seqin"
-        },
-        {
           "objID": "1376d8e2-de99-457e-92a4-e2361ee6a2f3",
           "source": "24150806-de97-4a16-a08a-1303afa1879b",
           "output": "@seqout",
-          "target": "3ca37eb4-3d7d-41aa-b808-bdf1ece1ca7c",
+          "target": "d47fc663-c2c3-4547-dc50-821dc86cc852",
           "input": "@seqin"
         },
         {
@@ -836,17 +784,10 @@
           "input": "@seqin"
         },
         {
-          "objID": "9a0bfcd8-a7d5-42a2-b9bc-04ad6d5c7876",
-          "source": "fe1b7145-1a52-46e5-8d1b-6bd859a76334",
-          "output": "@error",
-          "target": "af1315b0-c631-4d4b-ae43-7880c69c2008",
-          "input": "@seqin"
-        },
-        {
-          "objID": "cdc442b5-8eca-4656-cf47-ab7dda92fbd5",
-          "source": "af1315b0-c631-4d4b-ae43-7880c69c2008",
+          "objID": "147eb365-e3c1-43e9-8dca-c7ff0d400cfa",
+          "source": "d47fc663-c2c3-4547-dc50-821dc86cc852",
           "output": "@seqout",
-          "target": "fe1b7145-1a52-46e5-8d1b-6bd859a76334",
+          "target": "3ca37eb4-3d7d-41aa-b808-bdf1ece1ca7c",
           "input": "@seqin"
         }
       ],
@@ -960,7 +901,7 @@
           "type": "IsTrueActionComponent",
           "left": -272,
           "top": -12,
-          "width": 249,
+          "width": 250,
           "height": 73,
           "customInputs": [],
           "customOutputs": [],
@@ -971,8 +912,8 @@
           "type": "SCPIActionComponent",
           "left": 23,
           "top": -128,
-          "width": 170,
-          "height": 73,
+          "width": 149,
+          "height": 55,
           "customInputs": [],
           "customOutputs": [
             {
@@ -981,7 +922,7 @@
               "type": "string"
             }
           ],
-          "catchError": true,
+          "catchError": false,
           "instrument": "instrument",
           "scpi": "err = syst:error?"
         },
@@ -1109,13 +1050,6 @@
           "input": "@seqin"
         },
         {
-          "objID": "b2e5f840-13e8-4725-ff6e-7d22e95f28fd",
-          "source": "06a2d90b-e21a-4bd8-be6d-8cb128170277",
-          "output": "@error",
-          "target": "d12054d6-162b-4d18-8595-287f12ae2159",
-          "input": "value"
-        },
-        {
           "objID": "1f3b8669-b707-40d3-f8df-26a11f00dac6",
           "source": "74415d9f-ba33-403a-83c3-0f0c9fce4276",
           "output": "True",
@@ -1128,13 +1062,6 @@
           "output": "False",
           "target": "acfa5035-1c22-4510-82f9-fdc4f1ea54d0",
           "input": "@seqin"
-        },
-        {
-          "objID": "0876c223-f899-4118-fda5-2522e7e7500b",
-          "source": "06a2d90b-e21a-4bd8-be6d-8cb128170277",
-          "output": "@error",
-          "target": "872ff061-75ff-4bba-8fa6-69a6611cf32a",
-          "input": "err"
         }
       ],
       "localVariables": [],
@@ -1186,18 +1113,18 @@
           "type": "SCPIActionComponent",
           "left": 465,
           "top": -55,
-          "width": 349,
+          "width": 299,
           "height": 133,
           "customInputs": [],
           "customOutputs": [],
-          "catchError": true,
+          "catchError": false,
           "instrument": "instrument",
           "scpi": "{slots[i].oe} = outp? {slots[i].ch}\n{slots[i].mode} = OUTPut:MODE? {slots[i].ch}\n{slots[i].u_set} = sour{slots[i].ch_idx}:volt?\n{slots[i].i_set} = sour{slots[i].ch_idx}:curr?\n{slots[i].u_mon} = meas:volt? {slots[i].ch}\n{slots[i].i_mon} = meas:curr? {slots[i].ch}\n{slots[i].p_mon} = meas:pow? {slots[i].ch}"
         },
         {
           "objID": "2052b813-da5a-4e96-e437-a8cb7a4df6ad",
           "type": "SetVariableActionComponent",
-          "left": 864,
+          "left": 820,
           "top": -55,
           "width": 214,
           "height": 56,
@@ -1248,13 +1175,6 @@
           "objID": "b3e05110-1741-4b72-a0f8-4299752e2770",
           "source": "2052b813-da5a-4e96-e437-a8cb7a4df6ad",
           "output": "@seqout",
-          "target": "45ebc062-eb4c-4b60-e5db-5bf6f8782b72",
-          "input": "next"
-        },
-        {
-          "objID": "1d8dda55-0de3-425a-ea17-a8cbf75cd6a7",
-          "source": "4ff324fe-c964-4da7-cbe2-ce27fff51777",
-          "output": "@error",
           "target": "45ebc062-eb4c-4b60-e5db-5bf6f8782b72",
           "input": "next"
         },
@@ -1404,7 +1324,7 @@
               "type": "TextWidget",
               "left": 206,
               "top": 10,
-              "width": 302,
+              "width": 420,
               "height": 28,
               "customInputs": [],
               "customOutputs": [],
@@ -1421,64 +1341,25 @@
             {
               "objID": "e950324f-54aa-4fd0-a7a6-669d167f8ba9",
               "type": "TextWidget",
-              "left": 508,
+              "left": 626,
               "top": 10,
-              "width": 144,
+              "width": 174,
               "height": 28,
               "customInputs": [],
               "customOutputs": [],
-              "data": "\"Firmware Ver. \" + fw_ver",
+              "data": "fw_ver ? \"Firmware Ver. \" + fw_ver : \"\"",
               "style": {
                 "objID": "55a3106b-8da1-49f8-a057-5526a179671a",
                 "inheritFrom": "default",
                 "fontSize": "",
                 "fontWeight": "normal",
-                "alignHorizontal": "center"
+                "alignHorizontal": "right"
               },
               "hiddenInEditor": false,
               "timeline": []
-            },
-            {
-              "objID": "19b274b2-b9dd-4ca7-d4b1-87e1e6b69746",
-              "type": "ButtonWidget",
-              "left": 650,
-              "top": 5,
-              "width": 150,
-              "height": 37,
-              "customInputs": [],
-              "customOutputs": [],
-              "asOutputProperties": [
-                "action"
-              ],
-              "data": "\"Firmware upgrade\"",
-              "style": {
-                "objID": "68b8e89b-c9e3-4038-97d1-aac1da71554b",
-                "inheritFrom": "button",
-                "fontSize": "14",
-                "fontWeight": "900",
-                "fontStyle": "normal",
-                "alignVertical": "center"
-              },
-              "timeline": [],
-              "enabled": "false",
-              "disabledStyle": {
-                "objID": "4fbd0d29-976e-42d8-ab05-f4b0cb351ee2",
-                "inheritFrom": "default"
-              }
             }
           ],
           "layout": "static"
-        },
-        {
-          "objID": "fb7c6e12-e830-41d9-fe22-b25234fecb97",
-          "type": "LogActionComponent",
-          "left": 859,
-          "top": 443,
-          "width": 87,
-          "height": 55,
-          "customInputs": [],
-          "customOutputs": [],
-          "value": "\"TODO\""
         },
         {
           "objID": "b4277a3a-2be5-468c-f7a5-463cfb3039b8",
@@ -1545,7 +1426,7 @@
         {
           "objID": "ef011a77-3b03-4cb1-9064-43b1ac3a1423",
           "type": "StartActionComponent",
-          "left": 134,
+          "left": 81,
           "top": -76,
           "width": 87,
           "height": 25,
@@ -1573,16 +1454,58 @@
           "customInputs": [],
           "customOutputs": [],
           "milliseconds": "10"
+        },
+        {
+          "objID": "6df5465c-3914-433a-9f2e-1f15c8b241a1",
+          "type": "DelayActionComponent",
+          "left": 327,
+          "top": -320,
+          "width": 87,
+          "height": 55,
+          "customInputs": [],
+          "customOutputs": [],
+          "milliseconds": "100"
+        },
+        {
+          "objID": "24127d82-fdde-47c9-c405-ea89412fb422",
+          "type": "CatchErrorActionComponent",
+          "left": -46,
+          "top": -320,
+          "width": 93,
+          "height": 54,
+          "customInputs": [],
+          "customOutputs": []
+        },
+        {
+          "objID": "ab066ea7-d221-457d-bd21-390a197c517d",
+          "type": "SetVariableActionComponent",
+          "left": 97,
+          "top": -253,
+          "width": 218,
+          "height": 76,
+          "customInputs": [
+            {
+              "objID": "a64f8146-d552-42c6-98fb-1e39a5fc16c1",
+              "name": "err",
+              "type": "string"
+            }
+          ],
+          "customOutputs": [],
+          "entries": [
+            {
+              "objID": "fa6cc10d-95b9-47df-b2a8-8f1ba6807a3a",
+              "variable": "error_message",
+              "value": "err"
+            },
+            {
+              "objID": "735fcf29-c774-407d-eda3-93cf502d0c13",
+              "variable": "error_time",
+              "value": "Date.now()"
+            }
+          ]
         }
       ],
       "connectionLines": [
-        {
-          "objID": "82a3a509-232e-44a3-8de3-b4ab06fa79ab",
-          "source": "19b274b2-b9dd-4ca7-d4b1-87e1e6b69746",
-          "output": "action",
-          "target": "fb7c6e12-e830-41d9-fe22-b25234fecb97",
-          "input": "@seqin"
-        },
         {
           "objID": "b51e1f28-6f73-46ac-e04b-dab99139c139",
           "source": "3db28463-cf86-4261-af23-47177d81e36f",
@@ -1630,6 +1553,27 @@
           "source": "0e20649e-cf51-42f4-cae3-0df19ba86e2e",
           "output": "@seqout",
           "target": "f8a86189-ff4d-4f2b-9382-aace0b73474d",
+          "input": "@seqin"
+        },
+        {
+          "objID": "8d959827-d437-4cae-edeb-06eccff82f08",
+          "source": "24127d82-fdde-47c9-c405-ea89412fb422",
+          "output": "@seqout",
+          "target": "6df5465c-3914-433a-9f2e-1f15c8b241a1",
+          "input": "@seqin"
+        },
+        {
+          "objID": "7270111a-205f-41e4-c824-b8da1cc8f277",
+          "source": "24127d82-fdde-47c9-c405-ea89412fb422",
+          "output": "Message",
+          "target": "ab066ea7-d221-457d-bd21-390a197c517d",
+          "input": "err"
+        },
+        {
+          "objID": "89af2e68-7e18-44e1-880a-ffd91c885f47",
+          "source": "6df5465c-3914-433a-9f2e-1f15c8b241a1",
+          "output": "@seqout",
+          "target": "dd149896-6974-4c3a-b544-962bb382a844",
           "input": "@seqin"
         }
       ],
@@ -2441,7 +2385,7 @@
             {
               "objID": "e424bb74-7253-4891-ac7b-c0f958b47808",
               "variable": "number_input.value",
-              "value": "Math.round(slot.u_set, 3) + \"\""
+              "value": "slot.u_set"
             },
             {
               "objID": "6e6cc82a-0ecd-4017-a103-d342bd6b37e6",
@@ -2478,7 +2422,7 @@
             {
               "objID": "fea36a9a-8995-46b5-a0b9-1ab1335a6013",
               "variable": "number_input.value",
-              "value": "Math.round(slot.i_set, 5) + \"\""
+              "value": "slot.i_set"
             },
             {
               "objID": "d89c16f1-4ebb-458f-9381-cac1928c3727",
@@ -2846,7 +2790,7 @@
                 "action",
                 "onChange"
               ],
-              "data": "number_input.value",
+              "data": "input",
               "style": {
                 "objID": "80fa004e-4164-47ab-f563-68eb92c80dbc",
                 "inheritFrom": "default"
@@ -2957,26 +2901,26 @@
         {
           "objID": "eefd1333-169c-4d59-9b88-1141f3188852",
           "type": "IsTrueActionComponent",
-          "left": -131,
-          "top": 539,
-          "width": 299,
+          "left": -133,
+          "top": 504,
+          "width": 219,
           "height": 73,
           "customInputs": [],
           "customOutputs": [],
-          "value": "number_input.value >= number_input.min &&\nnumber_input.value <= number_input.max"
+          "value": "value >= number_input.min &&\nvalue <= number_input.max"
         },
         {
           "objID": "82157cae-ba21-45c5-a58f-96e610057ab9",
           "type": "SCPIActionComponent",
           "left": 227,
           "top": 539,
-          "width": 626,
+          "width": 546,
           "height": 55,
           "customInputs": [],
           "customOutputs": [],
           "catchError": true,
           "instrument": "instrument",
-          "scpi": "sour{number_input.ch_idx}:{number_input.unit == \"V\" ? \"volt\" : \"curr\"} {number_input.value}"
+          "scpi": "sour{number_input.ch_idx}:{number_input.unit == \"V\" ? \"volt\" : \"curr\"} {value}"
         },
         {
           "objID": "8904cadb-1738-4c1d-f810-57abe675b038",
@@ -3016,6 +2960,58 @@
               "value": "\"\""
             }
           ]
+        },
+        {
+          "objID": "82faa7eb-3b33-4545-a9ae-6bb74f08e46c",
+          "type": "SetVariableActionComponent",
+          "left": -512,
+          "top": 539,
+          "width": 282,
+          "height": 56,
+          "customInputs": [],
+          "customOutputs": [],
+          "catchError": true,
+          "entries": [
+            {
+              "objID": "3bf930e5-b7bc-483c-999c-76773e0071d2",
+              "variable": "value",
+              "value": "Flow.parseFloat(input)"
+            }
+          ]
+        },
+        {
+          "objID": "4d9b610b-6a89-4396-8178-2e22a09fc26f",
+          "type": "WatchVariableActionComponent",
+          "left": 106,
+          "top": -100,
+          "width": 185,
+          "height": 55,
+          "customInputs": [],
+          "customOutputs": [],
+          "variable": "number_input.value"
+        },
+        {
+          "objID": "56b3e9d3-d638-4f3c-d462-bcb03e31719a",
+          "type": "SetVariableActionComponent",
+          "left": 347,
+          "top": -100,
+          "width": 169,
+          "height": 56,
+          "customInputs": [
+            {
+              "objID": "fe18f248-ac57-421d-84f8-9b3f49f9deb3",
+              "name": "value",
+              "type": "float"
+            }
+          ],
+          "customOutputs": [],
+          "entries": [
+            {
+              "objID": "4557a6dd-b32e-436e-fe93-c910e51f54c2",
+              "variable": "input",
+              "value": "value"
+            }
+          ]
         }
       ],
       "connectionLines": [
@@ -3037,7 +3033,7 @@
           "objID": "8f395ee7-4100-4ee9-8ab6-1521ed005050",
           "source": "bf6a6d68-83bb-414e-8aa5-8fe9695e095a",
           "output": "action",
-          "target": "eefd1333-169c-4d59-9b88-1141f3188852",
+          "target": "82faa7eb-3b33-4545-a9ae-6bb74f08e46c",
           "input": "@seqin"
         },
         {
@@ -3058,7 +3054,7 @@
           "objID": "93dadf92-0f1b-4f27-f72b-5e7cb840e163",
           "source": "1ed9d174-234b-4b92-ec55-af463e320292",
           "output": "onChange",
-          "target": "eefd1333-169c-4d59-9b88-1141f3188852",
+          "target": "82faa7eb-3b33-4545-a9ae-6bb74f08e46c",
           "input": "@seqin"
         },
         {
@@ -3069,14 +3065,50 @@
           "input": "@seqin"
         },
         {
-          "objID": "72c6aeb2-a790-422e-910c-dd84f8fc8c34",
+          "objID": "37d09b00-6652-4a66-c483-4a2d8d11fef2",
+          "source": "82faa7eb-3b33-4545-a9ae-6bb74f08e46c",
+          "output": "@seqout",
+          "target": "eefd1333-169c-4d59-9b88-1141f3188852",
+          "input": "@seqin"
+        },
+        {
+          "objID": "be6f0c9e-fa3a-4328-932f-15ea70368239",
+          "source": "4d9b610b-6a89-4396-8178-2e22a09fc26f",
+          "output": "variable",
+          "target": "56b3e9d3-d638-4f3c-d462-bcb03e31719a",
+          "input": "value"
+        },
+        {
+          "objID": "e25f1e27-ffe5-4c7c-9b3f-bd8c5483258d",
+          "source": "82faa7eb-3b33-4545-a9ae-6bb74f08e46c",
+          "output": "@error",
+          "target": "8904cadb-1738-4c1d-f810-57abe675b038",
+          "input": "@seqin"
+        },
+        {
+          "objID": "7135f859-5fb1-4dfb-9a06-ccf6f3dbf2ad",
           "source": "82157cae-ba21-45c5-a58f-96e610057ab9",
           "output": "@error",
           "target": "993fbcd2-6f11-448b-abb8-1d07686402ad",
           "input": "@seqin"
         }
       ],
-      "localVariables": [],
+      "localVariables": [
+        {
+          "objID": "6a39e956-7e9e-4f31-a68c-d09b54d244b7",
+          "name": "input",
+          "type": "string",
+          "defaultValue": "\"\"",
+          "persistent": false
+        },
+        {
+          "objID": "d8173fa9-3f2a-4480-9228-7c064f70ce5e",
+          "name": "value",
+          "type": "float",
+          "defaultValue": "0",
+          "persistent": false
+        }
+      ],
       "name": "NumberInput",
       "style": "",
       "left": 0,
