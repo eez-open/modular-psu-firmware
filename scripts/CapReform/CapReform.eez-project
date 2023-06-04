@@ -516,7 +516,7 @@
                       },
                       "timeline": [],
                       "eventHandlers": [],
-                      "userWidgetPageName": "StartW"
+                      "userWidgetPageName": "Start"
                     },
                     {
                       "objID": "dca5b658-a6db-c190-10cb-1e0e1a8bc3b2",
@@ -533,7 +533,7 @@
                       },
                       "timeline": [],
                       "eventHandlers": [],
-                      "userWidgetPageName": "StopW"
+                      "userWidgetPageName": "Stop"
                     }
                   ]
                 },
@@ -569,7 +569,7 @@
                       },
                       "timeline": [],
                       "eventHandlers": [],
-                      "userWidgetPageName": "no dataW"
+                      "userWidgetPageName": "no data"
                     },
                     {
                       "objID": "d0e71894-4868-0981-5822-ded50f0c2687",
@@ -586,7 +586,7 @@
                       },
                       "timeline": [],
                       "eventHandlers": [],
-                      "userWidgetPageName": "ViewW"
+                      "userWidgetPageName": "View"
                     }
                   ]
                 },
@@ -622,7 +622,7 @@
                       },
                       "timeline": [],
                       "eventHandlers": [],
-                      "userWidgetPageName": "WiringDiagramW"
+                      "userWidgetPageName": "WiringDiagram"
                     },
                     {
                       "objID": "f613b27b-025b-41e2-86fc-b2ac1f143b40",
@@ -639,7 +639,7 @@
                       },
                       "timeline": [],
                       "eventHandlers": [],
-                      "userWidgetPageName": "BarGraphsW"
+                      "userWidgetPageName": "BarGraphs"
                     }
                   ]
                 }
@@ -678,198 +678,6 @@
       "lvglLocalStyles": {
         "objID": "ac69ea56-2887-70b2-b75f-ac170b248f48"
       }
-    },
-    {
-      "objID": "ec453344-a4ee-a9dc-c24d-409af92487e2",
-      "components": [
-        {
-          "objID": "368c4e59-b339-4f30-bca6-33eea3dd3365",
-          "type": "UserWidgetWidget",
-          "left": 0,
-          "top": 0,
-          "width": 64,
-          "height": 32,
-          "customInputs": [],
-          "customOutputs": [],
-          "style": {
-            "objID": "ebd573c5-8396-439c-f0eb-274555734698",
-            "inheritFrom": "default"
-          },
-          "timeline": [],
-          "eventHandlers": [],
-          "userWidgetPageName": "StartW"
-        }
-      ],
-      "connectionLines": [],
-      "localVariables": [],
-      "name": "Start",
-      "left": 0,
-      "top": 0,
-      "width": 64,
-      "height": 32,
-      "lvglLocalStyles": {
-        "objID": "8f25e293-51fc-5c29-57dd-f30539104b54"
-      }
-    },
-    {
-      "objID": "dc9a7529-ee36-f4d1-1288-0e617d490349",
-      "components": [
-        {
-          "objID": "fc79fcbf-5bf0-4731-afee-2c2b77ab952b",
-          "type": "UserWidgetWidget",
-          "left": 0,
-          "top": 0,
-          "width": 108,
-          "height": 32,
-          "customInputs": [],
-          "customOutputs": [],
-          "style": {
-            "objID": "c6dcf6c6-bbbb-4e77-99f2-c1a85ece4430",
-            "inheritFrom": "default"
-          },
-          "timeline": [],
-          "eventHandlers": [],
-          "userWidgetPageName": "ViewW"
-        }
-      ],
-      "connectionLines": [],
-      "localVariables": [],
-      "name": "View",
-      "left": 0,
-      "top": 0,
-      "width": 108,
-      "height": 32,
-      "lvglLocalStyles": {
-        "objID": "75cfef69-16db-988e-eaa8-b6eca1d278c8"
-      }
-    },
-    {
-      "objID": "29abfedf-d6a7-a181-a077-cc0a11e70a08",
-      "components": [
-        {
-          "objID": "8560539c-5115-4450-8556-eff8ecd6704f",
-          "type": "UserWidgetWidget",
-          "left": 0,
-          "top": 0,
-          "width": 64,
-          "height": 32,
-          "customInputs": [],
-          "customOutputs": [],
-          "style": {
-            "objID": "4f980eaa-01bb-4372-cc15-a19fdd754ea0",
-            "inheritFrom": "default"
-          },
-          "timeline": [],
-          "eventHandlers": [],
-          "userWidgetPageName": "StopW"
-        }
-      ],
-      "connectionLines": [],
-      "localVariables": [],
-      "name": "Stop",
-      "left": 0,
-      "top": 0,
-      "width": 64,
-      "height": 32,
-      "lvglLocalStyles": {
-        "objID": "4baec927-98ee-9e28-089d-e94bb92d7267"
-      }
-    },
-    {
-      "objID": "aec18cee-7ea5-dbc1-ae25-ea12443dce85",
-      "components": [
-        {
-          "objID": "3678cc11-6c03-437e-ae17-03b6d8eae877",
-          "type": "UserWidgetWidget",
-          "left": 0,
-          "top": 0,
-          "width": 108,
-          "height": 32,
-          "customInputs": [],
-          "customOutputs": [],
-          "style": {
-            "objID": "5804f74b-c487-4121-b166-96574a03e7a1",
-            "inheritFrom": "default"
-          },
-          "timeline": [],
-          "eventHandlers": [],
-          "userWidgetPageName": "no dataW"
-        }
-      ],
-      "connectionLines": [],
-      "localVariables": [],
-      "name": "no data",
-      "left": 0,
-      "top": 0,
-      "width": 108,
-      "height": 32,
-      "lvglLocalStyles": {
-        "objID": "abb05bf0-9458-4eb6-6e5d-c68703487be5"
-      }
-    },
-    {
-      "objID": "da5619e3-ce82-2ae1-6d67-fb2ba7d65c9c",
-      "components": [
-        {
-          "objID": "dd0c6e4a-952e-42db-afcc-8ec546acbf8e",
-          "type": "UserWidgetWidget",
-          "left": 0,
-          "top": 12,
-          "width": 134,
-          "height": 76,
-          "customInputs": [],
-          "customOutputs": [],
-          "style": {
-            "objID": "28bfd393-6000-4e45-b55f-98c1dd1b080b",
-            "inheritFrom": "default"
-          },
-          "timeline": [],
-          "eventHandlers": [],
-          "userWidgetPageName": "BarGraphsW"
-        }
-      ],
-      "connectionLines": [],
-      "localVariables": [],
-      "name": "BarGraphs",
-      "left": 0,
-      "top": 0,
-      "width": 134,
-      "height": 120,
-      "lvglLocalStyles": {
-        "objID": "630f4bcb-3ebb-0edb-90f4-517d7b0ac9c7"
-      }
-    },
-    {
-      "objID": "d7e2c4b3-53b9-9ec4-718a-fe5689c53bdc",
-      "components": [
-        {
-          "objID": "15b8f8c9-6f72-4b58-e566-7958abbd72cd",
-          "type": "UserWidgetWidget",
-          "left": 0,
-          "top": 0,
-          "width": 134,
-          "height": 110,
-          "customInputs": [],
-          "customOutputs": [],
-          "style": {
-            "objID": "c7e4dd87-d824-42e0-d15c-d4a57c528091",
-            "inheritFrom": "default"
-          },
-          "timeline": [],
-          "eventHandlers": [],
-          "userWidgetPageName": "WiringDiagramW"
-        }
-      ],
-      "connectionLines": [],
-      "localVariables": [],
-      "name": "WiringDiagram",
-      "left": 0,
-      "top": 0,
-      "width": 134,
-      "height": 110,
-      "lvglLocalStyles": {
-        "objID": "2c9bfb08-672d-9e6d-3971-f03f917c706b"
-      }
     }
   ],
   "userWidgets": [
@@ -904,7 +712,7 @@
       ],
       "connectionLines": [],
       "localVariables": [],
-      "name": "StartW",
+      "name": "Start",
       "left": 0,
       "top": 0,
       "width": 64,
@@ -945,7 +753,7 @@
       ],
       "connectionLines": [],
       "localVariables": [],
-      "name": "ViewW",
+      "name": "View",
       "left": 0,
       "top": 0,
       "width": 108,
@@ -986,7 +794,7 @@
       ],
       "connectionLines": [],
       "localVariables": [],
-      "name": "StopW",
+      "name": "Stop",
       "left": 0,
       "top": 0,
       "width": 64,
@@ -1020,7 +828,7 @@
       ],
       "connectionLines": [],
       "localVariables": [],
-      "name": "no dataW",
+      "name": "no data",
       "left": 0,
       "top": 0,
       "width": 108,
@@ -1072,7 +880,7 @@
       ],
       "connectionLines": [],
       "localVariables": [],
-      "name": "BarGraphsW",
+      "name": "BarGraphs",
       "left": 0,
       "top": 0,
       "width": 134,
@@ -1105,7 +913,7 @@
       ],
       "connectionLines": [],
       "localVariables": [],
-      "name": "WiringDiagramW",
+      "name": "WiringDiagram",
       "left": 0,
       "top": 0,
       "width": 134,
