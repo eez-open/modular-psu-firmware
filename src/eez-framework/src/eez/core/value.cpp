@@ -22,6 +22,7 @@
 #include <stdio.h>
 #include <string.h>
 #include <inttypes.h>
+#include <ctype.h>
 
 #include <eez/core/util.h>
 #include <eez/core/value.h>
@@ -731,7 +732,7 @@ ArrayValueRef::~ArrayValueRef() {
 
 bool assignValue(Value &dstValue, const Value &srcValue) {
     if (dstValue.isBoolean()) {
-        dstValue = srcValue;
+        dstValue = srcValue.toBool();
     } else if (dstValue.isInt32OrLess()) {
         dstValue = srcValue.toInt32();
     } else if (dstValue.isFloat()) {
@@ -857,7 +858,15 @@ double Value::toDouble(int *err) const {
 	}
 
 	if (isString()) {
-		return (double)atof(getString());
+        const char *pStart = getString();
+        char *pEnd;
+		double value = strtod(pStart, &pEnd);
+        while (isspace(*pEnd)) {
+            pEnd++;
+        }
+        if (*pEnd == '\0') {
+            return value;
+        }
 	}
 
     if (err) {
@@ -913,13 +922,21 @@ float Value::toFloat(int *err) const {
 	}
 
 	if (isString()) {
-		return (float)atof(getString());
+        const char *pStart = getString();
+        char *pEnd;
+		float value = strtof(pStart, &pEnd);
+        while (isspace(*pEnd)) {
+            pEnd++;
+        }
+        if (*pEnd == '\0') {
+            return value;
+        }
 	}
 
     if (err) {
         *err = 1;
     }
-	return NAN;
+    return NAN;
 }
 
 int32_t Value::toInt32(int *err) const {
@@ -973,7 +990,15 @@ int32_t Value::toInt32(int *err) const {
 	}
 
 	if (isString()) {
-		return (int64_t)atoi(getString());
+        const char *pStart = getString();
+        char *pEnd;
+		int value = strtol(pStart, &pEnd, 10);
+        while (isspace(*pEnd)) {
+            pEnd++;
+        }
+        if (*pEnd == '\0') {
+            return value;
+        }
 	}
 
     if (err) {
@@ -1027,7 +1052,15 @@ int64_t Value::toInt64(int *err) const {
 	}
 
 	if (isString()) {
-		return (int64_t)atoi(getString());
+        const char *pStart = getString();
+        char *pEnd;
+		int64_t value = strtol(pStart, &pEnd, 10);
+        while (isspace(*pEnd)) {
+            pEnd++;
+        }
+        if (*pEnd == '\0') {
+            return value;
+        }
 	}
 
     if (err) {

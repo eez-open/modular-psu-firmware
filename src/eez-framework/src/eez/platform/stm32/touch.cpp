@@ -129,13 +129,13 @@ void touchMeasure() {
 #endif
 
 #if defined(AR1021)
-    taskENTER_CRITICAL();
+    vTaskSuspendAll();
 
     uint8_t result[5];
     memset(result, 0, 5);
     HAL_I2C_Master_Receive(&hi2c1, TOUCH_DEVICE_ADDRESS, result, 5, 5);
 
-    taskEXIT_CRITICAL();
+    xTaskResumeAll();
 
     g_lastZ1Data = result[0] & 1 ? CONF_TOUCH_Z1_THRESHOLD + 1 : 0;
     if (g_lastZ1Data > CONF_TOUCH_Z1_THRESHOLD) {

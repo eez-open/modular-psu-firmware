@@ -36,7 +36,7 @@
 #include <eez/gui/widgets/containers/app_view.h>
 #include <eez/gui/widgets/containers/container.h>
 #include <eez/gui/widgets/containers/grid.h>
-#include <eez/gui/widgets/containers/layout_view.h>
+#include <eez/gui/widgets/containers/user_widget.h>
 #include <eez/gui/widgets/containers/list.h>
 #include <eez/gui/widgets/containers/select.h>
 

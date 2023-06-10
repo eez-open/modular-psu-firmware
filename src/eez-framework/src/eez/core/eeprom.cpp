@@ -94,14 +94,14 @@ bool readFromEEPROM(uint8_t *buffer, uint16_t bufferSize, uint16_t address) {
 
         HAL_StatusTypeDef returnValue;
 
-        taskENTER_CRITICAL();
+        vTaskSuspendAll();
         returnValue = HAL_I2C_Master_Transmit(&hi2c1, EEPROM_ADDRESS, data, 2, HAL_MAX_DELAY);
         if (returnValue != HAL_OK) {
-            taskEXIT_CRITICAL();
+            xTaskResumeAll();
             return false;
         }
         returnValue = HAL_I2C_Master_Receive(&hi2c1, EEPROM_ADDRESS, buffer + i, chunkSize, HAL_MAX_DELAY);
-        taskEXIT_CRITICAL();
+        xTaskResumeAll();
         if (returnValue != HAL_OK) {
             return false;
         }
@@ -122,9 +122,9 @@ bool writeToEEPROM(const uint8_t *buffer, uint16_t bufferSize, uint16_t address)
 
         HAL_StatusTypeDef returnValue;
 
-        taskENTER_CRITICAL();
+        vTaskSuspendAll();
         returnValue = HAL_I2C_Mem_Write(&hi2c1, EEPROM_ADDRESS, chunkAddress, I2C_MEMADD_SIZE_16BIT, (uint8_t *)buffer + i, chunkSize, HAL_MAX_DELAY);
-        taskEXIT_CRITICAL();
+        xTaskResumeAll();
 
         if (returnValue != HAL_OK) {
             return false;
@@ -140,14 +140,14 @@ bool writeToEEPROM(const uint8_t *buffer, uint16_t bufferSize, uint16_t address)
                 I2C_MEM_ADD_LSB(chunkAddress)
         };
 
-        taskENTER_CRITICAL();
+        vTaskSuspendAll();
         returnValue = HAL_I2C_Master_Transmit(&hi2c1, EEPROM_ADDRESS, data, 2, HAL_MAX_DELAY);
         if (returnValue != HAL_OK) {
-            taskEXIT_CRITICAL();
+            xTaskResumeAll();
             return false;
         }
         returnValue = HAL_I2C_Master_Receive(&hi2c1, EEPROM_ADDRESS, verify, chunkSize, HAL_MAX_DELAY);
-        taskEXIT_CRITICAL();
+        xTaskResumeAll();
         if (returnValue != HAL_OK) {
             return false;
         }
@@ -175,7 +175,7 @@ bool read(uint8_t *buffer, uint16_t bufferSize, uint16_t address) {
 #else
     File file;
     if (!file.open(EEPROM_FILE_PATH, FILE_READ)) {
-        return true;
+        return false;
     }
     file.seek(address);
     size_t readBytes = file.read(buffer, bufferSize);

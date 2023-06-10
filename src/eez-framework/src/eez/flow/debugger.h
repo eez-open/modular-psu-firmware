@@ -31,6 +31,8 @@ enum {
 };
 extern int g_debuggerMode;
 
+extern bool g_sendMinimalDebuggerMessages;
+
 bool canExecuteStep(FlowState *&flowState, unsigned &componentIndex);
 
 void onStarted(Assets *assets);
@@ -59,6 +61,8 @@ void logScpiQueryResult(FlowState *flowState, unsigned componentIndex, const cha
 void onPageChanged(int previousPageId, int activePageId, bool activePageIsFromStack = false, bool previousPageIsStillOnStack = false);
 
 void processDebuggerInput(char *buffer, uint32_t length);
+
+
 
 } // flow
 } // eez

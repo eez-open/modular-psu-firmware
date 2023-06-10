@@ -20,6 +20,10 @@
 
 #include <eez/core/action.h>
 
+#if defined(EEZ_FOR_LVGL)
+#include <eez/flow/hooks.h>
+#endif
+
 namespace eez {
 
 #if EEZ_OPTION_GUI
@@ -28,7 +32,7 @@ namespace gui {
 
 void executeActionFunction(int actionId) {
 #if defined(EEZ_FOR_LVGL)
-	g_actionExecFunctions[actionId](0);
+	eez::flow::executeLvglActionHook(actionId - 1);
 #else
     g_actionExecFunctions[actionId]();
 #endif

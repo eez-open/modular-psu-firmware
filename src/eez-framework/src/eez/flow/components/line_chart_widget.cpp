@@ -158,11 +158,11 @@ void executeLineChartWidgetComponent(FlowState *flowState, unsigned componentInd
         }
     }
 
-    // value input must be at position 0
-    int valueInputIndex = 0;
+    // reset input is at position 0
+    int resetInputIndex = 0;
 
-    // reset input is the last input
-    int resetInputIndex = component->inputs.count - 1;
+    // value input must be at position 1
+    int valueInputIndex = 1;
 
     if (flowState->values[component->inputs[resetInputIndex]].type != VALUE_TYPE_UNDEFINED) {
         // reset

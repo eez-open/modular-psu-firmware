@@ -44,23 +44,31 @@ typedef struct _ext_img_desc_t {
 } ext_img_desc_t;
 #endif
 
-void eez_flow_init(const uint8_t *assets, uint32_t assetsSize, lv_obj_t **objects, size_t numObjects, const ext_img_desc_t *images, size_t numImages);
+typedef void (*ActionExecFunc)(lv_event_t * e);
+void eez_flow_init(const uint8_t *assets, uint32_t assetsSize, lv_obj_t **objects, size_t numObjects, const ext_img_desc_t *images, size_t numImages, ActionExecFunc *actions);
+
 void eez_flow_tick();
+
+bool eez_flow_is_stopped();
 
 extern int16_t g_currentScreen;
 
 void loadScreen(int index);
 
 void flowOnPageLoaded(unsigned pageIndex);
-void flowPropagateValue(unsigned pageIndex, unsigned componentIndex, unsigned outputIndex);
 
-const char *evalTextProperty(unsigned pageIndex, unsigned componentIndex, unsigned propertyIndex, const char *errorMessage);
-int32_t evalIntegerProperty(unsigned pageIndex, unsigned componentIndex, unsigned propertyIndex, const char *errorMessage);
-bool evalBooleanProperty(unsigned pageIndex, unsigned componentIndex, unsigned propertyIndex, const char *errorMessage);
+// if flowState is nullptr then userWidgetComponentIndexOrPageIndex is page index
+void *getFlowState(void *flowState, unsigned userWidgetComponentIndexOrPageIndex);
 
-void assignStringProperty(unsigned pageIndex, unsigned componentIndex, unsigned propertyIndex, const char *value, const char *errorMessage);
-void assignIntegerProperty(unsigned pageIndex, unsigned componentIndex, unsigned propertyIndex, int32_t value, const char *errorMessage);
-void assignBooleanProperty(unsigned pageIndex, unsigned componentIndex, unsigned propertyIndex, bool value, const char *errorMessage);
+void flowPropagateValue(void *flowState, unsigned componentIndex, unsigned outputIndex);
+
+const char *evalTextProperty(void *flowState, unsigned componentIndex, unsigned propertyIndex, const char *errorMessage);
+int32_t evalIntegerProperty(void *flowState, unsigned componentIndex, unsigned propertyIndex, const char *errorMessage);
+bool evalBooleanProperty(void *flowState, unsigned componentIndex, unsigned propertyIndex, const char *errorMessage);
+
+void assignStringProperty(void *flowState, unsigned componentIndex, unsigned propertyIndex, const char *value, const char *errorMessage);
+void assignIntegerProperty(void *flowState, unsigned componentIndex, unsigned propertyIndex, int32_t value, const char *errorMessage);
+void assignBooleanProperty(void *flowState, unsigned componentIndex, unsigned propertyIndex, bool value, const char *errorMessage);
 
 float eez_linear(float x);
 float eez_easeInQuad(float x);
@@ -95,7 +103,7 @@ float eez_easeInBounce(float x);
 float eez_easeOutBounce(float x);
 float eez_easeInOutBounce(float x);
 
-float getTimelinePosition(unsigned pageIndex);
+float getTimelinePosition(void *flowState);
 
 extern int g_eezFlowLvlgMeterTickIndex;
 

@@ -29,8 +29,6 @@ struct CallActionActionComponent : public Component {
 	uint8_t outputsStartIndex;
 };
 
-typedef CallActionActionComponent LayoutViewWidgetComponent;
-
 struct CallActionComponenentExecutionState : public ComponenentExecutionState {
 	FlowState *flowState;
 

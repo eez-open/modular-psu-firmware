@@ -136,6 +136,7 @@ static void onSet(uint16_t value) {
 void DropDownListWidgetState::onTouch(const WidgetCursor &widgetCursor, Event &touchEvent) {
 	if (touchEvent.type == EVENT_TYPE_TOUCH_UP) {
 		g_dropDownListWidgetCursor = widgetCursor;
+        sound::playClick();
 		SelectFromEnumPage::pushSelectFromEnumPage(widgetCursor.appContext, enumDefinitionFunc, data.getInt(), nullptr, onSet, false, false);
 	}
 }

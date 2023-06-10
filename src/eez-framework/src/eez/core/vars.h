@@ -34,6 +34,14 @@ typedef struct _native_var_t {
     void *set;
 } native_var_t;
 
+#ifdef __cplusplus
+extern "C" {
+#endif
+
 extern native_var_t native_vars[];
+
+#ifdef __cplusplus
+}
+#endif
 
 #endif // EEZ_FRAMEWORK_CORE_VARS_H

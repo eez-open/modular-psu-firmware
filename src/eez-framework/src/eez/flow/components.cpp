@@ -67,10 +67,11 @@ void executeAnimateComponent(FlowState *flowState, unsigned componentIndex);
 void executeNoopComponent(FlowState *flowState, unsigned componentIndex);
 void executeOnEventComponent(FlowState *flowState, unsigned componentIndex);
 void executeLVGLComponent(FlowState *flowState, unsigned componentIndex);
+void executeLVGLUserWidgetComponent(FlowState *flowState, unsigned componentIndex);
 void executeSortArrayComponent(FlowState *flowState, unsigned componentIndex);
 
 #if EEZ_OPTION_GUI
-void executeLayoutViewWidgetComponent(FlowState *flowState, unsigned componentIndex);
+void executeUserWidgetWidgetComponent(FlowState *flowState, unsigned componentIndex);
 void executeLineChartWidgetComponent(FlowState *flowState, unsigned componentIndex);
 void executeRollerWidgetComponent(FlowState *flowState, unsigned componentIndex);
 #endif
@@ -124,6 +125,7 @@ static ExecuteComponentFunctionType g_executeComponentFunctions[] = {
     nullptr,
 #endif
     executeSortArrayComponent, // COMPONENT_TYPE_SORT_ARRAY_ACTION
+    executeLVGLUserWidgetComponent, // COMPONENT_TYPE_LVGL_USER_WIDGET
 };
 
 void registerComponent(ComponentTypes componentType, ExecuteComponentFunctionType executeComponentFunction) {
@@ -151,8 +153,8 @@ void executeComponent(FlowState *flowState, unsigned componentIndex) {
 	}
 #if EEZ_OPTION_GUI
     else if (component->type < 1000) {
-		if (component->type == defs_v3::COMPONENT_TYPE_LAYOUT_VIEW_WIDGET) {
-            executeLayoutViewWidgetComponent(flowState, componentIndex);
+		if (component->type == defs_v3::COMPONENT_TYPE_USER_WIDGET_WIDGET) {
+            executeUserWidgetWidgetComponent(flowState, componentIndex);
         } else if (component->type == defs_v3::COMPONENT_TYPE_LINE_CHART_EMBEDDED_WIDGET) {
 			executeLineChartWidgetComponent(flowState, componentIndex);
 		} else if (component->type == defs_v3::COMPONENT_TYPE_ROLLER_WIDGET) {

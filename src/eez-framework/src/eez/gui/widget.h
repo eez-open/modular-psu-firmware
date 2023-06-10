@@ -52,7 +52,7 @@ namespace gui {
     WIDGET_TYPE(ButtonGroup,   BUTTON_GROUP,   12) \
     WIDGET_TYPE(Reserved,      RESERVED,       13) \
     WIDGET_TYPE(BarGraph,      BAR_GRAPH,      14) \
-    WIDGET_TYPE(LayoutView,    LAYOUT_VIEW,    15) \
+    WIDGET_TYPE(UserWidget,    USER_WIDGET,    15) \
     WIDGET_TYPE(YTGraph,       YT_GRAPH,       16) \
     WIDGET_TYPE(UpDown,        UP_DOWN,        17) \
     WIDGET_TYPE(ListGraph,     LIST_GRAPH,     18) \

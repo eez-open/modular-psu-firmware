@@ -123,12 +123,20 @@ enum PropertyCode {
 
 ////////////////////////////////////////////////////////////////////////////////
 
+// in case when getLvglObjectFromIndexHook returns nullptr, i.e. LVGL widget is not yet created, we need to store
+// the index of the next action to be executed in the component execution state, so we can try later
+struct LVGLExecutionState : public ComponenentExecutionState {
+    uint32_t actionIndex;
+};
+
 void executeLVGLComponent(FlowState *flowState, unsigned componentIndex) {
     auto component = (LVGLComponent *)flowState->flow->components[componentIndex];
 
     char errorMessage[256];
 
-    for (uint32_t actionIndex = 0; actionIndex < component->actions.count; actionIndex++) {
+    auto executionState = (LVGLExecutionState *)flowState->componenentExecutionStates[componentIndex];
+
+    for (uint32_t actionIndex = executionState ? executionState->actionIndex : 0; actionIndex < component->actions.count; actionIndex++) {
         auto general = (LVGLComponent_ActionType *)component->actions[actionIndex];
         if (general->action == CHANGE_SCREEN) {
             auto specific = (LVGLComponent_ChangeScreen_ActionType *)general;
@@ -136,7 +144,15 @@ void executeLVGLComponent(FlowState *flowState, unsigned componentIndex) {
         } else if (general->action == PLAY_ANIMATION) {
             auto specific = (LVGLComponent_PlayAnimation_ActionType *)general;
 
-            auto target = getLvglObjectFromIndexHook(specific->target);
+            auto target = getLvglObjectFromIndexHook(flowState->lvglWidgetStartIndex + specific->target);
+            if (!target) {
+                if (!executionState) {
+                    executionState = allocateComponentExecutionState<LVGLExecutionState>(flowState, componentIndex);
+                }
+                executionState->actionIndex = actionIndex;
+                addToQueue(flowState, componentIndex, -1, -1, -1, true);
+                return;
+            }
 
             lv_anim_t anim;
 
@@ -156,10 +172,26 @@ void executeLVGLComponent(FlowState *flowState, unsigned componentIndex) {
         } else if (general->action == SET_PROPERTY) {
             auto specific = (LVGLComponent_SetProperty_ActionType *)general;
 
-            auto target = getLvglObjectFromIndexHook(specific->target);
+            auto target = getLvglObjectFromIndexHook(flowState->lvglWidgetStartIndex + specific->target);
+            if (!target) {
+                if (!executionState) {
+                    executionState = allocateComponentExecutionState<LVGLExecutionState>(flowState, componentIndex);
+                }
+                executionState->actionIndex = actionIndex;
+                addToQueue(flowState, componentIndex, -1, -1, -1, true);
+                return;
+            }
 
             if (specific->property == KEYBOARD_TEXTAREA) {
-                auto textarea = specific->textarea != -1 ? getLvglObjectFromIndexHook(specific->textarea) : nullptr;
+                auto textarea = specific->textarea != -1 ? getLvglObjectFromIndexHook(flowState->lvglWidgetStartIndex + specific->textarea) : nullptr;
+                if (!textarea) {
+                    if (!executionState) {
+                        executionState = allocateComponentExecutionState<LVGLExecutionState>(flowState, componentIndex);
+                    }
+                    executionState->actionIndex = actionIndex;
+                    addToQueue(flowState, componentIndex, -1, -1, -1, true);
+                    return;
+                }
                 lv_keyboard_set_textarea(target, textarea);
             } else {
                 Value value;
@@ -179,7 +211,7 @@ void executeLVGLComponent(FlowState *flowState, unsigned componentIndex) {
                             throwError(flowState, componentIndex, errorMessage);
                         }
                     } else {
-                        lv_label_set_text(target, strValue);
+                        lv_label_set_text(target, strValue ? strValue : "");
                     }
                 } else if (specific->property == BASIC_HIDDEN) {
                     int err;
@@ -243,6 +275,8 @@ void executeLVGLComponent(FlowState *flowState, unsigned componentIndex) {
                     }
                 }
             }
+
+            lv_obj_update_layout(target);
         }
     }
 

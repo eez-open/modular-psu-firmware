@@ -34,11 +34,13 @@ static struct {
 static unsigned g_queueHead;
 static unsigned g_queueTail;
 static bool g_queueIsFull = false;
+unsigned g_numContinuousTaskInQueue;
 
 void queueReset() {
 	g_queueHead = 0;
 	g_queueTail = 0;
 	g_queueIsFull = false;
+    g_numContinuousTaskInQueue = 0;
 }
 
 size_t getQueueSize() {
@@ -73,6 +75,7 @@ bool addToQueue(FlowState *flowState, unsigned componentIndex, int sourceCompone
 	}
 
     if (!continuousTask) {
+        ++g_numContinuousTaskInQueue;
 	    onAddToQueue(flowState, sourceComponentIndex, sourceOutputIndex, componentIndex, targetInputIndex);
     }
 
@@ -98,6 +101,7 @@ void removeNextTaskFromQueue() {
 	g_queueIsFull = false;
 
     if (!continuousTask) {
+        --g_numContinuousTaskInQueue;
 	    onRemoveFromQueue();
     }
 }

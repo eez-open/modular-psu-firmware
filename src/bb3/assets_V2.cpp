@@ -23,7 +23,7 @@
 #include <eez/gui/widgets/containers/app_view.h>
 #include <eez/gui/widgets/containers/container.h>
 #include <eez/gui/widgets/containers/grid.h>
-#include <eez/gui/widgets/containers/layout_view.h>
+#include <eez/gui/widgets/containers/user_widget.h>
 #include <eez/gui/widgets/containers/list.h>
 #include <eez/gui/widgets/containers/select.h>
 
@@ -444,11 +444,11 @@ static uint32_t convertWidget(WidgetV2 &widgetV2) {
 		return savedOffset;
 	}
 	
-	if (widgetV2.type == WIDGET_TYPE_LAYOUT_VIEW) {
+	if (widgetV2.type == WIDGET_TYPE_USER_WIDGET) {
 		auto &widgetV2Specific = *(LayoutViewWidgetV2 *)specificV2;
-		auto &widgetV3Specific = (LayoutViewWidget &)widgetV3;
+		auto &widgetV3Specific = (UserWidgetWidget &)widgetV3;
 
-		ADD_V3_OFFSET(sizeof(LayoutViewWidget));
+		ADD_V3_OFFSET(sizeof(UserWidgetWidget));
 
 		widgetV3Specific.layout = widgetV2Specific.layout;
 		widgetV3Specific.context = widgetV2Specific.context;

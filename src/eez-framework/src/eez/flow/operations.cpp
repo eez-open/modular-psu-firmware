@@ -38,7 +38,7 @@
 using namespace eez::gui;
 #endif
 
-extern "C" int g_eezFlowLvlgMeterTickIndex = 0;
+int g_eezFlowLvlgMeterTickIndex = 0;
 
 namespace eez {
 namespace flow {
@@ -54,6 +54,14 @@ Value op_add(const Value& a1, const Value& b1) {
 
     auto a = a1.getValue();
     auto b = b1.getValue();
+
+    if (!(a.isString() || a.isDouble() || a.isFloat() || a.isInt64() || a.isInt32OrLess())) {
+        return Value::makeError();
+    }
+
+    if (!(b.isString() || b.isDouble() || b.isFloat() || b.isInt64() || b.isInt32OrLess())) {
+        return Value::makeError();
+    }
 
     if (a.isString() || b.isString()) {
         Value value1 = a.toString(0x84eafaa8);
@@ -78,11 +86,7 @@ Value op_add(const Value& a1, const Value& b1) {
         return Value(a.toInt64() + b.toInt64(), VALUE_TYPE_INT64);
     }
 
-    if (a.isInt32OrLess() && b.isInt32OrLess()) {
-        return Value((int)(a.int32Value + b.int32Value), VALUE_TYPE_INT32);
-    }
-
-    return Value();
+    return Value((int)(a.int32Value + b.int32Value), VALUE_TYPE_INT32);
 }
 
 Value op_sub(const Value& a1, const Value& b1) {
@@ -97,6 +101,14 @@ Value op_sub(const Value& a1, const Value& b1) {
     auto a = a1.getValue();
     auto b = b1.getValue();
 
+    if (!(a.isDouble() || a.isFloat() || a.isInt64() || a.isInt32OrLess())) {
+        return Value::makeError();
+    }
+
+    if (!(b.isDouble() || b.isFloat() || b.isInt64() || b.isInt32OrLess())) {
+        return Value::makeError();
+    }
+
     if (a.isDouble() || b.isDouble()) {
         return Value(a.toDouble() - b.toDouble(), VALUE_TYPE_DOUBLE);
     }
@@ -109,11 +121,7 @@ Value op_sub(const Value& a1, const Value& b1) {
         return Value(a.toInt64() - b.toInt64(), VALUE_TYPE_INT64);
     }
 
-    if (a.isInt32OrLess() && b.isInt32OrLess()) {
-        return Value((int)(a.int32Value - b.int32Value), VALUE_TYPE_INT32);
-    }
-
-    return Value();
+    return Value((int)(a.int32Value - b.int32Value), VALUE_TYPE_INT32);
 }
 
 Value op_mul(const Value& a1, const Value& b1) {
@@ -128,6 +136,14 @@ Value op_mul(const Value& a1, const Value& b1) {
     auto a = a1.getValue();
     auto b = b1.getValue();
 
+    if (!(a.isDouble() || a.isFloat() || a.isInt64() || a.isInt32OrLess())) {
+        return Value::makeError();
+    }
+
+    if (!(b.isDouble() || b.isFloat() || b.isInt64() || b.isInt32OrLess())) {
+        return Value::makeError();
+    }
+
     if (a.isDouble() || b.isDouble()) {
         return Value(a.toDouble() * b.toDouble(), VALUE_TYPE_DOUBLE);
     }
@@ -140,11 +156,7 @@ Value op_mul(const Value& a1, const Value& b1) {
         return Value(a.toInt64() * b.toInt64(), VALUE_TYPE_INT64);
     }
 
-    if (a.isInt32OrLess() && b.isInt32OrLess()) {
-        return Value((int)(a.int32Value * b.int32Value), VALUE_TYPE_INT32);
-    }
-
-    return Value();
+    return Value((int)(a.int32Value * b.int32Value), VALUE_TYPE_INT32);
 }
 
 Value op_div(const Value& a1, const Value& b1) {
@@ -159,6 +171,14 @@ Value op_div(const Value& a1, const Value& b1) {
     auto a = a1.getValue();
     auto b = b1.getValue();
 
+    if (!(a.isDouble() || a.isFloat() || a.isInt64() || a.isInt32OrLess())) {
+        return Value::makeError();
+    }
+
+    if (!(b.isDouble() || b.isFloat() || b.isInt64() || b.isInt32OrLess())) {
+        return Value::makeError();
+    }
+
     if (a.isDouble() || b.isDouble()) {
         return Value(a.toDouble() / b.toDouble(), VALUE_TYPE_DOUBLE);
     }
@@ -168,14 +188,19 @@ Value op_div(const Value& a1, const Value& b1) {
     }
 
     if (a.isInt64() || b.isInt64()) {
-        return Value(1.0 * a.toInt64() / b.toInt64(), VALUE_TYPE_DOUBLE);
+        auto d = b.toInt64();
+        if (d == 0) {
+            return Value::makeError();
+        }
+
+        return Value(1.0 * a.toInt64() / d, VALUE_TYPE_DOUBLE);
     }
 
-    if (a.isInt32OrLess() && b.isInt32OrLess()) {
-        return Value(1.0 * a.int32Value / b.int32Value, VALUE_TYPE_DOUBLE);
+    if (b.int32Value == 0) {
+        return Value::makeError();
     }
 
-    return Value();
+    return Value(1.0 * a.int32Value / b.int32Value, VALUE_TYPE_DOUBLE);
 }
 
 Value op_mod(const Value& a1, const Value& b1) {
@@ -190,7 +215,36 @@ Value op_mod(const Value& a1, const Value& b1) {
     auto a = a1.getValue();
     auto b = b1.getValue();
 
-    return Value(a.toDouble() - floor(a.toDouble() / b.toDouble()) * b.toDouble(), VALUE_TYPE_DOUBLE);
+    if (!(a.isDouble() || a.isFloat() || a.isInt64() || a.isInt32OrLess())) {
+        return Value::makeError();
+    }
+
+    if (!(b.isDouble() || b.isFloat() || b.isInt64() || b.isInt32OrLess())) {
+        return Value::makeError();
+    }
+
+    if (a.isDouble() || b.isDouble()) {
+        Value(a.toDouble() - floor(a.toDouble() / b.toDouble()) * b.toDouble(), VALUE_TYPE_DOUBLE);
+    }
+
+    if (a.isFloat() || b.isFloat()) {
+        Value(a.toFloat() - floor(a.toFloat() / b.toFloat()) * b.toFloat(), VALUE_TYPE_FLOAT);
+    }
+
+    if (a.isInt64() || b.isInt64()) {
+        auto d = b.toInt64();
+        if (d == 0) {
+            return Value::makeError();
+        }
+
+        return Value(a.toInt64() % d, VALUE_TYPE_INT64);
+    }
+
+    if (b.int32Value == 0) {
+        return Value::makeError();
+    }
+
+    return Value((int)(a.int32Value % b.int32Value), VALUE_TYPE_INT32);
 }
 
 Value op_left_shift(const Value& a1, const Value& b1) {
@@ -204,6 +258,18 @@ Value op_left_shift(const Value& a1, const Value& b1) {
 
     auto a = a1.getValue();
     auto b = b1.getValue();
+
+    if (!(a.isInt64() || a.isInt32OrLess())) {
+        return Value::makeError();
+    }
+
+    if (!(b.isInt64() || b.isInt32OrLess())) {
+        return Value::makeError();
+    }
+
+    if (a.isInt64() || b.isInt64()) {
+        return Value(a.toInt64() << b.toInt64(), VALUE_TYPE_INT64);
+    }
 
     return Value((int)(a.toInt32() << b.toInt32()), VALUE_TYPE_INT32);
 }
@@ -220,7 +286,20 @@ Value op_right_shift(const Value& a1, const Value& b1) {
     auto a = a1.getValue();
     auto b = b1.getValue();
 
+    if (!(a.isInt64() || a.isInt32OrLess())) {
+        return Value::makeError();
+    }
+
+    if (!(b.isInt64() || b.isInt32OrLess())) {
+        return Value::makeError();
+    }
+
+    if (a.isInt64() || b.isInt64()) {
+        return Value(a.toInt64() >> b.toInt64(), VALUE_TYPE_INT64);
+    }
+
     return Value((int)(a.toInt32() >> b.toInt32()), VALUE_TYPE_INT32);
+
 }
 
 Value op_binary_and(const Value& a1, const Value& b1) {
@@ -235,7 +314,19 @@ Value op_binary_and(const Value& a1, const Value& b1) {
     auto a = a1.getValue();
     auto b = b1.getValue();
 
-    return Value((int)(a.toBool() & b.toBool()), VALUE_TYPE_INT32);
+    if (!(a.isInt64() || a.isInt32OrLess())) {
+        return Value::makeError();
+    }
+
+    if (!(b.isInt64() || b.isInt32OrLess())) {
+        return Value::makeError();
+    }
+
+    if (a.isInt64() || b.isInt64()) {
+        return Value(a.toInt64() & b.toInt64(), VALUE_TYPE_INT64);
+    }
+
+    return Value((int)(a.toInt32() & b.toInt32()), VALUE_TYPE_INT32);
 }
 
 Value op_binary_or(const Value& a1, const Value& b1) {
@@ -250,7 +341,19 @@ Value op_binary_or(const Value& a1, const Value& b1) {
     auto a = a1.getValue();
     auto b = b1.getValue();
 
-    return Value((int)(a.toBool() | b.toBool()), VALUE_TYPE_INT32);
+    if (!(a.isInt64() || a.isInt32OrLess())) {
+        return Value::makeError();
+    }
+
+    if (!(b.isInt64() || b.isInt32OrLess())) {
+        return Value::makeError();
+    }
+
+    if (a.isInt64() || b.isInt64()) {
+        return Value(a.toInt64() | b.toInt64(), VALUE_TYPE_INT64);
+    }
+
+    return Value((int)(a.toInt32() | b.toInt32()), VALUE_TYPE_INT32);
 }
 
 Value op_binary_xor(const Value& a1, const Value& b1) {
@@ -265,7 +368,19 @@ Value op_binary_xor(const Value& a1, const Value& b1) {
     auto a = a1.getValue();
     auto b = b1.getValue();
 
-    return Value((int)(a.toBool() ^ b.toBool()), VALUE_TYPE_INT32);
+    if (!(a.isInt64() || a.isInt32OrLess())) {
+        return Value::makeError();
+    }
+
+    if (!(b.isInt64() || b.isInt32OrLess())) {
+        return Value::makeError();
+    }
+
+    if (a.isInt64() || b.isInt64()) {
+        return Value(a.toInt64() ^ b.toInt64(), VALUE_TYPE_INT64);
+    }
+
+    return Value((int)(a.toInt32() ^ b.toInt32()), VALUE_TYPE_INT32);
 }
 
 bool is_equal(const Value& a1, const Value& b1) {

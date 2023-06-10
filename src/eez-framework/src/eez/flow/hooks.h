@@ -54,6 +54,7 @@ extern void (*onArrayValueFreeHook)(ArrayValue *arrayValue);
 #if defined(EEZ_FOR_LVGL)
 extern lv_obj_t *(*getLvglObjectFromIndexHook)(int32_t index);
 extern const void *(*getLvglImageByNameHook)(const char *name);
+extern void (*executeLvglActionHook)(int actionIndex);
 #endif
 
 extern double (*getDateNowHook)();

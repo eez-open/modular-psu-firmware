@@ -25,6 +25,7 @@ namespace flow {
 
 void queueReset();
 size_t getQueueSize();
+extern unsigned g_numContinuousTaskInQueue;
 bool addToQueue(FlowState *flowState, unsigned componentIndex,
     int sourceComponentIndex, int sourceOutputIndex, int targetInputIndex,
     bool continuousTask);

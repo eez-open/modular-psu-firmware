@@ -32,12 +32,10 @@ namespace eez {
 namespace gui {
 #endif
 
-#if defined(EEZ_FOR_LVGL)
-typedef void (*ActionExecFunc)(lv_event_t * e);
-#else
+#if !defined(EEZ_FOR_LVGL)
 typedef void (*ActionExecFunc)();
-#endif
 extern ActionExecFunc g_actionExecFunctions[];
+#endif
 
 void executeActionFunction(int actionId);
 

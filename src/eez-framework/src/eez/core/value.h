@@ -21,6 +21,7 @@
 #include <string.h>
 #include <eez/core/value_types.h>
 #include <eez/core/alloc.h>
+#include <eez/flow/flow_defs_v3.h>
 
 namespace eez {
 
@@ -321,7 +322,7 @@ struct Value {
     }
 
 	bool isDouble() const {
-		return type == VALUE_TYPE_DOUBLE;
+		return type == VALUE_TYPE_DOUBLE || type == VALUE_TYPE_DATE;
 	}
 
 	bool isBoolean() const {
@@ -376,7 +377,7 @@ struct Value {
 		return int64Value;
 	}
 
-	uint32_t getUInt64() const {
+	uint64_t getUInt64() const {
         return uint64Value;
     }
 
@@ -583,6 +584,9 @@ inline Value Value::getValue() const {
     if (type == VALUE_TYPE_ARRAY_ELEMENT_VALUE) {
         auto arrayElementValue = (ArrayElementValue *)refValue;
         auto array = arrayElementValue->arrayValue.getArray();
+        if (arrayElementValue->elementIndex < 0 || arrayElementValue->elementIndex >= (int)array->arraySize) {
+            return Value();
+        }
         return array->values[arrayElementValue->elementIndex];
     }
     return *this;
@@ -601,5 +605,170 @@ uint16_t getNumPagesFromValue(const Value &value);
 
 Value MakeRangeValue(uint16_t from, uint16_t to);
 Value MakeEnumDefinitionValue(uint8_t enumValue, uint8_t enumDefinition);
+
+////////////////////////////////////////////////////////////////////////////////
+
+inline Value IntegerValue(int32_t value) { return Value((int)value, VALUE_TYPE_INT32); }
+inline Value FloatValue(float value) { return Value(value, VALUE_TYPE_FLOAT); }
+inline Value DoubleValue(double value) { return Value(value, VALUE_TYPE_DOUBLE); }
+inline Value BooleanValue(bool value) { return Value(value, VALUE_TYPE_BOOLEAN); }
+inline Value StringValue(const char *value) { return Value::makeStringRef(value, -1, 0); }
+
+template<class T, uint32_t ARRAY_TYPE>
+struct ArrayOf {
+    Value value;
+
+    ArrayOf(size_t size) {
+        value = Value::makeArrayRef((uint32_t)size, ARRAY_TYPE, 0);
+    }
+
+    ArrayOf(Value value) : value(value) {}
+
+    operator Value() const { return value; }
+
+    operator bool() const { return value.isArray(); }
+
+    size_t size() {
+        return (size_t)value.getArray()->arraySize;
+    }
+
+    T at(int position) {
+        return value.getArray()->values[position];
+    }
+
+    void at(int position, const T &point) {
+        value.getArray()->values[position] = point.value;
+    }
+};
+
+struct ArrayOfInteger {
+    Value value;
+
+    ArrayOfInteger(size_t size) {
+        value = Value::makeArrayRef((uint32_t)size, flow::defs_v3::ARRAY_TYPE_INTEGER, 0);
+    }
+
+    ArrayOfInteger(Value value) : value(value) {}
+
+    operator Value() const { return value; }
+
+    operator bool() const { return value.isArray(); }
+
+    size_t size() {
+        return (size_t)value.getArray()->arraySize;
+    }
+
+    int at(int position) {
+        return value.getArray()->values[position].getInt();
+    }
+
+    void at(int position, int intValue) {
+        value.getArray()->values[position] = Value(intValue, VALUE_TYPE_INT32);
+    }
+};
+
+struct ArrayOfFloat {
+    Value value;
+
+    ArrayOfFloat(size_t size) {
+        value = Value::makeArrayRef((uint32_t)size, flow::defs_v3::ARRAY_TYPE_INTEGER, 0);
+    }
+
+    ArrayOfFloat(Value value) : value(value) {}
+
+    operator Value() const { return value; }
+
+    operator bool() const { return value.isArray(); }
+
+    size_t size() {
+        return (size_t)value.getArray()->arraySize;
+    }
+
+    float at(int position) {
+        return value.getArray()->values[position].getFloat();
+    }
+
+    void at(int position, float floatValue) {
+        value.getArray()->values[position] = Value(floatValue, VALUE_TYPE_FLOAT);
+    }
+};
+
+struct ArrayOfDouble {
+    Value value;
+
+    ArrayOfDouble(size_t size) {
+        value = Value::makeArrayRef((uint32_t)size, flow::defs_v3::ARRAY_TYPE_INTEGER, 0);
+    }
+
+    ArrayOfDouble(Value value) : value(value) {}
+
+    operator Value() const { return value; }
+
+    operator bool() const { return value.isArray(); }
+
+    size_t size() {
+        return (size_t)value.getArray()->arraySize;
+    }
+
+    double at(int position) {
+        return value.getArray()->values[position].getDouble();
+    }
+
+    void at(int position, double doubleValue) {
+        value.getArray()->values[position] = Value(doubleValue, VALUE_TYPE_DOUBLE);
+    }
+};
+
+struct ArrayOfBoolean {
+    Value value;
+
+    ArrayOfBoolean(size_t size) {
+        value = Value::makeArrayRef((uint32_t)size, flow::defs_v3::ARRAY_TYPE_INTEGER, 0);
+    }
+
+    ArrayOfBoolean(Value value) : value(value) {}
+
+    operator Value() const { return value; }
+
+    operator bool() const { return value.isArray(); }
+
+    size_t size() {
+        return (size_t)value.getArray()->arraySize;
+    }
+
+    bool at(int position) {
+        return value.getArray()->values[position].getDouble();
+    }
+
+    void at(int position, bool boolValue) {
+        value.getArray()->values[position] = Value(boolValue, VALUE_TYPE_BOOLEAN);
+    }
+};
+
+struct ArrayOfString {
+    Value value;
+
+    ArrayOfString(size_t size) {
+        value = Value::makeArrayRef((uint32_t)size, flow::defs_v3::ARRAY_TYPE_INTEGER, 0);
+    }
+
+    ArrayOfString(Value value) : value(value) {}
+
+    operator Value() const { return value; }
+
+    operator bool() const { return value.isArray(); }
+
+    size_t size() {
+        return (size_t)value.getArray()->arraySize;
+    }
+
+    const char *at(int position) {
+        return value.getArray()->values[position].getString();
+    }
+
+    void at(int position, const char *stringValue) {
+        value.getArray()->values[position] = Value(stringValue, VALUE_TYPE_STRING);
+    }
+};
 
 } // namespace eez

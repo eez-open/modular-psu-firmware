@@ -1,4 +1,3 @@
-
 /*
  * EEZ Modular Firmware
  * Copyright (C) 2021-present, Envox d.o.o.
@@ -67,6 +66,7 @@ static void updateArrayValue(ArrayValue *arrayValue1, ArrayValue *arrayValue2) {
             updateArrayValue(arrayValue1->values[i].getArray(), arrayValue2->values[i].getArray());
         } else {
             arrayValue1->values[i] = arrayValue2->values[i];
+            onValueChanged(&arrayValue1->values[i]);
         }
     }
 }
@@ -282,6 +282,10 @@ EM_PORT_API(void) clearInputValue(int flowStateIndex, int inputIndex) {
 }
 
 EM_PORT_API(Value *) evalProperty(int flowStateIndex, int componentIndex, int propertyIndex, int32_t *iterators, bool disableThrowError) {
+    if (eez::flow::isFlowStopped()) {
+        return nullptr;
+    }
+
     auto flowState = getFlowStateFromFlowStateIndex(flowStateIndex);
 
     if (disableThrowError) {
@@ -417,6 +421,10 @@ EM_PORT_API(int) getFlowStateFlowIndex(int flowStateIndex) {
     }
     auto flowState = getFlowStateFromFlowStateIndex(flowStateIndex);
     return flowState->flowIndex;
+}
+
+EM_PORT_API(void) setSendMinimalDebuggerMessages(bool sendMinimalDebuggerMessages) {
+    g_sendMinimalDebuggerMessages = sendMinimalDebuggerMessages;
 }
 
 #if EEZ_OPTION_GUI

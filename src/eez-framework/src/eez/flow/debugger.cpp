@@ -91,6 +91,7 @@ enum DebuggerState {
 };
 
 bool g_debuggerIsConnected;
+bool g_sendMinimalDebuggerMessages;
 static DebuggerState g_debuggerState;
 static bool g_skipNextBreakpoint;
 
@@ -127,6 +128,8 @@ void onDebuggerClientConnected() {
 	g_inputFromDebuggerPosition = 0;
 
     setDebuggerState(DEBUGGER_STATE_PAUSED);
+
+    // g_sendMinimalDebuggerMessages = true;
 }
 
 void onDebuggerClientDisconnected() {
@@ -418,7 +421,7 @@ void writeValue(const Value &value) {
 ////////////////////////////////////////////////////////////////////////////////
 
 void onStarted(Assets *assets) {
-    if (g_debuggerIsConnected) {
+    if (g_debuggerIsConnected && !g_sendMinimalDebuggerMessages) {
 		startToDebuggerMessageHook();
 
 		auto flowDefinition = static_cast<FlowDefinition *>(assets->flowDefinition);
@@ -444,7 +447,7 @@ void onStopped() {
 }
 
 void onAddToQueue(FlowState *flowState, int sourceComponentIndex, int sourceOutputIndex, unsigned targetComponentIndex, int targetInputIndex) {
-    if (g_debuggerIsConnected) {
+    if (g_debuggerIsConnected && !g_sendMinimalDebuggerMessages) {
 		startToDebuggerMessageHook();
 
         uint32_t free;
@@ -467,7 +470,7 @@ void onAddToQueue(FlowState *flowState, int sourceComponentIndex, int sourceOutp
 }
 
 void onRemoveFromQueue() {
-    if (g_debuggerIsConnected) {
+    if (g_debuggerIsConnected && !g_sendMinimalDebuggerMessages) {
 		startToDebuggerMessageHook();
 
         char buffer[256];
@@ -479,7 +482,7 @@ void onRemoveFromQueue() {
 }
 
 void onValueChanged(const Value *pValue) {
-    if (g_debuggerIsConnected) {
+    if (g_debuggerIsConnected && !g_sendMinimalDebuggerMessages) {
 		startToDebuggerMessageHook();
 
         char buffer[256];
@@ -653,7 +656,7 @@ void writeLogMessage(const char *str, size_t len) {
 }
 
 void logInfo(FlowState *flowState, unsigned componentIndex, const char *message) {
-	if (g_debuggerIsConnected) {
+	if (g_debuggerIsConnected && !g_sendMinimalDebuggerMessages) {
 		startToDebuggerMessageHook();
 
 		char buffer[256];
@@ -669,7 +672,7 @@ void logInfo(FlowState *flowState, unsigned componentIndex, const char *message)
 }
 
 void logScpiCommand(FlowState *flowState, unsigned componentIndex, const char *cmd) {
-	if (g_debuggerIsConnected) {
+	if (g_debuggerIsConnected && !g_sendMinimalDebuggerMessages) {
 		startToDebuggerMessageHook();
 
 		char buffer[256];
@@ -685,7 +688,7 @@ void logScpiCommand(FlowState *flowState, unsigned componentIndex, const char *c
 }
 
 void logScpiQuery(FlowState *flowState, unsigned componentIndex, const char *query) {
-	if (g_debuggerIsConnected) {
+	if (g_debuggerIsConnected && !g_sendMinimalDebuggerMessages) {
 		startToDebuggerMessageHook();
 
 		char buffer[256];
@@ -701,7 +704,7 @@ void logScpiQuery(FlowState *flowState, unsigned componentIndex, const char *que
 }
 
 void logScpiQueryResult(FlowState *flowState, unsigned componentIndex, const char *resultText, size_t resultTextLen) {
-	if (g_debuggerIsConnected) {
+	if (g_debuggerIsConnected && !g_sendMinimalDebuggerMessages) {
 		startToDebuggerMessageHook();
 
 		char buffer[256];

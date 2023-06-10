@@ -51,6 +51,8 @@
 
 #include <bb3/fpga/prog.h>
 
+#include <bb3/memory.h>
+
 extern bool g_supervisorWatchdogEnabled;
 
 namespace eez {
@@ -168,6 +170,49 @@ scpi_result_t scpi_cmd_debug(scpi_t *context) {
 #endif // DEBUG
 }
 
+static char *g_buffer = (char *)DLOG_RECORD_BUFFER;
+
+void dumpFreq(scpi_t *context) {
+	g_buffer[0] = 0;
+	stringAppendString(g_buffer, DLOG_RECORD_BUFFER_SIZE, "frequencies\r\n");
+    for (int i = 0; i < 290; i++) {
+		char buffer[100];
+        snprintf(buffer, sizeof(buffer), "%g\r\n", 240000000.0 + i * 2487889.0);
+        stringAppendString(g_buffer, DLOG_RECORD_BUFFER_SIZE, buffer);
+    }
+    SCPI_ResultCharacters(context, g_buffer, strlen(g_buffer));
+}
+
+void dumpTrace1(scpi_t *context) {
+	g_buffer[0] = 0;
+    for (int i = 0; i < 290; i++) {
+		char buffer[100];
+        snprintf(buffer, sizeof(buffer), "trace 1 value %d %g\r\n", i, i * 2.0);
+        stringAppendString(g_buffer, DLOG_RECORD_BUFFER_SIZE, buffer);
+    }
+    SCPI_ResultCharacters(context, g_buffer, strlen(g_buffer));
+}
+
+void dumpTrace2(scpi_t *context) {
+	g_buffer[0] = 0;
+    for (int i = 0; i < 290; i++) {
+		char buffer[100];
+        snprintf(buffer, sizeof(buffer), "trace 2 value %d %g\r\n", i, i * 3.0);
+        stringAppendString(g_buffer, DLOG_RECORD_BUFFER_SIZE, buffer);
+    }
+    SCPI_ResultCharacters(context, g_buffer, strlen(g_buffer));
+}
+
+void dumpTrace3(scpi_t *context) {
+	g_buffer[0] = 0;
+    for (int i = 0; i < 290; i++) {
+		char buffer[100];
+        snprintf(buffer, sizeof(buffer), "trace 3 value %d %g\r\n", i, 500 + 500 * sin(i * 2 * 3.14 / 290));
+        stringAppendString(g_buffer, DLOG_RECORD_BUFFER_SIZE, buffer);
+    }
+    SCPI_ResultCharacters(context, g_buffer, strlen(g_buffer));
+}
+
 scpi_result_t scpi_cmd_debugQ(scpi_t *context) {
 #ifdef DEBUG
     int32_t cmd;
@@ -193,7 +238,19 @@ scpi_result_t scpi_cmd_debugQ(scpi_t *context) {
 		} else if (cmd == 35) {
 			dumpAlloc(context);
 			return SCPI_RES_OK;
-		} else {
+		} else if (cmd == 101) {
+            dumpFreq(context);
+            return SCPI_RES_OK;
+        } else if (cmd == 102) {
+            dumpTrace1(context);
+            return SCPI_RES_OK;
+        } else if (cmd == 103) {
+            dumpTrace2(context);
+            return SCPI_RES_OK;
+        } else if (cmd == 104) {
+            dumpTrace3(context);
+            return SCPI_RES_OK;
+        } else {
             SCPI_ErrorPush(context, SCPI_ERROR_HARDWARE_MISSING);
             return SCPI_RES_ERR;
         }

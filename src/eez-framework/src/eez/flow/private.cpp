@@ -139,6 +139,10 @@ static FlowState *initFlowState(Assets *assets, int flowIndex, FlowState *parent
 
     flowState->timelinePosition = 0;
 
+#if defined(EEZ_FOR_LVGL)
+    flowState->lvglWidgetStartIndex = 0;
+#endif
+
     if (parentFlowState) {
         if (parentFlowState->lastChild) {
             parentFlowState->lastChild->nextSibling = flowState;
@@ -294,12 +298,6 @@ void freeFlowState(FlowState *flowState) {
 	onFlowStateDestroyed(flowState);
 
 	free(flowState);
-
-    if (parentFlowState) {
-        if (canFreeFlowState(parentFlowState)) {
-            freeFlowState(parentFlowState);
-        }
-    }
 }
 
 void deallocateComponentExecutionState(FlowState *flowState, unsigned componentIndex) {
@@ -430,20 +428,24 @@ void assignValue(FlowState *flowState, int componentIndex, Value &dstValue, cons
         if (dstValue.getType() == VALUE_TYPE_ARRAY_ELEMENT_VALUE) {
             auto arrayElementValue = (ArrayElementValue *)dstValue.refValue;
             auto array = arrayElementValue->arrayValue.getArray();
+            if (arrayElementValue->elementIndex < 0 || arrayElementValue->elementIndex >= (int)array->arraySize) {
+                throwError(flowState, componentIndex, "Can not assign, array element index out of bounds\n");
+                return;
+            }
             pDstValue = &array->values[arrayElementValue->elementIndex];
         } else {
             pDstValue = dstValue.pValueValue;
         }
 
-		if (assignValue(*pDstValue, srcValue)) {
-			onValueChanged(pDstValue);
-		} else {
-			char errorMessage[100];
-			snprintf(errorMessage, sizeof(errorMessage), "Can not assign %s to %s\n",
-				g_valueTypeNames[pDstValue->type](srcValue), g_valueTypeNames[srcValue.type](*pDstValue)
-			);
-			throwError(flowState, componentIndex, errorMessage);
-		}
+        if (assignValue(*pDstValue, srcValue)) {
+            onValueChanged(pDstValue);
+        } else {
+            char errorMessage[100];
+            snprintf(errorMessage, sizeof(errorMessage), "Can not assign %s to %s\n",
+                g_valueTypeNames[pDstValue->type](srcValue), g_valueTypeNames[srcValue.type](*pDstValue)
+            );
+            throwError(flowState, componentIndex, errorMessage);
+        }
 	}
 }
 
@@ -546,15 +548,18 @@ void throwError(FlowState *flowState, int componentIndex, const char *errorMessa
                 catchErrorComponentIndex
             )
         ) {
+            for (FlowState *fs = flowState; fs != catchErrorFlowState; fs = fs->parentFlowState) {
+                fs->error = true;
+            }
+
 			auto catchErrorComponentExecutionState = allocateComponentExecutionState<CatchErrorComponenentExecutionState>(catchErrorFlowState, catchErrorComponentIndex);
 			catchErrorComponentExecutionState->message = Value::makeStringRef(errorMessage, strlen(errorMessage), 0x9473eef2);
 
 			if (!addToQueue(catchErrorFlowState, catchErrorComponentIndex, -1, -1, -1, false)) {
-				catchErrorFlowState->error = true;
+			    onFlowError(flowState, componentIndex, errorMessage);
 				stopScriptHook();
 			}
 		} else {
-			flowState->error = true;
 			onFlowError(flowState, componentIndex, errorMessage);
 			stopScriptHook();
 		}

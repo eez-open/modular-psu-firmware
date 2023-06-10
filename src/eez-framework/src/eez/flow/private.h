@@ -50,7 +50,7 @@ struct FlowState {
 	Flow *flow;
 	uint16_t flowIndex;
 	bool isAction;
-	uint16_t error;
+	bool error;
 	uint32_t numAsyncComponents;
 	FlowState *parentFlowState;
 	Component *parentComponent;
@@ -60,6 +60,9 @@ struct FlowState {
     bool *componenentAsyncStates;
     unsigned executingComponentIndex;
     float timelinePosition;
+#if defined(EEZ_FOR_LVGL)
+    int32_t lvglWidgetStartIndex;
+#endif
 
     FlowState *firstChild;
     FlowState *lastChild;

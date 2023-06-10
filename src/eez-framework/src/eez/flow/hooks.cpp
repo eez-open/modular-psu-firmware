@@ -90,8 +90,12 @@ static const void *getLvglImageByName(const char *name) {
     return 0;
 }
 
+static void executeLvglAction(int actionIndex) {
+}
+
 lv_obj_t *(*getLvglObjectFromIndexHook)(int32_t index) = getLvglObjectFromIndex;
 const void *(*getLvglImageByNameHook)(const char *name) = getLvglImageByName;
+void (*executeLvglActionHook)(int actionIndex) = executeLvglAction;
 #endif
 
 double getDateNowDefaultImplementation() {

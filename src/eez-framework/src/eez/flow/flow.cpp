@@ -30,12 +30,13 @@
 #include <eez/flow/flow_defs_v3.h>
 #include <eez/flow/debugger.h>
 #include <eez/flow/hooks.h>
+#include <eez/flow/components/lvgl_user_widget.h>
 
 #if EEZ_OPTION_GUI
 #include <eez/gui/gui.h>
 #include <eez/gui/keypad.h>
 #include <eez/gui/widgets/input.h>
-#include <eez/gui/widgets/containers/layout_view.h>
+#include <eez/gui/widgets/containers/user_widget.h>
 using namespace eez::gui;
 #endif
 
@@ -52,7 +53,10 @@ int g_selectedLanguage = 0;
 FlowState *g_firstFlowState;
 FlowState *g_lastFlowState;
 
+static bool g_isStopping = false;
 static bool g_isStopped = true;
+
+static void doStop();
 
 ////////////////////////////////////////////////////////////////////////////////
 
@@ -78,9 +82,16 @@ void tick() {
 		return;
 	}
 
+    if (g_isStopping) {
+        doStop();
+        return;
+    }
+
 	uint32_t startTickCount = millis();
 
-    for (size_t i = 0; ; i++) {
+    auto n = getQueueSize();
+
+    for (size_t i = 0; i < n || g_numContinuousTaskInQueue > 0; i++) {
 		FlowState *flowState;
 		unsigned componentIndex;
         bool continuousTask;
@@ -96,21 +107,25 @@ void tick() {
 
         flowState->executingComponentIndex = componentIndex;
 
-        if (continuousTask) {
-            auto componentExecutionState = (ComponenentExecutionState *)flowState->componenentExecutionStates[componentIndex];
-            if (!componentExecutionState) {
-                executeComponent(flowState, componentIndex);
-            } else if (componentExecutionState->lastExecutedTime + FLOW_TICK_MAX_DURATION_MS <= startTickCount) {
-                componentExecutionState->lastExecutedTime = startTickCount;
-                executeComponent(flowState, componentIndex);
-            } else {
-                addToQueue(flowState, componentIndex, -1, -1, -1, true);
-            }
+        if (flowState->error) {
+            deallocateComponentExecutionState(flowState, componentIndex);
         } else {
-		    executeComponent(flowState, componentIndex);
+            if (continuousTask) {
+                auto componentExecutionState = (ComponenentExecutionState *)flowState->componenentExecutionStates[componentIndex];
+                if (!componentExecutionState) {
+                    executeComponent(flowState, componentIndex);
+                } else if (componentExecutionState->lastExecutedTime + FLOW_TICK_MAX_DURATION_MS <= startTickCount) {
+                    componentExecutionState->lastExecutedTime = startTickCount;
+                    executeComponent(flowState, componentIndex);
+                } else {
+                    addToQueue(flowState, componentIndex, -1, -1, -1, true);
+                }
+            } else {
+                executeComponent(flowState, componentIndex);
+            }
         }
 
-        if (isFlowStopped()) {
+        if (isFlowStopped() || g_isStopping) {
             break;
         }
 
@@ -120,9 +135,11 @@ void tick() {
             freeFlowState(flowState);
         }
 
-		if (millis() - startTickCount >= FLOW_TICK_MAX_DURATION_MS) {
-			break;
-		}
+        if ((i + 1) % 5 == 0) {
+            if (millis() - startTickCount >= FLOW_TICK_MAX_DURATION_MS) {
+                break;
+            }
+        }
 	}
 
 	finishToDebuggerMessageHook();
@@ -139,6 +156,10 @@ void freeAllChildrenFlowStates(FlowState *firstChildFlowState) {
 }
 
 void stop() {
+    g_isStopping = true;
+}
+
+void doStop() {
     freeAllChildrenFlowStates(g_firstFlowState);
     g_firstFlowState = nullptr;
     g_lastFlowState = nullptr;
@@ -164,17 +185,17 @@ FlowState *getPageFlowState(Assets *assets, int16_t pageIndex, const WidgetCurso
 		return nullptr;
 	}
 
-	if (widgetCursor.widget && widgetCursor.widget->type == WIDGET_TYPE_LAYOUT_VIEW) {
+	if (widgetCursor.widget && widgetCursor.widget->type == WIDGET_TYPE_USER_WIDGET) {
 		if (widgetCursor.flowState) {
-			auto layoutViewWidget = (LayoutViewWidget *)widgetCursor.widget;
+			auto userWidgetWidget = (UserWidgetWidget *)widgetCursor.widget;
 			auto flowState = widgetCursor.flowState;
-			auto layoutViewWidgetComponentIndex = layoutViewWidget->componentIndex;
+			auto userWidgetWidgetComponentIndex = userWidgetWidget->componentIndex;
 
-			return getLayoutViewFlowState(flowState, layoutViewWidgetComponentIndex, pageIndex);
+			return getUserWidgetFlowState(flowState, userWidgetWidgetComponentIndex, pageIndex);
 		}
 	} else {
 		auto page = assets->pages[pageIndex];
-		if (!(page->flags & PAGE_IS_USED_AS_CUSTOM_WIDGET)) {
+		if (!(page->flags & PAGE_IS_USED_AS_USER_WIDGET)) {
             FlowState *flowState;
             for (flowState = g_firstFlowState; flowState; flowState = flowState->nextSibling) {
                 if (flowState->flowIndex == pageIndex) {
@@ -224,11 +245,19 @@ int getPageIndex(FlowState *flowState) {
 	return flowState->flowIndex;
 }
 
+Value getGlobalVariable(uint32_t globalVariableIndex) {
+    return getGlobalVariable(g_mainAssets, globalVariableIndex);
+}
+
 Value getGlobalVariable(Assets *assets, uint32_t globalVariableIndex) {
     if (globalVariableIndex >= 0 && globalVariableIndex < assets->flowDefinition->globalVariables.count) {
         return *assets->flowDefinition->globalVariables[globalVariableIndex];
     }
     return Value();
+}
+
+void setGlobalVariable(uint32_t globalVariableIndex, const Value &value) {
+    setGlobalVariable(g_mainAssets, globalVariableIndex, value);
 }
 
 void setGlobalVariable(Assets *assets, uint32_t globalVariableIndex, const Value &value) {
@@ -252,34 +281,34 @@ void executeFlowAction(const WidgetCursor &widgetCursor, int16_t actionId, void 
 		auto componentOutput = flow->widgetActions[actionId];
 		if (componentOutput->componentIndex != -1 && componentOutput->componentOutputIndex != -1) {
             if (widgetCursor.widget->type == WIDGET_TYPE_DROP_DOWN_LIST) {
-                auto params = Value::makeArrayRef(defs_v3::SYSTEM_STRUCTURE_DROP_DOWN_LIST_ACTION_PARAMS_NUM_FIELDS, defs_v3::SYSTEM_STRUCTURE_DROP_DOWN_LIST_ACTION_PARAMS, 0x53e3b30b);
+                auto params = Value::makeArrayRef(defs_v3::SYSTEM_STRUCTURE_DROP_DOWN_LIST_CHANGE_EVENT_NUM_FIELDS, defs_v3::SYSTEM_STRUCTURE_DROP_DOWN_LIST_CHANGE_EVENT, 0x53e3b30b);
 
                 // index
-                ((ArrayValueRef *)params.refValue)->arrayValue.values[defs_v3::SYSTEM_STRUCTURE_DROP_DOWN_LIST_ACTION_PARAMS_FIELD_INDEX] = widgetCursor.iterators[0];
+                ((ArrayValueRef *)params.refValue)->arrayValue.values[defs_v3::SYSTEM_STRUCTURE_DROP_DOWN_LIST_CHANGE_EVENT_FIELD_INDEX] = widgetCursor.iterators[0];
 
                 // indexes
                 auto indexes = Value::makeArrayRef(MAX_ITERATORS, defs_v3::ARRAY_TYPE_INTEGER, 0xb1f68ef8);
                 for (size_t i = 0; i < MAX_ITERATORS; i++) {
                     ((ArrayValueRef *)indexes.refValue)->arrayValue.values[i] = (int)widgetCursor.iterators[i];
                 }
-                ((ArrayValueRef *)params.refValue)->arrayValue.values[defs_v3::SYSTEM_STRUCTURE_DROP_DOWN_LIST_ACTION_PARAMS_FIELD_INDEXES] = indexes;
+                ((ArrayValueRef *)params.refValue)->arrayValue.values[defs_v3::SYSTEM_STRUCTURE_DROP_DOWN_LIST_CHANGE_EVENT_FIELD_INDEXES] = indexes;
 
                 // selectedIndex
-                ((ArrayValueRef *)params.refValue)->arrayValue.values[defs_v3::SYSTEM_STRUCTURE_DROP_DOWN_LIST_ACTION_PARAMS_FIELD_SELECTED_INDEX] = *((int *)param);
+                ((ArrayValueRef *)params.refValue)->arrayValue.values[defs_v3::SYSTEM_STRUCTURE_DROP_DOWN_LIST_CHANGE_EVENT_FIELD_SELECTED_INDEX] = *((int *)param);
 
                 propagateValue(flowState, componentOutput->componentIndex, componentOutput->componentOutputIndex, params);
             } else {
-                auto params = Value::makeArrayRef(defs_v3::SYSTEM_STRUCTURE_ACTION_PARAMS_NUM_FIELDS, defs_v3::SYSTEM_STRUCTURE_ACTION_PARAMS, 0x285940bb);
+                auto params = Value::makeArrayRef(defs_v3::SYSTEM_STRUCTURE_CLICK_EVENT_NUM_FIELDS, defs_v3::SYSTEM_STRUCTURE_CLICK_EVENT, 0x285940bb);
 
                 // index
-                ((ArrayValueRef *)params.refValue)->arrayValue.values[defs_v3::SYSTEM_STRUCTURE_ACTION_PARAMS_FIELD_INDEX] = widgetCursor.iterators[0];
+                ((ArrayValueRef *)params.refValue)->arrayValue.values[defs_v3::SYSTEM_STRUCTURE_CLICK_EVENT_FIELD_INDEX] = widgetCursor.iterators[0];
 
                 // indexes
                 auto indexes = Value::makeArrayRef(MAX_ITERATORS, defs_v3::ARRAY_TYPE_INTEGER, 0xb1f68ef8);
                 for (size_t i = 0; i < MAX_ITERATORS; i++) {
                     ((ArrayValueRef *)indexes.refValue)->arrayValue.values[i] = (int)widgetCursor.iterators[i];
                 }
-                ((ArrayValueRef *)params.refValue)->arrayValue.values[defs_v3::SYSTEM_STRUCTURE_ACTION_PARAMS_FIELD_INDEXES] = indexes;
+                ((ArrayValueRef *)params.refValue)->arrayValue.values[defs_v3::SYSTEM_STRUCTURE_CLICK_EVENT_FIELD_INDEXES] = indexes;
 
                 propagateValue(flowState, componentOutput->componentIndex, componentOutput->componentOutputIndex, params);
             }

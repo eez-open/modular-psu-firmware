@@ -233,19 +233,35 @@ int getThemesCount() {
 }
 
 Theme *getTheme(int i) {
-	return g_mainAssets->colorsDefinition->themes[i];
+    if (i < 0 || i >= (int)g_mainAssets->colorsDefinition->themes.count) {
+        return nullptr;
+    }
+    return g_mainAssets->colorsDefinition->themes[i];
 }
 
 const char *getThemeName(int i) {
-	return static_cast<const char *>(getTheme(i)->name);
+    auto theme = getTheme(i);
+    if (!theme) {
+	    return "";
+    }
+    return static_cast<const char *>(theme->name);
 }
 
 const uint32_t getThemeColorsCount(int themeIndex) {
-	return getTheme(themeIndex)->colors.count;
+    auto theme = getTheme(themeIndex);
+    if (!theme) {
+	    return 0;
+    }
+	return theme->colors.count;
 }
 
 const uint16_t *getThemeColors(int themeIndex) {
-	return static_cast<uint16_t *>(getTheme(themeIndex)->colors.items);
+    auto theme = getTheme(themeIndex);
+    if (!theme) {
+        static uint16_t *g_themeColors = { 0 };
+	    return g_themeColors;
+    }
+	return static_cast<uint16_t *>(theme->colors.items);
 }
 
 const uint16_t *getColors() {
