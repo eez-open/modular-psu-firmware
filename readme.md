@@ -1,4 +1,4 @@
-[![GitHub release](https://img.shields.io/github/release/eez-open/modular-psu-firmware.svg)](https://github.com/eez-open/modular-psu-firmware/releases)  [![license](https://img.shields.io/github/license/eez-open/modular-psu-firmware.svg)](https://github.com/eez-open/modular-psu-firmware/blob/master/LICENSE.TXT) [![liberapay](https://img.shields.io/liberapay/receives/eez-open.svg?logo=liberapay)](https://liberapay.com/eez-open/donate)
+[![GitHub release](https://img.shields.io/github/release/eez-open/modular-psu-firmware.svg)](https://github.com/eez-open/modular-psu-firmware/releases)  [![license](https://img.shields.io/github/license/eez-open/modular-psu-firmware.svg)](https://github.com/eez-open/modular-psu-firmware/blob/master/LICENSE.TXT) [![liberapay](https://img.shields.io/liberapay/receives/eez-open.svg?logo=liberapay)](https://liberapay.com/eez-open/donate) [![Downloads](https://img.shields.io/github/downloads/eez-open/modular-psu-firmware/total)](https://github.com/eez-open/modular-psu-firmware/releases)
 
 ### Ownership and License
 
@@ -64,7 +64,7 @@ Install [Visual Studio Community 2017](https://visualstudio.microsoft.com/downlo
 
 Use git to clone https://github.com/eez-open/modular-psu-firmware.
 
-Execute `cmake.bat`.
+Execute `cmake.bat`
 
 Visual Studio solution is created in `\path\to\modular-psu-firmware\build\win32`.
 
