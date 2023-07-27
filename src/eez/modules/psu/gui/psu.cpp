@@ -127,6 +127,8 @@ void onEncoder(int counter, bool clicked);
 
 static void moveToNextFocusCursor();
 
+static bool g_autoRecallExecuted = false;
+
 ////////////////////////////////////////////////////////////////////////////////
 
 void showDebugTraceLog() {
@@ -233,12 +235,16 @@ void PsuAppContext::stateManagment() {
 			return;
 		}
 
-		if (!mp::isAutoStartEnabled()) {
-            if (activePageId == PAGE_ID_WELCOME) {
+        if (activePageId == PAGE_ID_WELCOME) {
+            if (!g_autoRecallExecuted) {
                 sendMessageToPsu(PSU_MESSAGE_AUTO_RECALL);
+                g_autoRecallExecuted = true;
+            } else {
+                if (!mp::isAutoStartEnabled()) {
+                    showPage(getMainPageId());
+                    return;
+                }
             }
-            showPage(getMainPageId());
-			return;
         }
     }
 
@@ -1614,6 +1620,7 @@ void loadCustomLogo() {
 ////////////////////////////////////////////////////////////////////////////////
 
 void showWelcomePage() {
+    g_autoRecallExecuted = false;
     loadCustomLogo();
     showPage(PAGE_ID_WELCOME);
 }

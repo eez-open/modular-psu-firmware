@@ -529,6 +529,10 @@ void clearAutoStartScript() {
 
 void autoStart() {
     if (!g_autoStartConditionIsChecked) {
+        while(!g_autoRecallFinished) {
+            osDelay(1);
+        }
+
 		if (g_scriptingParameters.autoStartScript[0]) {
 			if (mcu::encoder::isButtonPressed()) {
 				psu::gui::yesNoDialog(PAGE_ID_YES_NO_AUTO_START_SKIPPED, Value(), clearAutoStartScript, nullptr, nullptr);
