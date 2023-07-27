@@ -99,6 +99,8 @@
 
 namespace eez {
 
+bool g_autoRecallFinished = false;
+
 using namespace scpi;
 
 TestResult g_masterTestResult;
@@ -957,6 +959,9 @@ void onThreadMessage(uint8_t type, uint32_t param) {
         g_slots[param]->resync();
     } else if (type == PSU_MESSAGE_COPY_CHANNEL_TO_CHANNEL) {
         channel_dispatcher::copyChannelToChannel(param >> 8, param & 0xFF);
+    } else if (type == PSU_MESSAGE_AUTO_RECALL) {
+        psu::autoRecall();
+        g_autoRecallFinished = true;
     } else if (type == PSU_MESSAGE_RESET_CHANNELS_HISTORY) {
         Channel::resetHistoryForAllChannels();
     } else if (calibration::onHighPriorityThreadMessage(type, param)) {

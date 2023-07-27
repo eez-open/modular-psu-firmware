@@ -84,8 +84,12 @@ void clearAutoStartScript() {
 void autoStart() {
     if (!g_autoStartConditionIsChecked) {
 		if (g_scriptingParameters.autoStartScript[0]) {
-			if (mcu::encoder::isButtonPressed()) {
-				psu::gui::g_psuAppContext.yesNoDialog(PAGE_ID_YES_NO_AUTO_START_SKIPPED, Value(), clearAutoStartScript, nullptr, nullptr);
+            while(!g_autoRecallFinished) {
+                osDelay(1);
+            }
+        
+            if (mcu::encoder::isButtonPressed()) {
+                psu::gui::g_psuAppContext.yesNoDialog(PAGE_ID_YES_NO_AUTO_START_SKIPPED, Value(), clearAutoStartScript, nullptr, nullptr);
 			} else {
 				if (psu::sd_card::exists(g_scriptingParameters.autoStartScript, nullptr)) {
 					g_autoStartScriptIsRunning = true;

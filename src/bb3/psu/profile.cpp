@@ -1592,6 +1592,10 @@ static bool isAutoSaveAllowed() {
 }
 
 static bool isProfile0Dirty() {
+    if (!g_autoRecallFinished) {
+        return false;
+    }
+    
     Parameters profile;
     memcpy(&profile, &g_profilesCache[0], sizeof(profile));
     saveState(profile, nullptr);

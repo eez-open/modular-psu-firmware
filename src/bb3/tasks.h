@@ -64,6 +64,7 @@ enum HighPriorityThreadMessage {
     PSU_MESSAGE_SAVE_SERIAL_NO,
     PSU_MESSAGE_MODULE_RESYNC,
     PSU_MESSAGE_COPY_CHANNEL_TO_CHANNEL,
+    PSU_MESSAGE_AUTO_RECALL,
 
     // this must be at the end
     PSU_MESSAGE_MODULE_SPECIFIC,
