@@ -23,6 +23,7 @@
 
 #include <eez/core/util.h>
 #include <eez/core/debug.h>
+#include <eez/core/utf8.h>
 
 #include <eez/flow/components.h>
 #include <eez/flow/flow_defs_v3.h>
@@ -71,9 +72,9 @@ int elementCompare(const void *a, const void *b) {
 
     if (aValue.isString() && bValue.isString()) {
         if (g_sortArrayActionComponent->flags & SORT_ARRAY_FLAG_IGNORE_CASE) {
-            result = strcicmp(aValue.getString(), bValue.getString());
+            result = utf8casecmp(aValue.getString(), bValue.getString());
         } else {
-            result = strcmp(aValue.getString(), bValue.getString());
+            result = utf8cmp(aValue.getString(), bValue.getString());
         }
     } else {
         int err;
@@ -123,7 +124,7 @@ void executeSortArrayComponent(FlowState *flowState, unsigned componentIndex) {
             throwError(flowState, componentIndex, "SortArray: invalid struct field index\n");
         }
     } else {
-        if (array->arrayType != defs_v3::ARRAY_TYPE_INTEGER || array->arrayType != defs_v3::ARRAY_TYPE_FLOAT || array->arrayType != defs_v3::ARRAY_TYPE_DOUBLE || array->arrayType != defs_v3::ARRAY_TYPE_STRING) {
+        if (array->arrayType != defs_v3::ARRAY_TYPE_INTEGER && array->arrayType != defs_v3::ARRAY_TYPE_FLOAT && array->arrayType != defs_v3::ARRAY_TYPE_DOUBLE && array->arrayType != defs_v3::ARRAY_TYPE_STRING) {
             throwError(flowState, componentIndex, "SortArray: array type is neither array:integer or array:float or array:double or array:string\n");
             return;
         }

@@ -102,7 +102,7 @@ void ListWidgetState::enumChildren() {
             if (widget->listType == LIST_TYPE_VERTICAL) {
                 if (offset < height) {
                     widgetCursor.y = savedY + offset;
-                    drawRectangle(widgetCursor.x, widgetCursor.y, widgetCursor.w, widgetCursor.h, trackStyle, false, false, true);
+                    drawRectangle(widgetCursor.x, widgetCursor.y, widgetCursor.w, MIN(widgetCursor.h, offset - offset), trackStyle, false, false, true);
                     offset += childWidget->height + widget->gap;
                 } else {
                     break;
@@ -110,7 +110,7 @@ void ListWidgetState::enumChildren() {
             } else {
                 if (offset < width) {
                     widgetCursor.x = savedX + offset;
-                    drawRectangle(widgetCursor.x, widgetCursor.y, widgetCursor.w, widgetCursor.h, trackStyle, false, false, true);
+                    drawRectangle(widgetCursor.x, widgetCursor.y, MIN(widgetCursor.w, width - offset), widgetCursor.h, trackStyle, false, false, true);
                     offset += childWidget->width + widget->gap;
                 } else {
                     break;

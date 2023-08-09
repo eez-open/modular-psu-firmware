@@ -31,8 +31,6 @@ enum {
 };
 extern int g_debuggerMode;
 
-extern bool g_sendMinimalDebuggerMessages;
-
 bool canExecuteStep(FlowState *&flowState, unsigned &componentIndex);
 
 void onStarted(Assets *assets);

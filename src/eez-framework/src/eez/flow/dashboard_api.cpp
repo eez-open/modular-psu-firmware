@@ -18,7 +18,7 @@
 
 #include <eez/conf-internal.h>
 
-#if defined(__EMSCRIPTEN__)
+#if defined(EEZ_DASHBOARD_API)
 
 #include <emscripten.h>
 
@@ -39,6 +39,8 @@ using namespace eez::flow;
 
 namespace eez {
 namespace flow {
+
+bool g_dashboardValueFree = false;
 
 int getFlowStateIndex(FlowState *flowState) {
     return (int)((uint8_t *)flowState - ALLOC_BUFFER);
@@ -129,13 +131,26 @@ EM_PORT_API(Value *) createDateValue(double value) {
     return pValue;
 }
 
+EM_PORT_API(Value *) createBlobValue(const uint8_t *buffer, uint32_t bufferLen) {
+    auto pValue = ObjectAllocator<Value>::allocate(0x35109c5c);
+    *pValue = Value::makeBlobRef(buffer, bufferLen, 0x1100895c);
+    return pValue;
+}
+
 EM_PORT_API(void) arrayValueSetElementValue(Value *arrayValuePtr, int elementIndex, Value *valuePtr) {
     auto array = arrayValuePtr->getArray();
     array->values[elementIndex] = *valuePtr;
 }
 
 EM_PORT_API(void) valueFree(Value *valuePtr) {
+    eez::flow::g_dashboardValueFree = true;
     ObjectAllocator<Value>::deallocate(valuePtr);
+    eez::flow::g_dashboardValueFree = false;
+}
+
+EM_PORT_API(Value *) getGlobalVariable(int globalVariableIndex) {
+    auto flowDefinition = static_cast<FlowDefinition *>(eez::g_mainAssets->flowDefinition);
+    return flowDefinition->globalVariables[globalVariableIndex];
 }
 
 EM_PORT_API(void) setGlobalVariable(int globalVariableIndex, Value *valuePtr) {
@@ -374,6 +389,11 @@ EM_PORT_API(void) executeCallAction(int flowStateIndex, int componentIndex, int 
     eez::flow::executeCallAction(flowState, componentIndex, flowIndex);
 }
 
+EM_PORT_API(void) onEvent(int flowStateIndex, FlowEvent flowEvent, Value *flowValue) {
+    auto flowState = getFlowStateFromFlowStateIndex(flowStateIndex);
+    eez::flow::onEvent(flowState, flowEvent, *flowValue);
+}
+
 EM_PORT_API(void) logInfo(int flowStateIndex, int componentIndex, const char *infoMessage) {
     auto flowState = getFlowStateFromFlowStateIndex(flowStateIndex);
     eez::flow::logInfo(flowState, componentIndex, infoMessage);
@@ -423,8 +443,8 @@ EM_PORT_API(int) getFlowStateFlowIndex(int flowStateIndex) {
     return flowState->flowIndex;
 }
 
-EM_PORT_API(void) setSendMinimalDebuggerMessages(bool sendMinimalDebuggerMessages) {
-    g_sendMinimalDebuggerMessages = sendMinimalDebuggerMessages;
+EM_PORT_API(void) setDebuggerMessageSubsciptionFilter(uint32_t filter) {
+    eez::flow::setDebuggerMessageSubsciptionFilter(filter);
 }
 
 #if EEZ_OPTION_GUI
@@ -433,4 +453,4 @@ EM_PORT_API(bool) isRTL() {
 }
 #endif
 
-#endif // __EMSCRIPTEN__
+#endif // EEZ_DASHBOARD_API

@@ -23,11 +23,13 @@ namespace gui {
 
 struct ButtonGroupWidget : public Widget {
     int16_t selectedStyle;
+    int16_t selectedButton;
 };
 
 struct ButtonGroupWidgetState : public WidgetState {
 	WidgetStateFlags flags;
 	Value data;
+    Value selectedButton;
 
     bool updateState() override;
     void render() override;

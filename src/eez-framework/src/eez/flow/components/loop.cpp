@@ -29,6 +29,7 @@ namespace flow {
 struct LoopComponenentExecutionState : public ComponenentExecutionState {
     Value dstValue;
     Value toValue;
+
     Value currentValue;
 };
 
@@ -56,6 +57,8 @@ void executeLoopComponent(FlowState *flowState, unsigned componentIndex) {
         return;
     }
 
+    Value currentValue;
+
     if (!loopComponentExecutionState) {
         Value dstValue;
         if (!evalAssignableProperty(flowState, componentIndex, defs_v3::LOOP_ACTION_COMPONENT_PROPERTY_VARIABLE, dstValue, "Failed to evaluate Variable in Loop")) {
@@ -76,24 +79,36 @@ void executeLoopComponent(FlowState *flowState, unsigned componentIndex) {
         loopComponentExecutionState->dstValue = dstValue;
         loopComponentExecutionState->toValue = toValue;
 
-		loopComponentExecutionState->currentValue = fromValue;
+		currentValue = fromValue;
     } else {
-        loopComponentExecutionState->currentValue = op_add(loopComponentExecutionState->currentValue, stepValue);
+        if (loopComponentExecutionState->dstValue.getType() == VALUE_TYPE_FLOW_OUTPUT) {
+            currentValue = op_add(loopComponentExecutionState->currentValue, stepValue);
+        } else {
+            currentValue = op_add(loopComponentExecutionState->dstValue, stepValue);
+        }
+    }
+
+    if (loopComponentExecutionState->dstValue.getType() == VALUE_TYPE_FLOW_OUTPUT) {
+        loopComponentExecutionState->currentValue = currentValue;
+    } else {
+        assignValue(flowState, componentIndex, loopComponentExecutionState->dstValue, currentValue);
     }
 
     bool condition;
     if (stepValue.getInt() > 0) {
-        condition = op_great(loopComponentExecutionState->currentValue, loopComponentExecutionState->toValue).toBool();
+        condition = op_great(currentValue, loopComponentExecutionState->toValue).toBool();
     } else {
-        condition = op_less(loopComponentExecutionState->currentValue, loopComponentExecutionState->toValue).toBool();
+        condition = op_less(currentValue, loopComponentExecutionState->toValue).toBool();
     }
 
     if (condition) {
         // done
         deallocateComponentExecutionState(flowState, componentIndex);
-        propagateValue(flowState, componentIndex, component->outputs.count - 1);
+        propagateValue(flowState, componentIndex, 1);
     } else {
-        assignValue(flowState, componentIndex, loopComponentExecutionState->dstValue, loopComponentExecutionState->currentValue);
+        if (loopComponentExecutionState->dstValue.getType() == VALUE_TYPE_FLOW_OUTPUT) {
+            assignValue(flowState, componentIndex, loopComponentExecutionState->dstValue, currentValue);
+        }
         propagateValueThroughSeqout(flowState, componentIndex);
     }
 }

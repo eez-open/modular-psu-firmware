@@ -29,9 +29,11 @@
 namespace eez {
 namespace gui {
 
-void drawButtons(const WidgetCursor &widgetCursor, const Style *style, const Style *selectedStyle, int selectedButton, int count) {
+void drawButtons(const WidgetCursor &widgetCursor, const Style *style, const Style *selectedStyle, int selectedButton, int count, ArrayValue *buttonLabelsArray = nullptr) {
     auto x = widgetCursor.x;
     auto y = widgetCursor.y;
+
+    WidgetCursor widgetCursorForLabel = widgetCursor;
 
     if (widgetCursor.w > widgetCursor.h) {
         // horizontal orientation
@@ -43,9 +45,12 @@ void drawButtons(const WidgetCursor &widgetCursor, const Style *style, const Sty
         int h = widgetCursor.h;
         for (Cursor i = 0; i < count; i++) {
             char text[32];
-			WidgetCursor widgetCursor;
-			widgetCursor.cursor = i;
-            getLabel(widgetCursor, widgetCursor.widget->data, text, 32);
+            if (buttonLabelsArray) {
+                buttonLabelsArray->values[i].toText(text, 32);
+            } else {
+                widgetCursorForLabel.cursor = i;
+                getLabel(widgetCursorForLabel, widgetCursor.widget->data, text, 32);
+            }
             drawText(text, -1, x, y, w, h, i == selectedButton ? selectedStyle : style);
             x += w;
         }
@@ -76,8 +81,12 @@ void drawButtons(const WidgetCursor &widgetCursor, const Style *style, const Sty
             }
 
             char text[32];
-			widgetCursor.cursor = i;
-            getLabel(widgetCursor, widgetCursor.widget->data, text, 32);
+            if (buttonLabelsArray) {
+                buttonLabelsArray->values[i].toText(text, 32);
+            } else {
+			    widgetCursorForLabel.cursor = i;
+                getLabel(widgetCursorForLabel, widgetCursor.widget->data, text, 32);
+            }
             drawText(text, -1, x, y + yOffset, w, labelHeight, i == selectedButton ? selectedStyle: style);
 
             int b = y + yOffset + labelHeight;
@@ -102,6 +111,7 @@ bool ButtonGroupWidgetState::updateState() {
 
     WIDGET_STATE(flags.active, g_isActiveWidget);
     WIDGET_STATE(data, get(widgetCursor, widget->data));
+    WIDGET_STATE(selectedButton, get(widgetCursor, widget->selectedButton));
 
     WIDGET_STATE_END()
 }
@@ -114,7 +124,12 @@ void ButtonGroupWidgetState::render() {
     const Style* style = getStyle(widget->style);
     const Style* selectedStyle = getStyle(widget->selectedStyle);
 
-    drawButtons(widgetCursor, style, selectedStyle, data.getInt(), count(widgetCursor, widget->data));
+    if (data.isArray()) {
+        auto buttonLabelsArray = data.getArray();
+        drawButtons(widgetCursor, style, selectedStyle, selectedButton.getInt(), buttonLabelsArray->arraySize, buttonLabelsArray);
+    } else {
+        drawButtons(widgetCursor, style, selectedStyle, data.getInt(), count(widgetCursor, widget->data), nullptr);
+    }
 }
 
 bool ButtonGroupWidgetState::hasOnTouch() {
@@ -123,9 +138,9 @@ bool ButtonGroupWidgetState::hasOnTouch() {
 
 void ButtonGroupWidgetState::onTouch(const WidgetCursor &widgetCursor, Event &touchEvent) {
     if (touchEvent.type == EVENT_TYPE_TOUCH_DOWN) {
-        const Widget *widget = widgetCursor.widget;
+        auto widget = (const ButtonGroupWidget *)widgetCursor.widget;
 
-        int count_ = count(widgetCursor, widget->data);
+        int count_ = data.isArray() ? data.getArray()->arraySize : count(widgetCursor, widget->data);
 
         int selectedButton;
         if (widgetCursor.w > widgetCursor.h) {
@@ -140,7 +155,7 @@ void ButtonGroupWidgetState::onTouch(const WidgetCursor &widgetCursor, Event &to
         }
 
         if (selectedButton >= 0 && selectedButton < count_) {
-            set(widgetCursor, widget->data, selectedButton);
+            set(widgetCursor, data.isArray() ? widget->selectedButton : widget->data, selectedButton);
             sound::playClick();
         }
     }

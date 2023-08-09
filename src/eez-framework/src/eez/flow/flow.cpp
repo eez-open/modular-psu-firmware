@@ -40,6 +40,10 @@
 using namespace eez::gui;
 #endif
 
+#if defined(EEZ_DASHBOARD_API)
+#include <eez/flow/dashboard_api.h>
+#endif
+
 namespace eez {
 namespace flow {
 
@@ -160,6 +164,10 @@ void stop() {
 }
 
 void doStop() {
+    onStopped();
+    finishToDebuggerMessageHook();
+    g_debuggerIsConnected = false;
+
     freeAllChildrenFlowStates(g_firstFlowState);
     g_firstFlowState = nullptr;
     g_lastFlowState = nullptr;
@@ -167,7 +175,6 @@ void doStop() {
     g_isStopped = true;
 
 	queueReset();
-    onStopped();
 }
 
 bool isFlowStopped() {
@@ -356,15 +363,6 @@ void dataOperation(int16_t dataId, DataOperationEnum operation, const WidgetCurs
 				value = 0;
 			}
 		}
-#if OPTION_KEYPAD
-		else if (operation == DATA_OPERATION_GET_TEXT_CURSOR_POSITION) {
-
-			Keypad *keypad = getActiveKeypad();
-			if (keypad) {
-				value = keypad->getCursorPosition();
-			}
-		}
-#endif
 		else if (operation == DATA_OPERATION_GET_MIN) {
 			if (component->type == WIDGET_TYPE_INPUT) {
 				value = getInputWidgetMin(widgetCursor);
@@ -479,6 +477,12 @@ void dataOperation(int16_t dataId, DataOperationEnum operation, const WidgetCurs
         } else if (operation == DATA_OPERATION_GET_TEXT_REFRESH_RATE) {
             getValue(flowDataId, operation, widgetCursor, value);
         }
+#if OPTION_KEYPAD
+		else if (operation == DATA_OPERATION_GET_TEXT_CURSOR_POSITION) {
+            getValue(flowDataId, operation, widgetCursor, value);
+		}
+#endif
+
 	} else {
 		// TODO this shouldn't happen
 		value = Value();
@@ -486,6 +490,22 @@ void dataOperation(int16_t dataId, DataOperationEnum operation, const WidgetCurs
 }
 
 #endif // EEZ_OPTION_GUI
+
+void onArrayValueFree(ArrayValue *arrayValue) {
+#if defined(EEZ_DASHBOARD_API)
+    if (g_dashboardValueFree) {
+        return;
+    }
+#endif
+
+    if (arrayValue->arrayType == defs_v3::OBJECT_TYPE_MQTT_CONNECTION) {
+        onFreeMQTTConnection(arrayValue);
+    }
+
+    if (eez::flow::onArrayValueFreeHook) {
+        eez::flow::onArrayValueFreeHook(arrayValue);
+    }
+}
 
 } // namespace flow
 } // namespace eez

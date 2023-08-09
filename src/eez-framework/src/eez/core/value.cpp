@@ -28,6 +28,7 @@
 #include <eez/core/value.h>
 #include <eez/core/vars.h>
 
+#include <eez/flow/flow.h>
 #include <eez/flow/hooks.h>
 #include <eez/flow/date.h>
 
@@ -720,9 +721,7 @@ ValueTypeNameFunction g_valueTypeNames[] = {
 ////////////////////////////////////////////////////////////////////////////////
 
 ArrayValueRef::~ArrayValueRef() {
-    if (eez::flow::onArrayValueFreeHook) {
-        eez::flow::onArrayValueFreeHook(&arrayValue);
-    }
+    eez::flow::onArrayValueFree(&arrayValue);
     for (uint32_t i = 1; i < arrayValue.arraySize; i++) {
         (arrayValue.values + i)->~Value();
     }
@@ -732,9 +731,9 @@ ArrayValueRef::~ArrayValueRef() {
 
 bool assignValue(Value &dstValue, const Value &srcValue) {
     if (dstValue.isBoolean()) {
-        dstValue = srcValue.toBool();
+        dstValue.int32Value = srcValue.toBool();
     } else if (dstValue.isInt32OrLess()) {
-        dstValue = srcValue.toInt32();
+        dstValue.int32Value = srcValue.toInt32();
     } else if (dstValue.isFloat()) {
         dstValue.floatValue = srcValue.toFloat();
     } else if (dstValue.isDouble()) {
@@ -1304,6 +1303,35 @@ Value Value::makeBlobRef(const uint8_t *blob, uint32_t len, uint32_t id) {
     blobRef->len = len;
 
     memcpy(blobRef->blob, blob, len);
+
+    blobRef->refCounter = 1;
+
+    Value value;
+
+    value.type = VALUE_TYPE_BLOB_REF;
+    value.unit = 0;
+    value.options = VALUE_OPTIONS_REF;
+    value.reserved = 0;
+    value.refValue = blobRef;
+
+	return value;
+}
+
+Value Value::makeBlobRef(const uint8_t *blob1, uint32_t len1, const uint8_t *blob2, uint32_t len2, uint32_t id) {
+    auto blobRef = ObjectAllocator<BlobRef>::allocate(id);
+	if (blobRef == nullptr) {
+		return Value(0, VALUE_TYPE_NULL);
+	}
+
+	blobRef->blob = (uint8_t *)alloc(len1 + len2, id + 1);
+    if (blobRef->blob == nullptr) {
+        ObjectAllocator<BlobRef>::deallocate(blobRef);
+        return Value(0, VALUE_TYPE_NULL);
+    }
+    blobRef->len = len1 + len2;
+
+    memcpy(blobRef->blob, blob1, len1);
+    memcpy(blobRef->blob + len1, blob2, len2);
 
     blobRef->refCounter = 1;
 

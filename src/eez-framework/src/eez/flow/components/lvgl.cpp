@@ -28,6 +28,7 @@
 #include <eez/flow/queue.h>
 #include <eez/flow/debugger.h>
 #include <eez/flow/hooks.h>
+#include <eez/flow/lvgl_api.h>
 
 #include <eez/flow/components/lvgl.h>
 
@@ -123,6 +124,31 @@ enum PropertyCode {
 
 ////////////////////////////////////////////////////////////////////////////////
 
+#if !defined(EEZ_LVGL_SCREEN_STACK_SIZE)
+#define EEZ_LVGL_SCREEN_STACK_SIZE 10
+#endif
+
+int16_t g_screenStack[EEZ_LVGL_SCREEN_STACK_SIZE];
+unsigned g_scrrenStackPosition = 0;
+
+void pushScreen(int16_t screen) {
+    // remove the oldest screen from the stack if the stack is full
+    if (g_scrrenStackPosition == EEZ_LVGL_SCREEN_STACK_SIZE) {
+        for (unsigned i = 1; i < EEZ_LVGL_SCREEN_STACK_SIZE; i++) {
+            g_screenStack[i - 1] = g_screenStack[i];
+        }
+        g_scrrenStackPosition--;
+    }
+
+    g_screenStack[g_scrrenStackPosition++] = screen;
+}
+
+int16_t popScreen() {
+    return g_scrrenStackPosition > 0 ? g_screenStack[--g_scrrenStackPosition] : -1;
+}
+
+////////////////////////////////////////////////////////////////////////////////
+
 // in case when getLvglObjectFromIndexHook returns nullptr, i.e. LVGL widget is not yet created, we need to store
 // the index of the next action to be executed in the component execution state, so we can try later
 struct LVGLExecutionState : public ComponenentExecutionState {
@@ -140,7 +166,15 @@ void executeLVGLComponent(FlowState *flowState, unsigned componentIndex) {
         auto general = (LVGLComponent_ActionType *)component->actions[actionIndex];
         if (general->action == CHANGE_SCREEN) {
             auto specific = (LVGLComponent_ChangeScreen_ActionType *)general;
-            replacePageHook(specific->screen, specific->fadeMode, specific->speed, specific->delay);
+            if (specific->screen == -1) {
+                auto screen = popScreen();
+                if (screen >= 0) {
+                    replacePageHook(screen, specific->fadeMode, specific->speed, specific->delay);
+                }
+            } else {
+                pushScreen(g_currentScreen + 1);
+                replacePageHook(specific->screen, specific->fadeMode, specific->speed, specific->delay);
+            }
         } else if (general->action == PLAY_ANIMATION) {
             auto specific = (LVGLComponent_PlayAnimation_ActionType *)general;
 

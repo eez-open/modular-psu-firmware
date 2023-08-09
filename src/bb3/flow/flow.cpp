@@ -44,7 +44,7 @@ void init() {
     stopScriptHook = stopScript;
 
     scpiComponentInitHook = scpiComponentInit;
-    registerComponent(defs_v3::COMPONENT_TYPE_SCPIACTION, executeScpiComponent);
+    registerComponent(defs_v3::COMPONENT_TYPE_SCPI_ACTION, executeScpiComponent);
 
     startToDebuggerMessageHook = startToDebuggerMessage;
     writeDebuggerBufferHook = writeDebuggerBuffer;

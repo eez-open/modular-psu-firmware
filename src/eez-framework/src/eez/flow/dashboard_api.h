@@ -23,6 +23,8 @@
 namespace eez {
 namespace flow {
 
+extern bool g_dashboardValueFree;
+
 int getFlowStateIndex(FlowState *flowState);
 
 } // flow

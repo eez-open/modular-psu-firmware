@@ -30,6 +30,31 @@
 #define RADIO_BUTTON_OFF_ICON (char)141
 #endif
 
+#if EEZ_GUI_DOCUMENT_API_VERSION == 1
+
+#define STYLE_ID_INFO_ALERT STYLE_ID_MESSAGE_BOX_INFO
+#define STYLE_ID_ERROR_ALERT STYLE_ID_MESSAGE_BOX_ERROR
+#define STYLE_ID_INFO_ALERT_BUTTON STYLE_ID_MESSAGE_BOX_INFO_BUTTON
+#define STYLE_ID_ERROR_ALERT_BUTTON STYLE_ID_MESSAGE_BOX_ERROR_BUTTON
+
+#define STYLE_ID_SELECT_ENUM_ITEM_POPUP_CONTAINER STYLE_ID_DROP_DOWN_LIST_POPUP_CONTAINER
+#define STYLE_ID_SELECT_ENUM_ITEM_POPUP_ITEM STYLE_ID_DROP_DOWN_LIST_POPUP_ITEM
+#define STYLE_ID_SELECT_ENUM_ITEM_POPUP_DISABLED_ITEM STYLE_ID_DROP_DOWN_LIST_DISABLED_POPUP_ITEM
+
+#define STYLE_ID_SELECT_ENUM_ITEM_POPUP_CONTAINER_S STYLE_ID_DROP_DOWN_LIST_POPUP_CONTAINER
+#define STYLE_ID_SELECT_ENUM_ITEM_POPUP_ITEM_S STYLE_ID_DROP_DOWN_LIST_POPUP_ITEM
+#define STYLE_ID_SELECT_ENUM_ITEM_POPUP_DISABLED_ITEM_S STYLE_ID_DROP_DOWN_LIST_DISABLED_POPUP_ITEM
+
+#define STYLE_ID_MENU_WITH_BUTTONS_CONTAINER STYLE_ID_MESSAGE_BOX_QUESTION_CONTAINER
+#define STYLE_ID_MENU_WITH_BUTTONS_MESSAGE STYLE_ID_MESSAGE_BOX_QUESTION_MESSAGE
+#define STYLE_ID_MENU_WITH_BUTTONS_BUTTON STYLE_ID_MESSAGE_BOX_QUESTION_BUTTON
+
+#else
+
+#define STYLE_ID_INFO_ALERT_BUTTON STYLE_ID_ERROR_ALERT_BUTTON
+
+#endif
+
 namespace eez {
 namespace gui {
 
@@ -175,7 +200,7 @@ void ToastMessagePage::init(AppContext *appContext, ToastType type, const Value&
 
     auto styleId = type == INFO_TOAST ? STYLE_ID_INFO_ALERT : STYLE_ID_ERROR_ALERT;
     auto style = getStyle(styleId);
-    auto actionStyle = getStyle(STYLE_ID_ERROR_ALERT_BUTTON);
+    auto actionStyle = getStyle(INFO_TOAST ? STYLE_ID_INFO_ALERT_BUTTON : STYLE_ID_ERROR_ALERT_BUTTON);
 
     font::Font font = styleGetFont(style);
 
@@ -283,7 +308,7 @@ void ToastMessagePage::init(AppContext *appContext, ToastType type, const Value&
     if (actionLabel) {
         actionWidget.type = WIDGET_TYPE_BUTTON;
         actionWidget.data = DATA_ID_NONE;
-        actionWidget.style = STYLE_ID_ERROR_ALERT_BUTTON;
+        actionWidget.style = INFO_TOAST ? STYLE_ID_INFO_ALERT_BUTTON : STYLE_ID_ERROR_ALERT_BUTTON;
         actionWidget.text = actionLabel;
         actionWidget.x = style->paddingLeft + (textWidth - actionLabelWidth) / 2;
         actionWidget.y = style->paddingTop + yText;
@@ -959,7 +984,6 @@ void QuestionPage::init(AppContext *appContext, const Value &message, const Valu
         m_buttonTextWidgets[i].text = buttonsArray->values[i].getString();
         m_buttonTextWidgets[i].flags = 0;
         TextWidget_autoSize(m_buttonTextWidgets[i]);
-        m_buttonTextWidgets[i].height = m_buttonTextWidgets[i].height * 3 / 2;
     }
 
     m_numButtonTextWidgets = buttonsArray->arraySize;

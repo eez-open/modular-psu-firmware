@@ -63,6 +63,7 @@ struct FlowState {
 #if defined(EEZ_FOR_LVGL)
     int32_t lvglWidgetStartIndex;
 #endif
+    Value eventValue;
 
     FlowState *firstChild;
     FlowState *lastChild;
@@ -116,10 +117,11 @@ void executeCallAction(FlowState *flowState, unsigned componentIndex, int flowIn
 
 enum FlowEvent {
     FLOW_EVENT_OPEN_PAGE,
-    FLOW_EVENT_CLOSE_PAGE
+    FLOW_EVENT_CLOSE_PAGE,
+    FLOW_EVENT_KEYDOWN
 };
 
-void onEvent(FlowState *flowState, FlowEvent flowEvent);
+void onEvent(FlowState *flowState, FlowEvent flowEvent, Value eventValue);
 
 void throwError(FlowState *flowState, int componentIndex, const char *errorMessage);
 void throwError(FlowState *flowState, int componentIndex, const char *errorMessage, const char *errorMessageDescription);

@@ -24,6 +24,7 @@ namespace eez {
 namespace flow {
 
 void executeOnEventComponent(FlowState *flowState, unsigned componentIndex) {
+    propagateValue(flowState, componentIndex, 1, flowState->eventValue);
 	propagateValueThroughSeqout(flowState, componentIndex);
 }
 

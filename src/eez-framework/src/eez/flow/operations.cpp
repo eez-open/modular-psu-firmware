@@ -55,6 +55,27 @@ Value op_add(const Value& a1, const Value& b1) {
     auto a = a1.getValue();
     auto b = b1.getValue();
 
+    if (a.isBlob() || b.isBlob()) {
+        if (a.isBlob()) {
+            if (b.isUndefinedOrNull()) {
+                return a;
+            }
+            if (!b.isBlob()) {
+                return Value::makeError();
+            }
+        } else {
+            if (a.isUndefinedOrNull()) {
+                return b;
+            }
+            return Value::makeError();
+        }
+
+        auto aBlob = a.getBlob();
+        auto bBlob = b.getBlob();
+
+        return Value::makeBlobRef(aBlob->blob, aBlob->len, bBlob->blob, bBlob->len, 0xc622dd24);
+    }
+
     if (!(a.isString() || a.isDouble() || a.isFloat() || a.isInt64() || a.isInt32OrLess())) {
         return Value::makeError();
     }
@@ -427,6 +448,10 @@ bool is_less(const Value& a1, const Value& b1) {
     return a.toDouble() < b.toDouble();
 }
 
+bool is_great(const Value& a1, const Value& b1) {
+    return !is_less(a1, b1) && !is_equal(a1, b1);
+}
+
 Value op_eq(const Value& a1, const Value& b1) {
     if (a1.isError()) {
         return a1;
@@ -472,7 +497,7 @@ Value op_great(const Value& a1, const Value& b1) {
         return b1;
     }
 
-    return Value(!is_less(a1, b1) && !is_equal(a1, b1), VALUE_TYPE_BOOLEAN);
+    return Value(is_great(a1, b1), VALUE_TYPE_BOOLEAN);
 }
 
 Value op_less_eq(const Value& a1, const Value& b1) {
@@ -1584,7 +1609,7 @@ void do_OPERATION_TYPE_MATH_ROUND(EvalStack &stack) {
 void do_OPERATION_TYPE_MATH_MIN(EvalStack &stack) {
     auto numArgs = stack.pop().getInt();
 
-    double minValue = INFINITY;
+    Value minValue;
 
     for (int i = 0; i < numArgs; i++) {
         auto value = stack.pop().getValue();
@@ -1592,19 +1617,18 @@ void do_OPERATION_TYPE_MATH_MIN(EvalStack &stack) {
             stack.push(value);
             return;
         }
-        auto valueDouble = value.toDouble();
-        if (valueDouble < minValue) {
-            minValue = valueDouble;
+        if (minValue.isUndefinedOrNull() || is_less(value, minValue)) {
+            minValue = value;
         }
     }
 
-    stack.push(Value(minValue, VALUE_TYPE_DOUBLE));
+    stack.push(minValue);
 }
 
 void do_OPERATION_TYPE_MATH_MAX(EvalStack &stack) {
     auto numArgs = stack.pop().getInt();
 
-    double maxValue = -INFINITY;
+    Value maxValue;
 
     for (int i = 0; i < numArgs; i++) {
         auto value = stack.pop().getValue();
@@ -1612,13 +1636,12 @@ void do_OPERATION_TYPE_MATH_MAX(EvalStack &stack) {
             stack.push(value);
             return;
         }
-        auto valueDouble = value.toDouble();
-        if (valueDouble > maxValue) {
-            maxValue = valueDouble;
+        if (maxValue.isUndefinedOrNull() || is_great(value, maxValue)) {
+            maxValue = value;
         }
     }
 
-    stack.push(Value(maxValue, VALUE_TYPE_DOUBLE));
+    stack.push(maxValue);
 }
 
 void do_OPERATION_TYPE_STRING_LENGTH(EvalStack &stack) {

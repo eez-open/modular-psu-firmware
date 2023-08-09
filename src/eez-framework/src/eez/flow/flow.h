@@ -59,8 +59,12 @@ void dataOperation(int16_t dataId, DataOperationEnum operation, const WidgetCurs
 int16_t getNativeVariableId(const WidgetCursor &widgetCursor);
 #endif
 
+void setDebuggerMessageSubsciptionFilter(uint32_t filter);
 void onDebuggerClientConnected();
 void onDebuggerClientDisconnected();
+
+void onArrayValueFree(ArrayValue *arrayValue);
+void onFreeMQTTConnection(ArrayValue *mqttConnectionValue);
 
 void executeScpi();
 void flushToDebuggerMessage();

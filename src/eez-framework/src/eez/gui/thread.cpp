@@ -53,6 +53,10 @@ EEZ_MESSAGE_QUEUE_DECLARE(gui, {
 void startThread() {
 	EEZ_MESSAGE_QUEUE_CREATE(gui, 20);
 	EEZ_THREAD_CREATE(gui, mainLoop);
+
+#ifdef __EMSCRIPTEN__
+    eez::gui::guiInit();
+#endif
 }
 
 void oneIter();

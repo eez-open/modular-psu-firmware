@@ -125,6 +125,17 @@ bool evalExpression(FlowState *flowState, int componentIndex, const uint8_t *ins
                 }
                 return true;
             }
+        } else if (operation == DATA_OPERATION_GET_TEXT_CURSOR_POSITION) {
+            result = g_stack.pop();
+            if (!result.isError()) {
+                if (result.getType() == VALUE_TYPE_NATIVE_VARIABLE) {
+                    auto nativeVariableId = result.getInt();
+                    result = Value(getTextCursorPosition(g_widgetCursor, nativeVariableId), VALUE_TYPE_INT32);
+                } else {
+                    result = Value();
+                }
+                return true;
+            }
         } else {
 #endif
             result = g_stack.pop().getValue();

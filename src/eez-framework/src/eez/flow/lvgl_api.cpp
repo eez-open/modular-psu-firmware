@@ -33,6 +33,7 @@
 
 #include <eez/core/os.h>
 #include <eez/core/action.h>
+#include <eez/core/util.h>
 
 #include <eez/flow/flow.h>
 #include <eez/flow/expression.h>
@@ -131,7 +132,11 @@ extern "C" void flowPropagateValue(void *flowState, unsigned componentIndex, uns
     eez::flow::propagateValue((eez::flow::FlowState *)flowState, componentIndex, outputIndex);
 }
 
-static char textValue[1000];
+#ifndef EEZ_LVGL_TEMP_STRING_BUFFER_SIZE
+#define EEZ_LVGL_TEMP_STRING_BUFFER_SIZE 1024
+#endif
+
+static char textValue[EEZ_LVGL_TEMP_STRING_BUFFER_SIZE];
 
 extern "C" const char *evalTextProperty(void *flowState, unsigned componentIndex, unsigned propertyIndex, const char *errorMessage) {
     eez::Value value;
@@ -168,6 +173,35 @@ extern "C" bool evalBooleanProperty(void *flowState, unsigned componentIndex, un
         return 0;
     }
     return booleanValue;
+}
+
+const char *evalStringArrayPropertyAndJoin(void *flowState, unsigned componentIndex, unsigned propertyIndex, const char *errorMessage, const char *separator) {
+    eez::Value value;
+    if (!eez::flow::evalProperty((eez::flow::FlowState *)flowState, componentIndex, propertyIndex, value, errorMessage)) {
+        return "";
+    }
+
+    if (value.isArray()) {
+        auto array = value.getArray();
+
+        textValue[0] = 0;
+        size_t textPosition = 0;
+
+        size_t separatorLength = strlen(separator);
+
+        for (uint32_t elementIndex = 0; elementIndex < array->arraySize; elementIndex++) {
+            if (elementIndex > 0) {
+                eez::stringAppendString(textValue + textPosition, sizeof(textValue) - textPosition, separator);
+                textPosition += separatorLength;
+            }
+            array->values[elementIndex].toText(textValue + textPosition, sizeof(textValue) - textPosition);
+            textPosition = strlen(textValue);
+        }
+
+        return textValue;
+    }
+
+    return "";
 }
 
 extern "C" void assignStringProperty(void *flowState, unsigned componentIndex, unsigned propertyIndex, const char *value, const char *errorMessage) {

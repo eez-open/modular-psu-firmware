@@ -97,6 +97,7 @@ struct Ref {
 
 struct ArrayValue;
 struct ArrayElementValue;
+struct BlobRef;
 
 ////////////////////////////////////////////////////////////////////////////////
 
@@ -297,6 +298,10 @@ struct Value {
 
     Value getValue() const;
 
+    bool isUndefinedOrNull() {
+        return type == VALUE_TYPE_UNDEFINED || type == VALUE_TYPE_NULL;
+    }
+
 	bool isInt32OrLess() const {
 		return (type >= VALUE_TYPE_INT8 && type <= VALUE_TYPE_UINT32) || type == VALUE_TYPE_BOOLEAN;
 	}
@@ -335,6 +340,10 @@ struct Value {
 
     bool isArray() const {
         return type == VALUE_TYPE_ARRAY || type == VALUE_TYPE_ARRAY_ASSET || type == VALUE_TYPE_ARRAY_REF;
+    }
+
+	bool isBlob() const {
+        return type == VALUE_TYPE_BLOB_REF;
     }
 
     bool isError() const {
@@ -448,6 +457,10 @@ struct Value {
         return pairOfInt16Value.second;
     }
 
+    BlobRef *getBlob() const {
+        return (BlobRef *)refValue;
+    }
+
     void toText(char *text, int count) const {
 		*text = 0;
 		g_valueTypeToTextFunctions[type](*this, text, count);
@@ -480,6 +493,7 @@ struct Value {
     static Value makeArrayElementRef(Value arrayValue, int elementIndex, uint32_t id);
 
     static Value makeBlobRef(const uint8_t *blob, uint32_t len, uint32_t id);
+    static Value makeBlobRef(const uint8_t *blob1, uint32_t len1, const uint8_t *blob2, uint32_t len2, uint32_t id);
 
     static Value makeError() { return Value(0, VALUE_TYPE_ERROR); }
 

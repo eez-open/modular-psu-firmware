@@ -141,7 +141,9 @@ void drawBorderAndBackground(int &x1, int &y1, int &x2, int &y2, const Style *st
                         image.lineOffset = bitmap->w - w;
                         image.pixels = (uint8_t *)bitmap->pixels + offset;
 
+                        auto savedOpacity = display::setOpacity(backgroundStyle.style->opacity);
                         display::drawBitmap(&image, x1, y1);
+                        display::setOpacity(savedOpacity);
                     }
 				}
 			}
@@ -257,7 +259,9 @@ void drawBorderAndBackground(int &x1, int &y1, int &x2, int &y2, const Style *st
 			image.lineOffset = bitmap->w - w;
             image.pixels = (uint8_t *)bitmap->pixels;
 
+            auto savedOpacity = display::setOpacity(style->opacity);
             display::drawBitmap(&image, x1, y1);
+            display::setOpacity(savedOpacity);
         }
     }
 }

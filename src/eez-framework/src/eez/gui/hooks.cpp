@@ -74,7 +74,8 @@ static void stateManagment() {
 
 static bool activePageHasBackdrop() {
 	if (getAppContextFromId(APP_CONTEXT_ID_DEVICE)->getActivePageId() == INTERNAL_PAGE_ID_TOAST_MESSAGE) {
-		return false;
+        ToastMessagePage *page = (ToastMessagePage *)getAppContextFromId(APP_CONTEXT_ID_DEVICE)->getActivePage();
+        return page->hasAction();
 	}
 	return true;
 }

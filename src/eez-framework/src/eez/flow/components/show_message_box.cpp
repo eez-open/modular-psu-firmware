@@ -76,7 +76,7 @@ void questionCallback(void *userParam, unsigned buttonIndex) {
     auto component = flowState->flow->components[componentIndex];
 
     if (buttonIndex < component->outputs.count - 1) {
-        propagateValue(flowState, componentIndex, buttonIndex);
+        propagateValue(flowState, componentIndex, 1 + buttonIndex);
     }
 }
 

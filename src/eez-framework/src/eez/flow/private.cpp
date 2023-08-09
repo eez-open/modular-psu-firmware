@@ -484,7 +484,7 @@ void endAsyncExecution(FlowState *flowState, int componentIndex) {
     }
 }
 
-void onEvent(FlowState *flowState, FlowEvent flowEvent) {
+void onEvent(FlowState *flowState, FlowEvent flowEvent, Value eventValue) {
 	for (unsigned componentIndex = 0; componentIndex < flowState->flow->components.count; componentIndex++) {
 		auto component = flowState->flow->components[componentIndex];
 		if (component->type == defs_v3::COMPONENT_TYPE_ON_EVENT_ACTION) {
@@ -493,6 +493,7 @@ void onEvent(FlowState *flowState, FlowEvent flowEvent) {
             };
             auto onEventComponent = (OnEventComponent *)component;
             if (onEventComponent->event == flowEvent) {
+                flowState->eventValue = eventValue;
                 if (!addToQueue(flowState, componentIndex, -1, -1, -1, false)) {
                     return;
                 }
