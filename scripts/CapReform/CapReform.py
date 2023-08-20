@@ -40,7 +40,7 @@ def input_charge_current():
 
 def input_reform_time():
   global reform_time
-  value = scpi('DISP:INPUT? "Reform duration",NUMBER,SECOND,10.0,7200.0,'+
+  value = scpi('DISP:INPUT? "Reform duration",NUMBER,SECOND,10.0,250000.0,'+
             str(reform_time))
   if value != None:
       reform_time = float(value)
@@ -165,12 +165,12 @@ def discharge_cap():
   ovp = scpi("SOUR1:VOLT:PROT:STAT?")
   if ovp:
     scpi("SOUR1:VOLT:PROT:STAT OFF")
-  scpi("DISP:WINDOW:TEXT \"Discharging...\"")
+  scpi("DISP:DIALog:DATA \"discharging\", INT, 1")
   scpi("OUTP 1")
   sleep_ms(1000)
   while getU(channel) > 0.5:
     sleep_ms(100)
-  scpi("DISP:WINDOW:TEXT:CLEAR")
+  scpi("DISP:DIALog:DATA \"discharging\", INT, 0")
   setI(channel, 0.1)
   scpi("OUTP 0")
   if ovp:
@@ -204,10 +204,13 @@ def main():
     fwstr = scpi("SYSTem:CPU:FIRMware?")
     i = fwstr.index('.')
     j = fwstr.index('.',i+1)
+    k = fwstr.index('.',j+1)
     fwmaj = int(fwstr[0:i]) 
     fwmin = int(fwstr[i+1:j])
-    if not(fwmaj > 1 or (fwmaj == 1 and fwmin >= 6)):
-      scpi('DISP:ERR "Script requires firmware >= 1.6"')
+    fwsubstr = fwstr[i+j:k]
+    fwsub = int(fwsubstr) if fwsubstr.isdigit() else 0
+    if not(fwmaj > 1 or (fwmaj == 1 and fwmin == 7 and fwsub >= 4) or (fwmaj == 1 and fwmin > 7)):
+      scpi('DISP:ERR "Script requires firmware >= 1.7.4"')
       return
         
     # Digital output for timing/jitter measurements
@@ -248,6 +251,7 @@ def main():
           scpi('OUTP:PROT:CLE CH2')
           scpi("INST CH1")
           scpi('OUTP:DPROG ON')
+          scpi('OUTPut:PROTection:MEASure OFF')
           discharge_cap()
           scpi('DISP:DIALog:DATA "run_state", INT, 1')
           scpi('DISP:DIALog:DATA "data_viewable", INT, 1')  
