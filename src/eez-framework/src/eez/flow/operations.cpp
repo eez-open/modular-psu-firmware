@@ -1043,6 +1043,41 @@ void do_OPERATION_TYPE_FLOW_PARSE_DOUBLE(EvalStack &stack) {
     stack.push(Value(value, VALUE_TYPE_DOUBLE));
 }
 
+void do_OPERATION_TYPE_FLOW_TO_INTEGER(EvalStack &stack) {
+    auto str = stack.pop();
+    if (str.isError()) {
+        stack.push(str);
+        return;
+    }
+
+    int err;
+    int value = str.toInt32(&err);
+    if (err) {
+        stack.push(Value::makeError());
+        return;
+    }
+
+    stack.push(Value(value, VALUE_TYPE_INT32));
+}
+
+void do_OPERATION_TYPE_FLOW_GET_BITMAP_INDEX(EvalStack &stack) {
+#if EEZ_OPTION_GUI
+    auto a = stack.pop().getValue();
+    if (a.isError()) {
+        stack.push(a);
+        return;
+    }
+
+    Value bitmapName = a.toString(0x244c1880);
+
+    int bitmapId = getBitmapIdByName(bitmapName.getString());
+
+    stack.push(Value(bitmapId, VALUE_TYPE_INT32));
+#else
+    stack.push(Value::makeError());
+#endif // EEZ_OPTION_GUI
+}
+
 void do_OPERATION_TYPE_DATE_NOW(EvalStack &stack) {
     stack.push(Value((double)date::now(), VALUE_TYPE_DATE));
 }
@@ -2165,6 +2200,8 @@ EvalOperation g_evalOperations[] = {
     do_OPERATION_TYPE_DATE_MAKE,
     do_OPERATION_TYPE_MATH_POW,
     do_OPERATION_TYPE_LVGL_METER_TICK_INDEX,
+    do_OPERATION_TYPE_FLOW_GET_BITMAP_INDEX,
+    do_OPERATION_TYPE_FLOW_TO_INTEGER,
 };
 
 } // namespace flow

@@ -25,6 +25,8 @@ struct UpDownWidget : public Widget {
     AssetsPtr<const char> downButtonText;
 	AssetsPtr<const char> upButtonText;
     int16_t buttonsStyle;
+    int16_t min;
+    int16_t max;
 };
 
 enum UpDownWidgetSegment {
@@ -37,6 +39,8 @@ struct UpDownWidgetState : public WidgetState {
 	WidgetStateFlags flags;
 	Value data;
 	UpDownWidgetSegment segment;
+    Value min;
+    Value max;
 
 	static WidgetCursor g_selectedWidget;
 
@@ -48,7 +52,7 @@ struct UpDownWidgetState : public WidgetState {
 	bool hasOnKeyboard() override;
 	bool onKeyboard(const WidgetCursor &widgetCursor, uint8_t key, uint8_t mod) override;
 
-private: 
+private:
 	void upDown(const WidgetCursor &widgetCursor, UpDownWidgetSegment segment_);
 };
 

@@ -60,7 +60,7 @@ void data_none(DataOperationEnum operation, const WidgetCursor &widgetCursor, Va
 int count(const WidgetCursor &widgetCursor, int16_t id) {
     Value countValue = 0;
     DATA_OPERATION_FUNCTION(id, DATA_OPERATION_COUNT, widgetCursor, countValue);
-    return countValue.getInt();
+    return countValue.toInt32();
 }
 
 void select(WidgetCursor &widgetCursor, int16_t id, int index, Value &oldValue) {
@@ -311,8 +311,8 @@ void ytDataSetPosition(const WidgetCursor &widgetCursor, int16_t id, uint32_t ne
 uint32_t ytDataGetPositionIncrement(const WidgetCursor &widgetCursor, int16_t id) {
     Value value;
     DATA_OPERATION_FUNCTION(id, DATA_OPERATION_YT_DATA_GET_POSITION_INCREMENT, widgetCursor, value);
-    if (value.getType() == VALUE_TYPE_UINT32) {
-        return value.getUInt32();
+    if (value.isInt32OrLess()) {
+        return value.getInt();
     }
     return 1;
 }

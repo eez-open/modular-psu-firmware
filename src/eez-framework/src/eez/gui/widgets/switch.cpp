@@ -126,7 +126,11 @@ void SwitchWidgetState::onTouch(const WidgetCursor &widgetCursor, Event &touchEv
 	if (touchEvent.type == EVENT_TYPE_TOUCH_UP) {
         set(widgetCursor, widgetCursor.widget->data, get(widgetCursor, widgetCursor.widget->data).getInt() ? 0 : 1);
 
-		sound::playClick();
+        if (widgetCursor.widget->action != ACTION_ID_NONE) {
+            executeAction(widgetCursor, widgetCursor.widget->action);
+        } else {
+            sound::playClick();
+        }
 
 		changeStartTime = millis();
 		if (changeStartTime == 0) {

@@ -240,7 +240,7 @@ void PsuAppContext::stateManagment() {
 
         if (activePageId == PAGE_ID_WELCOME) {
             if (!g_autoRecallExecuted) {
-                sendMessageToPsu(PSU_MESSAGE_AUTO_RECALL);
+                sendMessageToLowPriorityThread(THREAD_MESSAGE_AUTO_RECALL);
                 g_autoRecallExecuted = true;
             } else {
                 if (!scripting::isAutoStartEnabled()) {

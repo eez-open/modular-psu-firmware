@@ -108,7 +108,9 @@ void drawBorderAndBackground(int &x1, int &y1, int &x2, int &y2, const Style *st
 			if (color != TRANSPARENT_COLOR_INDEX) {
 				display::setColor(color, ignoreLuminocity);
 				auto savedOpacity = display::setOpacity(backgroundStyle.style->opacity);
-				display::fillRect(x1, y1, x2, y2);
+                if (x2 >= x1 && y2 >= y1) {
+                    display::fillRect(x1, y1, x2, y2);
+                }
 				display::setOpacity(savedOpacity);
 			}
 
@@ -241,7 +243,9 @@ void drawBorderAndBackground(int &x1, int &y1, int &x2, int &y2, const Style *st
 	if (color != TRANSPARENT_COLOR_INDEX) {
 		display::setColor(color, ignoreLuminocity);
 		auto savedOpacity = display::setOpacity(style->opacity);
-		display::fillRect(x1, y1, x2, y2);
+        if (x2 >= x1 && y2 >= y1) {
+		    display::fillRect(x1, y1, x2, y2);
+        }
 		display::setOpacity(savedOpacity);
 	}
 
@@ -705,6 +709,10 @@ void drawBitmap(Image *image, int x, int y, int w, int h, const Style *style, bo
     if (y_offset < 0)
         y_offset = y1;
 
+    // draw background
+    if (w > width || h > height) {
+        drawRectangle(x, y, w, h, style, active);
+    }
 
     // draw bitmap
     uint8_t savedOpacity = display::getOpacity();

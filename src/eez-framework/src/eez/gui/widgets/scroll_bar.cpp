@@ -244,7 +244,9 @@ void ScrollBarWidgetState::onTouch(const WidgetCursor &widgetCursor, Event &touc
         if (touchEvent.type == EVENT_TYPE_TOUCH_MOVE) {
             if (dragSegment == SCROLL_BAR_WIDGET_SEGMENT_THUMB) {
                 int size = getSize(widgetCursor);
-                setPosition(widgetCursor, dragStartPosition + (int)round(1.0 * (x - dragStartX) * size / wTrack));
+                int position = dragStartPosition + (int)round(1.0 * (x - dragStartX) * size / wTrack);
+                int positionIncrement = getPositionIncrement(widgetCursor);
+                setPosition(widgetCursor, (int)(roundf(1.0f * position / positionIncrement) * positionIncrement));
             }
         } else if (touchEvent.type == EVENT_TYPE_TOUCH_UP) {
             dragSegment = SCROLL_BAR_WIDGET_SEGMENT_NONE;

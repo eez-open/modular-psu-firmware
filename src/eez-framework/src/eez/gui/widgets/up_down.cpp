@@ -39,6 +39,11 @@ bool UpDownWidgetState::updateState() {
     WIDGET_STATE(flags.active, g_isActiveWidget);
     WIDGET_STATE(data, get(widgetCursor, widget->data));
 
+    if (widgetCursor.flowState) {
+        WIDGET_STATE(min, get(widgetCursor, widget->min));
+        WIDGET_STATE(max, get(widgetCursor, widget->max));
+    }
+
     WIDGET_STATE_END()
 }
 
@@ -49,7 +54,7 @@ void UpDownWidgetState::render() {
     const Style *buttonsStyle = getStyle(widget->buttonsStyle);
 
     font::Font buttonsFont = styleGetFont(buttonsStyle);
-    int buttonWidth = buttonsFont.getHeight();
+    int buttonWidth = buttonsStyle->paddingLeft + buttonsFont.getHeight() + buttonsStyle->paddingRight;
 
     if (widget->downButtonText) {
         drawText(
@@ -94,12 +99,20 @@ void UpDownWidgetState::upDown(const WidgetCursor &widgetCursor, UpDownWidgetSeg
         ++newValue;
     }
 
-    int min = getMin(widgetCursor, widget->data).getInt();
+    int min;
+    int max;
+
+    if (widgetCursor.flowState) {
+        min = this->min.getInt();
+        max = this->max.getInt();
+    } else {
+    min = getMin(widgetCursor, widget->data).getInt();
+    max = getMax(widgetCursor, widget->data).getInt();
+    }
+
     if (newValue < min) {
         newValue = min;
     }
-
-    int max = getMax(widgetCursor, widget->data).getInt();
     if (newValue > max) {
         newValue = max;
     }

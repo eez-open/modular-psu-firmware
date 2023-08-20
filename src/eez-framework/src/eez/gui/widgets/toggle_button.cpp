@@ -20,6 +20,7 @@
 
 #if EEZ_OPTION_GUI
 
+#include <eez/core/sound.h>
 #include <eez/core/util.h>
 
 #include <eez/gui/gui.h>
@@ -42,17 +43,32 @@ void ToggleButtonWidgetState::render() {
 
     auto widget = (const ToggleButtonWidget *)widgetCursor.widget;
     const Style* style = getStyle(widget->style);
+    const Style* checkedStyle = getStyle(widget->checkedStyle);
 
     auto &text = flags.enabled ? widget->text2 : widget->text1;
-    if (text) {
-        drawText(
-            static_cast<const char *>(text),
-            -1,
-            widgetCursor.x, widgetCursor.y, widgetCursor.w, widgetCursor.h,
-            style,
-            flags.active
-        );
-    }
+    drawText(
+        text ? static_cast<const char *>(text) : "",
+        -1,
+        widgetCursor.x, widgetCursor.y, widgetCursor.w, widgetCursor.h,
+        flags.enabled ? checkedStyle : style,
+        flags.active
+    );
+}
+
+bool ToggleButtonWidgetState::hasOnTouch() {
+    return true;
+}
+
+void ToggleButtonWidgetState::onTouch(const WidgetCursor &widgetCursor, Event &touchEvent) {
+	if (touchEvent.type == EVENT_TYPE_TOUCH_UP) {
+        set(widgetCursor, widgetCursor.widget->data, get(widgetCursor, widgetCursor.widget->data).getInt() ? 0 : 1);
+
+        if (widgetCursor.widget->action != ACTION_ID_NONE) {
+            executeAction(widgetCursor, widgetCursor.widget->action);
+        } else {
+            sound::playClick();
+        }
+	}
 }
 
 } // namespace gui

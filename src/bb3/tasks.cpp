@@ -452,7 +452,10 @@ void lowPriorityThreadOneIter() {
                 fs_driver::UnLinkDriver(param);
             } else if (type == THREAD_MESSAGE_AUTO_START_SCRIPT) {
             	scripting::autoStart();
-            }
+            } else if (type == THREAD_MESSAGE_AUTO_RECALL) {
+                psu::autoRecall();
+                g_autoRecallFinished = true;
+            } 
         }
 
         uint32_t diffMs = millis() - g_lastTickCountMs;

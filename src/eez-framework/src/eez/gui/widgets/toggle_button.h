@@ -24,6 +24,7 @@ namespace gui {
 struct ToggleButtonWidget : public Widget {
     AssetsPtr<const char> text1;
 	AssetsPtr<const char> text2;
+    int16_t checkedStyle;
 };
 
 struct ToggleButtonWidgetState : public WidgetState {
@@ -31,6 +32,9 @@ struct ToggleButtonWidgetState : public WidgetState {
 
     bool updateState() override;
     void render() override;
+
+    bool hasOnTouch() override;
+	void onTouch(const WidgetCursor &widgetCursor, Event &touchEvent) override;
 };
 
 } // namespace gui

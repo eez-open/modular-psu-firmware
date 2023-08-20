@@ -226,6 +226,15 @@ const gui::Bitmap *getBitmap(int bitmapID) {
 	return nullptr;
 }
 
+const int getBitmapIdByName(const char *bitmapName) {
+    for (uint32_t i = 0; i < g_mainAssets->bitmaps.count; i++) {
+		if (strcmp(g_mainAssets->bitmaps[i]->name, bitmapName) == 0) {
+            return i + 1;
+        }
+	}
+    return 0;
+}
+
 #endif // EEZ_OPTION_GUI
 
 int getThemesCount() {

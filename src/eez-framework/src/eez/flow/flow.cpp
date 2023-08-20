@@ -360,8 +360,8 @@ void dataOperation(int16_t dataId, DataOperationEnum operation, const WidgetCurs
 				    value = array->arraySize;
                 }
 			} else {
-				value = 0;
-			}
+                value = arrayValue;
+            }
 		}
 		else if (operation == DATA_OPERATION_GET_MIN) {
 			if (component->type == WIDGET_TYPE_INPUT) {
@@ -475,6 +475,8 @@ void dataOperation(int16_t dataId, DataOperationEnum operation, const WidgetCurs
                 value = 0;
             }
         } else if (operation == DATA_OPERATION_GET_TEXT_REFRESH_RATE) {
+            getValue(flowDataId, operation, widgetCursor, value);
+        } else if (operation == DATA_OPERATION_GET_BITMAP_IMAGE) {
             getValue(flowDataId, operation, widgetCursor, value);
         }
 #if OPTION_KEYPAD

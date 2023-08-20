@@ -330,6 +330,7 @@ struct Bitmap {
     int16_t h;
     int16_t bpp;
     int16_t reserved;
+    AssetsPtr<const char> name;
     const uint8_t pixels[1];
 };
 
@@ -472,6 +473,7 @@ const gui::PageAsset* getPageAsset(int pageId, gui::WidgetCursor& widgetCursor);
 const gui::Style *getStyle(int styleID);
 const gui::FontData *getFontData(int fontID);
 const gui::Bitmap *getBitmap(int bitmapID);
+const int getBitmapIdByName(const char *bitmapName);
 #endif
 
 int getThemesCount();
