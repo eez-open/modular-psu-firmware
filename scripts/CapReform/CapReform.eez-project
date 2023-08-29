@@ -1,546 +1,1013 @@
 {
+  "objID": "6666cd76-f969-5646-9e7b-e39d750cc7d9",
   "settings": {
+    "objID": "e007d988-9fba-797d-72e9-efc33ca6d05c",
     "general": {
+      "objID": "fd434352-2277-c4a8-e87e-e96cfcbf2305",
       "projectVersion": "v2",
+      "projectType": "resource",
       "masterProject": "..\\..\\modular-psu-firmware.eez-project",
-      "imports": []
+      "extensions": [],
+      "imports": [],
+      "colorFormat": "BGR",
+      "resourceFiles": []
     },
     "build": {
+      "objID": "72794a43-a0fc-13c2-7eb5-67dd952141a4",
       "configurations": [
         {
+          "objID": "bba0546c-06b8-604d-c43e-ecf1963e7492",
           "name": "Default"
         }
       ],
-      "files": []
+      "files": [],
+      "lvglInclude": "lvgl/lvgl.h"
     }
   },
-  "data": [
-    {
-      "name": "cap_max_volt",
-      "description": "Capacitors Max. Voltage rating",
-      "type": "float",
-      "defaultValue": "25.0V",
-      "defaultMinValue": 1,
-      "defaultMaxValue": 80
-    },
-    {
-      "name": "charge_current",
-      "description": "Charging current",
-      "type": "float",
-      "defaultValue": "100uA",
-      "defaultMinValue": 10,
-      "defaultMaxValue": 1
-    },
-    {
-      "name": "reform_time",
-      "type": "integer",
-      "defaultValue": "3600s",
-      "defaultMinValue": 10,
-      "defaultMaxValue": 7200
-    },
-    {
-      "name": "reform_progress",
-      "description": "Progress bar",
-      "type": "integer",
-      "defaultValue": "0"
-    },
-    {
-      "name": "run_state",
-      "description": "run state",
-      "type": "enum",
-      "enumItems": "[\n    \"Start\",\n    \"Running\"\n]",
-      "defaultValue": "0"
-    },
-    {
-      "name": "data_viewable",
-      "type": "boolean",
-      "defaultValue": "0"
-    },
-    {
-      "name": "Vmon",
-      "type": "float",
-      "defaultValue": "0 V"
-    },
-    {
-      "name": "Imon",
-      "type": "float",
-      "defaultValue": "0mA"
-    },
-    {
-      "name": "Time",
-      "type": "integer",
-      "defaultValue": "119"
-    }
-  ],
+  "variables": {
+    "objID": "c6c71e16-53e1-217f-d03b-cef56c6b037a",
+    "globalVariables": [
+      {
+        "objID": "bc2bc5a8-fdcf-9af9-70b9-1bf9dfa9601e",
+        "name": "cap_max_volt",
+        "description": "Capacitors Max. Voltage rating",
+        "type": "float",
+        "defaultValue": "25.0V"
+      },
+      {
+        "objID": "58c508c5-6d6c-26bb-6b1b-fb4078a67809",
+        "name": "charge_current",
+        "description": "Charging current",
+        "type": "float",
+        "defaultValue": "100uA"
+      },
+      {
+        "objID": "8d470458-710f-98c7-5a8b-8f1d3ec756d4",
+        "name": "reform_time",
+        "type": "integer",
+        "defaultValue": "3600s"
+      },
+      {
+        "objID": "0ac78077-5e14-a81c-c8ed-115c56c42488",
+        "name": "reform_progress",
+        "description": "Progress bar",
+        "type": "integer",
+        "defaultValue": "0"
+      },
+      {
+        "objID": "22ba72ab-f5c7-230b-93d0-bef19cfcbb30",
+        "name": "run_state",
+        "description": "run state",
+        "type": "enum:Run_state",
+        "defaultValue": "0"
+      },
+      {
+        "objID": "9cde56ac-f392-0c94-d9ed-cee2a3aa33a3",
+        "name": "data_viewable",
+        "type": "boolean",
+        "defaultValue": "0"
+      },
+      {
+        "objID": "8a17575f-e285-59a9-c045-3476124c5e8c",
+        "name": "Vmon",
+        "type": "float",
+        "defaultValue": "0 V"
+      },
+      {
+        "objID": "f5704b0c-e7ce-9439-adc5-e3ac707f3d4f",
+        "name": "Imon",
+        "type": "float",
+        "defaultValue": "0mA"
+      },
+      {
+        "objID": "85fa80d1-31c8-1625-ad69-88cb43c0979d",
+        "name": "Time",
+        "type": "integer",
+        "defaultValue": "119"
+      }
+    ],
+    "structures": [],
+    "enums": [
+      {
+        "objID": "f8183f44-bf68-239f-a0e3-8e59bb8c6456",
+        "name": "Run_state",
+        "members": [
+          {
+            "objID": "ca41f2ac-3968-64d8-9e5c-2a3eaae45c3b",
+            "name": "Start",
+            "value": 0
+          },
+          {
+            "objID": "fe92cc0e-1a03-2225-80a4-da177799a92d",
+            "name": "Running",
+            "value": 1
+          }
+        ]
+      }
+    ]
+  },
   "actions": [
     {
+      "objID": "8cb0138e-9a34-1e54-875f-d250f623ea8a",
+      "components": [],
+      "connectionLines": [],
+      "localVariables": [],
       "name": "input_cap_max_volt"
     },
     {
+      "objID": "eea71c30-8437-ef1e-051d-7349b29ee033",
+      "components": [],
+      "connectionLines": [],
+      "localVariables": [],
       "name": "input_charge_current"
     },
     {
+      "objID": "1ba78974-a7b2-53ae-ec3a-f4a014ab9cfd",
+      "components": [],
+      "connectionLines": [],
+      "localVariables": [],
       "name": "input_reform_time"
     },
     {
+      "objID": "f786d5aa-58da-ab24-5b4f-84652888c902",
+      "components": [],
+      "connectionLines": [],
+      "localVariables": [],
       "name": "close_script"
     },
     {
+      "objID": "f2e9e244-f107-26c6-6643-23b92aef149b",
+      "components": [],
+      "connectionLines": [],
+      "localVariables": [],
       "name": "start_reform"
     },
     {
+      "objID": "e4d8f513-55c7-7a26-2bcd-39d2450264e9",
+      "components": [],
+      "connectionLines": [],
+      "localVariables": [],
       "name": "view_dlog"
     },
     {
+      "objID": "090bba50-e29c-93a9-e746-ab79e3aae31d",
+      "components": [],
+      "connectionLines": [],
+      "localVariables": [],
       "name": "stop_reform"
     }
   ],
-  "gui": {
-    "pages": [
-      {
-        "name": "Main",
-        "widgets": [
-          {
-            "type": "Container",
-            "style": {
-              "inheritFrom": "default"
-            },
-            "left": 0,
-            "top": 240,
-            "width": 480,
-            "height": 32,
-            "resizing": {
-              "pinToEdge": 11,
-              "fixSize": 0
-            },
-            "widgets": []
+  "userPages": [
+    {
+      "objID": "4056c471-a82f-f00e-c80e-c8e49fee3bb7",
+      "components": [
+        {
+          "objID": "f90b60d0-0665-1f2d-d7bb-8672ca4b6e2e",
+          "type": "Container",
+          "left": 0,
+          "top": 240,
+          "width": 480,
+          "height": 32,
+          "customInputs": [],
+          "customOutputs": [],
+          "resizing": {
+            "pinToEdge": 11,
+            "fixSize": 0
           },
-          {
-            "type": "Text",
-            "style": {
-              "inheritFrom": "status_bgnd"
-            },
-            "left": 64,
-            "top": 240,
-            "width": 416,
-            "height": 32,
-            "text": "Capacitor Reform"
+          "style": {
+            "objID": "fb6a8ebf-ffb2-c572-e37b-06078605c72c",
+            "useStyle": "default",
+            "childStyles": []
           },
-          {
-            "type": "Text",
-            "style": {
-              "inheritFrom": "status_icon_enabled"
-            },
-            "action": "close_script",
-            "left": 0,
-            "top": 240,
-            "width": 64,
-            "height": 32,
-            "text": "E"
+          "timeline": [],
+          "eventHandlers": [],
+          "widgets": [],
+          "layout": "static"
+        },
+        {
+          "objID": "dd4888a8-6ddf-bda8-ee39-329ba1088f6e",
+          "type": "Text",
+          "left": 64,
+          "top": 240,
+          "width": 416,
+          "height": 32,
+          "customInputs": [],
+          "customOutputs": [],
+          "style": {
+            "objID": "7e9248a4-65d7-7e9e-b307-1e128e85390f",
+            "useStyle": "status_bgnd",
+            "childStyles": []
           },
-          {
-            "type": "Container",
-            "style": {
-              "inheritFrom": "default"
-            },
-            "left": 0,
-            "top": 0,
-            "width": 479,
-            "height": 120,
-            "widgets": [
-              {
-                "type": "Text",
-                "style": {
-                  "inheritFrom": "default_S"
-                },
-                "left": 24,
-                "top": 8,
-                "width": 186,
-                "height": 32,
-                "text": "Capacitor Max Voltage:"
+          "timeline": [],
+          "eventHandlers": [],
+          "text": "Capacitor Reform",
+          "focusStyle": {
+            "objID": "0a599c6e-40dc-a537-729d-76d72cb4e404",
+            "useStyle": "default",
+            "childStyles": []
+          }
+        },
+        {
+          "objID": "3ff50907-83c1-3780-6dd9-86fd394135b5",
+          "type": "Text",
+          "left": 0,
+          "top": 240,
+          "width": 64,
+          "height": 32,
+          "customInputs": [],
+          "customOutputs": [],
+          "style": {
+            "objID": "a16b7fcc-e6a6-7e64-aacd-2ed15424d643",
+            "useStyle": "status_icon_enabled",
+            "childStyles": []
+          },
+          "timeline": [],
+          "eventHandlers": [
+            {
+              "objID": "67221ed0-75d0-a8e5-1c2b-39a2479158f0",
+              "eventName": "CLICKED",
+              "handlerType": "action",
+              "action": "close_script"
+            }
+          ],
+          "text": "E",
+          "focusStyle": {
+            "objID": "f8e2b07f-2232-0dd6-5942-c402ded003bf",
+            "useStyle": "default",
+            "childStyles": []
+          }
+        },
+        {
+          "objID": "e94d48a8-4b18-c941-0c17-1b6d7c7141e4",
+          "type": "Container",
+          "left": 0,
+          "top": 0,
+          "width": 479,
+          "height": 120,
+          "customInputs": [],
+          "customOutputs": [],
+          "style": {
+            "objID": "05c58537-4548-c9da-8467-13171e04d126",
+            "useStyle": "default",
+            "childStyles": []
+          },
+          "timeline": [],
+          "eventHandlers": [],
+          "widgets": [
+            {
+              "objID": "43558a21-ee65-e823-462a-152dd5524455",
+              "type": "Text",
+              "left": 24,
+              "top": 8,
+              "width": 186,
+              "height": 32,
+              "customInputs": [],
+              "customOutputs": [],
+              "style": {
+                "objID": "692bdde5-5238-e52c-ab36-935dfb75fa85",
+                "useStyle": "default_S",
+                "childStyles": []
               },
-              {
-                "type": "Text",
-                "style": {
-                  "inheritFrom": "default_S"
-                },
-                "left": 82,
-                "top": 44,
-                "width": 128,
-                "height": 32,
-                "text": "Charge current:"
-              },
-              {
-                "type": "Text",
-                "style": {
-                  "inheritFrom": "default_S"
-                },
-                "left": 100,
-                "top": 80,
-                "width": 109,
-                "height": 32,
-                "text": "Reform time:"
-              },
-              {
-                "type": "DisplayData",
-                "style": {
-                  "inheritFrom": "edit_value_active_S_left"
-                },
-                "data": "cap_max_volt",
-                "action": "input_cap_max_volt",
-                "left": 210,
-                "top": 8,
-                "width": 122,
-                "height": 32,
-                "displayOption": 0
-              },
-              {
-                "type": "DisplayData",
-                "style": {
-                  "inheritFrom": "edit_value_active_S_left"
-                },
-                "data": "charge_current",
-                "action": "input_charge_current",
-                "left": 210,
-                "top": 44,
-                "width": 122,
-                "height": 32,
-                "displayOption": 0
-              },
-              {
-                "type": "DisplayData",
-                "style": {
-                  "inheritFrom": "edit_value_active_S_left"
-                },
-                "data": "reform_time",
-                "action": "input_reform_time",
-                "left": 210,
-                "top": 80,
-                "width": 122,
-                "height": 32,
-                "displayOption": 0
+              "timeline": [],
+              "eventHandlers": [],
+              "text": "Capacitor Max Voltage:",
+              "focusStyle": {
+                "objID": "08546139-a3b5-7685-9ba6-4461e0675103",
+                "useStyle": "default",
+                "childStyles": []
               }
-            ]
-          },
-          {
-            "type": "Container",
-            "style": {
-              "inheritFrom": "default"
             },
-            "left": 7,
-            "top": 120,
-            "width": 325,
-            "height": 110,
-            "widgets": [
-              {
-                "type": "Bitmap",
-                "style": {
-                  "inheritFrom": "default"
-                },
-                "left": 0,
-                "top": 0,
-                "width": 325,
-                "height": 110,
-                "resizing": {
-                  "pinToEdge": 0,
-                  "fixSize": 0
-                },
-                "bitmap": "Profile"
+            {
+              "objID": "45e9dc83-607a-8aee-6442-815b5aec6dc6",
+              "type": "Text",
+              "left": 82,
+              "top": 44,
+              "width": 128,
+              "height": 32,
+              "customInputs": [],
+              "customOutputs": [],
+              "style": {
+                "objID": "8b6f54d9-cb36-39f0-571a-8904a32008c5",
+                "useStyle": "default_S",
+                "childStyles": []
               },
-              {
-                "type": "Progress",
-                "style": {
-                  "inheritFrom": "status_bgnd"
-                },
-                "data": "reform_progress",
-                "left": 6,
-                "top": 95,
-                "width": 266,
-                "height": 12
+              "timeline": [],
+              "eventHandlers": [],
+              "text": "Charge current:",
+              "focusStyle": {
+                "objID": "731de5ad-53ec-4a1b-4ab7-ea075ecbfdee",
+                "useStyle": "default",
+                "childStyles": []
               }
-            ]
-          },
-          {
-            "type": "Container",
-            "style": {
-              "inheritFrom": "default"
             },
-            "left": 338,
-            "top": 120,
-            "width": 134,
-            "height": 110,
-            "widgets": []
-          },
-          {
-            "type": "Select",
-            "style": {
-              "inheritFrom": "default"
-            },
-            "data": "run_state",
-            "left": 374,
-            "top": 16,
-            "width": 64,
-            "height": 32,
-            "widgets": [
-              {
-                "type": "LayoutView",
-                "style": {
-                  "inheritFrom": "default"
-                },
-                "left": 0,
-                "top": 0,
-                "width": 64,
-                "height": 32,
-                "layout": "Start"
+            {
+              "objID": "e679fe15-b41e-0f14-f260-4e364f22a398",
+              "type": "Text",
+              "left": 100,
+              "top": 80,
+              "width": 109,
+              "height": 32,
+              "customInputs": [],
+              "customOutputs": [],
+              "style": {
+                "objID": "331a6d1c-54af-dac7-2290-cb5c6b60b1d3",
+                "useStyle": "default_S",
+                "childStyles": []
               },
-              {
-                "type": "LayoutView",
-                "style": {
-                  "inheritFrom": "default"
-                },
-                "left": 0,
-                "top": 0,
-                "width": 64,
-                "height": 32,
-                "layout": "Stop"
+              "timeline": [],
+              "eventHandlers": [],
+              "text": "Reform time:",
+              "focusStyle": {
+                "objID": "63415614-7d2c-72e8-6e4d-a1c60db67209",
+                "useStyle": "default",
+                "childStyles": []
               }
-            ]
-          },
-          {
-            "type": "Select",
-            "style": {
-              "inheritFrom": "default"
             },
-            "data": "data_viewable",
-            "left": 352,
-            "top": 66,
-            "width": 108,
-            "height": 32,
-            "widgets": [
-              {
-                "type": "LayoutView",
-                "style": {
-                  "inheritFrom": "default"
-                },
-                "left": 0,
-                "top": 0,
-                "width": 108,
-                "height": 32,
-                "layout": "no data"
+            {
+              "objID": "7b1bcc9f-ec9d-31e2-3f4e-33cba636a438",
+              "type": "DisplayData",
+              "left": 210,
+              "top": 8,
+              "width": 122,
+              "height": 32,
+              "customInputs": [],
+              "customOutputs": [],
+              "data": "cap_max_volt",
+              "style": {
+                "objID": "8dedd1a2-1dbf-8fae-0d46-3f6f83d25bea",
+                "useStyle": "edit_value_active_S_left",
+                "childStyles": []
               },
-              {
-                "type": "LayoutView",
-                "style": {
-                  "inheritFrom": "default"
-                },
-                "left": 0,
-                "top": 0,
-                "width": 108,
-                "height": 32,
-                "layout": "View"
-              }
-            ]
-          },
-          {
-            "type": "Select",
-            "style": {
-              "inheritFrom": "default"
-            },
-            "data": "run_state",
-            "left": 338,
-            "top": 120,
-            "width": 134,
-            "height": 110,
-            "widgets": [
-              {
-                "type": "LayoutView",
-                "style": {
-                  "inheritFrom": "default"
-                },
-                "left": 0,
-                "top": 0,
-                "width": 134,
-                "height": 110,
-                "layout": "WiringDiagram"
+              "timeline": [],
+              "eventHandlers": [
+                {
+                  "objID": "52528ca0-ea60-10db-dd2f-5245ec70aa92",
+                  "eventName": "CLICKED",
+                  "handlerType": "action",
+                  "action": "input_cap_max_volt"
+                }
+              ],
+              "focusStyle": {
+                "objID": "9f5a5606-b44c-31c7-65fa-4cc11281a48b",
+                "useStyle": "default",
+                "childStyles": []
               },
-              {
-                "type": "LayoutView",
-                "style": {
-                  "inheritFrom": "default"
-                },
-                "left": 0,
-                "top": 0,
-                "width": 134,
-                "height": 110,
-                "layout": "BarGraphs"
-              }
-            ]
-          }
-        ],
-        "left": 0,
-        "top": 0,
-        "width": 480,
-        "height": 272
-      },
-      {
-        "name": "Start",
-        "widgets": [
-          {
-            "type": "Text",
-            "style": {
-              "inheritFrom": "button_M"
+              "displayOption": 0,
+              "refreshRate": "0"
             },
-            "data": "run_state",
-            "action": "start_reform",
-            "left": 0,
-            "top": 0,
-            "width": 64,
-            "height": 32,
-            "text": "Start"
-          }
-        ],
-        "left": 0,
-        "top": 0,
-        "width": 64,
-        "height": 32
-      },
-      {
-        "name": "View",
-        "widgets": [
-          {
-            "type": "Text",
-            "style": {
-              "inheritFrom": "button_M"
+            {
+              "objID": "44683728-b48b-84bd-d129-a0d3a8ea5099",
+              "type": "DisplayData",
+              "left": 210,
+              "top": 44,
+              "width": 122,
+              "height": 32,
+              "customInputs": [],
+              "customOutputs": [],
+              "data": "charge_current",
+              "style": {
+                "objID": "3ac91702-4f50-d3fa-e3a3-7b090bd068f0",
+                "useStyle": "edit_value_active_S_left",
+                "childStyles": []
+              },
+              "timeline": [],
+              "eventHandlers": [
+                {
+                  "objID": "d95ce544-9c15-6abd-fc0e-05d8300aa797",
+                  "eventName": "CLICKED",
+                  "handlerType": "action",
+                  "action": "input_charge_current"
+                }
+              ],
+              "focusStyle": {
+                "objID": "5b950e42-9043-cb4a-97fa-9776b4eea159",
+                "useStyle": "default",
+                "childStyles": []
+              },
+              "displayOption": 0,
+              "refreshRate": "0"
             },
-            "data": "run_state",
-            "action": "view_dlog",
-            "left": 0,
-            "top": 0,
-            "width": 108,
-            "height": 32,
-            "text": "View Data"
-          }
-        ],
-        "left": 0,
-        "top": 0,
-        "width": 108,
-        "height": 32
-      },
-      {
-        "name": "Stop",
-        "widgets": [
-          {
-            "type": "Text",
-            "style": {
-              "inheritFrom": "button_M"
-            },
-            "data": "run_state",
-            "action": "stop_reform",
-            "left": 0,
-            "top": 0,
-            "width": 64,
-            "height": 32,
-            "text": "Stop"
-          }
-        ],
-        "left": 0,
-        "top": 0,
-        "width": 64,
-        "height": 32
-      },
-      {
-        "name": "no data",
-        "widgets": [
-          {
-            "type": "Text",
-            "style": {
-              "inheritFrom": "default"
-            },
-            "data": "run_state",
-            "action": "",
-            "left": 0,
-            "top": 0,
-            "width": 108,
-            "height": 32,
-            "text": " "
-          }
-        ],
-        "left": 0,
-        "top": 0,
-        "width": 108,
-        "height": 32
-      },
-      {
-        "name": "BarGraphs",
-        "widgets": [
-          {
-            "type": "DisplayData",
-            "style": {
-              "inheritFrom": "default"
-            },
-            "data": "Vmon",
-            "left": 0,
-            "top": 12,
-            "width": 134,
-            "height": 32,
-            "displayOption": 0
+            {
+              "objID": "c130b53a-5cc7-47f4-910e-fdedd6caf07d",
+              "type": "DisplayData",
+              "left": 210,
+              "top": 80,
+              "width": 122,
+              "height": 32,
+              "customInputs": [],
+              "customOutputs": [],
+              "data": "reform_time",
+              "style": {
+                "objID": "6e6ace00-8317-3ade-e86f-8bff0e149fac",
+                "useStyle": "edit_value_active_S_left",
+                "childStyles": []
+              },
+              "timeline": [],
+              "eventHandlers": [
+                {
+                  "objID": "d75f7455-1156-f1b2-7d38-31526d145647",
+                  "eventName": "CLICKED",
+                  "handlerType": "action",
+                  "action": "input_reform_time"
+                }
+              ],
+              "focusStyle": {
+                "objID": "01cf0ddf-b928-4af9-ef9e-df26fc6672e8",
+                "useStyle": "default",
+                "childStyles": []
+              },
+              "displayOption": 0,
+              "refreshRate": "0"
+            }
+          ],
+          "layout": "static"
+        },
+        {
+          "objID": "b58e31bf-781c-6dcf-5be2-e0aefaff28b3",
+          "type": "Container",
+          "left": 7,
+          "top": 120,
+          "width": 325,
+          "height": 110,
+          "customInputs": [],
+          "customOutputs": [],
+          "style": {
+            "objID": "46a91e32-db07-1f1c-ebb3-114ddd3c98a1",
+            "useStyle": "default",
+            "childStyles": []
           },
-          {
-            "type": "DisplayData",
-            "style": {
-              "inheritFrom": "default"
+          "timeline": [],
+          "eventHandlers": [],
+          "widgets": [
+            {
+              "objID": "901b65aa-4633-e2bf-3b2c-1b28344aa34c",
+              "type": "Bitmap",
+              "left": 0,
+              "top": 0,
+              "width": 325,
+              "height": 110,
+              "customInputs": [],
+              "customOutputs": [],
+              "resizing": {
+                "pinToEdge": 0,
+                "fixSize": 0
+              },
+              "style": {
+                "objID": "71c4fab7-c525-f58f-4814-527ec6c17bc4",
+                "useStyle": "default",
+                "childStyles": []
+              },
+              "timeline": [],
+              "eventHandlers": [],
+              "bitmap": "Profile"
             },
-            "data": "Imon",
-            "left": 0,
-            "top": 56,
-            "width": 134,
-            "height": 32,
-            "displayOption": 0
-          }
-        ],
-        "left": 0,
-        "top": 0,
-        "width": 134,
-        "height": 120
-      },
-      {
-        "name": "WiringDiagram",
-        "widgets": [
-          {
-            "type": "Bitmap",
-            "style": {
-              "inheritFrom": "default"
+            {
+              "objID": "af8e15ea-2d9d-0b5e-8ff8-8ce3361286c0",
+              "type": "Progress",
+              "left": 6,
+              "top": 95,
+              "width": 266,
+              "height": 12,
+              "customInputs": [],
+              "customOutputs": [],
+              "data": "reform_progress",
+              "style": {
+                "objID": "328f29c0-6406-bb5b-e399-48bcd128dcaa",
+                "useStyle": "status_bgnd",
+                "childStyles": []
+              },
+              "timeline": [],
+              "eventHandlers": [],
+              "orientation": "horizontal"
+            }
+          ],
+          "layout": "static"
+        },
+        {
+          "objID": "a9c55d8b-73ed-bd49-d870-12f6504ac2d2",
+          "type": "Container",
+          "left": 338,
+          "top": 120,
+          "width": 134,
+          "height": 110,
+          "customInputs": [],
+          "customOutputs": [],
+          "style": {
+            "objID": "23397fe6-0ea9-08b0-5a19-5e78acf74ad2",
+            "useStyle": "default",
+            "childStyles": []
+          },
+          "timeline": [],
+          "eventHandlers": [],
+          "widgets": [],
+          "layout": "static"
+        },
+        {
+          "objID": "049694e6-5989-d362-dc6f-82e8c4e0f13b",
+          "type": "Select",
+          "left": 374,
+          "top": 16,
+          "width": 64,
+          "height": 32,
+          "customInputs": [],
+          "customOutputs": [],
+          "data": "run_state",
+          "style": {
+            "objID": "fc9c8717-8ebc-1b90-d4d5-f962f01d7228",
+            "useStyle": "default",
+            "childStyles": []
+          },
+          "timeline": [],
+          "eventHandlers": [],
+          "widgets": [
+            {
+              "objID": "a105dcea-d2b8-7f32-7843-75695f922ec4",
+              "type": "UserWidgetWidget",
+              "left": 0,
+              "top": 0,
+              "width": 64,
+              "height": 32,
+              "customInputs": [],
+              "customOutputs": [],
+              "style": {
+                "objID": "91a03c90-45a2-13f7-6844-e4e3e000845c",
+                "useStyle": "default",
+                "childStyles": []
+              },
+              "timeline": [],
+              "eventHandlers": [],
+              "userWidgetPageName": "Start"
             },
-            "left": 0,
-            "top": 0,
-            "width": 134,
-            "height": 110,
-            "bitmap": "Connection"
-          }
-        ],
-        "left": 0,
-        "top": 0,
-        "width": 134,
-        "height": 110
+            {
+              "objID": "dca5b658-a6db-c190-10cb-1e0e1a8bc3b2",
+              "type": "UserWidgetWidget",
+              "left": 0,
+              "top": 0,
+              "width": 64,
+              "height": 32,
+              "customInputs": [],
+              "customOutputs": [],
+              "style": {
+                "objID": "2b1217d8-272a-6949-93db-5d7c15992f93",
+                "useStyle": "default",
+                "childStyles": []
+              },
+              "timeline": [],
+              "eventHandlers": [],
+              "userWidgetPageName": "Stop"
+            }
+          ]
+        },
+        {
+          "objID": "cc3037e7-8f0f-70c8-a53b-38328fa3137b",
+          "type": "Select",
+          "left": 352,
+          "top": 66,
+          "width": 108,
+          "height": 32,
+          "customInputs": [],
+          "customOutputs": [],
+          "data": "data_viewable",
+          "style": {
+            "objID": "d0099347-b0bb-f35b-fee9-db7e4ec1d33e",
+            "useStyle": "default",
+            "childStyles": []
+          },
+          "timeline": [],
+          "eventHandlers": [],
+          "widgets": [
+            {
+              "objID": "5545291f-f39c-21de-8ac3-b2254fab1129",
+              "type": "UserWidgetWidget",
+              "left": 0,
+              "top": 0,
+              "width": 108,
+              "height": 32,
+              "customInputs": [],
+              "customOutputs": [],
+              "style": {
+                "objID": "2daf4db4-bf58-3b93-9f52-304c7cb327ab",
+                "useStyle": "default",
+                "childStyles": []
+              },
+              "timeline": [],
+              "eventHandlers": [],
+              "userWidgetPageName": "no data"
+            },
+            {
+              "objID": "d0e71894-4868-0981-5822-ded50f0c2687",
+              "type": "UserWidgetWidget",
+              "left": 0,
+              "top": 0,
+              "width": 108,
+              "height": 32,
+              "customInputs": [],
+              "customOutputs": [],
+              "style": {
+                "objID": "b90cd44c-d370-4506-2da1-596d49f80af2",
+                "useStyle": "default",
+                "childStyles": []
+              },
+              "timeline": [],
+              "eventHandlers": [],
+              "userWidgetPageName": "View"
+            }
+          ]
+        },
+        {
+          "objID": "8e7d4fbb-967a-1d2b-4944-ab69843eacfa",
+          "type": "Select",
+          "left": 338,
+          "top": 120,
+          "width": 134,
+          "height": 110,
+          "customInputs": [],
+          "customOutputs": [],
+          "data": "run_state",
+          "style": {
+            "objID": "35d5880b-01be-244b-043f-96c682dfea99",
+            "useStyle": "default",
+            "childStyles": []
+          },
+          "timeline": [],
+          "eventHandlers": [],
+          "widgets": [
+            {
+              "objID": "93478b6c-6379-6bd0-9f9d-effd71f7e835",
+              "type": "UserWidgetWidget",
+              "left": 0,
+              "top": 0,
+              "width": 134,
+              "height": 110,
+              "customInputs": [],
+              "customOutputs": [],
+              "style": {
+                "objID": "3d1df078-5e2c-1741-4843-260c5386a3c0",
+                "useStyle": "default",
+                "childStyles": []
+              },
+              "timeline": [],
+              "eventHandlers": [],
+              "userWidgetPageName": "WiringDiagram"
+            },
+            {
+              "objID": "f613b27b-025b-41e2-86fc-b2ac1f143b40",
+              "type": "UserWidgetWidget",
+              "left": 0,
+              "top": 0,
+              "width": 134,
+              "height": 110,
+              "customInputs": [],
+              "customOutputs": [],
+              "style": {
+                "objID": "da04b833-14dc-4fb5-d4f0-d7087adb9703",
+                "useStyle": "default",
+                "childStyles": []
+              },
+              "timeline": [],
+              "eventHandlers": [],
+              "userWidgetPageName": "BarGraphs"
+            }
+          ]
+        }
+      ],
+      "connectionLines": [],
+      "localVariables": [],
+      "name": "Main",
+      "left": 0,
+      "top": 0,
+      "width": 480,
+      "height": 272,
+      "lvglLocalStyles": {
+        "objID": "ac69ea56-2887-70b2-b75f-ac170b248f48"
       }
-    ],
-    "styles": [],
-    "fonts": [],
-    "bitmaps": [
-      {
-        "name": "Profile",
-        "image": "data:image/png;base64,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",
-        "bpp": 16,
-        "alwaysBuild": false
-      },
-      {
-        "name": "Connection",
-        "image": "data:image/png;base64,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",
-        "bpp": 16,
-        "alwaysBuild": false
+    }
+  ],
+  "userWidgets": [
+    {
+      "objID": "63b301a2-6407-4826-aca9-4e2c97a11095",
+      "components": [
+        {
+          "objID": "edcd73c8-2668-4f78-a947-99d6d93f2dd9",
+          "type": "Text",
+          "left": 0,
+          "top": 0,
+          "width": 64,
+          "height": 32,
+          "customInputs": [],
+          "customOutputs": [],
+          "data": "run_state",
+          "style": {
+            "objID": "b469d191-7776-406d-a9a1-e8bbc8fb3188",
+            "useStyle": "button_M",
+            "childStyles": []
+          },
+          "timeline": [],
+          "eventHandlers": [
+            {
+              "objID": "7855473e-18e7-4eaa-8562-d5600d6fb96f",
+              "eventName": "CLICKED",
+              "handlerType": "action",
+              "action": "start_reform"
+            },
+            {
+              "objID": "68df2ce1-40bf-2d2b-1eeb-276fb8c365bb",
+              "eventName": "CLICKED",
+              "handlerType": "action",
+              "action": "start_reform"
+            }
+          ],
+          "text": "Start",
+          "focusStyle": {
+            "objID": "5118f75c-7ae2-4d4a-ceb4-7eccae8642c9",
+            "useStyle": "default",
+            "childStyles": []
+          }
+        }
+      ],
+      "connectionLines": [],
+      "localVariables": [],
+      "name": "Start",
+      "left": 0,
+      "top": 0,
+      "width": 64,
+      "height": 32,
+      "isUsedAsUserWidget": true,
+      "lvglLocalStyles": {
+        "objID": "75b54fce-2350-4857-ba85-7e1809e93c1a"
       }
-    ],
-    "colors": [],
-    "themes": []
-  }
+    },
+    {
+      "objID": "ed62048a-c171-4c58-9326-3752162ce014",
+      "components": [
+        {
+          "objID": "57285169-9cf3-406a-f4ad-96899dc933ed",
+          "type": "Text",
+          "left": 0,
+          "top": 0,
+          "width": 108,
+          "height": 32,
+          "customInputs": [],
+          "customOutputs": [],
+          "data": "run_state",
+          "style": {
+            "objID": "7b09b8e7-4ed9-4da2-eee8-d1f44f8da078",
+            "useStyle": "default",
+            "childStyles": []
+          },
+          "timeline": [],
+          "eventHandlers": [],
+          "text": " ",
+          "focusStyle": {
+            "objID": "f3af9f20-a414-4ba7-af0d-0e8bad5de344",
+            "useStyle": "default",
+            "childStyles": []
+          }
+        }
+      ],
+      "connectionLines": [],
+      "localVariables": [],
+      "name": "no data",
+      "left": 0,
+      "top": 0,
+      "width": 108,
+      "height": 32,
+      "isUsedAsUserWidget": true,
+      "lvglLocalStyles": {
+        "objID": "06a62cca-a7e3-427b-f9d8-e5646406edbc"
+      }
+    },
+    {
+      "objID": "87e3c0eb-079d-4ce1-f67c-35a712873107",
+      "components": [
+        {
+          "objID": "fdb372e5-ebf8-45d9-b66b-9cb657c2145d",
+          "type": "Text",
+          "left": 0,
+          "top": 0,
+          "width": 108,
+          "height": 32,
+          "customInputs": [],
+          "customOutputs": [],
+          "data": "run_state",
+          "style": {
+            "objID": "a9e67eb7-6fd6-49d7-ddf7-577375b57933",
+            "useStyle": "button_M",
+            "childStyles": []
+          },
+          "timeline": [],
+          "eventHandlers": [
+            {
+              "objID": "f1f77ece-3f57-4d53-8ac3-e90504176dee",
+              "eventName": "CLICKED",
+              "handlerType": "action",
+              "action": "view_dlog"
+            },
+            {
+              "objID": "68df2ce1-40bf-2d2b-1eeb-276fb8c365bb",
+              "eventName": "CLICKED",
+              "handlerType": "action",
+              "action": "view_dlog"
+            }
+          ],
+          "text": "View Data",
+          "focusStyle": {
+            "objID": "90a2e74b-6445-43b8-8162-f4189a82130e",
+            "useStyle": "default",
+            "childStyles": []
+          }
+        }
+      ],
+      "connectionLines": [],
+      "localVariables": [],
+      "name": "View",
+      "left": 0,
+      "top": 0,
+      "width": 108,
+      "height": 32,
+      "isUsedAsUserWidget": true,
+      "lvglLocalStyles": {
+        "objID": "ade265dc-e1ca-407e-bcfc-24ee8006d607"
+      }
+    },
+    {
+      "objID": "272d628b-e16c-4a69-fdca-29924aae697f",
+      "components": [
+        {
+          "objID": "6b20178e-fcfd-4d00-cc94-a6d3651a3536",
+          "type": "Bitmap",
+          "left": 0,
+          "top": 0,
+          "width": 134,
+          "height": 110,
+          "customInputs": [],
+          "customOutputs": [],
+          "style": {
+            "objID": "f40efc03-0fe8-49a6-dc9a-09794015b3a8",
+            "useStyle": "default",
+            "childStyles": []
+          },
+          "timeline": [],
+          "eventHandlers": [],
+          "bitmap": "Connection"
+        }
+      ],
+      "connectionLines": [],
+      "localVariables": [],
+      "name": "WiringDiagram",
+      "left": 0,
+      "top": 0,
+      "width": 134,
+      "height": 110,
+      "isUsedAsUserWidget": true,
+      "lvglLocalStyles": {
+        "objID": "af42df62-730a-43b3-c12a-61254068c1dc"
+      }
+    },
+    {
+      "objID": "d02a49c5-0de2-4239-dfbd-98f28a6d2f44",
+      "components": [
+        {
+          "objID": "ecd6eacd-ad89-482b-c75e-d3b0f4bb4dd2",
+          "type": "DisplayData",
+          "left": 0,
+          "top": 12,
+          "width": 134,
+          "height": 32,
+          "customInputs": [],
+          "customOutputs": [],
+          "data": "Vmon",
+          "style": {
+            "objID": "3be25b97-355d-45a6-b87f-6e3466b0ce21",
+            "useStyle": "default",
+            "childStyles": []
+          },
+          "timeline": [],
+          "eventHandlers": [],
+          "focusStyle": {
+            "objID": "5d5df15d-e525-4f92-8468-8db386f576ee",
+            "useStyle": "default",
+            "childStyles": []
+          },
+          "displayOption": 0,
+          "refreshRate": "0"
+        },
+        {
+          "objID": "9957650e-51f0-41e2-f4d0-c7be3be5402f",
+          "type": "DisplayData",
+          "left": 0,
+          "top": 56,
+          "width": 134,
+          "height": 32,
+          "customInputs": [],
+          "customOutputs": [],
+          "data": "Imon",
+          "style": {
+            "objID": "9e4647ce-5819-499d-a36b-bb57b1b59a0e",
+            "useStyle": "default",
+            "childStyles": []
+          },
+          "timeline": [],
+          "eventHandlers": [],
+          "focusStyle": {
+            "objID": "a421aa2b-10ae-4d3e-e594-e4a3cd6b9c46",
+            "useStyle": "default",
+            "childStyles": []
+          },
+          "displayOption": 0,
+          "refreshRate": "0"
+        }
+      ],
+      "connectionLines": [],
+      "localVariables": [],
+      "name": "BarGraphs",
+      "left": 0,
+      "top": 0,
+      "width": 134,
+      "height": 120,
+      "isUsedAsUserWidget": true,
+      "lvglLocalStyles": {
+        "objID": "3bd359b6-98f6-46f7-be46-d5a7a73aa3f4"
+      }
+    },
+    {
+      "objID": "3d0f3b8a-f4c1-4c80-aadf-656553437cbc",
+      "components": [
+        {
+          "objID": "2ee1326f-5d42-4f37-b34e-ac1f25f10b82",
+          "type": "Text",
+          "left": 0,
+          "top": 0,
+          "width": 64,
+          "height": 32,
+          "customInputs": [],
+          "customOutputs": [],
+          "data": "run_state",
+          "style": {
+            "objID": "06406068-0589-476f-9f98-7c77443c5db6",
+            "useStyle": "button_M",
+            "childStyles": []
+          },
+          "timeline": [],
+          "eventHandlers": [
+            {
+              "objID": "3b2b1ca1-c588-4001-fd1f-56dd97909f5b",
+              "eventName": "CLICKED",
+              "handlerType": "action",
+              "action": "stop_reform"
+            },
+            {
+              "objID": "78ddd9bb-65ee-4386-9c5a-5b7e97043c61",
+              "eventName": "CLICKED",
+              "handlerType": "action",
+              "action": "stop_reform"
+            },
+            {
+              "objID": "44e86a48-5762-be97-99bb-827524877993",
+              "eventName": "CLICKED",
+              "handlerType": "action",
+              "action": "stop_reform"
+            }
+          ],
+          "text": "Stop",
+          "focusStyle": {
+            "objID": "1cf334de-4fd9-4bd1-a539-89931bea2798",
+            "useStyle": "default",
+            "childStyles": []
+          }
+        }
+      ],
+      "connectionLines": [],
+      "localVariables": [],
+      "name": "Stop",
+      "left": 0,
+      "top": 0,
+      "width": 64,
+      "height": 32,
+      "isUsedAsUserWidget": true,
+      "lvglLocalStyles": {
+        "objID": "c11c24f1-1b38-401b-d98a-6aca9be92929"
+      }
+    }
+  ],
+  "styles": [],
+  "fonts": [],
+  "bitmaps": [
+    {
+      "objID": "e14310bd-1f22-1341-452b-b529b34065c0",
+      "name": "Profile",
+      "image": "data:image/png;base64,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",
+      "bpp": 16,
+      "alwaysBuild": false
+    },
+    {
+      "objID": "18117f11-8b6e-7808-9de6-f0cf68f16525",
+      "name": "Connection",
+      "image": "data:image/png;base64,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",
+      "bpp": 16,
+      "alwaysBuild": false
+    }
+  ],
+  "colors": [],
+  "themes": []
 }
