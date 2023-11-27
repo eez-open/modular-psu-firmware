@@ -32,8 +32,8 @@ static const uint32_t DISPLAY_BPP = 16; // RGB565
 #endif
 
 #if defined(EEZ_PLATFORM_SIMULATOR)
-static const uint32_t DISPLAY_WIDTH = 1396;
-static const uint32_t DISPLAY_HEIGHT = 563;
+static const uint32_t DISPLAY_WIDTH = 480;
+static const uint32_t DISPLAY_HEIGHT = 272;
 static const uint32_t DISPLAY_BPP = 32;  // RGBA8888
 
 static const char *TITLE = "BB3 Firmware Simulator";

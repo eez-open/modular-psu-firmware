@@ -34,13 +34,13 @@ FrontPanelAppContext g_frontPanelAppContext;
 
 void FrontPanelAppContext::stateManagment() {
     AppContext::stateManagment();
-    if (!isPageOnStack(PAGE_ID_FRONT_PANEL)) {
-        showPage(PAGE_ID_FRONT_PANEL);
+    if (!isPageOnStack(PAGE_ID_FRONT_PANEL_NO_FRAME)) {
+        showPage(PAGE_ID_FRONT_PANEL_NO_FRAME);
     }
 }
 
 int FrontPanelAppContext::getMainPageId() {
-    return PAGE_ID_FRONT_PANEL;
+    return PAGE_ID_FRONT_PANEL_NO_FRAME;
 }
 
 int FrontPanelAppContext::getLongTouchActionHook(const WidgetCursor &widgetCursor) {

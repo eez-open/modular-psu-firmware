@@ -1240,6 +1240,46 @@
       "lvglLocalStyles": {
         "objID": "f8806e4e-5893-d3a5-adc9-9e26d21d16ec"
       }
+    },
+    {
+      "objID": "2b24b534-90e7-4f8c-8474-8c44da591379",
+      "components": [
+        {
+          "objID": "a571eaca-9e60-4f0c-897d-8f6f996a1ba0",
+          "type": "AppView",
+          "left": 0,
+          "top": 0,
+          "width": 480,
+          "height": 272,
+          "customInputs": [],
+          "customOutputs": [],
+          "data": "main_app_view",
+          "style": {
+            "objID": "0e598f25-3469-4b04-a67b-e971bf714392",
+            "useStyle": "default",
+            "childStyles": [],
+            "backgroundColor": "#ffffff",
+            "activeColor": "#ffffff"
+          },
+          "timeline": [],
+          "eventHandlers": []
+        }
+      ],
+      "connectionLines": [],
+      "localVariables": [],
+      "name": "front_panel_no_frame",
+      "style": "default",
+      "usedIn": [
+        "simulator"
+      ],
+      "left": 0,
+      "top": 0,
+      "width": 480,
+      "height": 272,
+      "isUsedAsUserWidget": false,
+      "lvglLocalStyles": {
+        "objID": "14cb2fd7-d236-436e-d9d5-cd3a5ef01588"
+      }
     }
   ],
   "userWidgets": [],
