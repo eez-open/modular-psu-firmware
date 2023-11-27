@@ -50,7 +50,7 @@ inline utf8_int8_t *utf8catcodepoint(utf8_int8_t *str, utf8_int32_t chr, size_t 
 #ifdef _MSC_VER
 #define utf8casecmp _stricmp
 #else
-#define utf8casecmp stricmp
+#define utf8casecmp strcasecmp
 #endif
 
 #endif
