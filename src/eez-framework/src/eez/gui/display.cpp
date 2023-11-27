@@ -276,8 +276,12 @@ void update() {
         if (g_animationState.enabled) {
             display::finishAnimation();
         }
+#if defined(EEZ_PLATFORM_SIMULATOR)
+        syncBuffer();
+#else
         osDelay(16);
         sendMessageToGuiThread(GUI_QUEUE_MESSAGE_TYPE_DISPLAY_VSYNC, 0, 0);
+#endif
         return;
     }
 

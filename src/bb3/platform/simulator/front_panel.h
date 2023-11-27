@@ -30,6 +30,7 @@ public:
     void stateManagment() override;
 
     int getLongTouchActionHook(const WidgetCursor &widgetCursor) override;
+    void onPageTouch(const WidgetCursor &foundWidget, Event &touchEvent) override;
 
 protected:
     int getMainPageId() override;

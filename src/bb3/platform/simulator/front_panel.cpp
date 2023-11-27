@@ -51,6 +51,14 @@ int FrontPanelAppContext::getLongTouchActionHook(const WidgetCursor &widgetCurso
     return AppContext::getLongTouchActionHook(widgetCursor);
 }
 
+void FrontPanelAppContext::onPageTouch(const WidgetCursor &foundWidget, Event &touchEvent) {
+    if (psu::gui::g_psuAppContext.getActivePageId() == PAGE_ID_NONE || psu::gui::g_psuAppContext.getActivePageId() == PAGE_ID_STANDBY) {
+        // wake up
+        psu::changePowerState(true);
+    }
+
+    AppContext::onPageTouch(foundWidget, touchEvent);
+}
 ////////////////////////////////////////////////////////////////////////////////
 
 void data_main_app_view(DataOperationEnum operation, const WidgetCursor &widgetCursor, Value &value) {
