@@ -1116,9 +1116,18 @@ bool Value::toBool(int *err) const {
 		return uint64Value != 0;
 	}
 
+	if (type == VALUE_TYPE_DATE) {
+		return doubleValue != 0;
+	}
+
 	if (isString()) {
 		const char *str = getString();
 		return str && *str;
+	}
+
+	if (isBlob()) {
+		auto blobRef = getBlob();
+		return blobRef->len > 0;
 	}
 
 	if (isArray()) {

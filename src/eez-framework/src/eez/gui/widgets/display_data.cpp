@@ -60,11 +60,17 @@ bool DisplayDataWidgetState::updateState() {
     WIDGET_STATE(flags.focused, isFocusWidget(widgetCursor));
     WIDGET_STATE(flags.blinking, g_isBlinkTime && (styleIsBlink(style) || isBlinking(widgetCursor, widget->data)));
 
+    uint32_t refreshRate;
+    if (widgetCursor.flowState) {
+        refreshRate = get(widgetCursor, widget->refreshRate).toInt32(nullptr);
+    } else {
+        refreshRate = getTextRefreshRate(widgetCursor, widget->data);
+    }
+
     bool refreshData = true;
     auto newData = get(widgetCursor, widget->data);
     auto currentTime = millis();
     if (hasPreviousState && data != newData) {
-        uint32_t refreshRate = getTextRefreshRate(widgetCursor, widget->data);
         if (refreshRate != 0 && currentTime - dataRefreshLastTime < refreshRate) {
             refreshData = false;
         }

@@ -80,6 +80,7 @@ FlowState *initPageFlowState(Assets *assets, int flowIndex, FlowState *parentFlo
 
 bool canFreeFlowState(FlowState *flowState, bool includingWatchVariable = true);
 void freeFlowState(FlowState *flowState);
+void freeAllChildrenFlowStates(FlowState *flowState);
 
 void deallocateComponentExecutionState(FlowState *flowState, unsigned componentIndex);
 

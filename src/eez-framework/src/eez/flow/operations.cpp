@@ -27,11 +27,16 @@
 #include <eez/core/os.h>
 #include <eez/core/value.h>
 #include <eez/core/util.h>
+#include <eez/core/utf8.h>
 
 #include <eez/flow/flow.h>
 #include <eez/flow/operations.h>
 #include <eez/flow/flow_defs_v3.h>
 #include <eez/flow/date.h>
+
+extern "C" {
+#include <eez/libs/sha256/sha256.h>
+}
 
 #if EEZ_OPTION_GUI
 #include <eez/gui/gui.h>
@@ -245,11 +250,11 @@ Value op_mod(const Value& a1, const Value& b1) {
     }
 
     if (a.isDouble() || b.isDouble()) {
-        Value(a.toDouble() - floor(a.toDouble() / b.toDouble()) * b.toDouble(), VALUE_TYPE_DOUBLE);
+        return Value(a.toDouble() - floor(a.toDouble() / b.toDouble()) * b.toDouble(), VALUE_TYPE_DOUBLE);
     }
 
     if (a.isFloat() || b.isFloat()) {
-        Value(a.toFloat() - floor(a.toFloat() / b.toFloat()) * b.toFloat(), VALUE_TYPE_FLOAT);
+        return Value(a.toFloat() - floor(a.toFloat() / b.toFloat()) * b.toFloat(), VALUE_TYPE_FLOAT);
     }
 
     if (a.isInt64() || b.isInt64()) {
@@ -427,6 +432,22 @@ bool is_equal(const Value& a1, const Value& b1) {
             return false;
         }
         return strcmp(aStr, bStr) == 0;
+    }
+
+    if (a.isBlob() && b.isBlob()) {
+        auto aBlobRef = a.getBlob();
+        auto bBlobRef = b.getBlob();
+        if (!aBlobRef && !aBlobRef) {
+            return true;
+        }
+        if (!aBlobRef || !bBlobRef) {
+            return false;
+        }
+        if (aBlobRef->len != bBlobRef->len) {
+            return false;
+        }
+        return memcmp(aBlobRef->blob, bBlobRef->blob, aBlobRef->len) == 0;
+
     }
 
     return a.toDouble() == b.toDouble();
@@ -945,15 +966,37 @@ void do_OPERATION_TYPE_FLOW_MAKE_ARRAY_VALUE(EvalStack &stack) {
         return;
     }
 
+    auto numInitElementsValue = stack.pop();
+    if (numInitElementsValue.isError()) {
+        stack.push(numInitElementsValue);
+        return;
+    }
+
     int arrayType = arrayTypeValue.getInt();
-    int arraySize = arraySizeValue.getInt();
+
+    int err;
+    int arraySize = arraySizeValue.toInt32(&err);
+    if (err) {
+        stack.push(Value::makeError());
+        return;
+    }
+
+    int numInitElements = numInitElementsValue.toInt32(&err);
+    if (err) {
+        stack.push(Value::makeError());
+        return;
+    }
 
     auto arrayValue = Value::makeArrayRef(arraySize, arrayType, 0x837260d4);
 
     auto array = arrayValue.getArray();
 
     for (int i = 0; i < arraySize; i++) {
-        array->values[i] = stack.pop().getValue();
+        if (i < numInitElements) {
+            array->values[i] = stack.pop().getValue();
+        } else {
+            array->values[i] = Value();
+        }
     }
 
     stack.push(arrayValue);
@@ -976,7 +1019,12 @@ void do_OPERATION_TYPE_FLOW_LANGUAGES(EvalStack &stack) {
 void do_OPERATION_TYPE_FLOW_TRANSLATE(EvalStack &stack) {
     auto textResourceIndexValue = stack.pop();
 
-    int textResourceIndex = textResourceIndexValue.getInt();
+    int err;
+    int textResourceIndex = textResourceIndexValue.toInt32(&err);
+    if (err) {
+        stack.push(Value::makeError());
+        return;
+    }
 
     int languageIndex = g_selectedLanguage;
 
@@ -1909,6 +1957,59 @@ void do_OPERATION_TYPE_STRING_SPLIT(EvalStack &stack) {
     stack.push(arrayValue);
 }
 
+void do_OPERATION_TYPE_STRING_FROM_CODE_POINT(EvalStack &stack) {
+    Value charCodeValue = stack.pop().getValue();
+    if (charCodeValue.isError()) {
+        stack.push(charCodeValue);
+        return;
+    }
+
+    int err = 0;
+    int32_t charCode = charCodeValue.toInt32(&err);
+    if (err != 0) {
+        stack.push(Value::makeError());
+        return;
+    }
+
+    char str[16] = {0};
+
+    utf8catcodepoint(str, charCode, sizeof(str));
+
+    Value resultValue = Value::makeStringRef(str, strlen(str), 0x02c2e778);
+    stack.push(resultValue);
+    return;
+}
+
+void do_OPERATION_TYPE_STRING_CODE_POINT_AT(EvalStack &stack) {
+    auto strValue = stack.pop().getValue();
+    if (strValue.isError()) {
+        stack.push(strValue);
+        return;
+    }
+
+    Value indexValue = stack.pop().getValue();
+    if (indexValue.isError()) {
+        stack.push(indexValue);
+        return;
+    }
+
+    utf8_int32_t codePoint = 0;
+
+    const char *str = strValue.getString();
+    if (str) {
+        int index = indexValue.toInt32();
+        if (index >= 0) {
+            do {
+                str = utf8codepoint(str, &codePoint);
+            } while (codePoint && --index >= 0);
+        }
+    }
+
+    stack.push(Value((int)codePoint, VALUE_TYPE_INT32));
+
+    return;
+}
+
 void do_OPERATION_TYPE_ARRAY_LENGTH(EvalStack &stack) {
     auto a = stack.pop().getValue();
     if (a.isError()) {
@@ -1916,56 +2017,73 @@ void do_OPERATION_TYPE_ARRAY_LENGTH(EvalStack &stack) {
         return;
     }
 
-    if (!a.isArray()) {
+    if (a.isArray()) {
+        auto array = a.getArray();
+        stack.push(Value(array->arraySize, VALUE_TYPE_UINT32));
+    } else if (a.isBlob()) {
+        auto blobRef = a.getBlob();
+        stack.push(Value(blobRef->len, VALUE_TYPE_UINT32));
+    } else {
         stack.push(Value::makeError());
         return;
     }
-
-    auto array = a.getArray();
-    stack.push(Value(array->arraySize, VALUE_TYPE_UINT32));
 }
 
 void do_OPERATION_TYPE_ARRAY_SLICE(EvalStack &stack) {
     auto numArgs = stack.pop().getInt();
+
     auto arrayValue = stack.pop().getValue();
     if (arrayValue.isError()) {
         stack.push(arrayValue);
         return;
     }
-    auto fromValue = stack.pop().getValue();
-    if (fromValue.isError()) {
-        stack.push(fromValue);
-        return;
-    }
-    auto from = fromValue.getInt();
-
-    int to = -1;
-    if (numArgs > 2) {
-        auto toValue = stack.pop().getValue();
-        if (toValue.isError()) {
-            stack.push(toValue);
-            return;
-        }
-        to = toValue.getInt();
-    }
-
     if (!arrayValue.isArray()) {
         stack.push(Value::makeError());
         return;
     }
     auto array = arrayValue.getArray();
 
-    if (from < 0 || from >= (int)array->arraySize) {
-        stack.push(Value::makeError());
-        return;
+    int from;
+    if (numArgs > 1) {
+        auto fromValue = stack.pop().getValue();
+        if (fromValue.isError()) {
+            stack.push(fromValue);
+            return;
+        }
+
+        int err;
+        from = fromValue.toInt32(&err);
+        if (err) {
+            stack.push(Value::makeError());
+            return;
+        }
+
+        if (from < 0) {
+            from = 0;
+        }
+    } else {
+        from = 0;
     }
 
-    if (numArgs <= 2) {
+    int to;
+    if (numArgs > 2) {
+        auto toValue = stack.pop().getValue();
+        if (toValue.isError()) {
+            stack.push(toValue);
+            return;
+        }
+        int err;
+        to = toValue.toInt32(&err);
+        if (err) {
+            stack.push(Value::makeError());
+            return;
+        }
+
+        if (to < 0) {
+            to = 0;
+        }
+    } else {
         to = array->arraySize;
-    }
-    if (to < 0 || to >= (int)array->arraySize) {
-        stack.push(Value::makeError());
-        return;
     }
 
     if (from > to) {
@@ -1976,9 +2094,9 @@ void do_OPERATION_TYPE_ARRAY_SLICE(EvalStack &stack) {
     auto size = to - from;
 
     auto resultArrayValue = Value::makeArrayRef(size, array->arrayType, 0xe2d78c65);
-    auto resultArray = array;
+    auto resultArray = resultArrayValue.getArray();
 
-    for (int elementIndex = from; elementIndex < to; elementIndex++) {
+    for (int elementIndex = from; elementIndex < to && elementIndex < (int)array->arraySize; elementIndex++) {
         resultArray->values[elementIndex - from] = array->values[elementIndex];
     }
 
@@ -1991,7 +2109,12 @@ void do_OPERATION_TYPE_ARRAY_ALLOCATE(EvalStack &stack) {
         stack.push(sizeValue);
         return;
     }
-    auto size = sizeValue.getInt();
+    int err;
+    auto size = sizeValue.toInt32(&err);
+    if (err) {
+        stack.push(Value::makeError());
+        return;
+    }
 
     auto resultArrayValue = Value::makeArrayRef(size, defs_v3::ARRAY_TYPE_ANY, 0xe2d78c65);
 
@@ -2129,6 +2252,40 @@ void do_OPERATION_TYPE_LVGL_METER_TICK_INDEX(EvalStack &stack) {
     stack.push(g_eezFlowLvlgMeterTickIndex);
 }
 
+void do_OPERATION_TYPE_CRYPTO_SHA256(EvalStack &stack) {
+    auto value = stack.pop().getValue();
+    if (value.isError()) {
+        stack.push(value);
+        return;
+    }
+
+    const uint8_t *data;
+    uint32_t dataLen;
+
+    if (value.isString()) {
+        const char *str = value.getString();
+        data = (uint8_t *)str;
+        dataLen = strlen(str);
+    } else if (value.isBlob()) {
+        auto blobRef = value.getBlob();
+        data = blobRef->blob;
+        dataLen = blobRef->len;
+    } else {
+        stack.push(Value::makeError());
+        return;
+    }
+
+    BYTE buf[SHA256_BLOCK_SIZE];
+    SHA256_CTX ctx;
+    sha256_init(&ctx);
+	sha256_update(&ctx, data, dataLen);
+	sha256_final(&ctx, buf);
+
+    auto result = Value::makeBlobRef(buf, SHA256_BLOCK_SIZE, 0x1f0c0c0c);
+
+    stack.push(result);
+}
+
 EvalOperation g_evalOperations[] = {
     do_OPERATION_TYPE_ADD,
     do_OPERATION_TYPE_SUB,
@@ -2202,6 +2359,9 @@ EvalOperation g_evalOperations[] = {
     do_OPERATION_TYPE_LVGL_METER_TICK_INDEX,
     do_OPERATION_TYPE_FLOW_GET_BITMAP_INDEX,
     do_OPERATION_TYPE_FLOW_TO_INTEGER,
+    do_OPERATION_TYPE_STRING_FROM_CODE_POINT,
+    do_OPERATION_TYPE_STRING_CODE_POINT_AT,
+    do_OPERATION_TYPE_CRYPTO_SHA256,
 };
 
 } // namespace flow

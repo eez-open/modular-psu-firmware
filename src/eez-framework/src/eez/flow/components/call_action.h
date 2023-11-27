@@ -29,11 +29,5 @@ struct CallActionActionComponent : public Component {
 	uint8_t outputsStartIndex;
 };
 
-struct CallActionComponenentExecutionState : public ComponenentExecutionState {
-	FlowState *flowState;
-
-	~CallActionComponenentExecutionState();
-};
-
 } // flow
 } // eez

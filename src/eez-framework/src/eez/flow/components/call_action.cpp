@@ -30,10 +30,6 @@
 namespace eez {
 namespace flow {
 
-CallActionComponenentExecutionState::~CallActionComponenentExecutionState() {
-    freeFlowState(flowState);
-}
-
 void executeCallAction(FlowState *flowState, unsigned componentIndex, int flowIndex) {
     // if componentIndex == -1 then execute flow at flowIndex without CallAction component
 
@@ -44,29 +40,12 @@ void executeCallAction(FlowState *flowState, unsigned componentIndex, int flowIn
 		return;
 	}
 
-    if ((int)componentIndex != -1) {
-        auto callActionComponenentExecutionState = (CallActionComponenentExecutionState *)flowState->componenentExecutionStates[componentIndex];
-        if (callActionComponenentExecutionState) {
-            if (canFreeFlowState(callActionComponenentExecutionState->flowState)) {
-                deallocateComponentExecutionState(flowState, componentIndex);
-            } else {
-                addToQueue(flowState, componentIndex, -1, -1, -1, true);
-                return;
-            }
-        }
-    }
-
 	FlowState *actionFlowState = initActionFlowState(flowIndex, flowState, componentIndex);
 
 	if (canFreeFlowState(actionFlowState)) {
         freeFlowState(actionFlowState);
         if ((int)componentIndex != -1) {
 		    propagateValueThroughSeqout(flowState, componentIndex);
-        }
-	} else {
-        if ((int)componentIndex != -1) {
-		    auto callActionComponenentExecutionState = allocateComponentExecutionState<CallActionComponenentExecutionState>(flowState, componentIndex);
-		    callActionComponenentExecutionState->flowState = actionFlowState;
         }
 	}
 }

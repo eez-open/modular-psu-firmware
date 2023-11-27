@@ -155,6 +155,10 @@ scpi_result_t scpi_cmd_debug(scpi_t *context) {
 			return SCPI_RES_OK;
 		} 
 #endif
+        else if (cmd == 35) {
+            SCPI_ResultText(context, "test");
+            return SCPI_RES_OK;
+        }
         else {
             SCPI_ErrorPush(context, SCPI_ERROR_PARAMETER_NOT_ALLOWED);
             return SCPI_RES_ERR;
@@ -249,6 +253,20 @@ scpi_result_t scpi_cmd_debugQ(scpi_t *context) {
             return SCPI_RES_OK;
         } else if (cmd == 104) {
             dumpTrace3(context);
+            return SCPI_RES_OK;
+        } else if (cmd == 105) {
+            int32_t delay;
+            SCPI_ParamInt32(context, &delay, false);
+            osDelay(delay);
+        	char message[128];
+        	snprintf(message, sizeof(message), "delayed %d ms", (int)delay);
+            SCPI_ResultText(context, message);
+            return SCPI_RES_OK;
+        } else if (cmd == 106) {
+            const char *data = "+2.49815724E+01,+2.49797297E+01,+2.49834151E+01,+2.49917072E+01,+2.49953926E+01,+2.49935499E+01,+2.49788084E+01,+2.49714376E+01,+2.50380860E+01,+2.50362433E+01,+2.49705163E+01,+2.49158454E+01,+2.49871005E+01,+2.50009206E+01,+2.49871005E+01,+2.49843364E+01,+2.49871005E+01,+2.50629622E+01,+2.49723590E+01,+2.50344006E+01,+2.50380860E+01,+2.50380860E+01,+2.49843364E+01,+2.49566962E+01,+2.49502468E+01,+2.50095244E+01,+2.50122884E+01,+2.50095244E+01,+2.49957042E+01,+2.49244492E+01,+2.49318199E+01,+2.50021536E+01,+2.49428760E+01,+2.50058390E+01,+2.49484041E+01,+2.50095244E+01,+2.50168951E+01,+2.50159738E+01,+2.49437974E+01,+2.49502468E+01,+2.50150524E+01,+2.50242658E+01,+2.50297939E+01,+2.50316366E+01,+2.49714376E+01,+2.50417714E+01,+2.50918355E+01,+2.50196591E+01,+2.50215018E+01,+2.50215018E+01,+2.50095244E+01,+2.50021536E+01,+2.49864908E+01,+2.49087863E+01,+2.49717493E+01,+2.49717493E+01,+2.49524011E+01,+2.49413450E+01,+2.49358169E+01,+2.49192328E+01,+2.49238395E+01,+2.49109407E+01,+2.48971205E+01,+2.48906711E+01,+2.49536341E+01,+2.49600835E+01,+2.49072553E+01,+2.48470564E+01,+2.49849598E+01,+2.49858811E+01,+2.49904878E+01,+2.49247608E+01,+2.49950945E+01,+2.49219968E+01,+2.49766677E+01,+2.49118620E+01,+2.49646902E+01,+2.49600835E+01,+2.49508701E+01";
+            SCPI_ResultArbitraryBlock(context, data, strlen(data));
+            return SCPI_RES_OK;
+        } else if (cmd == 107) {
             return SCPI_RES_OK;
         } else {
             SCPI_ErrorPush(context, SCPI_ERROR_HARDWARE_MISSING);

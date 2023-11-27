@@ -95,7 +95,7 @@ void executeLoopComponent(FlowState *flowState, unsigned componentIndex) {
     }
 
     bool condition;
-    if (stepValue.getInt() > 0) {
+    if (stepValue.toDouble(nullptr) > 0) {
         condition = op_great(currentValue, loopComponentExecutionState->toValue).toBool();
     } else {
         condition = op_less(currentValue, loopComponentExecutionState->toValue).toBool();

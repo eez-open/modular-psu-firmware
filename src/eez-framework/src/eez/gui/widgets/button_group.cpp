@@ -37,11 +37,7 @@ void drawButtons(const WidgetCursor &widgetCursor, const Style *style, const Sty
 
     if (widgetCursor.w > widgetCursor.h) {
         // horizontal orientation
-        display::setColor(style->backgroundColor);
-        display::fillRect(x, y, x + widgetCursor.w - 1, y + widgetCursor.h - 1);
-
         int w = widgetCursor.w / count;
-        x += (widgetCursor.w - w * count) / 2;
         int h = widgetCursor.h;
         for (Cursor i = 0; i < count; i++) {
             char text[32];
@@ -49,10 +45,14 @@ void drawButtons(const WidgetCursor &widgetCursor, const Style *style, const Sty
                 buttonLabelsArray->values[i].toText(text, 32);
             } else {
                 widgetCursorForLabel.cursor = i;
-                getLabel(widgetCursorForLabel, widgetCursor.widget->data, text, 32);
+                getLabel(widgetCursorForLabel, widgetCursorForLabel.widget->data, text, 32);
             }
-            drawText(text, -1, x, y, w, h, i == selectedButton ? selectedStyle : style);
-            x += w;
+            if (i < count - 1) {
+                drawText(text, -1, x, y, w, h, i == selectedButton ? selectedStyle : style);
+                x += w;
+            } else {
+                drawText(text, -1, x, y, widgetCursor.x + widgetCursor.w - x, h, i == selectedButton ? selectedStyle : style);
+            }
         }
     } else {
         // vertical orientation
@@ -72,8 +72,6 @@ void drawButtons(const WidgetCursor &widgetCursor, const Style *style, const Sty
         int labelHeight = MIN(w, h);
         int yOffset = (h - labelHeight) / 2;
 
-		WidgetCursor widgetCursor;
-
 		for (Cursor i = 0; i < count; i++) {
             if (yOffset > 0) {
                 display::setColor(style->backgroundColor);
@@ -85,7 +83,7 @@ void drawButtons(const WidgetCursor &widgetCursor, const Style *style, const Sty
                 buttonLabelsArray->values[i].toText(text, 32);
             } else {
 			    widgetCursorForLabel.cursor = i;
-                getLabel(widgetCursorForLabel, widgetCursor.widget->data, text, 32);
+                getLabel(widgetCursorForLabel, widgetCursorForLabel.widget->data, text, 32);
             }
             drawText(text, -1, x, y + yOffset, w, labelHeight, i == selectedButton ? selectedStyle: style);
 
@@ -111,7 +109,9 @@ bool ButtonGroupWidgetState::updateState() {
 
     WIDGET_STATE(flags.active, g_isActiveWidget);
     WIDGET_STATE(data, get(widgetCursor, widget->data));
-    WIDGET_STATE(selectedButton, get(widgetCursor, widget->selectedButton));
+    if (widgetCursor.flowState) {
+        WIDGET_STATE(selectedButton, get(widgetCursor, widget->selectedButton));
+    }
 
     WIDGET_STATE_END()
 }
@@ -124,7 +124,7 @@ void ButtonGroupWidgetState::render() {
     const Style* style = getStyle(widget->style);
     const Style* selectedStyle = getStyle(widget->selectedStyle);
 
-    if (data.isArray()) {
+    if (widgetCursor.flowState) {
         auto buttonLabelsArray = data.getArray();
         drawButtons(widgetCursor, style, selectedStyle, selectedButton.getInt(), buttonLabelsArray->arraySize, buttonLabelsArray);
     } else {

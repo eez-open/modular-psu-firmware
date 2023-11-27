@@ -597,11 +597,19 @@ inline Value Value::getValue() const {
     }
     if (type == VALUE_TYPE_ARRAY_ELEMENT_VALUE) {
         auto arrayElementValue = (ArrayElementValue *)refValue;
-        auto array = arrayElementValue->arrayValue.getArray();
-        if (arrayElementValue->elementIndex < 0 || arrayElementValue->elementIndex >= (int)array->arraySize) {
-            return Value();
+        if (arrayElementValue->arrayValue.isBlob()) {
+            auto blobRef = arrayElementValue->arrayValue.getBlob();
+            if (arrayElementValue->elementIndex < 0 || arrayElementValue->elementIndex >= (int)blobRef->len) {
+                return Value();
+            }
+            return Value((uint32_t)blobRef->blob[arrayElementValue->elementIndex], VALUE_TYPE_UINT32);
+        } else {
+            auto array = arrayElementValue->arrayValue.getArray();
+            if (arrayElementValue->elementIndex < 0 || arrayElementValue->elementIndex >= (int)array->arraySize) {
+                return Value();
+            }
+            return array->values[arrayElementValue->elementIndex];
         }
-        return array->values[arrayElementValue->elementIndex];
     }
     return *this;
 }

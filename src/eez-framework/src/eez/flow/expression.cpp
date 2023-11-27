@@ -80,6 +80,23 @@ static void evalExpression(FlowState *flowState, const uint8_t *instructions, in
                         g_stack.push(Value::makeError());
                         g_stack.setErrorMessage("Integer value expected for array element index\n");
                     }
+                } else if (arrayValue.isBlob()) {
+                    auto blobRef = arrayValue.getBlob();
+
+                    int err;
+                    auto elementIndex = elementIndexValue.toInt32(&err);
+                    if (!err) {
+                        if (elementIndex >= 0 && elementIndex < (int)blobRef->len) {
+                            g_stack.push(Value::makeArrayElementRef(arrayValue, elementIndex, 0x132e0e2f));
+                        } else {
+                            g_stack.push(Value::makeError());
+                            g_stack.setErrorMessage("Blob element index out of bounds\n");
+                        }
+                    } else {
+                        g_stack.push(Value::makeError());
+                        g_stack.setErrorMessage("Integer value expected for blob element index\n");
+                    }
+
                 } else {
                     g_stack.push(Value::makeError());
                     g_stack.setErrorMessage("Array value expected\n");

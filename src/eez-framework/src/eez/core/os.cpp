@@ -42,6 +42,10 @@
 #endif
 #endif
 
+#if defined(__EMSCRIPTEN__)
+#include <sys/time.h>
+#endif
+
 #include <eez/core/os.h>
 
 namespace eez {
@@ -49,7 +53,9 @@ namespace eez {
 uint32_t millis() {
 #if defined(EEZ_PLATFORM_STM32)
 	return HAL_GetTick();
-#elif defined(EEZ_PLATFORM_SIMULATOR) || defined(__EMSCRIPTEN__)
+#elif defined(__EMSCRIPTEN__)
+	return (uint32_t)emscripten_get_now();
+#elif defined(EEZ_PLATFORM_SIMULATOR)
 	return osKernelGetTickCount();
 #elif defined(EEZ_PLATFORM_ESP32)
 	return (unsigned long) (esp_timer_get_time() / 1000ULL);

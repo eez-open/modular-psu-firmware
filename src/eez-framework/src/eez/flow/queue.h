@@ -32,6 +32,8 @@ bool addToQueue(FlowState *flowState, unsigned componentIndex,
 bool peekNextTaskFromQueue(FlowState *&flowState, unsigned &componentIndex, bool &continuousTask);
 void removeNextTaskFromQueue();
 
+bool isInQueue(FlowState *flowState, unsigned componentIndex);
+
 bool isThereAnyTaskInQueueForFlowState(FlowState *flowState, bool includingWatchVariable);
 
 } // flow

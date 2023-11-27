@@ -27,6 +27,9 @@ struct BarGraphWidget : public Widget {
     int16_t line1Style;
     int16_t line2Data;
     int16_t line2Style;
+    int16_t min;
+    int16_t max;
+    int16_t refreshRate;
     uint8_t orientation; // BAR_GRAPH_ORIENTATION_...
 };
 
@@ -40,6 +43,10 @@ struct BarGraphWidgetState : public WidgetState {
     Value line1Data;
     Value line2Data;
     Value textData;
+    Value min;
+    Value max;
+    Value refreshRate;
+
     uint32_t textDataRefreshLastTime;
 
     bool updateState() override;

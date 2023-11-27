@@ -388,7 +388,7 @@ void NumericKeypad::getKeypadText(char *text, size_t count) {
 bool NumericKeypad::getText(char *text, size_t count) {
     if (m_state == START) {
         m_startValue.toText(text, count);
-        if (!m_startValue.isFloat() && !m_startValue.isDouble() || m_startValue.unit == UNIT_UNKNOWN) {
+        if ((!m_startValue.isFloat() && !m_startValue.isDouble()) || m_startValue.unit == UNIT_UNKNOWN) {
             appendEditUnit(text, count);
         }
         return false;

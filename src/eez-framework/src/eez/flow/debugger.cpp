@@ -618,7 +618,7 @@ void onComponentExecutionStateChanged(FlowState *flowState, int componentIndex) 
 			MESSAGE_TO_DEBUGGER_COMPONENT_EXECUTION_STATE_CHANGED,
 			(int)flowState->flowStateIndex,
 			componentIndex,
-            flowState->componenentExecutionStates[componentIndex] ? 1 : 0
+            (int)flowState->componenentExecutionStates[componentIndex]
 		);
 
         writeDebuggerBufferHook(buffer, strlen(buffer));

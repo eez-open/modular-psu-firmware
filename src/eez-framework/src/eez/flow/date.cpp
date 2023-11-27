@@ -65,8 +65,8 @@ static struct {
 ////////////////////////////////////////////////////////////////////////////////
 
 Format g_localeFormat = FORMAT_DMY_24;
-int g_timeZone = 100;
-DstRule g_dstRule = DST_RULE_EUROPE;
+int g_timeZone = 0;
+DstRule g_dstRule = DST_RULE_OFF;
 
 //
 // PRIVATE function declarations
@@ -242,17 +242,17 @@ int getMilliseconds(Date time) {
 }
 
 Date utcToLocal(Date utc) {
-    Date local = utc + ((g_timeZone / 100) * 60 + g_timeZone % 100) * 60L;
+    Date local = utc + ((g_timeZone / 100) * 60 + g_timeZone % 100) * 60L * 1000L;
     if (isDst(local, g_dstRule)) {
-        local += SECONDS_PER_HOUR;
+        local += SECONDS_PER_HOUR * 1000L;
     }
     return local;
 }
 
 Date localToUtc(Date local) {
-    Date utc = local - ((g_timeZone / 100) * 60 + g_timeZone % 100) * 60L;
+    Date utc = local - ((g_timeZone / 100) * 60 + g_timeZone % 100) * 60L * 1000L;
     if (isDst(local, g_dstRule)) {
-        utc -= SECONDS_PER_HOUR;
+        utc -= SECONDS_PER_HOUR * 1000L;
     }
     return utc;
 }

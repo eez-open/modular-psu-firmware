@@ -2481,7 +2481,7 @@ enum PagesEnum {
     PAGE_ID_DIB_MUX14D_RELAY_CYCLES = 231
 };
 
-extern const uint8_t assets[315783];
+extern const uint8_t assets[315770];
 
 #elif defined(EEZ_PLATFORM_SIMULATOR)
 
@@ -4746,7 +4746,8 @@ enum ColorsEnum {
 	COLOR_ID_CUSTOM_D5CDBD = 119,
 	COLOR_ID_CUSTOM_A08F6B = 120,
 	COLOR_ID_CUSTOM_F2F0EC = 121,
-	COLOR_ID_CUSTOM_FF040B = 122
+	COLOR_ID_CUSTOM_F2F2F2 = 122,
+	COLOR_ID_CUSTOM_FF040B = 123
 };
 
 enum PagesEnum {
@@ -4996,7 +4997,7 @@ enum PagesEnum {
     PAGE_ID_DIB_MUX14D_RELAY_CYCLES = 243
 };
 
-extern const uint8_t assets[429914];
+extern const uint8_t assets[430175];
 
 #endif
 

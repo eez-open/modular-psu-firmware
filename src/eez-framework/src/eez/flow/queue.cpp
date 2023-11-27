@@ -106,6 +106,26 @@ void removeNextTaskFromQueue() {
     }
 }
 
+bool isInQueue(FlowState *flowState, unsigned componentIndex) {
+	if (g_queueHead == g_queueTail && !g_queueIsFull) {
+		return false;
+	}
+
+    unsigned int it = g_queueHead;
+    while (true) {
+		if (g_queue[it].flowState == flowState && g_queue[it].componentIndex == componentIndex) {
+            return true;
+		}
+
+        it = (it + 1) % QUEUE_SIZE;
+        if (it == g_queueTail) {
+            break;
+        }
+	}
+
+    return false;
+}
+
 bool isThereAnyTaskInQueueForFlowState(FlowState *flowState, bool includingWatchVariable) {
 	if (g_queueHead == g_queueTail && !g_queueIsFull) {
 		return false;

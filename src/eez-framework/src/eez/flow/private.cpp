@@ -35,6 +35,7 @@ using namespace eez::gui;
 #include <eez/flow/flow_defs_v3.h>
 #include <eez/flow/hooks.h>
 #include <eez/flow/components/call_action.h>
+#include <eez/flow/components/on_event.h>
 
 namespace eez {
 namespace flow {
@@ -249,6 +250,14 @@ bool canFreeFlowState(FlowState *flowState, bool includingWatchVariable) {
         }
     }
 
+    auto childFlowState = flowState->firstChild;
+    while (childFlowState != nullptr) {
+        if (!canFreeFlowState(childFlowState, false)) {
+            return false;
+        }
+        childFlowState = childFlowState->nextSibling;
+    }
+
     return true;
 }
 
@@ -295,9 +304,21 @@ void freeFlowState(FlowState *flowState) {
         deallocateComponentExecutionState(flowState, i);
 	}
 
+    freeAllChildrenFlowStates(flowState->firstChild);
+
 	onFlowStateDestroyed(flowState);
 
 	free(flowState);
+}
+
+void freeAllChildrenFlowStates(FlowState *firstChildFlowState) {
+    auto flowState = firstChildFlowState;
+    while (flowState != nullptr) {
+        auto nextFlowState = flowState->nextSibling;
+        freeAllChildrenFlowStates(flowState->firstChild);
+        freeFlowState(flowState);
+        flowState = nextFlowState;
+    }
 }
 
 void deallocateComponentExecutionState(FlowState *flowState, unsigned componentIndex) {
@@ -427,12 +448,35 @@ void assignValue(FlowState *flowState, int componentIndex, Value &dstValue, cons
 		Value *pDstValue;
         if (dstValue.getType() == VALUE_TYPE_ARRAY_ELEMENT_VALUE) {
             auto arrayElementValue = (ArrayElementValue *)dstValue.refValue;
-            auto array = arrayElementValue->arrayValue.getArray();
-            if (arrayElementValue->elementIndex < 0 || arrayElementValue->elementIndex >= (int)array->arraySize) {
-                throwError(flowState, componentIndex, "Can not assign, array element index out of bounds\n");
+            if (arrayElementValue->arrayValue.isBlob()) {
+                auto blobRef = arrayElementValue->arrayValue.getBlob();
+                if (arrayElementValue->elementIndex < 0 || arrayElementValue->elementIndex >= (int)blobRef->len) {
+                    throwError(flowState, componentIndex, "Can not assign, blob element index out of bounds\n");
+                    return;
+                }
+
+                int err;
+                int32_t elementValue = srcValue.toInt32(&err);
+                if (err != 0) {
+                    char errorMessage[100];
+                    snprintf(errorMessage, sizeof(errorMessage), "Can not non-integer to blob");
+                } else if (elementValue < 0 || elementValue > 255) {
+                    char errorMessage[100];
+                    snprintf(errorMessage, sizeof(errorMessage), "Can not assign %d to blob", (int)elementValue);
+                    throwError(flowState, componentIndex, errorMessage);
+                } else {
+                    blobRef->blob[arrayElementValue->elementIndex] = elementValue;
+                    // TODO: onValueChanged
+                }
                 return;
+            } else {
+                auto array = arrayElementValue->arrayValue.getArray();
+                if (arrayElementValue->elementIndex < 0 || arrayElementValue->elementIndex >= (int)array->arraySize) {
+                    throwError(flowState, componentIndex, "Can not assign, array element index out of bounds\n");
+                    return;
+                }
+                pDstValue = &array->values[arrayElementValue->elementIndex];
             }
-            pDstValue = &array->values[arrayElementValue->elementIndex];
         } else {
             pDstValue = dstValue.pValueValue;
         }
@@ -488,18 +532,24 @@ void onEvent(FlowState *flowState, FlowEvent flowEvent, Value eventValue) {
 	for (unsigned componentIndex = 0; componentIndex < flowState->flow->components.count; componentIndex++) {
 		auto component = flowState->flow->components[componentIndex];
 		if (component->type == defs_v3::COMPONENT_TYPE_ON_EVENT_ACTION) {
-            struct OnEventComponent : public Component {
-                uint8_t event;
-            };
             auto onEventComponent = (OnEventComponent *)component;
             if (onEventComponent->event == flowEvent) {
                 flowState->eventValue = eventValue;
-                if (!addToQueue(flowState, componentIndex, -1, -1, -1, false)) {
-                    return;
+
+                if (!isInQueue(flowState, componentIndex)) {
+                    if (!addToQueue(flowState, componentIndex, -1, -1, -1, false)) {
+                        return;
+                    }
                 }
             }
 		}
 	}
+
+    if (flowEvent == FLOW_EVENT_KEYDOWN) {
+        for (auto childFlowState = flowState->firstChild; childFlowState != nullptr; childFlowState = childFlowState->nextSibling) {
+            onEvent(childFlowState, flowEvent, eventValue);
+        }
+    }
 }
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -517,6 +567,12 @@ bool findCatchErrorComponent(FlowState *flowState, FlowState *&catchErrorFlowSta
 			return true;
 		}
 	}
+
+    if (flowState->parentFlowState && flowState->parentComponent && flowState->parentComponent->errorCatchOutput != -1) {
+        catchErrorFlowState = flowState->parentFlowState;
+        catchErrorComponentIndex = flowState->parentComponentIndex;
+        return true;
+    }
 
     return findCatchErrorComponent(flowState->parentFlowState, catchErrorFlowState, catchErrorComponentIndex);
 }
@@ -553,13 +609,24 @@ void throwError(FlowState *flowState, int componentIndex, const char *errorMessa
                 fs->error = true;
             }
 
-			auto catchErrorComponentExecutionState = allocateComponentExecutionState<CatchErrorComponenentExecutionState>(catchErrorFlowState, catchErrorComponentIndex);
-			catchErrorComponentExecutionState->message = Value::makeStringRef(errorMessage, strlen(errorMessage), 0x9473eef2);
+            auto component = catchErrorFlowState->flow->components[catchErrorComponentIndex];
 
-			if (!addToQueue(catchErrorFlowState, catchErrorComponentIndex, -1, -1, -1, false)) {
-			    onFlowError(flowState, componentIndex, errorMessage);
-				stopScriptHook();
-			}
+            if (component->type == defs_v3::COMPONENT_TYPE_CATCH_ERROR_ACTION) {
+                auto catchErrorComponentExecutionState = allocateComponentExecutionState<CatchErrorComponenentExecutionState>(catchErrorFlowState, catchErrorComponentIndex);
+                catchErrorComponentExecutionState->message = Value::makeStringRef(errorMessage, strlen(errorMessage), 0x9473eef2);
+
+                if (!addToQueue(catchErrorFlowState, catchErrorComponentIndex, -1, -1, -1, false)) {
+                    onFlowError(flowState, componentIndex, errorMessage);
+                    stopScriptHook();
+                }
+            } else {
+                propagateValue(
+                    catchErrorFlowState,
+                    catchErrorComponentIndex,
+                    component->errorCatchOutput,
+                    Value::makeStringRef(errorMessage, strlen(errorMessage), 0x9473eef3)
+                );
+            }
 		} else {
 			onFlowError(flowState, componentIndex, errorMessage);
 			stopScriptHook();

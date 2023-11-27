@@ -30,17 +30,10 @@
 #include <eez/flow/expression.h>
 #include <eez/flow/debugger.h>
 
+#include <eez/flow/components/sort_array.h>
+
 namespace eez {
 namespace flow {
-
-#define SORT_ARRAY_FLAG_ASCENDING   (1 << 0)
-#define SORT_ARRAY_FLAG_IGNORE_CASE (1 << 1)
-
-struct SortArrayActionComponent : public Component {
-    int32_t arrayType;
-    int32_t structFieldIndex;
-    uint32_t flags;
-};
 
 SortArrayActionComponent *g_sortArrayActionComponent;
 
@@ -98,6 +91,12 @@ int elementCompare(const void *a, const void *b) {
     return result;
 }
 
+void sortArray(SortArrayActionComponent *component, ArrayValue *array) {
+    g_sortArrayActionComponent = component;
+    qsort(&array->values[0], array->arraySize, sizeof(Value), elementCompare);
+
+}
+
 void executeSortArrayComponent(FlowState *flowState, unsigned componentIndex) {
     auto component = (SortArrayActionComponent *)flowState->flow->components[componentIndex];
 
@@ -130,8 +129,7 @@ void executeSortArrayComponent(FlowState *flowState, unsigned componentIndex) {
         }
     }
 
-    g_sortArrayActionComponent = component;
-    qsort(&array->values[0], array->arraySize, sizeof(Value), elementCompare);
+    sortArray(component, array);
 
 	propagateValue(flowState, componentIndex, component->outputs.count - 1, arrayValue);
 }

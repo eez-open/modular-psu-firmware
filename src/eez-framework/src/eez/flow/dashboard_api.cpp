@@ -54,9 +54,8 @@ struct DashboardComponentExecutionState : public ComponenentExecutionState {
     ~DashboardComponentExecutionState() {
 		EM_ASM({
             freeComponentExecutionState($0, $1);
-        }, g_wasmModuleId, state);
+        }, g_wasmModuleId, this);
     }
-	int32_t state;
 };
 
 } // flow
@@ -171,32 +170,39 @@ EM_PORT_API(int) getFlowIndex(int flowStateIndex) {
     return flowState->flowIndex;
 }
 
-EM_PORT_API(int) getComponentExecutionState(int flowStateIndex, int componentIndex) {
+EM_PORT_API(void *) getComponentExecutionState(int flowStateIndex, int componentIndex) {
     auto flowState = getFlowStateFromFlowStateIndex(flowStateIndex);
     auto component = flowState->flow->components[componentIndex];
     auto executionState = (DashboardComponentExecutionState *)flowState->componenentExecutionStates[componentIndex];
     if (executionState) {
-        return executionState->state;
+        return executionState;
     }
-    return -1;
+    return nullptr;
 }
 
-EM_PORT_API(void) setComponentExecutionState(int flowStateIndex, int componentIndex, int state) {
+EM_PORT_API(void *) allocateDashboardComponentExecutionState(int flowStateIndex, int componentIndex) {
     auto flowState = getFlowStateFromFlowStateIndex(flowStateIndex);
     auto component = flowState->flow->components[componentIndex];
     auto executionState = (DashboardComponentExecutionState *)flowState->componenentExecutionStates[componentIndex];
     if (executionState) {
-        if (state != -1) {
-            executionState->state = state;
-        } else {
-            deallocateComponentExecutionState(flowState, componentIndex);
-        }
-    } else {
-        if (state != -1) {
-            executionState = allocateComponentExecutionState<DashboardComponentExecutionState>(flowState, componentIndex);
-            executionState->state = state;
-        }
+        return executionState;
     }
+    return allocateComponentExecutionState<DashboardComponentExecutionState>(flowState, componentIndex);
+}
+
+EM_PORT_API(void) deallocateDashboardComponentExecutionState(int flowStateIndex, int componentIndex, int state) {
+    auto flowState = getFlowStateFromFlowStateIndex(flowStateIndex);
+    auto component = flowState->flow->components[componentIndex];
+    auto executionState = (DashboardComponentExecutionState *)flowState->componenentExecutionStates[componentIndex];
+    if (executionState) {
+        deallocateComponentExecutionState(flowState, componentIndex);
+    }
+}
+
+EM_PORT_API(uint32_t) getUint8Param(int flowStateIndex, int componentIndex, int offset) {
+    auto flowState = getFlowStateFromFlowStateIndex(flowStateIndex);
+    auto component = flowState->flow->components[componentIndex];
+    return *(const uint8_t *)((const uint8_t *)component + sizeof(Component) + offset);
 }
 
 EM_PORT_API(uint32_t) getUint32Param(int flowStateIndex, int componentIndex, int offset) {
@@ -204,7 +210,6 @@ EM_PORT_API(uint32_t) getUint32Param(int flowStateIndex, int componentIndex, int
     auto component = flowState->flow->components[componentIndex];
     return *(const uint32_t *)((const uint8_t *)component + sizeof(Component) + offset);
 }
-
 
 EM_PORT_API(const char *) getStringParam(int flowStateIndex, int componentIndex, int offset) {
     auto flowState = getFlowStateFromFlowStateIndex(flowStateIndex);

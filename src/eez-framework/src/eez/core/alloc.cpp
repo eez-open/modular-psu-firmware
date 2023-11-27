@@ -61,6 +61,29 @@ void getAllocInfo(uint32_t &free, uint32_t &alloc) {
 	alloc = mon.total_size - mon.free_size;
 }
 
+#elif 0 && defined(__EMSCRIPTEN__)
+
+void initAllocHeap(uint8_t *heap, size_t heapSize) {
+}
+
+void *alloc(size_t size, uint32_t id) {
+    return ::malloc(size);
+}
+
+void free(void *ptr) {
+    ::free(ptr);
+}
+
+template<typename T> void freeObject(T *ptr) {
+	ptr->~T();
+	::free(ptr);
+}
+
+void getAllocInfo(uint32_t &free, uint32_t &alloc) {
+	free = 0;
+	alloc = 0;
+}
+
 #else
 
 static const size_t ALIGNMENT = 64;

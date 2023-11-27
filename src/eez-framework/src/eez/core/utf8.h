@@ -38,6 +38,12 @@ inline const utf8_int8_t* utf8codepoint(const utf8_int8_t *str, utf8_int32_t *ou
     return str + 1;
 }
 
+inline utf8_int8_t *utf8catcodepoint(utf8_int8_t *str, utf8_int32_t chr, size_t n) {
+    if (n < 1) return nullptr;
+    str[0] = (char)chr;
+    return str + 1;
+}
+
 #define utf8len strlen
 #define utf8cmp strcmp
 

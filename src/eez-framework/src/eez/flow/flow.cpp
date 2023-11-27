@@ -71,6 +71,7 @@ unsigned start(Assets *assets) {
 	}
 
     g_isStopped = false;
+    g_isStopping = false;
 
 	queueReset();
 
@@ -147,16 +148,6 @@ void tick() {
 	}
 
 	finishToDebuggerMessageHook();
-}
-
-void freeAllChildrenFlowStates(FlowState *firstChildFlowState) {
-    auto flowState = firstChildFlowState;
-    while (flowState != nullptr) {
-        auto nextFlowState = flowState->nextSibling;
-        freeAllChildrenFlowStates(flowState->firstChild);
-        freeFlowState(flowState);
-        flowState = nextFlowState;
-    }
 }
 
 void stop() {
@@ -504,8 +495,15 @@ void onArrayValueFree(ArrayValue *arrayValue) {
         onFreeMQTTConnection(arrayValue);
     }
 
+    const uint32_t CATEGORY_SHIFT = 13;
+    const uint32_t CATEGORY_MASK = 0x7;
+    const uint32_t CATEGORY_OBJECT = 5;
+
     if (eez::flow::onArrayValueFreeHook) {
-        eez::flow::onArrayValueFreeHook(arrayValue);
+        if (((arrayValue->arrayType >> CATEGORY_SHIFT) & CATEGORY_MASK) == CATEGORY_OBJECT) {
+            // call only for object types
+            eez::flow::onArrayValueFreeHook(arrayValue);
+        }
     }
 }
 

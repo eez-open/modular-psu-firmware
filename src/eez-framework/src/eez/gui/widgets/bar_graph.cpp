@@ -40,7 +40,7 @@ namespace gui {
 #define BAR_GRAPH_DO_NOT_DISPLAY_VALUE (1 << 4)
 
 int calcValuePosInBarGraphWidget(Value &value, float min, float max, int d) {
-    return (int)roundf((value.getFloat() - min) * d / (max - min));
+    return (int)roundf((value.toFloat() - min) * d / (max - min));
 }
 
 int calcValuePosInBarGraphWidgetWithClamp(Value &value, float min, float max, int d) {
@@ -85,14 +85,21 @@ bool BarGraphWidgetState::updateState() {
     WIDGET_STATE(line1Data, get(widgetCursor, widget->line1Data));
     WIDGET_STATE(line2Data, get(widgetCursor, widget->line2Data));
 
+    if (widgetCursor.flowState) {
+        WIDGET_STATE(min, get(widgetCursor, widget->min));
+        WIDGET_STATE(max, get(widgetCursor, widget->max));
+        WIDGET_STATE(refreshRate, get(widgetCursor, widget->refreshRate));
+    }
+
     bool refreshTextData = true;
     auto currentTime = millis();
-    if (hasPreviousState && textData != data) {
-        uint32_t refreshRate = getTextRefreshRate(widgetCursor, widget->data);
-        if (refreshRate != 0 && currentTime - textDataRefreshLastTime < refreshRate) {
+    if (!textData.isUndefinedOrNull() || textData != data) {
+        uint32_t refreshRateMs = widgetCursor.flowState ? refreshRate.toInt32(nullptr) : getTextRefreshRate(widgetCursor, widget->data);
+        if (refreshRateMs != 0 && currentTime - textDataRefreshLastTime < refreshRateMs) {
             refreshTextData = false;
         }
     }
+
     if (refreshTextData) {
         WIDGET_STATE(textData, data);
         textDataRefreshLastTime = currentTime;
@@ -112,14 +119,21 @@ void BarGraphWidgetState::render() {
     const int w = widgetCursor.w;
     const int h = widgetCursor.h;
 
-    float min = getMin(widgetCursor, widget->data).getFloat();
-
+    float min;
     float max;
-    Value displayValueRange = getDisplayValueRange(widgetCursor, widget->data);
-    if (displayValueRange.getType() == VALUE_TYPE_FLOAT) {
-        max = displayValueRange.getFloat();
+
+    if (widgetCursor.flowState) {
+        min = this->min.toFloat(nullptr);
+        max = this->max.toFloat(nullptr);
     } else {
-        max = getMax(widgetCursor, widget->data).getFloat();
+        min = getMin(widgetCursor, widget->data).getFloat();
+
+        Value displayValueRange = getDisplayValueRange(widgetCursor, widget->data);
+        if (displayValueRange.getType() == VALUE_TYPE_FLOAT) {
+            max = displayValueRange.getFloat();
+        } else {
+            max = getMax(widgetCursor, widget->data).getFloat();
+        }
     }
 
     bool horizontal =

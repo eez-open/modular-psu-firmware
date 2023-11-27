@@ -269,7 +269,7 @@ size_t File::write(const void *buf, size_t size) {
         CHUNK_SIZE = 512;
 
         unalignedLength = MIN(4 - unalignedLength, size);
-		uint8_t unalignedBuffer[4] __attribute__((aligned));
+		uint8_t unalignedBuffer[4] __attribute__((aligned)) = { 0, 0, 0, 0};
 		for (size_t i = 0; i < unalignedLength; i++) {
 			unalignedBuffer[i] = ((uint8_t *)buf)[i];
 		}

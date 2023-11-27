@@ -24,6 +24,7 @@ namespace eez {
 namespace gui {
 
 struct DisplayDataWidget : public Widget {
+    int16_t refreshRate;
     uint8_t displayOption;
 };
 
