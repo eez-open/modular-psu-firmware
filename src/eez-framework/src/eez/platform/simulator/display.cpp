@@ -82,7 +82,7 @@ void initDriver() {
     }
 
     // Create window
-    g_mainWindow = SDL_CreateWindow(TITLE, SDL_WINDOWPOS_CENTERED, SDL_WINDOWPOS_CENTERED, DISPLAY_WIDTH, DISPLAY_HEIGHT, SDL_WINDOW_HIDDEN | SDL_WINDOW_BORDERLESS);
+    g_mainWindow = SDL_CreateWindow(TITLE, SDL_WINDOWPOS_CENTERED, SDL_WINDOWPOS_CENTERED, 800, 480, SDL_WINDOW_HIDDEN | SDL_WINDOW_BORDERLESS);
 
     if (g_mainWindow == NULL) {
         printf("Window could not be created! SDL Error: %s\n", SDL_GetError());
@@ -134,12 +134,12 @@ void syncBuffer() {
     }
 
     SDL_Surface *rgbSurface = SDL_CreateRGBSurfaceFrom(
-        (uint32_t *)g_syncedBuffer, DISPLAY_WIDTH, DISPLAY_HEIGHT, 32, 4 * DISPLAY_WIDTH, 0x000000FF, 0x0000FF00, 0x00FF0000, 0xFF000000);
+        (uint32_t *)g_syncedBuffer, 800, 480, 32, 4 * DISPLAY_WIDTH, 0x000000FF, 0x0000FF00, 0x00FF0000, 0xFF000000);
     if (rgbSurface != NULL) {
         SDL_Texture *texture = SDL_CreateTextureFromSurface(g_renderer, rgbSurface);
         if (texture != NULL) {
             SDL_Rect srcRect = { 0, 0, (int)DISPLAY_WIDTH, (int)DISPLAY_HEIGHT };
-            SDL_Rect dstRect = { 0, 0, (int)DISPLAY_WIDTH, (int)DISPLAY_HEIGHT };
+            SDL_Rect dstRect = { 0, 0, (int)800, (int)480 };
 
             SDL_RenderCopyEx(g_renderer, texture, &srcRect, &dstRect, 0.0, NULL, SDL_FLIP_NONE);
 

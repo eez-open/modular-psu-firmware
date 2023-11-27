@@ -80,7 +80,11 @@ void readEvents() {
         }
     }
 
-    SDL_GetMouseState(&g_mouseX, &g_mouseY);
+    int mouseX, mouseY;
+    SDL_GetMouseState(&mouseX, &mouseY);
+    
+    g_mouseX = mouseX * 480 / 800;
+    g_mouseY = mouseY * 272 / 480;
 
     // for web simulator
     if (yMouseWheel >= 100 || yMouseWheel <= -100) {
