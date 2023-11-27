@@ -82,7 +82,7 @@ void initDriver() {
     }
 
     // Create window
-    g_mainWindow = SDL_CreateWindow(TITLE, SDL_WINDOWPOS_CENTERED, SDL_WINDOWPOS_CENTERED, 800, 480, SDL_WINDOW_HIDDEN | SDL_WINDOW_BORDERLESS);
+    g_mainWindow = SDL_CreateWindow(TITLE, SDL_WINDOWPOS_CENTERED, SDL_WINDOWPOS_CENTERED, 800, 480, SDL_WINDOW_HIDDEN | SDL_WINDOW_BORDERLESS | SDL_WINDOW_FULLSCREEN_DESKTOP);
 
     if (g_mainWindow == NULL) {
         printf("Window could not be created! SDL Error: %s\n", SDL_GetError());
