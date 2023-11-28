@@ -53,8 +53,10 @@ int FrontPanelAppContext::getLongTouchActionHook(const WidgetCursor &widgetCurso
 
 void FrontPanelAppContext::onPageTouch(const WidgetCursor &foundWidget, Event &touchEvent) {
     if (psu::gui::g_psuAppContext.getActivePageId() == PAGE_ID_NONE || psu::gui::g_psuAppContext.getActivePageId() == PAGE_ID_STANDBY) {
-        // wake up
-        psu::changePowerState(true);
+        if (touchEvent.type == EVENT_TYPE_LONG_TOUCH) {
+            // wake up
+            psu::changePowerState(true);
+        }
     }
 
     AppContext::onPageTouch(foundWidget, touchEvent);
